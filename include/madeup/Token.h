@@ -1,0 +1,87 @@
+#ifndef TOKEN_H
+#define TOKEN_H
+
+#include "madeup/SourceLocation.h"
+
+namespace madeup {
+
+/* ------------------------------------------------------------------------- */
+
+class Token {
+  public:
+    enum token_t {
+      LEFT_PARENTHESIS,
+      RIGHT_PARENTHESIS,
+      COLON,
+      CIRCUMFLEX,
+      ID,
+      LEFT_BRACKET,
+      RIGHT_BRACKET,
+      PLUS,
+      MINUS,
+      TIMES,
+      DIVIDE,
+      DOUBLE_DIVIDE,
+      INTEGER,
+      REAL,
+      STRING,
+      COMMA,
+      DOT,
+      LESS_THAN,
+      LESS_THAN_OR_EQUAL_TO,
+      GREATER_THAN,
+      GREATER_THAN_OR_EQUAL_TO,
+      EQUAL_TO,
+      NOT_EQUAL_TO,
+      REMAINDER,
+      ASSIGN,
+      PIPE,
+      RANGE,
+      NEWLINE,
+      AND,
+      BY,
+      ELSE,
+      END,
+      FALSE,
+      FOR,
+      IF,
+      IN,
+      NOT,
+      OF,
+      OR,
+      REPEAT,
+      THEN,
+      THROUGH,
+      TO,
+      TRUE,
+      WHILE,
+      END_OF_FILE
+    };
+
+    Token(token_t type,
+          const std::string &text,
+          int start_row,
+          int start_column,
+          int end_row,
+          int end_column);
+
+    token_t getType() const;
+    const std::string getText() const;
+    const SourceLocation &getLocation() const;
+    const std::string getTypeString() const;
+
+  private:
+    token_t type; 
+    std::string text;
+    SourceLocation location;
+};
+
+/* ------------------------------------------------------------------------- */
+
+std::ostream &operator<<(std::ostream &out, const Token &token);
+
+/* ------------------------------------------------------------------------- */
+
+}
+
+#endif
