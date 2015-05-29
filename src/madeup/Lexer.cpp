@@ -129,7 +129,7 @@ Token Lexer::getToken() {
   }
 
   std::stringstream ss;
-  ss << start_row << "(" << start_column << "-" << end_column << "): I found a character that I didn't recognize: " << (char) c << ".";
+  ss << start_row << "(" << start_column << "-" << end_column << "): I found a character that I didn't recognize: " << (isprint(c) ? (char) c : (int) c) << ".";
   throw MessagedException(ss.str());
 }
 

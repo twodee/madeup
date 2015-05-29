@@ -254,13 +254,109 @@ void Parser::expressionLevel5() {
 /* ------------------------------------------------------------------------- */
 
 void Parser::expressionLevel6() {
-  atom();
+  expressionLevel7();
   while (isUp(Token::CIRCUMFLEX)) {
     ++i;
-    atom();
+    expressionLevel7();
     Co<Expression> b = popExpression();
     Co<Expression> a = popExpression();
     expressions.push(Co<Expression>(new ExpressionPower(a, b)));
+  }
+}
+
+/* ------------------------------------------------------------------------- */
+
+void Parser::expressionLevel7() {
+  expressionLevel8();
+  if (isUp(Token::BY) || isUp(Token::OF)) {
+    std::stack<Co<Expression> > dimensions;
+    dimensions.push(popExpression());
+
+    while (isUp(Token::BY)) {
+      ++i;
+      expressionLevel8();
+      dimensions.push(popExpression());
+    }
+
+    if (isUp(Token::OF)) {
+      ++i;
+      expressionLevel8();
+      Co<Expression> fill = popExpression();
+      do {
+        Co<Expression> dimension = dimensions.top();
+        dimensions.pop();
+        fill = Co<Expression>(new ExpressionArrayConstructor(fill, dimension));
+      } while (dimensions.size() > 0);
+      expressions.push(fill);
+    } else {
+      throw MessagedException("mssing of");
+    }
+  }
+}
+
+/* ------------------------------------------------------------------------- */
+
+void Parser::expressionLevel8() {
+  if (isUp(Token::NOT)) {
+    ++i;
+    expressionLevel8();
+    Co<Expression> e = popExpression();
+    expressions.push(Co<Expression>(new ExpressionNot(e)));
+  } else if (isUp(Token::MINUS)) {
+    ++i;
+    expressionLevel8();
+    Co<Expression> e = popExpression();
+    expressions.push(Co<Expression>(new ExpressionNegation(e)));
+  } else {
+    expressionLevel9();
+  }
+}
+
+/* ------------------------------------------------------------------------- */
+
+void Parser::expressionLevel9() {
+  atom();
+  while (isUp(Token::LEFT_BRACKET) || isUp(Token::DOT)) {
+    if (isUp(Token::DOT)) {
+      ++i;
+      if (isUp(Token::ID) && tokens[i].getText() == "length") {
+        std::string name = tokens[i].getText();
+        ++i;
+        expressions.push(Co<Expression>(new ExpressionArrayLength(popExpression())));
+      } else {
+        throw MessagedException("not legal after .");
+      }
+    } else { 
+      ++i;
+      expressionLevel0();
+      if (isUp(Token::RIGHT_BRACKET)) {
+        ++i;
+        Co<Expression> b = popExpression();
+        Co<Expression> a = popExpression();
+        if (isUp(Token::ASSIGN)) {
+          ++i;
+          Co<Expression> rhs;
+          if (isUp(Token::NEWLINE)) {
+            ++i;
+            block();
+            rhs = popBlock();
+            if (isUp(Token::END)) {
+              ++i;
+            } else {
+              throw MessagedException("missing end");
+            }
+          } else {
+            expressionLevel0();
+            rhs = popExpression();
+          }
+          expressions.push(Co<Expression>(new ExpressionDefineArrayElement(a, b, rhs)));
+        } else {
+          expressions.push(Co<Expression>(new ExpressionArraySubscript(a, b)));
+        }
+      } else {
+        throw MessagedException("missing ]");
+      }
+    }
   }
 }
 
@@ -302,16 +398,6 @@ void Parser::atom() {
   } else if (isUp(Token::STRING)) {
     expressions.push(Co<Expression>(new ExpressionString(tokens[i].getText())));
     ++i;
-  } else if (isUp(Token::NOT)) {
-    ++i;
-    expressionLevel0();
-    Co<Expression> e = popExpression();
-    expressions.push(Co<Expression>(new ExpressionNot(e)));
-  } else if (isUp(Token::MINUS)) {
-    ++i;
-    expressionLevel0();
-    Co<Expression> e = popExpression();
-    expressions.push(Co<Expression>(new ExpressionNegation(e)));
   } else if (isUp(Token::REPEAT)) {
     ++i;
     expressionLevel0();
@@ -411,17 +497,17 @@ void Parser::atom() {
         formals.push_back(tokens[i].getText());
         ++i;
       }
-      Co<Expression> body;
+      Co<Expression> rhs;
       if (isUp(Token::ASSIGN)) {
         ++i;
         expressionLevel0();
-        body = popExpression();
+        rhs = popExpression();
       } else if (isUp(Token::NEWLINE)) {
         ++i;
         block();
         if (isUp(Token::END)) {
           ++i;
-          body = popBlock();
+          rhs = popBlock();
         } else {
           throw MessagedException("missing end");
         }
@@ -429,7 +515,7 @@ void Parser::atom() {
         throw MessagedException("unexpected after func declare");
       }
 
-      Co<ExpressionDefine> define(new ExpressionDefine(name, body));
+      Co<ExpressionDefine> define(new ExpressionDefine(name, rhs));
       for (std::vector<std::string>::const_iterator formal = formals.begin(); formal != formals.end(); ++formal) {
         define->AddFormal(*formal);
       }
@@ -440,33 +526,44 @@ void Parser::atom() {
   } else if (isUp(Token::ID) && isUp(Token::ASSIGN, 2)) {
     std::string name = tokens[i].getText();
     i += 2;
-    Co<Expression> body;
+    Co<Expression> rhs;
     if (isUp(Token::NEWLINE)) {
       ++i;
       block();
       if (isUp(Token::END)) {
-        body = popBlock();
+        rhs = popBlock();
       } else {
         throw MessagedException("expecting end after assignment");
       }
     } else {
       expressionLevel0();
-      body = popExpression();
+      rhs = popExpression();
     }
 
     Co<ExpressionDefineVariable> define;
     if (name == "seed") {
-      define = Co<ExpressionDefineVariable>(new ExpressionDefineVariableSeed(name.c_str(), body));
+      define = Co<ExpressionDefineVariable>(new ExpressionDefineVariableSeed(name.c_str(), rhs));
     } else {
-      define = Co<ExpressionDefineVariable>(new ExpressionDefineVariable(name.c_str(), body));
+      define = Co<ExpressionDefineVariable>(new ExpressionDefineVariable(name.c_str(), rhs));
     }
     expressions.push(define);
   } else if (isUp(Token::ID)) {
     std::string name = tokens[i].getText();
     ++i;
     if (isUp(Token::ID) && isUp(Token::COLON, 2)) {
-      // grab
-      i += 2;
+      /* std::cout << "name" << std::endl; */
+      Co<ExpressionCallWithNamedParameters> call(new ExpressionCallWithNamedParameters(name));
+      while (isUp(Token::ID) && isUp(Token::COLON, 2)) {
+        std::string formal = tokens[i].getText();
+        /* std::cout << "formal: " << formal << std::endl; */
+        i += 2;
+        expressionLevel0();
+        Co<Expression> actual = popExpression();
+        /* std::cout << "actual: " << actual << std::endl; */
+        call->AddParameter(formal, actual);
+      }
+      expressions.push(call);
+      /* std::cout << "call: " << call << std::endl; */
     } else {
       Co<ExpressionCall> call(new ExpressionCall(name));
       if (isInExpressionFirst()) {

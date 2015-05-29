@@ -1,5 +1,5 @@
 add_library(twodee
-  SHARED
+  STATIC
   Camera.cpp
   FieldTraits.cpp
   Log.cpp

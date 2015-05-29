@@ -27,6 +27,9 @@ class Parser {
     void expressionLevel4();
     void expressionLevel5();
     void expressionLevel6();
+    void expressionLevel7();
+    void expressionLevel8();
+    void expressionLevel9();
     void atom();
 
   private:

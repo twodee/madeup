@@ -1,15 +1,28 @@
 cmake_minimum_required(VERSION 2.6)
 project(madeup)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+option(USE_DEBUG "Enable debug information" ON)
 
-# if(CMAKE_COMPILER_IS_GNUCXX) 
-  message("compiling with flags")
+if(APPLE)
+  set(WWW_ROOT "/Library/WebServer/Documents" CACHE STRING "Directory in which to install web resources")
+  set(CMAKE_MACOSX_RPATH ON)
+elseif(UNIX)
+  set(WWW_ROOT "/var/www/madeup" CACHE STRING "Directory in which to install web resources")
+endif()
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
+if(USE_DEBUG AND CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   set(CMAKE_C_FLAGS "-g -pedantic -Wall -std=c99")
   set(CMAKE_CXX_FLAGS "-g -pedantic -Wall -std=c++11")
-# endif(CMAKE_COMPILER_IS_GNUCXX) 
+endif()
 
 add_subdirectory(src/twodee)
 add_subdirectory(src/madeup)
 add_subdirectory(src)
+
+add_custom_target(www
+  COMMAND make WWW_ROOT=${WWW_ROOT} MADEUP=$<TARGET_FILE:madeup> TWODEE=$<TARGET_FILE:twodee> MERP=$<TARGET_FILE:merp>
+  DEPENDS madeup twodee merp
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/www)

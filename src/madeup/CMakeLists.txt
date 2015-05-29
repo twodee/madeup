@@ -1,5 +1,5 @@
 add_library(madeup
-  SHARED
+  STATIC
   Environment.cpp
   Expression.cpp
   ExpressionClosure.cpp
