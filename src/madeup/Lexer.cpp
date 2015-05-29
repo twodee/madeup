@@ -38,6 +38,13 @@ const std::vector<Token> &Lexer::lex() {
     isEOF = token.getType() == Token::END_OF_FILE;
   } while (!isEOF);
 
+  if (tokens.size() == 1 || tokens[tokens.size() - 2].getType() != Token::NEWLINE) {
+    Token eof = tokens.back();
+    tokens.pop_back();
+    tokens.push_back(Token(Token::NEWLINE, "\n", -1, -1, -1, -1));
+    tokens.push_back(eof);
+  }
+
   return tokens;
 }
 
@@ -51,6 +58,7 @@ Token Lexer::makeToken(Token::token_t type) {
 
 Token Lexer::getToken() {
   text_so_far = "";
+
   
   /* std::cout << "start_row: " << start_row << std::endl; */
   /* std::cout << "start_column: " << start_column << std::endl; */
@@ -72,7 +80,7 @@ Token Lexer::getToken() {
 
   end_column = start_column;
 
-  if (in.eof()) {
+  if (c == EOF) {
     return makeToken(Token::END_OF_FILE);
   } else {
     text_so_far += (char) c;
@@ -126,11 +134,11 @@ Token Lexer::getToken() {
     return getTokenAfterLetter();
   } else if (isdigit(c)) {
     return getTokenAfterDigit();
+  } else {
+    std::stringstream ss;
+    ss << start_row << "(" << start_column << "-" << end_column << "): I found a character that I didn't recognize: " << (isprint(c) ? (char) c : (int) c) << ".";
+    throw MessagedException(ss.str());
   }
-
-  std::stringstream ss;
-  ss << start_row << "(" << start_column << "-" << end_column << "): I found a character that I didn't recognize: " << (isprint(c) ? (char) c : (int) c) << ".";
-  throw MessagedException(ss.str());
 }
 
 /* ------------------------------------------------------------------------- */
@@ -171,7 +179,7 @@ Token Lexer::getTokenAfterMinus() {
     do {
       ++end_column;
       c = in.get();
-    } while (!in.eof() && c != '\n');
+    } while (c != EOF && c != '\n');
     in.putback(c);
     return getToken();
   } else if (isdigit(c)) {
@@ -192,7 +200,7 @@ Token Lexer::getTokenAfterQuote() {
   int c = in.get();
   ++end_column;
 
-  while (!in.eof() && c != '"' && c != '\n') {
+  while (c != EOF && c != '"' && c != '\n') {
     text_so_far += (char) c;
     c = in.get();
     ++end_column;
@@ -214,7 +222,7 @@ Token Lexer::getTokenAfterQuote() {
 Token Lexer::getTokenAfterLetter() {
   int c = in.get();
 
-  while (!in.eof() && (isalpha(c) || isdigit(c))) {
+  while (c != EOF && (isalpha(c) || isdigit(c))) {
     ++end_column;
     text_so_far += (char) c;
     c = in.get();
@@ -266,7 +274,7 @@ Token Lexer::getTokenAfterDigit() {
   int c = in.get();
   ++end_column;
 
-  while (!in.eof() && isdigit(c)) {
+  while (c != EOF && isdigit(c)) {
     text_so_far += (char) c;
     c = in.get();
     ++end_column;
@@ -278,7 +286,7 @@ Token Lexer::getTokenAfterDigit() {
     throw MessagedException(ss.str());
   }
 
-  if (in.eof() || c != '.' || (c == '.' && in.peek() == '.')) {
+  if (c == EOF || c != '.' || (c == '.' && in.peek() == '.')) {
     in.putback(c);
     --end_column;
     return makeToken(Token::INTEGER);
@@ -296,7 +304,7 @@ Token Lexer::getTokenAfterDigit() {
       throw MessagedException(ss.str());
     }
    
-    while (!in.eof() && isdigit(c)) {
+    while (c != EOF && isdigit(c)) {
       text_so_far += (char) c;
       c = in.get();
       ++end_column;
