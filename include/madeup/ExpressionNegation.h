@@ -28,9 +28,9 @@ class ExpressionNegation : public Expression {
         return Co<Expression>(new ExpressionInteger(-lint->GetInteger()));
       }
       
-      ExpressionDecimal *ldecimal = dynamic_cast<ExpressionDecimal *>(lvalue.GetPointer());
+      ExpressionReal *ldecimal = dynamic_cast<ExpressionReal *>(lvalue.GetPointer());
       if (ldecimal) {
-        return Co<Expression>(new ExpressionDecimal(-ldecimal->GetDecimal()));
+        return Co<Expression>(new ExpressionReal(-ldecimal->GetReal()));
       }
 
       throw MessagedException(left->GetSourceLocation() + ": Operator not expects a numeric operand. " + left->GetSource() + " is not numeric.");

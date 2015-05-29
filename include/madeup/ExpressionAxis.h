@@ -36,9 +36,9 @@ class ExpressionAxis : public Expression {
       Co<Expression> z_value = z->Evaluate(env);
 
       double xd;
-      ExpressionDecimal *x_double = dynamic_cast<ExpressionDecimal *>(x_value.GetPointer());
+      ExpressionReal *x_double = dynamic_cast<ExpressionReal *>(x_value.GetPointer());
       if (x_double) {
-        xd = x_double->GetDecimal();
+        xd = x_double->GetReal();
       } else {
         ExpressionInteger *x_int = dynamic_cast<ExpressionInteger *>(x_value.GetPointer());
         if (x_int) {
@@ -49,9 +49,9 @@ class ExpressionAxis : public Expression {
       }
 
       double yd;
-      ExpressionDecimal *y_double = dynamic_cast<ExpressionDecimal *>(y_value.GetPointer());
+      ExpressionReal *y_double = dynamic_cast<ExpressionReal *>(y_value.GetPointer());
       if (y_double) {
-        yd = y_double->GetDecimal();
+        yd = y_double->GetReal();
       } else {
         ExpressionInteger *y_int = dynamic_cast<ExpressionInteger *>(y_value.GetPointer());
         if (y_int) {
@@ -62,9 +62,9 @@ class ExpressionAxis : public Expression {
       }
 
       double zd;
-      ExpressionDecimal *z_double = dynamic_cast<ExpressionDecimal *>(z_value.GetPointer());
+      ExpressionReal *z_double = dynamic_cast<ExpressionReal *>(z_value.GetPointer());
       if (z_double) {
-        zd = z_double->GetDecimal();
+        zd = z_double->GetReal();
       } else {
         ExpressionInteger *z_int = dynamic_cast<ExpressionInteger *>(z_value.GetPointer());
         if (z_int) {

@@ -40,8 +40,8 @@ class ExpressionDivide : public Expression {
           throw MessagedException(right->GetSourceLocation() + ": I don't know how to divide by 0.");
         }
       } else if (lnumber && rnumber) {
-        if (rnumber->GetDecimal() != 0.0) {
-          value = Co<Expression>(new ExpressionDecimal(lnumber->GetDecimal() / rnumber->GetDecimal()));
+        if (rnumber->GetReal() != 0.0) {
+          value = Co<Expression>(new ExpressionReal(lnumber->GetReal() / rnumber->GetReal()));
         } else {
           throw MessagedException(right->GetSourceLocation() + ": I don't know how to divide by 0.");
         }

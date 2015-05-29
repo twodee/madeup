@@ -4,7 +4,7 @@
 #include <sstream>
 
 #include "madeup/Expression.h"
-#include "madeup/ExpressionDecimal.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionInteger.h"
 #include "twodee/MessagedException.h"
 
@@ -36,7 +36,7 @@ class ExpressionSign : public Expression {
       } else {
         ExpressionNumber *n_number = dynamic_cast<ExpressionNumber *>(n_value.GetPointer());
         if (n_number) {
-          float n = n_number->GetDecimal();
+          float n = n_number->GetReal();
           return Co<Expression>(new ExpressionInteger(n > 0 ? 1 : (n < 0 ? -1 : 0)));
         } else {
           throw MessagedException(n_closure->GetSourceLocation() + ": I expect function sign to be given a number. That thing you gave it wasn't a number.");

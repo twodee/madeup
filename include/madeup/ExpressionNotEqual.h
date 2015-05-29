@@ -5,7 +5,7 @@
 
 #include "madeup/Expression.h"
 #include "madeup/ExpressionBoolean.h"
-#include "madeup/ExpressionDecimal.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionInteger.h"
 #include "madeup/ExpressionString.h"
 #include "twodee/MessagedException.h"
@@ -31,8 +31,8 @@ class ExpressionNotEqual : public Expression {
 
       ExpressionString *lstring = dynamic_cast<ExpressionString *>(lvalue.GetPointer());
       ExpressionString *rstring = dynamic_cast<ExpressionString *>(rvalue.GetPointer());
-      ExpressionDecimal *ldecimal = dynamic_cast<ExpressionDecimal *>(lvalue.GetPointer());
-      ExpressionDecimal *rdecimal = dynamic_cast<ExpressionDecimal *>(rvalue.GetPointer());
+      ExpressionReal *ldecimal = dynamic_cast<ExpressionReal *>(lvalue.GetPointer());
+      ExpressionReal *rdecimal = dynamic_cast<ExpressionReal *>(rvalue.GetPointer());
       ExpressionInteger *linteger = dynamic_cast<ExpressionInteger *>(lvalue.GetPointer());
       ExpressionInteger *rinteger = dynamic_cast<ExpressionInteger *>(rvalue.GetPointer());
       ExpressionBoolean *lboolean = dynamic_cast<ExpressionBoolean *>(lvalue.GetPointer());
@@ -42,7 +42,7 @@ class ExpressionNotEqual : public Expression {
       if (lstring && rstring) {
         r = Co<Expression>(new ExpressionBoolean(lstring->GetString() != rstring->GetString()));
       } else if (ldecimal && rdecimal) {
-        r = Co<Expression>(new ExpressionBoolean(ldecimal->GetDecimal() != rdecimal->GetDecimal()));
+        r = Co<Expression>(new ExpressionBoolean(ldecimal->GetReal() != rdecimal->GetReal()));
       } else if (linteger && rinteger) {
         r = Co<Expression>(new ExpressionBoolean(linteger->GetInteger() != rinteger->GetInteger()));
       } else if (lboolean && rboolean) {

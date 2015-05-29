@@ -5,7 +5,7 @@
 
 #include "madeup/Expression.h"
 #include "madeup/ExpressionNumber.h"
-#include "madeup/ExpressionDecimal.h"
+#include "madeup/ExpressionReal.h"
 
 namespace madeup {
 
@@ -27,8 +27,8 @@ class ExpressionCosine : public Expression {
 
       ExpressionNumber *number = dynamic_cast<ExpressionNumber *>(v.GetPointer());
       if (number) {
-        float value = number->GetDecimal();
-        return Co<Expression>(new ExpressionDecimal(cosf(value * td::PI / 180.0f)));
+        float value = number->GetReal();
+        return Co<Expression>(new ExpressionReal(cosf(value * td::PI / 180.0f)));
       }
 
       throw MessagedException(degrees_closure->GetSourceLocation() + ": Function cos expects a number. " + degrees_closure->GetSource() + " is not a number.");

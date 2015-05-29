@@ -5,7 +5,7 @@
 
 #include "madeup/Expression.h"
 #include "madeup/ExpressionClosure.h"
-#include "madeup/ExpressionDecimal.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionNumber.h"
 #include "madeup/ExpressionUnit.h"
 
@@ -49,7 +49,7 @@ class ExpressionScale : public Expression {
           ss << xyz[i]->GetSourceLocation() << ": Function scale expects a numeric " << (char) ('x' + i) << " coordinate. " << xyz[i]->GetSource() << " is not a number.";
           throw MessagedException(ss.str());
         }
-        v[i] = number->GetDecimal();
+        v[i] = number->GetReal();
       }
 
       env.Scale(v[0], v[1], v[2]);

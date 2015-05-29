@@ -9,7 +9,7 @@
 #include "madeup/ExpressionString.h"
 #include "madeup/ExpressionBoolean.h"
 #include "madeup/ExpressionString.h"
-#include "madeup/ExpressionDecimal.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionInteger.h"
 
 using namespace td;
@@ -38,9 +38,9 @@ class ExpressionPrint : public Expression {
         return value;
       }
 
-      ExpressionDecimal *decimal_value = dynamic_cast<ExpressionDecimal *>(value.GetPointer());
+      ExpressionReal *decimal_value = dynamic_cast<ExpressionReal *>(value.GetPointer());
       if (decimal_value) {
-        std::cout << decimal_value->GetDecimal() << std::endl;
+        std::cout << decimal_value->GetReal() << std::endl;
         return value;
       }
 

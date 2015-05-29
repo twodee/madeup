@@ -9,7 +9,7 @@
 #include "madeup/ExpressionString.h"
 #include "madeup/ExpressionBoolean.h"
 #include "madeup/ExpressionString.h"
-#include "madeup/ExpressionDecimal.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionInteger.h"
 
 using namespace td;

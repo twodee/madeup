@@ -4,7 +4,7 @@
 #include <sstream>
 
 #include "madeup/Expression.h"
-#include "madeup/ExpressionDecimal.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionInteger.h"
 #include "twodee/MessagedException.h"
 
@@ -37,7 +37,7 @@ class ExpressionAbsoluteValue : public Expression {
       if (integer) {
         r = Co<Expression>(new ExpressionInteger(abs(integer->GetInteger())));
       } else {
-        r = Co<Expression>(new ExpressionDecimal(fabs(number->GetDecimal())));
+        r = Co<Expression>(new ExpressionReal(fabs(number->GetReal())));
       }
 
       return r;

@@ -28,7 +28,7 @@ class ExpressionMove : public Expression {
 
       ExpressionNumber *number = dynamic_cast<ExpressionNumber *>(v.GetPointer());
       if (number) {
-        float value = number->GetDecimal();
+        float value = number->GetReal();
         env.Move(value);
         return v;
       } else {

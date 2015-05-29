@@ -2,6 +2,7 @@
 #define EXPRESSIONARRAY_H
 
 #include "madeup/ExpressionInteger.h"
+#include "madeup/ExpressionUnit.h"
 
 namespace madeup {
 

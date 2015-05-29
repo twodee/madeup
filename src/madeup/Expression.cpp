@@ -4,10 +4,10 @@
 #include "madeup/ExpressionBoolean.h"
 #include "madeup/ExpressionCall.h"
 #include "madeup/ExpressionClosure.h"
-#include "madeup/ExpressionDecimal.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionDefine.h"
 #include "madeup/ExpressionDivide.h"
-#include "madeup/ExpressionDecimalDivide.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionEqual.h"
 #include "madeup/ExpressionFor.h"
 #include "madeup/ExpressionGreater.h"
@@ -232,7 +232,7 @@ Co<Expression> Parse(stringstream& ss) {
     ss.get(); // eat space
     float f;
     ss >> f;
-    expr = Co<Expression>(new ExpressionDecimal(f));
+    expr = Co<Expression>(new ExpressionReal(f));
   }
 
   else if (token.compare("define") == 0) {

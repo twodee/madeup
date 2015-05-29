@@ -25,7 +25,7 @@ class ExpressionYaw : public Expression {
       ExpressionNumber *degrees = dynamic_cast<ExpressionNumber *>(v.GetPointer());
 
       if (degrees) {
-        float value = degrees->GetDecimal();
+        float value = degrees->GetReal();
         env.Yaw(value);
         return v;
       } else {

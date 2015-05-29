@@ -4,7 +4,7 @@
 #include <sstream>
 
 #include "madeup/Expression.h"
-#include "madeup/ExpressionDecimal.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionInteger.h"
 #include "twodee/MessagedException.h"
 
@@ -37,7 +37,7 @@ class ExpressionSubtract : public Expression {
       if (linteger && rinteger) {
         r = Co<Expression>(new ExpressionInteger(linteger->GetInteger() - rinteger->GetInteger()));
       } else if (lnumber && rnumber) {
-        r = Co<Expression>(new ExpressionDecimal(lnumber->GetDecimal() - rnumber->GetDecimal()));
+        r = Co<Expression>(new ExpressionReal(lnumber->GetReal() - rnumber->GetReal()));
       } else {
         throw MessagedException(GetSourceLocation() + ": Operator - doesn't know how to subtract " + right->GetSource() + " from " + left->GetSource() + ".");
       }

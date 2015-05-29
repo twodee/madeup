@@ -4,7 +4,7 @@
 #include <sstream>
 
 #include "madeup/Expression.h"
-#include "madeup/ExpressionDecimal.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionInteger.h"
 #include "twodee/MessagedException.h"
 
@@ -45,7 +45,7 @@ class ExpressionPower : public Expression {
       if (linteger && rinteger) {
         r = Co<Expression>(new ExpressionInteger((int) pow(linteger->GetInteger(), rinteger->GetInteger())));
       } else {
-        r = Co<Expression>(new ExpressionDecimal(pow(lnumber->GetDecimal(), rnumber->GetDecimal())));
+        r = Co<Expression>(new ExpressionReal(pow(lnumber->GetReal(), rnumber->GetReal())));
       }
 
       return r;

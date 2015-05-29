@@ -82,7 +82,7 @@ class Environment {
 
     Trimesh *GetMesh();
     std::string GetPathsJSON() const;
-    void SetGeometryMode(geometry_mode_t mode);
+    void SetGeometryMode(GeometryMode::geometry_mode_t mode);
 
     float GetVariableAsFloat(const std::string& id);
     const Turtle& GetTurtle() const;
@@ -98,7 +98,7 @@ class Environment {
     static Trimesh *shapes;
     static std::vector<std::vector<Turtle> > paths;
     static std::stack<QMatrix4<float> > xforms;
-    static geometry_mode_t geometry_mode;
+    static GeometryMode::geometry_mode_t geometry_mode;
 };
 
 /* ------------------------------------------------------------------------- */

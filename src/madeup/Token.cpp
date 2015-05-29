@@ -61,8 +61,8 @@ const std::string Token::getTypeString() const {
       return "TIMES";
     case DIVIDE:
       return "DIVIDE";
-    case DOUBLE_DIVIDE:
-      return "DOUBLE_DIVIDE";
+    case REAL_DIVIDE:
+      return "REAL_DIVIDE";
     case INTEGER:
       return "INTEGER";
     case REAL:

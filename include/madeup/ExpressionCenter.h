@@ -5,7 +5,7 @@
 
 #include "madeup/Expression.h"
 #include "madeup/ExpressionClosure.h"
-#include "madeup/ExpressionDecimal.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionNumber.h"
 #include "madeup/ExpressionUnit.h"
 

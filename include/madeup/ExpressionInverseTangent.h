@@ -4,7 +4,7 @@
 #include <math.h>
 
 #include "madeup/Expression.h"
-#include "madeup/ExpressionDecimal.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionNumber.h"
 #include "twodee/Utilities.h"
 
@@ -28,8 +28,8 @@ class ExpressionInverseTangent : public Expression {
 
       ExpressionNumber *number = dynamic_cast<ExpressionNumber *>(v.GetPointer());
       if (number) {
-        float value = number->GetDecimal();
-        return Co<Expression>(new ExpressionDecimal(atanf(value) * 180.0f / td::PI));
+        float value = number->GetReal();
+        return Co<Expression>(new ExpressionReal(atanf(value) * 180.0f / td::PI));
       }
 
       throw MessagedException(ratio_closure->GetSourceLocation() + ": Function atan expects a number. " + ratio_closure->GetSource() + " is not a number.");
@@ -64,7 +64,7 @@ class ExpressionInverseTangent2 : public Expression {
         throw MessagedException(opposite_closure->GetSourceLocation() + ": Function atan2 expects opposite to be a number. " + opposite_closure->GetSource() + " is not a number.");
       }
 
-      float opposite_value = opposite->GetDecimal();
+      float opposite_value = opposite->GetReal();
 
       // Adjacent
       Co<ExpressionClosure> adjacent_closure = env["adjacent"];
@@ -79,9 +79,9 @@ class ExpressionInverseTangent2 : public Expression {
         throw MessagedException(adjacent_closure->GetSourceLocation() + ": Function atan2 expects adjacent to be a number. " + adjacent_closure->GetSource() + " is not a number.");
       }
 
-      float adjacent_value = adjacent->GetDecimal();
+      float adjacent_value = adjacent->GetReal();
 
-      return Co<Expression>(new ExpressionDecimal(atan2f(opposite_value, adjacent_value) * 180.0f / td::PI));
+      return Co<Expression>(new ExpressionReal(atan2f(opposite_value, adjacent_value) * 180.0f / td::PI));
     }
 
     void Write(ostream& out) const {

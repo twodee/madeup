@@ -24,7 +24,7 @@ class ExpressionRoll : public Expression {
 
       ExpressionNumber *degrees = dynamic_cast<ExpressionNumber *>(v.GetPointer());
       if (degrees) {
-        float value = degrees->GetDecimal();
+        float value = degrees->GetReal();
         env.Roll(value);
         return v;
       } else {

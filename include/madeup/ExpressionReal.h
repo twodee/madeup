@@ -1,5 +1,5 @@
-#ifndef EXPRESSIONDECIMAL_H
-#define EXPRESSIONDECIMAL_H
+#ifndef EXPRESSIONREAL_H
+#define EXPRESSIONREAL_H
 
 #include "madeup/ExpressionNumber.h"
 
@@ -7,18 +7,18 @@ namespace madeup {
 
 /* ------------------------------------------------------------------------- */
 
-class ExpressionDecimal : public ExpressionNumber {
+class ExpressionReal : public ExpressionNumber {
   public:
-    ExpressionDecimal(float value) :
+    ExpressionReal(float value) :
       ExpressionNumber(),
       value(value) {
     }
 
     Co<Expression> Evaluate(Environment& env) {
-      return Co<Expression>(new ExpressionDecimal(value));
+      return Co<Expression>(new ExpressionReal(value));
     }
 
-    float GetDecimal() const {
+    float GetReal() const {
       return value;
     }
 
@@ -27,7 +27,7 @@ class ExpressionDecimal : public ExpressionNumber {
     }
 
     void Write(ostream& out) const {
-      out << "(DECIMAL " << value << ")";
+      out << "(REAL " << value << ")";
     }
 
   private:

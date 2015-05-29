@@ -1,5 +1,5 @@
-#ifndef EXPRESSIONDOUBLEDIVIDE_H
-#define EXPRESSIONDOUBLEDIVIDE_H
+#ifndef EXPRESSIONREALDIVIDE_H
+#define EXPRESSIONREALDIVIDE_H
 
 #include <sstream>
 
@@ -13,9 +13,9 @@ namespace madeup {
 
 /* ------------------------------------------------------------------------- */
 
-class ExpressionDecimalDivide : public Expression {
+class ExpressionRealDivide : public Expression {
   public:
-    ExpressionDecimalDivide(Co<Expression> left, Co<Expression> right) :
+    ExpressionRealDivide(Co<Expression> left, Co<Expression> right) :
       Expression(),
       left(left),
       right(right) {
@@ -32,8 +32,8 @@ class ExpressionDecimalDivide : public Expression {
       
       // Make sure both are numbers.
       if (lnumber && rnumber) {
-        if (rnumber->GetDecimal() != 0.0) {
-          value = Co<Expression>(new ExpressionDecimal(lnumber->GetDecimal() / rnumber->GetDecimal()));
+        if (rnumber->GetReal() != 0.0) {
+          value = Co<Expression>(new ExpressionReal(lnumber->GetReal() / rnumber->GetReal()));
         } else {
           throw MessagedException(right->GetSourceLocation() + ": I don't know how to divide by 0.");
         }

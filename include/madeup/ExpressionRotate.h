@@ -5,7 +5,7 @@
 
 #include "madeup/Expression.h"
 #include "madeup/ExpressionClosure.h"
-#include "madeup/ExpressionDecimal.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionNumber.h"
 #include "madeup/ExpressionUnit.h"
 
@@ -54,7 +54,7 @@ class ExpressionRotate : public Expression {
           ss << xyz[i]->GetSourceLocation() << ": Function rotate expects a numeric " << (char) ('x' + i) << " coordinate. " << xyz[i]->GetSource() << " is not a number.";
           throw MessagedException(ss.str());
         }
-        v[i] = number->GetDecimal();
+        v[i] = number->GetReal();
       }
 
       Co<Expression> vv = degrees_closure->Evaluate(env);
@@ -64,7 +64,7 @@ class ExpressionRotate : public Expression {
         ss << degrees_closure->GetSourceLocation() << ": Function rotate expects degrees to be a number. " << degrees_closure->GetSource() << " is not a number.";
         throw MessagedException(ss.str());
       }
-      float degrees = number->GetDecimal();
+      float degrees = number->GetReal();
 
       env.Rotate(v[0], v[1], v[2], degrees);
 

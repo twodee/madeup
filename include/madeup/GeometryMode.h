@@ -1,14 +1,21 @@
 #ifndef GEOMETRYMODE_H
 #define GEOMETRYMODE_H
 
+namespace madeup {
+
 /* ------------------------------------------------------------------------- */
 
-enum geometry_mode_t {
-  SURFACE,
-  PATH,
-  NONE
+class GeometryMode {
+  public:
+    enum geometry_mode_t {
+      SURFACE,
+      PATH,
+      NONE
+    };
 };
 
 /* ------------------------------------------------------------------------- */
+
+}
 
 #endif

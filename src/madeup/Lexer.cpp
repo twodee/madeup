@@ -12,6 +12,9 @@ namespace madeup {
 
 Lexer::Lexer(std::istream &in) :
   in(in) {
+  if (!in.good()) {
+    throw MessagedException("bad input stream");
+  }
 }
 
 /* ------------------------------------------------------------------------- */
@@ -137,7 +140,7 @@ Token Lexer::getTokenAfterSlash() {
   if (c == '/') {
     ++end_column;
     text_so_far += (char) c;
-    return makeToken(Token::DOUBLE_DIVIDE);
+    return makeToken(Token::REAL_DIVIDE);
   } else {
     --end_column;
     in.putback(c);
@@ -189,10 +192,18 @@ Token Lexer::getTokenAfterQuote() {
   int c = in.get();
   ++end_column;
 
-  while (!in.eof() && c != '"') {
+  while (!in.eof() && c != '"' && c != '\n') {
     text_so_far += (char) c;
     c = in.get();
     ++end_column;
+  }
+
+  if (c != '"') {
+    --end_column;
+    in.putback(c);
+    std::stringstream ss;
+    ss << start_row << "(" << start_column << "-" << end_column << "): I was reading the string \"" << text_so_far << "\", but it didn't end with a quotation mark.";
+    throw MessagedException(ss.str());
   }
 
   return Token(Token::STRING, text_so_far, start_row, start_column, end_row, end_column);
@@ -267,7 +278,7 @@ Token Lexer::getTokenAfterDigit() {
     throw MessagedException(ss.str());
   }
 
-  if (in.eof() || c != '.') {
+  if (in.eof() || c != '.' || (c == '.' && in.peek() == '.')) {
     in.putback(c);
     --end_column;
     return makeToken(Token::INTEGER);
@@ -277,11 +288,11 @@ Token Lexer::getTokenAfterDigit() {
     c = in.get();
     ++end_column;
 
-    // Must be at least number after decimal.
+    // Must be at least one number after decimal.
     if (!isdigit(c)) {
       // TODO strip off decimal?
       std::stringstream ss;
-      ss << start_row << "(" << start_column << "-" << end_column << "): I was reading the number " << text_so_far << ", but I couldn't find any digits after the decimal point. You must have at least one digit there.";
+      ss << start_row << "(" << start_column << "-" << end_column << "): I was reading the number " << text_so_far.substr(0, text_so_far.length() - 1) << ", but I couldn't find any digits after the decimal point. You must have at least one digit there.";
       throw MessagedException(ss.str());
     }
    

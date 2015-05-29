@@ -4,7 +4,7 @@
 #include <sstream>
 
 #include "madeup/Expression.h"
-#include "madeup/ExpressionDecimal.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionInteger.h"
 #include "twodee/MessagedException.h"
 
@@ -47,9 +47,9 @@ class ExpressionMin : public Expression {
         } else if (!b_number) {
           throw MessagedException(b_closure->GetSourceLocation() + ": I expect function min to be given a number. That thing you gave it wasn't a number.");
         } else {
-          float a = a_integer->GetDecimal();
-          float b = b_integer->GetDecimal();
-          return Co<Expression>(new ExpressionDecimal(a < b ? a : b));
+          float a = a_integer->GetReal();
+          float b = b_integer->GetReal();
+          return Co<Expression>(new ExpressionReal(a < b ? a : b));
         }
       }
     }

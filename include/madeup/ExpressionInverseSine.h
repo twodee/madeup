@@ -4,7 +4,7 @@
 #include <math.h>
 
 #include "madeup/Expression.h"
-#include "madeup/ExpressionDecimal.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionNumber.h"
 #include "twodee/Utilities.h"
 
@@ -30,8 +30,8 @@ class ExpressionInverseSine : public Expression {
         throw MessagedException(ratio_closure->GetSourceLocation() + ": I expect the ratio given to asin to be a number. But that thing you gave it is not a number.");
       }
       
-      float value = number->GetDecimal();
-      return Co<Expression>(new ExpressionDecimal(asin(value) * 180.0f / td::PI));
+      float value = number->GetReal();
+      return Co<Expression>(new ExpressionReal(asin(value) * 180.0f / td::PI));
     }
 
     void Write(ostream& out) const {

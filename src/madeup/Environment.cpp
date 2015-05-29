@@ -10,7 +10,7 @@
 #include "madeup/ExpressionClosure.h"
 #include "madeup/ExpressionCosine.h"
 #include "madeup/ExpressionDebug.h"
-#include "madeup/ExpressionDecimal.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionDot.h"
 #include "madeup/ExpressionEcho.h"
 #include "madeup/ExpressionExtrude.h"
@@ -55,7 +55,7 @@ stack<Turtle> Environment::previous_turtles;
 vector<Node> Environment::run;
 Trimesh *Environment::shapes = NULL; //new Trimesh(0, 0);
 vector<vector<Turtle> > Environment::paths;
-geometry_mode_t Environment::geometry_mode = SURFACE;
+GeometryMode::geometry_mode_t Environment::geometry_mode = GeometryMode::SURFACE;
 stack<QMatrix4<float> > Environment::xforms;
 
 /* ------------------------------------------------------------------------- */
@@ -79,17 +79,17 @@ Environment::Environment(const Environment& other) :
 
 void Environment::Prime() {
   shapes = new Trimesh(0, 0);
-  Add("radius", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("radius", Co<Expression>(new ExpressionDecimal(1.0f)))), Environment())));
+  Add("radius", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("radius", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
   Add("nsides", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("nsides", Co<Expression>(new ExpressionInteger(4)))), Environment())));
-  Add("fracture", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("fracture", Co<Expression>(new ExpressionDecimal(100)))), Environment())));
-  Add("pi", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("pi", Co<Expression>(new ExpressionDecimal(td::PI)))), Environment())));
-  Add("e", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("e", Co<Expression>(new ExpressionDecimal(td::E)))), Environment())));
-  Add("twist", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("twist", Co<Expression>(new ExpressionDecimal(45.0f)))), Environment())));
-  Add("axisx", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisx", Co<Expression>(new ExpressionDecimal(0.0f)))), Environment())));
-  Add("axisy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisy", Co<Expression>(new ExpressionDecimal(1.0f)))), Environment())));
-  Add("axisz", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisz", Co<Expression>(new ExpressionDecimal(0.0f)))), Environment())));
-  Add("energy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("energy", Co<Expression>(new ExpressionDecimal(100.0f)))), Environment())));
-  Add("halflife", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("halflife", Co<Expression>(new ExpressionDecimal(1.0f)))), Environment())));
+  Add("fracture", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("fracture", Co<Expression>(new ExpressionReal(100)))), Environment())));
+  Add("pi", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("pi", Co<Expression>(new ExpressionReal(td::PI)))), Environment())));
+  Add("e", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("e", Co<Expression>(new ExpressionReal(td::E)))), Environment())));
+  Add("twist", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("twist", Co<Expression>(new ExpressionReal(45.0f)))), Environment())));
+  Add("axisx", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisx", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
+  Add("axisy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisy", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
+  Add("axisz", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisz", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
+  Add("energy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("energy", Co<Expression>(new ExpressionReal(100.0f)))), Environment())));
+  Add("halflife", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("halflife", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
 
   Environment globals;
   globals.Add("nsides", (*this)["nsides"]);
@@ -305,10 +305,10 @@ Co<ExpressionClosure> Environment::operator[](const string& id) {
 
 void Environment::RecordVertex() {
   Co<Expression> v = (*this)["radius"]->Evaluate(*this);
-  ExpressionDecimal *radius_value = dynamic_cast<ExpressionDecimal *>(v.GetPointer());
+  ExpressionReal *radius_value = dynamic_cast<ExpressionReal *>(v.GetPointer());
   float radius;
   if (radius_value) {
-    radius = radius_value->GetDecimal();
+    radius = radius_value->GetReal();
   } else {
     ExpressionInteger *radius_value = dynamic_cast<ExpressionInteger *>(v.GetPointer());
     radius = radius_value->GetInteger();
@@ -318,7 +318,7 @@ void Environment::RecordVertex() {
   ExpressionNumber *energy_value = dynamic_cast<ExpressionNumber *>(v.GetPointer());
   float energy;
   if (energy_value) {
-    energy = energy_value->GetDecimal();
+    energy = energy_value->GetReal();
   } else {
   }
 
@@ -326,7 +326,7 @@ void Environment::RecordVertex() {
   ExpressionNumber *halflife_value = dynamic_cast<ExpressionNumber *>(v.GetPointer());
   float halflife;
   if (halflife_value) {
-    halflife = halflife_value->GetDecimal();
+    halflife = halflife_value->GetReal();
   } else {
   }
 
@@ -503,7 +503,7 @@ void Environment::Pop() {
 /* ------------------------------------------------------------------------- */
 
 void Environment::Dowel() {
-  if (geometry_mode == SURFACE) {
+  if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() >= 2) {
       QVector3<float> diff = run[0].position - run[run.size() - 1].position;
       float squared_length = diff.GetSquaredLength();
@@ -533,20 +533,20 @@ void Environment::Dowel() {
         int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->GetInteger();
 
         Co<Expression> fracture_value = (*this)["fracture"]->Evaluate(*this);
-        ExpressionDecimal *fracture_number = dynamic_cast<ExpressionDecimal *>(fracture_value.GetPointer());
+        ExpressionReal *fracture_number = dynamic_cast<ExpressionReal *>(fracture_value.GetPointer());
         float fracture;
         if (fracture_number) {
-          fracture = fracture_number->GetDecimal();
+          fracture = fracture_number->GetReal();
         } else {
           ExpressionInteger *fracture_number = dynamic_cast<ExpressionInteger *>(fracture_value.GetPointer());
           fracture = fracture_number->GetInteger();
         }
 
         Co<Expression> twist_value = (*this)["twist"]->Evaluate(*this);
-        ExpressionDecimal *twist_number = dynamic_cast<ExpressionDecimal *>(twist_value.GetPointer());
+        ExpressionReal *twist_number = dynamic_cast<ExpressionReal *>(twist_value.GetPointer());
         float twist;
         if (twist_number) {
-          twist = twist_number->GetDecimal();
+          twist = twist_number->GetReal();
         } else {
           ExpressionInteger *twist_number = dynamic_cast<ExpressionInteger *>(twist_value.GetPointer());
           twist = twist_number->GetInteger();
@@ -584,7 +584,7 @@ void Environment::Dowel() {
 /* ------------------------------------------------------------------------- */
 
 void Environment::Revolve() {
-  if (geometry_mode == SURFACE) {
+  if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() >= 2) {
       QVector3<float> diff = run[0].position - run[run.size() - 1].position;
       float squared_length = diff.GetSquaredLength();
@@ -612,20 +612,20 @@ void Environment::Revolve() {
         int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->GetInteger();
 
         Co<Expression> x_value = (*this)["x"]->Evaluate(*this);
-        float x = dynamic_cast<ExpressionNumber *>(x_value.GetPointer())->GetDecimal();
+        float x = dynamic_cast<ExpressionNumber *>(x_value.GetPointer())->GetReal();
         Co<Expression> y_value = (*this)["y"]->Evaluate(*this);
-        float y = dynamic_cast<ExpressionNumber *>(y_value.GetPointer())->GetDecimal();
+        float y = dynamic_cast<ExpressionNumber *>(y_value.GetPointer())->GetReal();
         Co<Expression> z_value = (*this)["z"]->Evaluate(*this);
-        float z = dynamic_cast<ExpressionNumber *>(z_value.GetPointer())->GetDecimal();
+        float z = dynamic_cast<ExpressionNumber *>(z_value.GetPointer())->GetReal();
 
         Co<Expression> fracture_value = (*this)["fracture"]->Evaluate(*this);
         ExpressionNumber *fracture_number = dynamic_cast<ExpressionNumber *>(fracture_value.GetPointer());
-        float fracture = fracture_number->GetDecimal();
+        float fracture = fracture_number->GetReal();
         line->Fracture(fracture);
 
         Co<Expression> degrees_expr = (*this)["degrees"]->Evaluate(*this);
         ExpressionNumber *degrees_number = dynamic_cast<ExpressionNumber *>(degrees_expr.GetPointer());
-        float degrees = degrees_number->GetDecimal();
+        float degrees = degrees_number->GetReal();
 
         Trimesh *trimesh = line->Revolve(QVector3<float>(x, y, z), nsides, degrees);
 
@@ -641,7 +641,7 @@ void Environment::Revolve() {
 /* ------------------------------------------------------------------------- */
 
 void Environment::Extrude(const QVector3<float>& axis, float length) {
-  if (geometry_mode == SURFACE) {
+  if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() > 0) {
       Polyline<float> *line = new Polyline<float>(run.size(), 3, Polyline<float>::CLOSED);
       for (unsigned int i = 0; i < run.size(); ++i) {
@@ -662,7 +662,7 @@ void Environment::Extrude(const QVector3<float>& axis, float length) {
 /* ------------------------------------------------------------------------- */
 
 void Environment::Dot() {
-  if (geometry_mode == SURFACE) {
+  if (geometry_mode == GeometryMode::SURFACE) {
     Co<Expression> nsides_value = (*this)["nsides"]->Evaluate(*this);
     int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->GetInteger();
 
@@ -682,7 +682,7 @@ void Environment::Dot() {
 /* ------------------------------------------------------------------------- */
 
 void Environment::Box() {
-  if (geometry_mode == SURFACE) {
+  if (geometry_mode == GeometryMode::SURFACE) {
     for (unsigned int i = 0; i < run.size(); ++i) {
       Trimesh *trimesh = Trimesh::GetBox(run[i].radius);
       *trimesh += run[i].position;
@@ -698,7 +698,7 @@ void Environment::Box() {
 /* ------------------------------------------------------------------------- */
 
 void Environment::Blobs(float grain, float iso) {
-  if (geometry_mode == SURFACE) {
+  if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() > 0) {
 
       // Find min and max.
@@ -792,7 +792,7 @@ void Environment::Blobs(float grain, float iso) {
 /* ------------------------------------------------------------------------- */
 
 void Environment::Surface(int width, int height) {
-  if (geometry_mode == SURFACE) {
+  if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() != (unsigned int) (width * height)) {
       std::stringstream ss;
       ss << "The surface command expected " << width << "x" << height << " vertices. However, " << run.size() << " vertices were visited.";
@@ -833,9 +833,9 @@ void Environment::Forget() {
 /* ------------------------------------------------------------------------- */
 
 void Environment::Axis(float x, float y, float z) {
-  Add("axisx", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisx", new ExpressionDecimal(x))), Environment())));
-  Add("axisy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisy", new ExpressionDecimal(y))), Environment())));
-  Add("axisz", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisz", new ExpressionDecimal(z))), Environment())));
+  Add("axisx", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisx", new ExpressionReal(x))), Environment())));
+  Add("axisy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisy", new ExpressionReal(y))), Environment())));
+  Add("axisz", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisz", new ExpressionReal(z))), Environment())));
 }
 
 /* ------------------------------------------------------------------------- */
@@ -860,7 +860,7 @@ bool Environment::IsBound(const string& id) const {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::SetGeometryMode(geometry_mode_t mode) {
+void Environment::SetGeometryMode(GeometryMode::geometry_mode_t mode) {
   geometry_mode = mode; 
 }
 
@@ -902,9 +902,9 @@ float Environment::GetVariableAsFloat(const std::string& id) {
   Co<ExpressionClosure> closure = (*this)[id];
   Co<Expression> v = closure->Evaluate(*this);
 
-  ExpressionDecimal *decimal = dynamic_cast<ExpressionDecimal *>(v.GetPointer());
+  ExpressionReal *decimal = dynamic_cast<ExpressionReal *>(v.GetPointer());
   if (decimal) {
-    return decimal->GetDecimal();
+    return decimal->GetReal();
   }
 
   ExpressionInteger *integer = dynamic_cast<ExpressionInteger *>(v.GetPointer());

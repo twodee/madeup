@@ -26,7 +26,7 @@ class ExpressionInteger : public ExpressionNumber {
       value = i;
     }
 
-    float GetDecimal() const {
+    float GetReal() const {
       return value;
     }
 

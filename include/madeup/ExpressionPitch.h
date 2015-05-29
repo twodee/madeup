@@ -25,7 +25,7 @@ class ExpressionPitch : public Expression {
 
       ExpressionNumber *degrees = dynamic_cast<ExpressionNumber *>(v.GetPointer());
       if (degrees) {
-        float value = degrees->GetDecimal();
+        float value = degrees->GetReal();
         env.Pitch(value);
         return v;
       } else {

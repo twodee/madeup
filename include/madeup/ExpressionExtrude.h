@@ -30,7 +30,7 @@ class ExpressionExtrude : public Expression {
       if (!number) {
         throw MessagedException(v->GetSourceLocation() + ": Function extrude expects length to be a number, but it is not.");
       }
-      float length = number->GetDecimal();
+      float length = number->GetReal();
 
       closure = env["x"];
       if (closure.IsNull()) {
@@ -41,7 +41,7 @@ class ExpressionExtrude : public Expression {
       if (!number) {
         throw MessagedException(v->GetSourceLocation() + ": Function extrude expects x to be a number, but it is not.");
       }
-      float x = number->GetDecimal();
+      float x = number->GetReal();
 
       closure = env["y"];
       if (closure.IsNull()) {
@@ -52,7 +52,7 @@ class ExpressionExtrude : public Expression {
       if (!number) {
         throw MessagedException(v->GetSourceLocation() + ": Function extrude expects y to be a number, but it is not.");
       }
-      float y = number->GetDecimal();
+      float y = number->GetReal();
 
       closure = env["z"];
       if (closure.IsNull()) {
@@ -63,7 +63,7 @@ class ExpressionExtrude : public Expression {
       if (!number) {
         throw MessagedException(v->GetSourceLocation() + ": Function extrude expects z to be a number, but it is not.");
       }
-      float z = number->GetDecimal();
+      float z = number->GetReal();
 
       QVector3<float> axis(x, y, z);
       env.Extrude(axis, length);

@@ -4,7 +4,7 @@
 #include <sstream>
 
 #include "madeup/Expression.h"
-#include "madeup/ExpressionDecimal.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionInteger.h"
 #include "madeup/ExpressionBoolean.h"
 #include "twodee/MessagedException.h"
@@ -38,7 +38,7 @@ class ExpressionGreaterOrEqual : public Expression {
       if (linteger && rinteger) {
         r = Co<Expression>(new ExpressionBoolean(linteger->GetInteger() >= rinteger->GetInteger()));
       } else if (lnumber && rnumber) {
-        r = Co<Expression>(new ExpressionBoolean(lnumber->GetDecimal() >= rnumber->GetDecimal()));
+        r = Co<Expression>(new ExpressionBoolean(lnumber->GetReal() >= rnumber->GetReal()));
       } else {
         throw MessagedException(GetSourceLocation() + ": Operator >= doesn't know how to relate " + left->GetSource() + " and " + right->GetSource() + ".");
       }

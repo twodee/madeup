@@ -5,7 +5,7 @@
 
 #include "madeup/Expression.h"
 #include "madeup/ExpressionString.h"
-#include "madeup/ExpressionDecimal.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionInteger.h"
 #include "madeup/ExpressionBoolean.h"
 #include "twodee/MessagedException.h"
@@ -51,7 +51,7 @@ class ExpressionAdd : public Expression {
         if (rinteger) {
           ss << rinteger->GetInteger();
         } else if (rnumber) {
-          ss << rnumber->GetDecimal();
+          ss << rnumber->GetReal();
         } else if (rboolean) {
           ss << (rboolean->GetBoolean() ? "true" : "false");
         } else {
@@ -66,7 +66,7 @@ class ExpressionAdd : public Expression {
         if (linteger) {
           ss << linteger->GetInteger();
         } else if (lnumber) {
-          ss << lnumber->GetDecimal();
+          ss << lnumber->GetReal();
         } else if (lboolean) {
           ss << lboolean->GetBoolean();
         } else {
@@ -81,7 +81,7 @@ class ExpressionAdd : public Expression {
       }
 
       else if (lnumber && rnumber) {
-        value = Co<Expression>(new ExpressionDecimal(lnumber->GetDecimal() + rnumber->GetDecimal()));
+        value = Co<Expression>(new ExpressionReal(lnumber->GetReal() + rnumber->GetReal()));
       }
 
       else {

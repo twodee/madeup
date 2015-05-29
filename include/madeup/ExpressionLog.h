@@ -4,7 +4,7 @@
 #include <math.h>
 
 #include "madeup/Expression.h"
-#include "madeup/ExpressionDecimal.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionNumber.h"
 #include "twodee/Utilities.h"
 
@@ -37,9 +37,9 @@ class ExpressionLog : public Expression {
         throw MessagedException(x_closure->GetSourceLocation() + ": I expect log's x to be a number. That thing you gave me sure isn't a number.");
       }
 
-      float base = base_number->GetDecimal();
-      float x = x_number->GetDecimal();
-      return Co<Expression>(new ExpressionDecimal(log(x) / log(base)));
+      float base = base_number->GetReal();
+      float x = x_number->GetReal();
+      return Co<Expression>(new ExpressionReal(log(x) / log(base)));
     }
 
     void Write(ostream& out) const {

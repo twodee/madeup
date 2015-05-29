@@ -21,7 +21,7 @@ class Token {
       MINUS,
       TIMES,
       DIVIDE,
-      DOUBLE_DIVIDE,
+      REAL_DIVIDE,
       INTEGER,
       REAL,
       STRING,

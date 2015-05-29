@@ -27,7 +27,7 @@ class ExpressionBlobs : public Expression {
       if (!number) {
         throw MessagedException(v->GetSourceLocation() + ": Function blobs expects grain to be a number, but it is not.");
       }
-      float grain = number->GetDecimal();
+      float grain = number->GetReal();
 
       closure = env["iso"];
       if (closure.IsNull()) {
@@ -38,7 +38,7 @@ class ExpressionBlobs : public Expression {
       if (!number) {
         throw MessagedException(v->GetSourceLocation() + ": Function blobs expects iso to be a number, but it is not.");
       }
-      float iso = number->GetDecimal();
+      float iso = number->GetReal();
 
       env.Blobs(grain, iso);
 
