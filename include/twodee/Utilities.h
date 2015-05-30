@@ -30,6 +30,7 @@ class Utilities {
      @return String contents of file
      */
     static char *FileToString(const std::string& path);
+    static std::string Slurp(const std::string& path);
 
     /**
      Convert array of one type to array of another. Assumes destination array

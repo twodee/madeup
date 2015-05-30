@@ -28,7 +28,6 @@ int main(int argc, char **argv) {
   int optind = 1;
   for (; optind < argc && argv[optind][0] == '-'; ++optind) {
     std::string formal = argv[optind];
-    std::cout << "formal: " << formal << std::endl;
 
     if (formal == "--timeout") {
       wants_timeout = true;
@@ -76,8 +75,12 @@ int main(int argc, char **argv) {
         }
         ++optind;
       } else {
-        usage("-i given, but no path specified.");
+        usage("--geometry given, but no path specified.");
       }
+    }
+
+    else {
+      usage("unknown option: " + formal);
     }
   }
 
@@ -92,9 +95,8 @@ int main(int argc, char **argv) {
     usage("Stray parameters.");
   }
 
-  /* if (out_path.size() == 0) { */
-    /* usage("Output path missing."); */
-  /* } */
+  std::string source = Utilities::Slurp(in_path);
+  std::cout << "source: " << source << std::endl;
 
   std::ifstream in(in_path);
   Lexer lexer(in);

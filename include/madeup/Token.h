@@ -60,10 +60,7 @@ class Token {
 
     Token(token_t type,
           const std::string &text,
-          int start_row,
-          int start_column,
-          int end_row,
-          int end_column);
+          const SourceLocation &location);
 
     token_t getType() const;
     const std::string getText() const;

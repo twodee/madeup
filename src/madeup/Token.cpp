@@ -8,13 +8,10 @@ namespace madeup {
 
 Token::Token(token_t type,
              const std::string &text,
-             int start_row,
-             int start_column,
-             int end_row,
-             int end_column) :
+             const SourceLocation &location) :
   type(type),
   text(text),
-  location(start_row, start_column, end_row, end_column) {
+  location(location) {
 }
 
 /* ------------------------------------------------------------------------- */

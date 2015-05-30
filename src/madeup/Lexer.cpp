@@ -11,7 +11,8 @@ namespace madeup {
 /* ------------------------------------------------------------------------- */
 
 Lexer::Lexer(std::istream &in) :
-  in(in) {
+  in(in),
+  location() {
   if (!in.good()) {
     throw MessagedException("bad input stream");
   }
@@ -26,9 +27,12 @@ const std::vector<Token> &Lexer::getTokens() const {
 /* ------------------------------------------------------------------------- */
 
 const std::vector<Token> &Lexer::lex() {
-  start_row = 0;
-  end_row = 0;
-  end_column = -1;
+  location.start_row = 1;
+  location.end_row = 1;
+  location.end_column = -1;
+  location.start_index = 0;
+  location.end_index = -1;
+
   tokens.clear();
 
   bool isEOF;
@@ -41,7 +45,7 @@ const std::vector<Token> &Lexer::lex() {
   if (tokens.size() == 1 || tokens[tokens.size() - 2].getType() != Token::NEWLINE) {
     Token eof = tokens.back();
     tokens.pop_back();
-    tokens.push_back(Token(Token::NEWLINE, "\n", -1, -1, -1, -1));
+    tokens.push_back(Token(Token::NEWLINE, "\n", location));
     tokens.push_back(eof);
   }
 
@@ -51,7 +55,7 @@ const std::vector<Token> &Lexer::lex() {
 /* ------------------------------------------------------------------------- */
 
 Token Lexer::makeToken(Token::token_t type) {
-  return Token(type, text_so_far, start_row, start_column, end_row, end_column);
+  return Token(type, text_so_far, location);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -59,26 +63,25 @@ Token Lexer::makeToken(Token::token_t type) {
 Token Lexer::getToken() {
   text_so_far = "";
 
-  
-  /* std::cout << "start_row: " << start_row << std::endl; */
-  /* std::cout << "start_column: " << start_column << std::endl; */
-  /* std::cout << "end_row: " << end_row << std::endl; */
-  /* std::cout << "end_column: " << end_column << std::endl; */
-
   if (in.eof()) {
     return makeToken(Token::END_OF_FILE);
   }
 
-  start_column = end_column + 1;
-  int c = in.get();
+  // This token picks up where the last one left off, skipping any whitespace.
+  // Start will drop anchor here.
+  location.start_column = location.end_column + 1;
+  location.start_index = location.end_index + 1;
 
-  // Skip overwhitespace.
+  int c = in.get();
   while (isspace(c) && c != '\n') {
-    ++start_column;
+    ++location.start_column;
+    ++location.start_index;
     c = in.get();
   }
 
-  end_column = start_column;
+  // But end will get carried along the token's extent.
+  location.end_column = location.start_column;
+  location.end_index = location.start_index;
 
   if (c == EOF) {
     return makeToken(Token::END_OF_FILE);
@@ -110,9 +113,9 @@ Token Lexer::getToken() {
     return makeToken(Token::COLON);
   } else if (c == '\n') {
     Token token = makeToken(Token::NEWLINE);
-    ++start_row;
-    ++end_row;
-    end_column = -1;
+    ++location.start_row;
+    ++location.end_row;
+    location.end_column = -1;
     return token;
   } else if (c == '/') {
     return getTokenAfterSlash();
@@ -136,7 +139,13 @@ Token Lexer::getToken() {
     return getTokenAfterDigit();
   } else {
     std::stringstream ss;
-    ss << start_row << "(" << start_column << "-" << end_column << "): I found a character that I didn't recognize: " << (isprint(c) ? (char) c : (int) c) << ".";
+    ss << location.start_row << "(" << location.start_index << "-" << location.end_index << "): I found a character that I didn't recognize: ";
+    if (isprint(c)) {
+      ss << (char) c;
+    } else {
+      ss << std::hex << std::uppercase << (int) c << std::dec << std::nouppercase;
+    }
+    ss << ".";
     throw MessagedException(ss.str());
   }
 }
@@ -146,11 +155,11 @@ Token Lexer::getToken() {
 Token Lexer::getTokenAfterSlash() {
   int c = in.get();
   if (c == '/') {
-    ++end_column;
+    ++location.end_column;
+    ++location.end_index;
     text_so_far += (char) c;
     return makeToken(Token::REAL_DIVIDE);
   } else {
-    --end_column;
     in.putback(c);
     return makeToken(Token::DIVIDE);
   }
@@ -161,11 +170,11 @@ Token Lexer::getTokenAfterSlash() {
 Token Lexer::getTokenAfterDot() {
   int c = in.get();
   if (c == '.') {
-    ++end_column;
+    ++location.end_column;
+    ++location.end_index;
     text_so_far += (char) c;
     return makeToken(Token::RANGE);
   } else {
-    --end_column;
     in.putback(c);
     return makeToken(Token::DOT);
   }
@@ -177,13 +186,15 @@ Token Lexer::getTokenAfterMinus() {
   int c = in.get();
   if (c == '-') {
     do {
-      ++end_column;
+      ++location.end_column;
+      ++location.end_index;
       c = in.get();
     } while (c != EOF && c != '\n');
     in.putback(c);
     return getToken();
   } else if (isdigit(c)) {
-    ++end_column;
+    ++location.end_column;
+    ++location.end_index;
     text_so_far += (char) c;
     return getTokenAfterDigit();
   } else {
@@ -198,23 +209,26 @@ Token Lexer::getTokenAfterQuote() {
   text_so_far = "";
 
   int c = in.get();
-  ++end_column;
+  ++location.end_column;
+  ++location.end_index;
 
   while (c != EOF && c != '"' && c != '\n') {
     text_so_far += (char) c;
     c = in.get();
-    ++end_column;
+    ++location.end_column;
+    ++location.end_index;
   }
 
   if (c != '"') {
-    --end_column;
+    --location.end_column;
+    --location.end_index;
     in.putback(c);
     std::stringstream ss;
-    ss << start_row << "(" << start_column << "-" << end_column << "): I was reading the string \"" << text_so_far << "\", but it didn't end with a quotation mark.";
+    ss << location.start_row << "(" << location.start_index << "-" << location.end_index << "): I was reading the string \"" << text_so_far << "\", but it didn't end with a quotation mark.";
     throw MessagedException(ss.str());
   }
 
-  return Token(Token::STRING, text_so_far, start_row, start_column, end_row, end_column);
+  return Token(Token::STRING, text_so_far, location);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -223,7 +237,8 @@ Token Lexer::getTokenAfterLetter() {
   int c = in.get();
 
   while (c != EOF && (isalpha(c) || isdigit(c))) {
-    ++end_column;
+    ++location.end_column;
+    ++location.end_index;
     text_so_far += (char) c;
     c = in.get();
   }
@@ -272,52 +287,57 @@ Token Lexer::getTokenAfterLetter() {
 
 Token Lexer::getTokenAfterDigit() {
   int c = in.get();
-  ++end_column;
+  ++location.end_column;
+  ++location.end_index;
 
   while (c != EOF && isdigit(c)) {
     text_so_far += (char) c;
     c = in.get();
-    ++end_column;
+    ++location.end_column;
+    ++location.end_index;
   }
 
   if (isalpha(c)) {
     std::stringstream ss;
-    ss << start_row << "(" << start_column << "-" << end_column << "): I was reading the integer " << text_so_far << ", when suddenly I hit '" << (char) c << "'. What do I do with that?";
+    ss << location.start_row << "(" << location.start_index << "-" << location.end_index << "): I was reading the integer " << text_so_far << ", when suddenly I hit '" << (char) c << "'. What do I do with that?";
     throw MessagedException(ss.str());
   }
 
   if (c == EOF || c != '.' || (c == '.' && in.peek() == '.')) {
     in.putback(c);
-    --end_column;
+    --location.end_column;
+    --location.end_index;
     return makeToken(Token::INTEGER);
   } else {
     text_so_far += (char) c;
 
     c = in.get();
-    ++end_column;
+    ++location.end_column;
+    ++location.end_index;
 
     // Must be at least one number after decimal.
     if (!isdigit(c)) {
-      // TODO strip off decimal?
       std::stringstream ss;
-      ss << start_row << "(" << start_column << "-" << end_column << "): I was reading the number " << text_so_far.substr(0, text_so_far.length() - 1) << ", but I couldn't find any digits after the decimal point. You must have at least one digit there.";
+      ss << location.start_row << "(" << location.start_index << "-" << location.end_index << "): I was reading the number " << text_so_far.substr(0, text_so_far.length() - 1) << ", but I couldn't find any digits after the decimal point. You must have at least one digit there.";
       throw MessagedException(ss.str());
     }
    
     while (c != EOF && isdigit(c)) {
       text_so_far += (char) c;
       c = in.get();
-      ++end_column;
+      ++location.end_column;
+      ++location.end_index;
     }
 
     if (isalpha(c)) {
       std::stringstream ss;
-      ss << start_row << "(" << start_column << "-" << end_column << "): I was reading the number " << text_so_far << ", when suddenly I hit a '" << (char) c << "'.";
+      ss << location.start_row << "(" << location.start_index << "-" << location.end_index << "): I was reading the number " << text_so_far << ", when suddenly I hit a '" << (char) c << "'.";
       throw MessagedException(ss.str());
     }
 
     in.putback(c);
-    --end_column;
+    --location.end_column;
+    --location.end_index;
     return makeToken(Token::REAL);
   }
 }
@@ -327,7 +347,8 @@ Token Lexer::getTokenAfterDigit() {
 Token Lexer::getTokenAfterLessThan() {
   int c = in.get();
   if (c == '=') {
-    ++end_column;
+    ++location.end_column;
+    ++location.end_index;
     text_so_far += (char) c;
     return makeToken(Token::LESS_THAN_OR_EQUAL_TO);
   } else {
@@ -341,7 +362,8 @@ Token Lexer::getTokenAfterLessThan() {
 Token Lexer::getTokenAfterGreaterThan() {
   int c = in.get();
   if (c == '=') {
-    ++end_column;
+    ++location.end_column;
+    ++location.end_index;
     text_so_far += (char) c;
     return makeToken(Token::GREATER_THAN_OR_EQUAL_TO);
   } else {
@@ -355,7 +377,8 @@ Token Lexer::getTokenAfterGreaterThan() {
 Token Lexer::getTokenAfterEquals() {
   int c = in.get();
   if (c == '=') {
-    ++end_column;
+    ++location.end_column;
+    ++location.end_index;
     text_so_far += (char) c;
     return makeToken(Token::EQUAL_TO);
   } else {
@@ -370,12 +393,13 @@ Token Lexer::getTokenAfterBang() {
   int c = in.get();
 
   if (c == '=') {
-    ++end_column;
+    ++location.end_column;
+    ++location.end_index;
     text_so_far += (char) c;
     return makeToken(Token::NOT_EQUAL_TO);
   } else {
     std::stringstream ss;
-    ss << start_row << "(" << start_column << "-" << end_column << "): I ran into " << text_so_far << " and I didn't know what to do with it. It's not part of the language I speak.";
+    ss << location.start_row << "(" << location.start_index << "-" << location.end_index << "): I ran into " << text_so_far << " and I didn't know what to do with it. It's not part of the language I speak.";
     throw MessagedException(ss.str());
   }
 }

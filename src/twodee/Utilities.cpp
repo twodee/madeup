@@ -8,7 +8,7 @@ namespace td {
 /* ------------------------------------------------------------------------- */
 
 char *Utilities::FileToString(const std::string& path) {
-  std::ifstream f(path.c_str(), std::ios::in | std::ios::ate); // | std::ios::binary);
+  std::ifstream f(path.c_str(), std::ios::in | std::ios::ate | std::ios::binary);
 
   if (f.fail()) {
     throw MessagedException("can't open file " + path + " for reading");
@@ -27,6 +27,32 @@ char *Utilities::FileToString(const std::string& path) {
   s[size] = '\0';
 
   return s;
+}
+
+/* ------------------------------------------------------------------------- */
+
+std::string Utilities::Slurp(const std::string &path) {
+  std::ifstream f(path.c_str(), std::ios::in | std::ios::ate | std::ios::binary);
+
+  if (f.fail()) {
+    throw MessagedException("can't open file " + path + " for reading");
+  }
+
+  // Make buffer that's the size of the file.
+  int size = (int) f.tellg();
+  char *s = new char[size + 1];
+
+  // Go back to file start and read contents in.
+  f.seekg(0, std::ios::beg);
+  f.read(s, size);
+  f.close();
+
+  // Null terminate.
+  s[size] = '\0';
+  std::string text = s;
+  delete[] s;
+
+  return text;
 }
 
 /* ------------------------------------------------------------------------- */

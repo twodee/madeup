@@ -33,10 +33,7 @@ class Lexer {
 
     std::vector<Token> tokens;
     std::istream &in;
-    int start_row;
-    int end_row;
-    int start_column;
-    int end_column;
+    SourceLocation location;
     std::string text_so_far;
 };
 
