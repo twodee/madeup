@@ -137,7 +137,9 @@ const std::string Token::getTypeString() const {
 
 std::ostream &operator<<(std::ostream &out, const Token &token) {
   std::string text = token.getType() == Token::NEWLINE ? "\\n" : token.getText();
-  out << text << " [" << token.getTypeString() << " -> " << token.getLocation().getStartRow() << ":" << token.getLocation().getStartColumn() << " to " << token.getLocation().getEndRow() << ":" << token.getLocation().getEndColumn() << "]";
+  out << token.getLocation().getStartRow()
+      << "(" << token.getLocation().getStartIndex() << "-" << token.getLocation().getEndIndex() << ")"
+      << " " << token.getTypeString() << ": " << text;
   return out;
 }
 

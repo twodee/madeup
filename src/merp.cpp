@@ -96,7 +96,6 @@ int main(int argc, char **argv) {
   }
 
   std::string source = Utilities::Slurp(in_path);
-  std::cout << "source: " << source << std::endl;
 
   std::ifstream in(in_path);
   Lexer lexer(in);
@@ -107,7 +106,7 @@ int main(int argc, char **argv) {
       std::cout << *i << std::endl;
     }
     
-    Parser parser(tokens);
+    Parser parser(tokens, source);
     Co<ExpressionBlock> program = parser.program();
 
     Environment env;

@@ -51,11 +51,14 @@ namespace madeup {
 
 /* ------------------------------------------------------------------------- */
 
-Parser::Parser(const std::vector<Token> &tokens) :
+Parser::Parser(const std::vector<Token> &tokens,
+               const std::string &source) :
   tokens(tokens),
+  source(source),
   expressions(),
   blocks(),
-  i(0) {
+  i(0),
+  is_in_loop_range(false) {
 }
 
 /* ------------------------------------------------------------------------- */
@@ -108,12 +111,14 @@ Co<ExpressionBlock> Parser::program() {
     ++i;
   } else {
     std::stringstream ss;
-    ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartColumn() << "-" << tokens[i].getLocation().getEndColumn() << "): I ran into \"" << tokens[i].getText() << "\" in a place I didn't expect it.";
+    ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place I didn't expect it.";
     throw MessagedException(ss.str());
   }
 
   if (i != tokens.size()) {
-    throw MessagedException("extra stuff at EOF");
+    std::stringstream ss;
+    ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place I didn't expect it.";
+    throw MessagedException(ss.str());
   }
 
   return popBlock();
@@ -140,7 +145,9 @@ void Parser::statement() {
       ++i;
       blocks.top()->AddExpression(popExpression());
     } else {
-      throw MessagedException("expected end of line after statement");
+      std::stringstream ss;
+      ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected a linebreak.";
+      throw MessagedException(ss.str());
     }
   }
 }
@@ -268,7 +275,7 @@ void Parser::expressionLevel6() {
 
 void Parser::expressionLevel7() {
   expressionLevel8();
-  if (isUp(Token::BY) || isUp(Token::OF)) {
+  if (!is_in_loop_range && (isUp(Token::BY) || isUp(Token::OF))) {
     std::stack<Co<Expression> > dimensions;
     dimensions.push(popExpression());
 
@@ -289,7 +296,9 @@ void Parser::expressionLevel7() {
       } while (dimensions.size() > 0);
       expressions.push(fill);
     } else {
-      throw MessagedException("mssing of");
+      std::stringstream ss;
+      ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected 'of'.";
+      throw MessagedException(ss.str());
     }
   }
 }
@@ -316,6 +325,10 @@ void Parser::expressionLevel8() {
 
 void Parser::expressionLevel9() {
   atom();
+  Co<Expression> array;
+  if (isUp(Token::LEFT_BRACKET) || isUp(Token::DOT)) {
+    array = popExpression();
+  }
   while (isUp(Token::LEFT_BRACKET) || isUp(Token::DOT)) {
     if (isUp(Token::DOT)) {
       ++i;
@@ -324,15 +337,16 @@ void Parser::expressionLevel9() {
         ++i;
         expressions.push(Co<Expression>(new ExpressionArrayLength(popExpression())));
       } else {
-        throw MessagedException("not legal after .");
+        std::stringstream ss;
+        ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected 'length'.";
+        throw MessagedException(ss.str());
       }
     } else { 
       ++i;
       expressionLevel0();
+      Co<Expression> subscript = popExpression();
       if (isUp(Token::RIGHT_BRACKET)) {
         ++i;
-        Co<Expression> b = popExpression();
-        Co<Expression> a = popExpression();
         if (isUp(Token::ASSIGN)) {
           ++i;
           Co<Expression> rhs;
@@ -343,18 +357,22 @@ void Parser::expressionLevel9() {
             if (isUp(Token::END)) {
               ++i;
             } else {
-              throw MessagedException("missing end");
+              std::stringstream ss;
+              ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected 'end'.";
+              throw MessagedException(ss.str());
             }
           } else {
             expressionLevel0();
             rhs = popExpression();
           }
-          expressions.push(Co<Expression>(new ExpressionDefineArrayElement(a, b, rhs)));
+          expressions.push(Co<Expression>(new ExpressionDefineArrayElement(array, subscript, rhs)));
         } else {
-          expressions.push(Co<Expression>(new ExpressionArraySubscript(a, b)));
+          expressions.push(Co<Expression>(new ExpressionArraySubscript(array, subscript)));
         }
       } else {
-        throw MessagedException("missing ]");
+        std::stringstream ss;
+        ss << subscript->GetStartLine() << "(" << subscript->GetStartIndex() << "-" << subscript->GetEndIndex() << "): I didn't find a ']' where I expected it.";
+        throw MessagedException(ss.str());
       }
     }
   }
@@ -366,20 +384,26 @@ void Parser::atom() {
   if (isUp(Token::LEFT_PARENTHESIS)) {
     ++i;
     expressionLevel0();
+    Co<Expression> e = popExpression();
     if (isUp(Token::RIGHT_PARENTHESIS)) {
       ++i;
+      expressions.push(e);
     } else {
-      throw MessagedException("expecting )");
+      std::stringstream ss;
+      ss << e->GetStartLine() << "(" << e->GetStartIndex() << "-" << e->GetEndIndex() << "): I didn't find a ')' where I expected it.";
+      throw MessagedException(ss.str());
     }
   } else if (isUp(Token::PIPE)) {
     ++i;
     expressionLevel0();
+    Co<Expression> e = popExpression();
     if (isUp(Token::PIPE)) {
       ++i;
-      Co<Expression> e = popExpression();
       expressions.push(new ExpressionAbsoluteValue(e));
     } else {
-      throw MessagedException("expecting |");
+      std::stringstream ss;
+      ss << e->GetStartLine() << "(" << e->GetStartIndex() << "-" << e->GetEndIndex() << "): I didn't find a closing '|' where I expected it.";
+      throw MessagedException(ss.str());
     }
   } else if (isUp(Token::INTEGER)) {
     int n = atoi(tokens[i].getText().c_str());
@@ -411,11 +435,13 @@ void Parser::atom() {
         expressions.push(Co<Expression>(new ExpressionRepeat(n, block)));
       } else {
         std::stringstream ss;
-        ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartColumn() << "-" << tokens[i].getLocation().getEndColumn() << "): I ran into \"" << tokens[i].getText() << "\" in a place where I expected \"end\".";
+        ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartColumn() << "-" << tokens[i].getLocation().getEndColumn() << "): I found '" << tokens[i].getText() << "' in a place where I expected 'end'.";
         throw MessagedException(ss.str());
       }
     } else {
-      throw MessagedException("expected newline");
+      std::stringstream ss;
+      ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected a linebreak.";
+      throw MessagedException(ss.str());
     }
   } else if (isUp(Token::WHILE)) {
     ++i;
@@ -429,10 +455,14 @@ void Parser::atom() {
         Co<ExpressionBlock> block = popBlock();
         expressions.push(Co<Expression>(new ExpressionWhile(condition, block)));
       } else {
-        throw MessagedException("expecting end after repeat");
+        std::stringstream ss;
+        ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected 'end'.";
+        throw MessagedException(ss.str());
       }
     } else {
-      throw MessagedException("expected newline");
+      std::stringstream ss;
+      ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected a linebreak.";
+      throw MessagedException(ss.str());
     }
   } else if (isUp(Token::IF)) {
     ++i;
@@ -453,7 +483,9 @@ void Parser::atom() {
         else_block->AddExpression(popExpression());
         blocks.push(else_block);
       } else {
-        throw MessagedException("expecting else");
+        std::stringstream ss;
+        ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected 'else'.";
+        throw MessagedException(ss.str());
       }
     }
 
@@ -469,10 +501,14 @@ void Parser::atom() {
           if (isUp(Token::END)) {
             ++i;
           } else {
-            throw MessagedException("expecting end");
+            std::stringstream ss;
+            ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected 'end'.";
+            throw MessagedException(ss.str());
           }
         } else {
-          throw MessagedException("expecting newline after else");
+          std::stringstream ss;
+          ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected a linebreak.";
+          throw MessagedException(ss.str());
         }
       } else {
         blocks.push(Co<ExpressionBlock>(new ExpressionBlock()));
@@ -480,7 +516,9 @@ void Parser::atom() {
     }
 
     else {
-      throw MessagedException("expecting then or new line");
+      std::stringstream ss;
+      ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected 'then' or a linebreak.";
+      throw MessagedException(ss.str());
     }
 
     Co<ExpressionBlock> else_block = popBlock();
@@ -509,10 +547,14 @@ void Parser::atom() {
           ++i;
           rhs = popBlock();
         } else {
-          throw MessagedException("missing end");
+          std::stringstream ss;
+          ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected 'end'.";
+          throw MessagedException(ss.str());
         }
       } else {
-        throw MessagedException("unexpected after func declare");
+        std::stringstream ss;
+        ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected an assignment.";
+        throw MessagedException(ss.str());
       }
 
       Co<ExpressionDefine> define(new ExpressionDefine(name, rhs));
@@ -521,7 +563,9 @@ void Parser::atom() {
       }
       expressions.push(define);
     } else {
-      throw MessagedException("missing name");
+      std::stringstream ss;
+      ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected a name.";
+      throw MessagedException(ss.str());
     }
   } else if (isUp(Token::ID) && isUp(Token::ASSIGN, 2)) {
     std::string name = tokens[i].getText();
@@ -533,7 +577,9 @@ void Parser::atom() {
       if (isUp(Token::END)) {
         rhs = popBlock();
       } else {
-        throw MessagedException("expecting end after assignment");
+        std::stringstream ss;
+        ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected 'end'.";
+        throw MessagedException(ss.str());
       }
     } else {
       expressionLevel0();
@@ -551,19 +597,15 @@ void Parser::atom() {
     std::string name = tokens[i].getText();
     ++i;
     if (isUp(Token::ID) && isUp(Token::COLON, 2)) {
-      /* std::cout << "name" << std::endl; */
       Co<ExpressionCallWithNamedParameters> call(new ExpressionCallWithNamedParameters(name));
       while (isUp(Token::ID) && isUp(Token::COLON, 2)) {
         std::string formal = tokens[i].getText();
-        /* std::cout << "formal: " << formal << std::endl; */
         i += 2;
         expressionLevel0();
         Co<Expression> actual = popExpression();
-        /* std::cout << "actual: " << actual << std::endl; */
         call->AddParameter(formal, actual);
       }
       expressions.push(call);
-      /* std::cout << "call: " << call << std::endl; */
     } else {
       Co<ExpressionCall> call(new ExpressionCall(name));
       if (isInExpressionFirst()) {
@@ -575,7 +617,9 @@ void Parser::atom() {
             expressionLevel0();
             call->AddParameter(popExpression());
           } else {
-            throw MessagedException("dangling comma");
+            std::stringstream ss;
+            ss << tokens[i - 1].getLocation().getStartRow() << "(" << tokens[i - 1].getLocation().getStartIndex() << "-" << tokens[i - 1].getLocation().getEndIndex() << "): I found an extra comma lying around.";
+            throw MessagedException(ss.str());
           }
         }
       }
@@ -633,7 +677,9 @@ void Parser::atom() {
 
         if (isUp(Token::RANGE)) {
           ++i;
+          is_in_loop_range = true;
           expressionLevel0();
+          is_in_loop_range = false;
           stop = popExpression();
 
           if (by.IsNull() && isUp(Token::BY)) {
@@ -644,13 +690,19 @@ void Parser::atom() {
             by = Co<Expression>(new ExpressionInteger(1));
           } else if (isUp(Token::BY)) {
             ++i;
-            throw MessagedException("can't have by with second term");
+            std::stringstream ss;
+            ss << tokens[i - 1].getLocation().getStartRow() << "(" << tokens[i - 1].getLocation().getStartIndex() << "-" << tokens[i - 1].getLocation().getEndIndex() << "): I found a by clause in a for loop that already had its step determined.";
+            throw MessagedException(ss.str());
           }
         } else {
-          throw MessagedException("missing range");
+          std::stringstream ss;
+          ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected '..'.";
+          throw MessagedException(ss.str());
         }
       } else {
-        throw MessagedException("bad for loop");
+        std::stringstream ss;
+        ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected 'in', 'through', or 'to'.";
+        throw MessagedException(ss.str());
       }
 
       if (isUp(Token::NEWLINE)) {
@@ -661,18 +713,24 @@ void Parser::atom() {
           ++i;
           expressions.push(Co<Expression>(new ExpressionFor(iterator_id, start, stop, by, body, is_inclusive)));
         } else {
-          throw MessagedException("expecting end");
+          std::stringstream ss;
+          ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected 'end'.";
+          throw MessagedException(ss.str());
         }
       } else {
-        throw MessagedException("expecting newline");
+        std::stringstream ss;
+        ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected a linebreak.";
+        throw MessagedException(ss.str());
       }
     } else {
-      throw MessagedException("missing id in for");
+      std::stringstream ss;
+      ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartIndex() << "-" << tokens[i].getLocation().getEndIndex() << "): I found '" << tokens[i].getText() << "' in a place where I expected a name.";
+      throw MessagedException(ss.str());
     }
 
   } else {
     std::stringstream ss;
-    ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartColumn() << "-" << tokens[i].getLocation().getEndColumn() << "): I ran into \"" << tokens[i].getText() << "\" in a place I didn't expect it.";
+    ss << tokens[i].getLocation().getStartRow() << "(" << tokens[i].getLocation().getStartColumn() << "-" << tokens[i].getLocation().getEndColumn() << "): I found '" << tokens[i].getText() << "' in a place I didn't expect it.";
     throw MessagedException(ss.str());
   }
 }

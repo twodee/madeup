@@ -15,7 +15,8 @@ namespace madeup {
 
 class Parser {
   public:
-    Parser(const std::vector<Token> &tokens);
+    Parser(const std::vector<Token> &tokens,
+           const std::string &source = "");
 
     Co<ExpressionBlock> program();
     void block();
@@ -38,10 +39,12 @@ class Parser {
     Co<Expression> popExpression();
     Co<ExpressionBlock> popBlock();
 
-    const std::vector<Token> &tokens;
+    const std::vector<Token> tokens;
+    const std::string source;
     std::stack<Co<Expression> > expressions;
     std::stack<Co<ExpressionBlock> > blocks;
     int i;
+    bool is_in_loop_range;
 };
 
 /* ------------------------------------------------------------------------- */

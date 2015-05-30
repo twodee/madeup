@@ -24,7 +24,7 @@ $back['out_path'] = $out_path;
 // input from.
 $in_path = tempnam(sys_get_temp_dir(), 'mupin');
 $back['in_path'] = $in_path;
-file_put_contents($in_path, $in['source'] . "\n");
+file_put_contents($in_path, $in['source']);
 error_log(json_encode($back));
 
 // Execute the interpreter and collect its output.

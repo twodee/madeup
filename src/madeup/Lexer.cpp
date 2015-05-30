@@ -18,7 +18,6 @@ Lexer::Lexer(std::istream &in) :
   }
 }
 
-/* ------------------------------------------------------------------------- */
 
 const std::vector<Token> &Lexer::getTokens() const {
   return tokens;
@@ -64,7 +63,7 @@ Token Lexer::getToken() {
   text_so_far = "";
 
   if (in.eof()) {
-    return makeToken(Token::END_OF_FILE);
+    return Token(Token::END_OF_FILE, "END OF FILE", location);
   }
 
   // This token picks up where the last one left off, skipping any whitespace.
@@ -84,7 +83,7 @@ Token Lexer::getToken() {
   location.end_index = location.start_index;
 
   if (c == EOF) {
-    return makeToken(Token::END_OF_FILE);
+    return Token(Token::END_OF_FILE, "END OF FILE", location);
   } else {
     text_so_far += (char) c;
   }
