@@ -21,21 +21,21 @@ class ExpressionNot : public Expression {
       left(left) {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
-      Co<Expression> lvalue = left->Evaluate(env);
+    Co<Expression> evaluate(Environment& env) const {
+      Co<Expression> lvalue = left->evaluate(env);
 
       ExpressionBoolean *lboolean = dynamic_cast<ExpressionBoolean *>(lvalue.GetPointer());
       
       if (lboolean) {
-        return Co<Expression>(new ExpressionBoolean(!lboolean->GetBoolean()));
+        return Co<Expression>(new ExpressionBoolean(!lboolean->toBoolean()));
       } else {
-        throw MessagedException(left->GetSourceLocation().toAnchor() + ": Operator not expects a boolean operand. " + left->GetSource() + " is not boolean.");
+        throw MessagedException(left->getSourceLocation().toAnchor() + ": Operator not expects a boolean operand. " + left->getSource() + " is not boolean.");
       }
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(not ";
-      left->Write(out);
+      left->write(out);
       out << ")";
     }
 

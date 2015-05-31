@@ -24,12 +24,12 @@ class ExpressionWhere : public Expression {
       Expression() {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
-      std::cerr << env.GetTurtle().position << std::endl;
+    Co<Expression> evaluate(Environment& env) const {
+      std::cerr << env.getTurtle().position << std::endl;
       return Co<Expression>(new ExpressionUnit());
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(where)";
     }
 

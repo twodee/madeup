@@ -24,13 +24,13 @@ class ExpressionPrint : public Expression {
       Expression() {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
+    Co<Expression> evaluate(Environment& env) const {
       Co<ExpressionClosure> message = env["message"];
       if (message.IsNull()) {
-        throw MessagedException(GetSourceLocation().toAnchor() + ": I expect function print to be given a value named message, but no message was given.");
+        throw MessagedException(getSourceLocation().toAnchor() + ": I expect function print to be given a value named message, but no message was given.");
       }
 
-      Co<Expression> value = message->Evaluate(env);
+      Co<Expression> value = message->evaluate(env);
 
       ExpressionString *string_value = dynamic_cast<ExpressionString *>(value.GetPointer());
       if (string_value) {
@@ -40,26 +40,26 @@ class ExpressionPrint : public Expression {
 
       ExpressionReal *decimal_value = dynamic_cast<ExpressionReal *>(value.GetPointer());
       if (decimal_value) {
-        std::cout << decimal_value->GetReal() << std::endl;
+        std::cout << decimal_value->toReal() << std::endl;
         return value;
       }
 
       ExpressionInteger *integer_value = dynamic_cast<ExpressionInteger *>(value.GetPointer());
       if (integer_value) {
-        std::cout << integer_value->GetInteger() << std::endl;
+        std::cout << integer_value->toInteger() << std::endl;
         return value;
       }
 
       ExpressionBoolean *boolean_value = dynamic_cast<ExpressionBoolean *>(value.GetPointer());
       if (boolean_value) {
-        std::cout << boolean_value->GetBoolean() << std::endl;
+        std::cout << boolean_value->toBoolean() << std::endl;
         return value;
       }
       
-      throw MessagedException(message->GetSourceLocation().toAnchor() + ": I expect function print to be given a string, boolean, or number. You gave it something I don't know how to print.");
+      throw MessagedException(message->getSourceLocation().toAnchor() + ": I expect function print to be given a string, boolean, or number. You gave it something I don't know how to print.");
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(print msg)";
     }
 

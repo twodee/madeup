@@ -22,11 +22,11 @@ class FormalParameter {
       evaluation_mode(evaluation_mode) {
     }
 
-    evaluation_mode_t GetEvaluationMode() const {
+    evaluation_mode_t getEvaluationMode() const {
       return evaluation_mode;
     }
 
-    const std::string &GetName() const {
+    const std::string &getName() const {
       return name;
     }
 
@@ -45,15 +45,15 @@ class ExpressionDefine : public Expression {
   public:
     ExpressionDefine(const std::string& name, Co<Expression> body);
     ExpressionDefine(const std::string& name, Co<Expression> body, const std::vector<FormalParameter>& formals);
-    void AddFormal(const std::string& name, FormalParameter::evaluation_mode_t evaluation_mode = FormalParameter::EAGER);
-    const FormalParameter& GetFormal(int i);
-    unsigned int GetArity() const;
-    Co<Expression> Evaluate(Environment& env);
-    Co<Expression> GetBody() const;
-    void Write(ostream& out) const;
-    void IsDynamicallyScoped(bool enable);
-    bool IsDynamicallyScoped() const;
-    const std::string& GetName() const { return name; }
+    void addFormal(const std::string& name, FormalParameter::evaluation_mode_t evaluation_mode = FormalParameter::EAGER);
+    const FormalParameter& getFormal(int i);
+    unsigned int getArity() const;
+    Co<Expression> evaluate(Environment& env) const;
+    Co<Expression> getBody() const;
+    void write(ostream& out) const;
+    void isDynamicallyScoped(bool enable);
+    bool isDynamicallyScoped() const;
+    const std::string& getName() const { return name; }
 
   private:
     std::string name;

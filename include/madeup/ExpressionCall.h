@@ -19,30 +19,30 @@ class ExpressionCall : public Expression {
 
     }
 
-    void AddParameter(Co<Expression> parameter) {
+    void addParameter(Co<Expression> parameter) {
       parameters.push_back(parameter);
     }
 
-    Co<Expression> Evaluate(Environment& env) {
+    Co<Expression> evaluate(Environment& env) const {
       Co<ExpressionClosure> closure = env[name];
       if (closure.IsNull()) {
-        throw MessagedException(GetSourceLocation().toAnchor() + ": I couldn't find a function or variable named " + name + ".");
+        throw MessagedException(getSourceLocation().toAnchor() + ": I couldn't find a function or variable named " + name + ".");
       }
 
-      Co<ExpressionDefine> define = closure->GetDefine();
+      Co<ExpressionDefine> define = closure->getDefine();
       
       // Make sure there are the correct number of parameters!
-      if (parameters.size() != define->GetArity()) {
+      if (parameters.size() != define->getArity()) {
         std::stringstream ss;
-        ss << GetSourceLocation().toAnchor() << ": I expect function " << define->GetName() << " to be given " << define->GetArity() << " parameter";
-        if (define->GetArity() != 1) {
+        ss << getSourceLocation().toAnchor() << ": I expect function " << define->getName() << " to be given " << define->getArity() << " parameter";
+        if (define->getArity() != 1) {
           ss << "s";
         }
 
-        if (define->GetArity() > 0) {
-          ss << ": " << define->GetFormal(0).GetName();
-          for (unsigned int i = 1; i < define->GetArity(); ++i) {
-            ss << ", " << define->GetFormal(i).GetName();
+        if (define->getArity() > 0) {
+          ss << ": " << define->getFormal(0).getName();
+          for (unsigned int i = 1; i < define->getArity(); ++i) {
+            ss << ", " << define->getFormal(i).getName();
           }
         }
 
@@ -51,26 +51,26 @@ class ExpressionCall : public Expression {
         throw MessagedException(ss.str());
       }
 
-      Co<Environment> closure_env(new Environment(*closure->GetEnvironment()));
-      for (unsigned int i = 0; i < define->GetArity(); ++i) {
-        const FormalParameter &formal = define->GetFormal(i);
-        bool is_lazy = formal.GetEvaluationMode() == FormalParameter::LAZY;
-        Co<ExpressionDefine> parameter_define = Co<ExpressionDefine>(new ExpressionDefine(formal.GetName(), is_lazy ? parameters[i] : parameters[i]->Evaluate(env)));
+      Co<Environment> closure_env(new Environment(*closure->getEnvironment()));
+      for (unsigned int i = 0; i < define->getArity(); ++i) {
+        const FormalParameter &formal = define->getFormal(i);
+        bool is_lazy = formal.getEvaluationMode() == FormalParameter::LAZY;
+        Co<ExpressionDefine> parameter_define = Co<ExpressionDefine>(new ExpressionDefine(formal.getName(), is_lazy ? parameters[i] : parameters[i]->evaluate(env)));
 
         Co<ExpressionClosure> parameter_closure = Co<ExpressionClosure>(new ExpressionClosure(parameter_define, is_lazy ? env : Environment()));
-        parameter_closure->SetSource(parameters[i]->GetSource(), parameters[i]->GetSourceLocation());
+        parameter_closure->setSource(parameters[i]->getSource(), parameters[i]->getSourceLocation());
 
-        closure_env->Add(define->GetFormal(i).GetName(), parameter_closure);
+        closure_env->add(define->getFormal(i).getName(), parameter_closure);
       }
 
       try {
-        return closure->Evaluate(*closure_env);
+        return closure->evaluate(*closure_env);
       } catch (UnlocatedException e) {
-        throw MessagedException(GetSourceLocation().toAnchor() + ": " + e.GetMessage());
+        throw MessagedException(getSourceLocation().toAnchor() + ": " + e.GetMessage());
       }
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(call " << name;
       for (vector<Co<Expression> >::const_iterator i = parameters.begin(); i != parameters.end(); ++i) {
         out << " " << *i;

@@ -21,30 +21,30 @@ class ExpressionWhile : public Expression {
       block(block) {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
+    Co<Expression> evaluate(Environment& env) const {
       Co<Expression> value = Co<Expression>(new ExpressionUnit());
-      Co<Expression> v = condition->Evaluate(env);
+      Co<Expression> v = condition->evaluate(env);
       ExpressionBoolean *condition_value = dynamic_cast<ExpressionBoolean *>(v.GetPointer());
       if (!condition_value) {
-        throw MessagedException(condition->GetSourceLocation().toAnchor() + ": A while loop expects a boolean condition. " + condition->GetSource() + " is not boolean.");
+        throw MessagedException(condition->getSourceLocation().toAnchor() + ": A while loop expects a boolean condition. " + condition->getSource() + " is not boolean.");
       }
-      while (condition_value->GetBoolean()) {
-        value = block->Evaluate(env);
-        v = condition->Evaluate(env);
+      while (condition_value->toBoolean()) {
+        value = block->evaluate(env);
+        v = condition->evaluate(env);
         condition_value = dynamic_cast<ExpressionBoolean *>(v.GetPointer());
         if (!condition_value) {
-          throw MessagedException(condition->GetSourceLocation().toAnchor() + ": A while loop expects a boolean condition. " + condition->GetSource() + " is not boolean.");
+          throw MessagedException(condition->getSourceLocation().toAnchor() + ": A while loop expects a boolean condition. " + condition->getSource() + " is not boolean.");
         }
       }
 
       return value;
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(while ";
-      condition->Write(out);
+      condition->write(out);
       out << " ";
-      block->Write(out);
+      block->write(out);
       out << ")";
     }
 

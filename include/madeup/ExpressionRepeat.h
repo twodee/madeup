@@ -20,28 +20,28 @@ class ExpressionRepeat : public Expression {
       body(body) {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
+    Co<Expression> evaluate(Environment& env) const {
       Co<Expression> r = Co<Expression>(new ExpressionUnit());
 
-      Co<Expression> v = niterations->Evaluate(env);
+      Co<Expression> v = niterations->evaluate(env);
       ExpressionInteger *niterations_value = dynamic_cast<ExpressionInteger *>(v.GetPointer());
       if (!niterations_value) {
-        throw MessagedException(niterations->GetSourceLocation().toAnchor() + ": A repeat loop expects its number of iterations to be an integer. " + niterations->GetSource() + " is not an integer.");
+        throw MessagedException(niterations->getSourceLocation().toAnchor() + ": A repeat loop expects its number of iterations to be an integer. " + niterations->getSource() + " is not an integer.");
       }
 
-      int n = niterations_value->GetInteger();
+      int n = niterations_value->toInteger();
       for (int i = 0; i < n; ++i) {
-        r = body->Evaluate(env);
+        r = body->evaluate(env);
       }
 
       return r;
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(repeat ";
-      niterations->Write(out);
+      niterations->write(out);
       out << " ";
-      body->Write(out);
+      body->write(out);
       out << ")";
     }
 

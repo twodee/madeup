@@ -14,12 +14,12 @@ class ExpressionBox : public Expression {
       Expression() {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
-      env.Box();
+    Co<Expression> evaluate(Environment& env) const {
+      env.box();
       return Co<Expression>(new ExpressionUnit());
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(box)";
     }
 

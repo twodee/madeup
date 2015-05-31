@@ -18,27 +18,27 @@ ExpressionDefineVariable::ExpressionDefineVariable(const string& name, Co<Expres
 
 /* ------------------------------------------------------------------------- */
 
-Co<Expression> ExpressionDefineVariable::Evaluate(Environment& env) {
-  Co<Expression> rhs_value = rhs->Evaluate(env);
-  rhs_value->SetSource(rhs->GetSource(), rhs->GetSourceLocation());
+Co<Expression> ExpressionDefineVariable::evaluate(Environment& env) const {
+  Co<Expression> rhs_value = rhs->evaluate(env);
+  rhs_value->setSource(rhs->getSource(), rhs->getSourceLocation());
   Co<ExpressionDefine> define = Co<ExpressionDefine>(new ExpressionDefine(name, rhs_value));
-  define->SetSource(GetSource(), GetSourceLocation());
+  define->setSource(getSource(), getSourceLocation());
   Co<ExpressionClosure> closure(new ExpressionClosure(define, env));
-  env.Add(name, closure);
+  env.add(name, closure);
   return rhs_value;
 }
 
 /* ------------------------------------------------------------------------- */
 
-Co<Expression> ExpressionDefineVariable::GetRightHandSide() const {
+Co<Expression> ExpressionDefineVariable::getRightHandSide() const {
   return rhs;
 }
 
 /* ------------------------------------------------------------------------- */
 
-void ExpressionDefineVariable::Write(ostream& out) const {
+void ExpressionDefineVariable::write(ostream& out) const {
   out << "(define-variable " << name << " ";
-  rhs->Write(out);
+  rhs->write(out);
   out << ")";
 }
 
@@ -50,15 +50,15 @@ ExpressionDefineVariableSeed::ExpressionDefineVariableSeed(const std::string& na
 
 /* ------------------------------------------------------------------------- */
 
-Co<Expression> ExpressionDefineVariableSeed::Evaluate(Environment& env) {
-  Co<Expression> expr = ExpressionDefineVariable::Evaluate(env);
+Co<Expression> ExpressionDefineVariableSeed::evaluate(Environment& env) const {
+  Co<Expression> expr = ExpressionDefineVariable::evaluate(env);
   ExpressionNumber *number = dynamic_cast<ExpressionNumber *>(expr.GetPointer());
 
   if (!number) {
     throw MessagedException("Expected number!");
   }
 
-  int seed = number->GetInteger();
+  int seed = number->toInteger();
   srand(seed);
 
   return expr;

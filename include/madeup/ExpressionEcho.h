@@ -21,12 +21,12 @@ class ExpressionEcho : public Expression {
       Expression() {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
-      env.Echo();
+    Co<Expression> evaluate(Environment& env) const {
+      env.echo();
       return Co<Expression>(new ExpressionUnit());
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(echo)";
     }
 

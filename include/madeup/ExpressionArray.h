@@ -19,11 +19,11 @@ class ExpressionArray : public Expression {
       }
     }
 
-    Co<Expression> Evaluate(Environment& env) {
+    Co<Expression> evaluate(Environment& env) const {
       return Co<Expression>((ExpressionArray *) (this));
     }
 
-    int GetLength() {
+    int getLength() {
       return nelements;
     }
 
@@ -34,15 +34,15 @@ class ExpressionArray : public Expression {
       return elements[i];
     }
 
-    void SetElement(int i, Co<Expression> expr) {
+    void setElement(int i, Co<Expression> expr) {
       elements[i] = expr;
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(ARRAY";
       for (int i = 0; i < nelements; ++i) {
         out << " ";
-        elements[i]->Write(out);
+        elements[i]->write(out);
       }
       out << ")";
     }
@@ -60,13 +60,13 @@ class ExpressionArrayReference : public Expression {
       array_expression(array_expression) {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
+    Co<Expression> evaluate(Environment& env) const {
       return Co<Expression>(new ExpressionArrayReference(array_expression));
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(ARRAYREF ";
-      array_expression->Write(out);
+      array_expression->write(out);
       out << ")";
     }
 
@@ -88,27 +88,27 @@ class ExpressionArrayConstructor : public Expression {
       length_expression(length_expression) {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
-      Co<Expression> length_value = length_expression->Evaluate(env);
+    Co<Expression> evaluate(Environment& env) const {
+      Co<Expression> length_value = length_expression->evaluate(env);
       ExpressionInteger *length = dynamic_cast<ExpressionInteger *>(length_value.GetPointer());
 
       if (!length) {
-        throw MessagedException(length_expression->GetSourceLocation().toAnchor() + ": An array expects its number of elements to be an integer. " + length_expression->GetSource() + " is not an integer.");
+        throw MessagedException(length_expression->getSourceLocation().toAnchor() + ": An array expects its number of elements to be an integer. " + length_expression->getSource() + " is not an integer.");
       }
 
-      Co<ExpressionArray> array = Co<Expression>(new ExpressionArray(length->GetInteger(), Co<Expression>(new ExpressionUnit())));
-      for (int i = 0; i < length->GetInteger(); ++i) {
-        array->SetElement(i, fill_expression->Evaluate(env));
+      Co<ExpressionArray> array = Co<Expression>(new ExpressionArray(length->toInteger(), Co<Expression>(new ExpressionUnit())));
+      for (int i = 0; i < length->toInteger(); ++i) {
+        array->setElement(i, fill_expression->evaluate(env));
       }
 
       return Co<Expression>(new ExpressionArrayReference(array));
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(MAKEARRAY ";
-      length_expression->Write(out);
+      length_expression->write(out);
       out << " ";
-      fill_expression->Write(out);
+      fill_expression->write(out);
       out << ")";
     }
 
@@ -126,20 +126,20 @@ class ExpressionArrayLength : public Expression {
       array_expression(array_expression) {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
-      Co<Expression> array_value = array_expression->Evaluate(env);
+    Co<Expression> evaluate(Environment& env) const {
+      Co<Expression> array_value = array_expression->evaluate(env);
       ExpressionArrayReference *array = dynamic_cast<ExpressionArrayReference *>(array_value.GetPointer());
 
       if (!array) {
-        throw MessagedException(array_expression->GetSourceLocation().toAnchor() + ": Length expects to be applied to an array. " + array_expression->GetSource() + " is not an array.");
+        throw MessagedException(array_expression->getSourceLocation().toAnchor() + ": Length expects to be applied to an array. " + array_expression->getSource() + " is not an array.");
       }
 
-      return Co<Expression>(new ExpressionInteger(array->GetArray()->GetLength()));
+      return Co<Expression>(new ExpressionInteger(array->GetArray()->getLength()));
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(LENGTH ";
-      array_expression->Write(out);
+      array_expression->write(out);
       out << ")";
     }
 
@@ -157,50 +157,50 @@ class ExpressionArraySubscript : public Expression {
       index_expression(index_expression) {
     }
 
-    Co<ExpressionArrayReference> EvaluateArrayReference(Environment& env) {
-      Co<Expression> array_value = array_expression->Evaluate(env);
+    Co<ExpressionArrayReference> evaluateArrayReference(Environment& env) const {
+      Co<Expression> array_value = array_expression->evaluate(env);
       ExpressionArrayReference *array = dynamic_cast<ExpressionArrayReference *>(array_value.GetPointer());
       if (!array) {
-        throw MessagedException(array_expression->GetSourceLocation().toAnchor() + ": Operator [] expects to be applied to an array. " + array_expression->GetSource() + " is not an array.");
+        throw MessagedException(array_expression->getSourceLocation().toAnchor() + ": Operator [] expects to be applied to an array. " + array_expression->getSource() + " is not an array.");
       }
 
       return Co<ExpressionArrayReference>(array_value);
     }
 
-    Co<ExpressionInteger> EvaluateIndex(Environment& env, Co<ExpressionArrayReference> array) {
-      Co<Expression> index_value = index_expression->Evaluate(env);
+    Co<ExpressionInteger> evaluateIndex(Environment& env, Co<ExpressionArrayReference> array) const {
+      Co<Expression> index_value = index_expression->evaluate(env);
       ExpressionInteger *index = dynamic_cast<ExpressionInteger *>(index_value.GetPointer());
       if (!index) {
-        throw MessagedException(index_expression->GetSourceLocation().toAnchor() + ": Operator [] expects index to be an integer. " + index_expression->GetSource() + " is not an integer.");
+        throw MessagedException(index_expression->getSourceLocation().toAnchor() + ": Operator [] expects index to be an integer. " + index_expression->getSource() + " is not an integer.");
       }
 
-      if (index->GetInteger() < 0) {
-        index->SetInteger(index->GetInteger() + array->GetArray()->GetLength());
+      if (index->toInteger() < 0) {
+        index->setInteger(index->toInteger() + array->GetArray()->getLength());
       }
 
-      if (index->GetInteger() < 0 || index->GetInteger() >= array->GetArray()->GetLength()) {
+      if (index->toInteger() < 0 || index->toInteger() >= array->GetArray()->getLength()) {
         std::stringstream ss;
-        ss << index_expression->GetSourceLocation().toAnchor();
+        ss << index_expression->getSourceLocation().toAnchor();
         ss << ": Operator [] expects a valid index. The array has ";
-        ss << array->GetArray()->GetLength();
-        ss << " elements, indexed 0 through " << (array->GetArray()->GetLength() - 1) << ". " << index_expression->GetSource() << " is not a valid index.";
+        ss << array->GetArray()->getLength();
+        ss << " elements, indexed 0 through " << (array->GetArray()->getLength() - 1) << ". " << index_expression->getSource() << " is not a valid index.";
         throw MessagedException(ss.str());
       }
 
       return Co<ExpressionInteger>(index_value);
     }
 
-    Co<Expression> Evaluate(Environment& env) {
-      Co<ExpressionArrayReference> array = EvaluateArrayReference(env);
-      Co<ExpressionInteger> index = EvaluateIndex(env, array);
-      return (*array->GetArray())[index->GetInteger()];
+    Co<Expression> evaluate(Environment& env) const {
+      Co<ExpressionArrayReference> array = evaluateArrayReference(env);
+      Co<ExpressionInteger> index = evaluateIndex(env, array);
+      return (*array->GetArray())[index->toInteger()];
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(SUBSCRIPT ";
-      array_expression->Write(out);
+      array_expression->write(out);
       out << " ";
-      index_expression->Write(out);
+      index_expression->write(out);
       out << ")";
     }
 

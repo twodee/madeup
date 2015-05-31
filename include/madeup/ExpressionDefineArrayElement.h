@@ -11,9 +11,9 @@ namespace madeup {
 class ExpressionDefineArrayElement : public Expression {
   public:
     ExpressionDefineArrayElement(Co<Expression> array, Co<Expression> index, Co<Expression> rhs);
-    Co<Expression> Evaluate(Environment& env);
-    Co<Expression> GetRightHandSide() const;
-    void Write(ostream& out) const;
+    Co<Expression> evaluate(Environment& env) const;
+    Co<Expression> getRightHandSide() const;
+    void write(ostream& out) const;
 
   private:
     Co<ExpressionArraySubscript> subscript;

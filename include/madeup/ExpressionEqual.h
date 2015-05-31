@@ -21,9 +21,9 @@ class ExpressionEqual : public Expression {
       right(right) {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
-      Co<Expression> lvalue = left->Evaluate(env);
-      Co<Expression> rvalue = right->Evaluate(env);
+    Co<Expression> evaluate(Environment& env) const {
+      Co<Expression> lvalue = left->evaluate(env);
+      Co<Expression> rvalue = right->evaluate(env);
 
       ExpressionString *lstring = dynamic_cast<ExpressionString *>(lvalue.GetPointer());
       ExpressionString *rstring = dynamic_cast<ExpressionString *>(rvalue.GetPointer());
@@ -38,11 +38,11 @@ class ExpressionEqual : public Expression {
       if (lstring && rstring) {
         value = Co<Expression>(new ExpressionBoolean(lstring->GetString() == rstring->GetString()));
       } else if (ldecimal && rdecimal) {
-        value = Co<Expression>(new ExpressionBoolean(ldecimal->GetReal() == rdecimal->GetReal()));
+        value = Co<Expression>(new ExpressionBoolean(ldecimal->toReal() == rdecimal->toReal()));
       } else if (linteger && rinteger) {
-        value = Co<Expression>(new ExpressionBoolean(linteger->GetInteger() == rinteger->GetInteger()));
+        value = Co<Expression>(new ExpressionBoolean(linteger->toInteger() == rinteger->toInteger()));
       } else if (lboolean && rboolean) {
-        value = Co<Expression>(new ExpressionBoolean(lboolean->GetBoolean() == rboolean->GetBoolean()));
+        value = Co<Expression>(new ExpressionBoolean(lboolean->toBoolean() == rboolean->toBoolean()));
       } else {
         value = new ExpressionBoolean(false);
       }
@@ -50,11 +50,11 @@ class ExpressionEqual : public Expression {
       return value;
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(== ";
-      left->Write(out);
+      left->write(out);
       out << " ";
-      right->Write(out);
+      right->write(out);
       out << ")";
     }
 

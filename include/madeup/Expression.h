@@ -28,13 +28,13 @@ class Expression {
     Expression();
     virtual ~Expression();
 
-    virtual Co<Expression> Evaluate(Environment& env) = 0;
-    virtual void Write(ostream& out) const = 0;
-    const std::string& GetSource() const;
-    const SourceLocation &GetSourceLocation() const;
-    void SetSource(const std::string& source, const SourceLocation &location);
+    virtual Co<Expression> evaluate(Environment& env) const = 0;
+    virtual void write(ostream& out) const = 0;
+    const std::string& getSource() const;
+    const SourceLocation &getSourceLocation() const;
+    void setSource(const std::string& source, const SourceLocation &location);
 
-    static Co<Expression> Parse(const std::string& s);
+    static Co<Expression> parse(const std::string& s);
 
   private:
     std::string source;

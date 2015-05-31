@@ -19,14 +19,14 @@ class ExpressionBlock : public Expression {
       statements() {
     }
 
-    void Append(Co<Expression> element) {
+    void append(Co<Expression> element) {
       statements.push_back(element);
     }
 
-    Co<Expression> Evaluate(Environment& env) {
+    Co<Expression> evaluate(Environment& env) const {
       Co<Expression> value(new ExpressionUnit());
-      for (vector<Co<Expression> >::iterator i = statements.begin(); i != statements.end(); ++i) {
-        value = (*i)->Evaluate(env);
+      for (vector<Co<Expression> >::const_iterator i = statements.begin(); i != statements.end(); ++i) {
+        value = (*i)->evaluate(env);
       }
       return value;
     }
@@ -36,18 +36,18 @@ class ExpressionBlock : public Expression {
       return statements[i];
     }
 
-    int GetLength() const {
+    int getLength() const {
       return statements.size();
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(block ";
       vector<Co<Expression> >::const_iterator i = statements.begin();
       if (i != statements.end()) {
-        (*i)->Write(out);
+        (*i)->write(out);
         for (++i; i != statements.end(); ++i) {
           out << " ";
-          (*i)->Write(out);
+          (*i)->write(out);
         }
       }
       out << ")";

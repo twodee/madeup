@@ -9,7 +9,7 @@ namespace madeup {
 /* ------------------------------------------------------------------------- */
 
 std::ostream &operator<<(std::ostream &out, const FormalParameter &parameter) {
-  out << parameter.GetName();
+  out << parameter.getName();
   return out;
 }
 
@@ -34,62 +34,62 @@ ExpressionDefine::ExpressionDefine(const string& name, Co<Expression> body, cons
 
 /* ------------------------------------------------------------------------- */
 
-void ExpressionDefine::AddFormal(const string& name, FormalParameter::evaluation_mode_t evaluation_mode) {
+void ExpressionDefine::addFormal(const string& name, FormalParameter::evaluation_mode_t evaluation_mode) {
   formals.push_back(FormalParameter(name, evaluation_mode));
 }
 
 /* ------------------------------------------------------------------------- */
 
-const FormalParameter& ExpressionDefine::GetFormal(int i) {
+const FormalParameter& ExpressionDefine::getFormal(int i) {
   return formals[i];
 }
 
 /* ------------------------------------------------------------------------- */
 
-unsigned int ExpressionDefine::GetArity() const {
+unsigned int ExpressionDefine::getArity() const {
   return formals.size();
 }
 
 /* ------------------------------------------------------------------------- */
 
-Co<Expression> ExpressionDefine::Evaluate(Environment& env) {
+Co<Expression> ExpressionDefine::evaluate(Environment& env) const {
   Co<ExpressionDefine> define = Co<ExpressionDefine>(new ExpressionDefine(name, body, formals));
   Co<ExpressionClosure> closure(new ExpressionClosure(define, env));
-  if (!env.IsBound(name)) {
-    env.Add(name, closure);
-    closure->SetEnvironment(env);
+  if (!env.isBound(name)) {
+    env.add(name, closure);
+    closure->setEnvironment(env);
   } else {
-    env.Add(name, closure);
+    env.add(name, closure);
   }
   return Co<Expression>(new ExpressionUnit());
 }
 
 /* ------------------------------------------------------------------------- */
 
-Co<Expression> ExpressionDefine::GetBody() const {
+Co<Expression> ExpressionDefine::getBody() const {
   return body;
 }
 
 /* ------------------------------------------------------------------------- */
 
-void ExpressionDefine::Write(ostream& out) const {
+void ExpressionDefine::write(ostream& out) const {
   out << "(define " << name << " ";
   for (vector<FormalParameter>::const_iterator i = formals.begin(); i != formals.end(); ++i) {
     out << *i << " ";
   }
-  body->Write(out);
+  body->write(out);
   out << ")";
 }
 
 /* ------------------------------------------------------------------------- */
 
-void ExpressionDefine::IsDynamicallyScoped(bool enable) {
+void ExpressionDefine::isDynamicallyScoped(bool enable) {
   is_dynamically_scoped = enable;
 }
 
 /* ------------------------------------------------------------------------- */
 
-bool ExpressionDefine::IsDynamicallyScoped() const {
+bool ExpressionDefine::isDynamicallyScoped() const {
   return is_dynamically_scoped;
 }
 

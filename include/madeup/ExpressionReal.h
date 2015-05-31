@@ -14,19 +14,19 @@ class ExpressionReal : public ExpressionNumber {
       value(value) {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
+    Co<Expression> evaluate(Environment& env) const {
       return Co<Expression>(new ExpressionReal(value));
     }
 
-    float GetReal() const {
+    float toReal() const {
       return value;
     }
 
-    int GetInteger() const {
+    int toInteger() const {
       return (int) value;
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(REAL " << value << ")";
     }
 

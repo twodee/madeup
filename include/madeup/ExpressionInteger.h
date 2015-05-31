@@ -14,23 +14,23 @@ class ExpressionInteger : public ExpressionNumber {
       value(value) {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
+    Co<Expression> evaluate(Environment& env) const {
       return Co<Expression>(new ExpressionInteger(value));
     }
 
-    int GetInteger() const {
+    int toInteger() const {
       return value;
     }
 
-    void SetInteger(int i) {
+    void setInteger(int i) {
       value = i;
     }
 
-    float GetReal() const {
+    float toReal() const {
       return value;
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(INTEGER " << value << ")";
     }
 

@@ -21,9 +21,9 @@ class ExpressionRealDivide : public Expression {
       right(right) {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
-      Co<Expression> lvalue = left->Evaluate(env);
-      Co<Expression> rvalue = right->Evaluate(env);
+    Co<Expression> evaluate(Environment& env) const {
+      Co<Expression> lvalue = left->evaluate(env);
+      Co<Expression> rvalue = right->evaluate(env);
 
       ExpressionNumber *lnumber = dynamic_cast<ExpressionNumber *>(lvalue.GetPointer());
       ExpressionNumber *rnumber = dynamic_cast<ExpressionNumber *>(rvalue.GetPointer());
@@ -32,23 +32,23 @@ class ExpressionRealDivide : public Expression {
       
       // Make sure both are numbers.
       if (lnumber && rnumber) {
-        if (rnumber->GetReal() != 0.0) {
-          value = Co<Expression>(new ExpressionReal(lnumber->GetReal() / rnumber->GetReal()));
+        if (rnumber->toReal() != 0.0) {
+          value = Co<Expression>(new ExpressionReal(lnumber->toReal() / rnumber->toReal()));
         } else {
-          throw MessagedException(right->GetSourceLocation().toAnchor() + ": I don't know how to divide by 0.");
+          throw MessagedException(right->getSourceLocation().toAnchor() + ": I don't know how to divide by 0.");
         }
       } else {
-        throw MessagedException(GetSourceLocation().toAnchor() + ": Operator // doesn't know how to divide " + left->GetSource() + " by " + right->GetSource() + ".");
+        throw MessagedException(getSourceLocation().toAnchor() + ": Operator // doesn't know how to divide " + left->getSource() + " by " + right->getSource() + ".");
       }
 
       return value;
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(// ";
-      left->Write(out);
+      left->write(out);
       out << " ";
-      right->Write(out);
+      right->write(out);
       out << ")";
     }
 

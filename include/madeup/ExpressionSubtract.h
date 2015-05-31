@@ -23,9 +23,9 @@ class ExpressionSubtract : public Expression {
       right(right) {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
-      Co<Expression> lvalue = left->Evaluate(env);
-      Co<Expression> rvalue = right->Evaluate(env);
+    Co<Expression> evaluate(Environment& env) const {
+      Co<Expression> lvalue = left->evaluate(env);
+      Co<Expression> rvalue = right->evaluate(env);
 
       ExpressionNumber *lnumber = dynamic_cast<ExpressionNumber *>(lvalue.GetPointer());
       ExpressionNumber *rnumber = dynamic_cast<ExpressionNumber *>(rvalue.GetPointer());
@@ -35,21 +35,21 @@ class ExpressionSubtract : public Expression {
       // Both are decimals.
       Co<Expression> r;
       if (linteger && rinteger) {
-        r = Co<Expression>(new ExpressionInteger(linteger->GetInteger() - rinteger->GetInteger()));
+        r = Co<Expression>(new ExpressionInteger(linteger->toInteger() - rinteger->toInteger()));
       } else if (lnumber && rnumber) {
-        r = Co<Expression>(new ExpressionReal(lnumber->GetReal() - rnumber->GetReal()));
+        r = Co<Expression>(new ExpressionReal(lnumber->toReal() - rnumber->toReal()));
       } else {
-        throw MessagedException(GetSourceLocation().toAnchor() + ": Operator - doesn't know how to subtract " + right->GetSource() + " from " + left->GetSource() + ".");
+        throw MessagedException(getSourceLocation().toAnchor() + ": Operator - doesn't know how to subtract " + right->getSource() + " from " + left->getSource() + ".");
       }
 
       return r;
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(- ";
-      left->Write(out);
+      left->write(out);
       out << " ";
-      right->Write(out);
+      right->write(out);
       out << ")";
     }
 

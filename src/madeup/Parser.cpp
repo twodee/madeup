@@ -94,7 +94,7 @@ void Parser::pushExpression(Expression *e,
                             const SourceLocation &to) {
   Co<Expression> ee(e);
   SourceLocation location(from, to);
-  ee->SetSource(getSubsource(location), location);
+  ee->setSource(getSubsource(location), location);
   expressions.push(ee);
 }
 
@@ -151,8 +151,8 @@ void Parser::block() {
     statement();
   } 
   Co<ExpressionBlock> block = blocks.top();
-  SourceLocation location((*block)[0]->GetSourceLocation(), (*block)[block->GetLength() - 1]->GetSourceLocation());
-  block->SetSource(getSubsource(location), location);
+  SourceLocation location((*block)[0]->getSourceLocation(), (*block)[block->getLength() - 1]->getSourceLocation());
+  block->setSource(getSubsource(location), location);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -164,7 +164,7 @@ void Parser::statement() {
     expressionLevel0();
     if (isUp(Token::NEWLINE)) {
       ++i;
-      blocks.top()->Append(popExpression());
+      blocks.top()->append(popExpression());
     } else {
       std::stringstream ss;
       ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected a linebreak.";
@@ -182,7 +182,7 @@ void Parser::expressionLevel0() {
     expressionLevel1();
     Co<Expression> b = popExpression();
     Co<Expression> a = popExpression();
-    pushExpression(new ExpressionOr(a, b), a->GetSourceLocation(), b->GetSourceLocation());
+    pushExpression(new ExpressionOr(a, b), a->getSourceLocation(), b->getSourceLocation());
   }
 }
 
@@ -195,7 +195,7 @@ void Parser::expressionLevel1() {
     expressionLevel2();
     Co<Expression> b = popExpression();
     Co<Expression> a = popExpression();
-    pushExpression(new ExpressionAnd(a, b), a->GetSourceLocation(), b->GetSourceLocation());
+    pushExpression(new ExpressionAnd(a, b), a->getSourceLocation(), b->getSourceLocation());
   }
 }
 
@@ -210,9 +210,9 @@ void Parser::expressionLevel2() {
     Co<Expression> b = popExpression();
     Co<Expression> a = popExpression();
     if (type == Token::EQUAL_TO) {
-      pushExpression(new ExpressionEqual(a, b), a->GetSourceLocation(), b->GetSourceLocation());
+      pushExpression(new ExpressionEqual(a, b), a->getSourceLocation(), b->getSourceLocation());
     } else {
-      pushExpression(new ExpressionNotEqual(a, b), a->GetSourceLocation(), b->GetSourceLocation());
+      pushExpression(new ExpressionNotEqual(a, b), a->getSourceLocation(), b->getSourceLocation());
     }
   }
 }
@@ -228,13 +228,13 @@ void Parser::expressionLevel3() {
     Co<Expression> b = popExpression();
     Co<Expression> a = popExpression();
     if (type == Token::LESS_THAN) {
-      pushExpression(new ExpressionLesser(a, b), a->GetSourceLocation(), b->GetSourceLocation());
+      pushExpression(new ExpressionLesser(a, b), a->getSourceLocation(), b->getSourceLocation());
     } else if (type == Token::LESS_THAN_OR_EQUAL_TO) {
-      pushExpression(new ExpressionLesserOrEqual(a, b), a->GetSourceLocation(), b->GetSourceLocation());
+      pushExpression(new ExpressionLesserOrEqual(a, b), a->getSourceLocation(), b->getSourceLocation());
     } else if (type == Token::GREATER_THAN) {
-      pushExpression(new ExpressionGreater(a, b), a->GetSourceLocation(), b->GetSourceLocation());
+      pushExpression(new ExpressionGreater(a, b), a->getSourceLocation(), b->getSourceLocation());
     } else {
-      pushExpression(new ExpressionGreaterOrEqual(a, b), a->GetSourceLocation(), b->GetSourceLocation());
+      pushExpression(new ExpressionGreaterOrEqual(a, b), a->getSourceLocation(), b->getSourceLocation());
     }
   }
 }
@@ -250,9 +250,9 @@ void Parser::expressionLevel4() {
     Co<Expression> b = popExpression();
     Co<Expression> a = popExpression();
     if (type == Token::PLUS) {
-      pushExpression(new ExpressionAdd(a, b), a->GetSourceLocation(), b->GetSourceLocation());
+      pushExpression(new ExpressionAdd(a, b), a->getSourceLocation(), b->getSourceLocation());
     } else {
-      pushExpression(new ExpressionSubtract(a, b), a->GetSourceLocation(), b->GetSourceLocation());
+      pushExpression(new ExpressionSubtract(a, b), a->getSourceLocation(), b->getSourceLocation());
     }
   }
 }
@@ -268,13 +268,13 @@ void Parser::expressionLevel5() {
     Co<Expression> b = popExpression();
     Co<Expression> a = popExpression();
     if (type == Token::TIMES) {
-      pushExpression(new ExpressionMultiply(a, b), a->GetSourceLocation(), b->GetSourceLocation());
+      pushExpression(new ExpressionMultiply(a, b), a->getSourceLocation(), b->getSourceLocation());
     } else if (type == Token::DIVIDE) {
-      pushExpression(new ExpressionDivide(a, b), a->GetSourceLocation(), b->GetSourceLocation());
+      pushExpression(new ExpressionDivide(a, b), a->getSourceLocation(), b->getSourceLocation());
     } else if (type == Token::REAL_DIVIDE) {
-      pushExpression(new ExpressionRealDivide(a, b), a->GetSourceLocation(), b->GetSourceLocation());
+      pushExpression(new ExpressionRealDivide(a, b), a->getSourceLocation(), b->getSourceLocation());
     } else {
-      pushExpression(new ExpressionRemainder(a, b), a->GetSourceLocation(), b->GetSourceLocation());
+      pushExpression(new ExpressionRemainder(a, b), a->getSourceLocation(), b->getSourceLocation());
     }
   }
 }
@@ -288,7 +288,7 @@ void Parser::expressionLevel6() {
     expressionLevel7();
     Co<Expression> b = popExpression();
     Co<Expression> a = popExpression();
-    pushExpression(new ExpressionPower(a, b), a->GetSourceLocation(), b->GetSourceLocation());
+    pushExpression(new ExpressionPower(a, b), a->getSourceLocation(), b->getSourceLocation());
   }
 }
 
@@ -314,8 +314,8 @@ void Parser::expressionLevel7() {
         Co<Expression> dimension = dimensions.top();
         dimensions.pop();
         Co<Expression> tmp = Co<Expression>(new ExpressionArrayConstructor(fill, dimension));
-        SourceLocation location(dimension->GetSourceLocation(), fill->GetSourceLocation());
-        tmp->SetSource(getSubsource(location), location);
+        SourceLocation location(dimension->getSourceLocation(), fill->getSourceLocation());
+        tmp->setSource(getSubsource(location), location);
         fill = tmp;
       } while (dimensions.size() > 0);
       expressions.push(fill);
@@ -334,12 +334,12 @@ void Parser::expressionLevel8() {
     ++i;
     expressionLevel8();
     Co<Expression> e = popExpression();
-    pushExpression(new ExpressionNot(e), e->GetSourceLocation(), e->GetSourceLocation());
+    pushExpression(new ExpressionNot(e), e->getSourceLocation(), e->getSourceLocation());
   } else if (isUp(Token::MINUS)) {
     ++i;
     expressionLevel8();
     Co<Expression> e = popExpression();
-    pushExpression(new ExpressionNegation(e), e->GetSourceLocation(), e->GetSourceLocation());
+    pushExpression(new ExpressionNegation(e), e->getSourceLocation(), e->getSourceLocation());
   } else {
     expressionLevel9();
   }
@@ -357,7 +357,7 @@ void Parser::expressionLevel9() {
     if (isUp(Token::DOT)) {
       ++i;
       if (isUp(Token::ID) && tokens[i].getText() == "length") {
-        pushExpression(new ExpressionArrayLength(array), array->GetSourceLocation(), tokens[i].getLocation());
+        pushExpression(new ExpressionArrayLength(array), array->getSourceLocation(), tokens[i].getLocation());
         ++i;
       } else {
         std::stringstream ss;
@@ -388,13 +388,13 @@ void Parser::expressionLevel9() {
             expressionLevel0();
             rhs = popExpression();
           }
-          pushExpression(new ExpressionDefineArrayElement(array, subscript, rhs), array->GetSourceLocation(), rhs->GetSourceLocation());
+          pushExpression(new ExpressionDefineArrayElement(array, subscript, rhs), array->getSourceLocation(), rhs->getSourceLocation());
         } else {
-          pushExpression(new ExpressionArraySubscript(array, subscript), array->GetSourceLocation(), subscript->GetSourceLocation());
+          pushExpression(new ExpressionArraySubscript(array, subscript), array->getSourceLocation(), subscript->getSourceLocation());
         }
       } else {
         std::stringstream ss;
-        ss << subscript->GetSourceLocation().toAnchor() << ": I didn't find a ']' where I expected it.";
+        ss << subscript->getSourceLocation().toAnchor() << ": I didn't find a ']' where I expected it.";
         throw MessagedException(ss.str());
       }
     }
@@ -413,7 +413,7 @@ void Parser::atom() {
       expressions.push(e);
     } else {
       std::stringstream ss;
-      ss << e->GetSourceLocation().toAnchor() << ": I didn't find a ')' where I expected it.";
+      ss << e->getSourceLocation().toAnchor() << ": I didn't find a ')' where I expected it.";
       throw MessagedException(ss.str());
     }
   } else if (!is_in_pipe && isUp(Token::PIPE)) {
@@ -428,30 +428,30 @@ void Parser::atom() {
       ++i;
     } else {
       std::stringstream ss;
-      ss << e->GetSourceLocation().toAnchor() << ": I didn't find a closing '|' where I expected it.";
+      ss << e->getSourceLocation().toAnchor() << ": I didn't find a closing '|' where I expected it.";
       throw MessagedException(ss.str());
     }
   } else if (isUp(Token::INTEGER)) {
     int n = atoi(tokens[i].getText().c_str());
     expressions.push(Co<Expression>(new ExpressionInteger(n)));
-    expressions.top()->SetSource(getSubsource(tokens[i].getLocation()), tokens[i].getLocation());
+    expressions.top()->setSource(getSubsource(tokens[i].getLocation()), tokens[i].getLocation());
     ++i;
   } else if (isUp(Token::REAL)) {
     float n = atof(tokens[i].getText().c_str());
     expressions.push(Co<Expression>(new ExpressionReal(n)));
-    expressions.top()->SetSource(getSubsource(tokens[i].getLocation()), tokens[i].getLocation());
+    expressions.top()->setSource(getSubsource(tokens[i].getLocation()), tokens[i].getLocation());
     ++i;
   } else if (isUp(Token::TRUE)) {
     expressions.push(Co<Expression>(new ExpressionBoolean(true)));
-    expressions.top()->SetSource(getSubsource(tokens[i].getLocation()), tokens[i].getLocation());
+    expressions.top()->setSource(getSubsource(tokens[i].getLocation()), tokens[i].getLocation());
     ++i;
   } else if (isUp(Token::FALSE)) {
     expressions.push(Co<Expression>(new ExpressionBoolean(false)));
-    expressions.top()->SetSource(getSubsource(tokens[i].getLocation()), tokens[i].getLocation());
+    expressions.top()->setSource(getSubsource(tokens[i].getLocation()), tokens[i].getLocation());
     ++i;
   } else if (isUp(Token::STRING)) {
     expressions.push(Co<Expression>(new ExpressionString(tokens[i].getText())));
-    expressions.top()->SetSource(getSubsource(tokens[i].getLocation()), tokens[i].getLocation());
+    expressions.top()->setSource(getSubsource(tokens[i].getLocation()), tokens[i].getLocation());
     ++i;
   } else if (isUp(Token::REPEAT)) {
     Token repeat_token = tokens[i];
@@ -509,8 +509,8 @@ void Parser::atom() {
       expressionLevel0();
       Co<ExpressionBlock> then_block(new ExpressionBlock());
       Co<Expression> then_expression = popExpression();
-      then_block->Append(then_expression);
-      then_block->SetSource(then_expression->GetSource(), then_expression->GetSourceLocation());
+      then_block->append(then_expression);
+      then_block->setSource(then_expression->getSource(), then_expression->getSourceLocation());
       blocks.push(then_block);
 
       if (isUp(Token::ELSE)) {
@@ -518,11 +518,10 @@ void Parser::atom() {
         expressionLevel0();
         Co<ExpressionBlock> else_block(new ExpressionBlock());
         Co<Expression> else_expression = popExpression();
-        else_block->Append(else_expression);
-        else_block->Append(else_expression);
-        else_block->SetSource(else_expression->GetSource(), else_expression->GetSourceLocation());
+        else_block->append(else_expression);
+        else_block->setSource(else_expression->getSource(), else_expression->getSourceLocation());
         blocks.push(else_block);
-        end_location = else_block->GetSourceLocation();
+        end_location = else_block->getSourceLocation();
       } else {
         std::stringstream ss;
         ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'else'.";
@@ -584,7 +583,7 @@ void Parser::atom() {
         ++i;
         expressionLevel0();
         rhs = popExpression();
-        end_location = rhs->GetSourceLocation();
+        end_location = rhs->getSourceLocation();
       } else if (isUp(Token::NEWLINE)) {
         ++i;
         block();
@@ -605,10 +604,10 @@ void Parser::atom() {
 
       Co<ExpressionDefine> define(new ExpressionDefine(name, rhs));
       for (std::vector<std::string>::const_iterator formal = formals.begin(); formal != formals.end(); ++formal) {
-        define->AddFormal(*formal);
+        define->addFormal(*formal);
       }
       SourceLocation location(to_token.getLocation(), end_location);
-      define->SetSource(getSubsource(location), location);
+      define->setSource(getSubsource(location), location);
       expressions.push(define);
     } else {
       std::stringstream ss;
@@ -635,7 +634,7 @@ void Parser::atom() {
     } else {
       expressionLevel0();
       rhs = popExpression();
-      end_location = rhs->GetSourceLocation();
+      end_location = rhs->getSourceLocation();
     }
 
     Co<ExpressionDefineVariable> define;
@@ -656,26 +655,26 @@ void Parser::atom() {
         i += 2;
         expressionLevel0();
         Co<Expression> actual = popExpression();
-        end_location = actual->GetSourceLocation();
-        call->AddParameter(formal, actual);
+        end_location = actual->getSourceLocation();
+        call->addParameter(formal, actual);
       }
       SourceLocation location(id_token.getLocation(), end_location);
-      call->SetSource(getSubsource(location), location);
+      call->setSource(getSubsource(location), location);
       expressions.push(call);
     } else {
       Co<ExpressionCall> call(new ExpressionCall(name));
       if (isInExpressionFirst()) {
         expressionLevel0();
         Co<Expression> actual = popExpression();
-        call->AddParameter(actual);
-        end_location = actual->GetSourceLocation();
+        call->addParameter(actual);
+        end_location = actual->getSourceLocation();
         while (isUp(Token::COMMA)) {
           ++i;
           if (isInExpressionFirst()) {
             expressionLevel0();
             actual = popExpression();
-            call->AddParameter(actual);
-            end_location = actual->GetSourceLocation();
+            call->addParameter(actual);
+            end_location = actual->getSourceLocation();
           } else {
             std::stringstream ss;
             ss << tokens[i - 1].getLocation().toAnchor() << ": I found an extra comma lying around.";
@@ -684,7 +683,7 @@ void Parser::atom() {
         }
       }
       SourceLocation location(id_token.getLocation(), end_location);
-      call->SetSource(getSubsource(location), location);
+      call->setSource(getSubsource(location), location);
       expressions.push(call);
     }
   } else if (isUp(Token::FOR)) {

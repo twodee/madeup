@@ -14,12 +14,12 @@ class ExpressionPop : public Expression {
       Expression() {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
-      env.Pop();
+    Co<Expression> evaluate(Environment& env) const {
+      env.pop();
       return Co<Expression>(new ExpressionUnit());
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(pop)";
     }
 

@@ -14,51 +14,51 @@ ExpressionClosure::ExpressionClosure(Co<ExpressionDefine> define, const Environm
 
 /* ------------------------------------------------------------------------- */
 
-void ExpressionClosure::SetEnvironment(const Environment& env) {
+void ExpressionClosure::setEnvironment(const Environment& env) {
   this->env = Co<Environment>(new Environment(env));
 }
 
 /* ------------------------------------------------------------------------- */
 
-Co<Expression> ExpressionClosure::Evaluate(Environment& env) {
+Co<Expression> ExpressionClosure::evaluate(Environment& env) const {
   // Assumes that the environment being passed is a modification of its own,
   // including the state at the time it was created and any temporaries for
   // parameters.
  
   /* std::cout << "------------------------------------------------" << std::endl; */
   /* std::cout << "in closure" << std::endl; */
-  /* std::cout << "define->GetName(): " << define->GetName() << std::endl; */
-  /* std::cout << "define->GetBody(): " << define->GetBody() << std::endl; */
+  /* std::cout << "define->getName(): " << define->getName() << std::endl; */
+  /* std::cout << "define->getBody(): " << define->getBody() << std::endl; */
   /* std::cout << env << std::endl; */
   /* std::cout << "about to print env" << std::endl; */
   /* std::cout << *this->env << std::endl; */
   /* std::cout << "printed env" << std::endl; */
-  return define->GetBody()->Evaluate(env);
+  return define->getBody()->evaluate(env);
 }
 
 /* ------------------------------------------------------------------------- */
 
-Co<Environment> ExpressionClosure::GetEnvironment() {
+Co<Environment> ExpressionClosure::getEnvironment() {
   return env;
 }
 
 /* ------------------------------------------------------------------------- */
 
-Co<ExpressionDefine> ExpressionClosure::GetDefine() {
+Co<ExpressionDefine> ExpressionClosure::getDefine() {
   return define;
 }
 
 /* ------------------------------------------------------------------------- */
 
-void ExpressionClosure::SetDefine(Co<ExpressionDefine> define) {
+void ExpressionClosure::setDefine(Co<ExpressionDefine> define) {
   this->define = define;
 }
 
 /* ------------------------------------------------------------------------- */
 
-void ExpressionClosure::Write(ostream& out) const {
+void ExpressionClosure::write(ostream& out) const {
   out << "(closure ";
-  define->GetBody()->Write(out);
+  define->getBody()->write(out);
   out << ")";
 }
 

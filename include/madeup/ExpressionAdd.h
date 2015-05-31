@@ -25,9 +25,9 @@ class ExpressionAdd : public Expression {
       right(right) {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
-      Co<Expression> lvalue = left->Evaluate(env);
-      Co<Expression> rvalue = right->Evaluate(env);
+    Co<Expression> evaluate(Environment& env) const {
+      Co<Expression> lvalue = left->evaluate(env);
+      Co<Expression> rvalue = right->evaluate(env);
 
       ExpressionString *lstring = dynamic_cast<ExpressionString *>(lvalue.GetPointer());
       ExpressionString *rstring = dynamic_cast<ExpressionString *>(rvalue.GetPointer());
@@ -49,13 +49,13 @@ class ExpressionAdd : public Expression {
         ostringstream ss;
         ss << lstring->GetString();
         if (rinteger) {
-          ss << rinteger->GetInteger();
+          ss << rinteger->toInteger();
         } else if (rnumber) {
-          ss << rnumber->GetReal();
+          ss << rnumber->toReal();
         } else if (rboolean) {
-          ss << (rboolean->GetBoolean() ? "true" : "false");
+          ss << (rboolean->toBoolean() ? "true" : "false");
         } else {
-          throw MessagedException(right->GetSourceLocation().toAnchor() + ": Operator + doesn't know how to join a string to " + right->GetSource());
+          throw MessagedException(right->getSourceLocation().toAnchor() + ": Operator + doesn't know how to join a string to " + right->getSource());
         }
         return Co<Expression>(new ExpressionString(ss.str()));
       }
@@ -64,38 +64,38 @@ class ExpressionAdd : public Expression {
       else if (rstring) {
         ostringstream ss;
         if (linteger) {
-          ss << linteger->GetInteger();
+          ss << linteger->toInteger();
         } else if (lnumber) {
-          ss << lnumber->GetReal();
+          ss << lnumber->toReal();
         } else if (lboolean) {
-          ss << lboolean->GetBoolean();
+          ss << lboolean->toBoolean();
         } else {
-          throw MessagedException(right->GetSourceLocation().toAnchor() + ": Operator + doesn't know how to join a string to " + right->GetSource() + ".");
+          throw MessagedException(right->getSourceLocation().toAnchor() + ": Operator + doesn't know how to join a string to " + right->getSource() + ".");
         }
         ss << rstring->GetString();
         value = Co<Expression>(new ExpressionString(ss.str()));
       }
 
       else if (linteger && rinteger) {
-        value = Co<Expression>(new ExpressionInteger(linteger->GetInteger() + rinteger->GetInteger()));
+        value = Co<Expression>(new ExpressionInteger(linteger->toInteger() + rinteger->toInteger()));
       }
 
       else if (lnumber && rnumber) {
-        value = Co<Expression>(new ExpressionReal(lnumber->GetReal() + rnumber->GetReal()));
+        value = Co<Expression>(new ExpressionReal(lnumber->toReal() + rnumber->toReal()));
       }
 
       else {
-        throw MessagedException(GetSourceLocation().toAnchor() + ": Operator + doesn't know how to join " + left->GetSource() + " and " + right->GetSource() + ".");
+        throw MessagedException(getSourceLocation().toAnchor() + ": Operator + doesn't know how to join " + left->getSource() + " and " + right->getSource() + ".");
       }
 
       return value;
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(+ ";
-      left->Write(out);
+      left->write(out);
       out << " ";
-      right->Write(out);
+      right->write(out);
       out << ")";
     }
 

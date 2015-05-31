@@ -11,10 +11,10 @@ namespace madeup {
 class ExpressionDefineVariable : public Expression {
   public:
     ExpressionDefineVariable(const std::string& name, Co<Expression> rhs);
-    Co<Expression> Evaluate(Environment& env);
-    Co<Expression> GetRightHandSide() const;
-    void Write(ostream& out) const;
-    const std::string& GetName() { return name; }
+    Co<Expression> evaluate(Environment& env) const;
+    Co<Expression> getRightHandSide() const;
+    void write(ostream& out) const;
+    const std::string& getName() { return name; }
 
   private:
     std::string name;
@@ -26,7 +26,7 @@ class ExpressionDefineVariable : public Expression {
 class ExpressionDefineVariableSeed : public ExpressionDefineVariable {
   public:
     ExpressionDefineVariableSeed(const std::string& name, Co<Expression> rhs);
-    Co<Expression> Evaluate(Environment& env);
+    Co<Expression> evaluate(Environment& env) const;
 
   private:
 };

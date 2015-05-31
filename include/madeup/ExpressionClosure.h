@@ -12,15 +12,15 @@ class ExpressionClosure : public Expression {
   public:
     ExpressionClosure(Co<ExpressionDefine> define, const Environment& env);
 
-    Co<Expression> Evaluate(Environment& env);
+    Co<Expression> evaluate(Environment& env) const;
 
-    Co<Environment> GetEnvironment();
-    void SetEnvironment(const Environment& env);
+    Co<Environment> getEnvironment();
+    void setEnvironment(const Environment& env);
 
-    Co<ExpressionDefine> GetDefine();
-    void SetDefine(Co<ExpressionDefine> define);
+    Co<ExpressionDefine> getDefine();
+    void setDefine(Co<ExpressionDefine> define);
 
-    void Write(ostream& out) const;
+    void write(ostream& out) const;
 
   private:
     Co<ExpressionDefine> define;

@@ -23,19 +23,19 @@ class ExpressionPower : public Expression {
       right(right) {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
-      Co<Expression> lvalue = left->Evaluate(env);
-      Co<Expression> rvalue = right->Evaluate(env);
+    Co<Expression> evaluate(Environment& env) const {
+      Co<Expression> lvalue = left->evaluate(env);
+      Co<Expression> rvalue = right->evaluate(env);
 
       ExpressionNumber *lnumber = dynamic_cast<ExpressionNumber *>(lvalue.GetPointer());
       ExpressionNumber *rnumber = dynamic_cast<ExpressionNumber *>(rvalue.GetPointer());
 
       if (!lnumber) {
-        throw MessagedException(left->GetSourceLocation().toAnchor() + ": Operator ^ expects a numeric base. " + left->GetSource() + " is not a number.");
+        throw MessagedException(left->getSourceLocation().toAnchor() + ": Operator ^ expects a numeric base. " + left->getSource() + " is not a number.");
       }
 
       if (!rnumber) {
-        throw MessagedException(right->GetSourceLocation().toAnchor() + ": Operator ^ expects a numeric exponent. " + right->GetSource() + " is not a number.");
+        throw MessagedException(right->getSourceLocation().toAnchor() + ": Operator ^ expects a numeric exponent. " + right->getSource() + " is not a number.");
       }
 
       ExpressionInteger *linteger = dynamic_cast<ExpressionInteger *>(lvalue.GetPointer());
@@ -43,19 +43,19 @@ class ExpressionPower : public Expression {
       
       Co<Expression> r;
       if (linteger && rinteger) {
-        r = Co<Expression>(new ExpressionInteger((int) pow(linteger->GetInteger(), rinteger->GetInteger())));
+        r = Co<Expression>(new ExpressionInteger((int) pow(linteger->toInteger(), rinteger->toInteger())));
       } else {
-        r = Co<Expression>(new ExpressionReal(pow(lnumber->GetReal(), rnumber->GetReal())));
+        r = Co<Expression>(new ExpressionReal(pow(lnumber->toReal(), rnumber->toReal())));
       }
 
       return r;
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(^ ";
-      left->Write(out);
+      left->write(out);
       out << " ";
-      right->Write(out);
+      right->write(out);
       out << ")";
     }
 

@@ -22,29 +22,29 @@ class ExpressionRemainder : public Expression {
       right(right) {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
-      Co<Expression> lvalue = left->Evaluate(env);
-      Co<Expression> rvalue = right->Evaluate(env);
+    Co<Expression> evaluate(Environment& env) const {
+      Co<Expression> lvalue = left->evaluate(env);
+      Co<Expression> rvalue = right->evaluate(env);
 
       ExpressionInteger *linteger = dynamic_cast<ExpressionInteger *>(lvalue.GetPointer());
       ExpressionInteger *rinteger = dynamic_cast<ExpressionInteger *>(rvalue.GetPointer());
       
       if (linteger && rinteger) {
-        if (rinteger->GetInteger() != 0) {
-          return Co<Expression>(new ExpressionInteger(linteger->GetInteger() % rinteger->GetInteger()));
+        if (rinteger->toInteger() != 0) {
+          return Co<Expression>(new ExpressionInteger(linteger->toInteger() % rinteger->toInteger()));
         } else {
-          throw MessagedException(right->GetSourceLocation().toAnchor() + ": I don't know how to get the remainder of something divided by 0.");
+          throw MessagedException(right->getSourceLocation().toAnchor() + ": I don't know how to get the remainder of something divided by 0.");
         }
       } else {
-        throw MessagedException(GetSourceLocation().toAnchor() + ": Operator % doesn't know how to get the remainder of " + left->GetSource() + " divided by " + right->GetSource() + ".");
+        throw MessagedException(getSourceLocation().toAnchor() + ": Operator % doesn't know how to get the remainder of " + left->getSource() + " divided by " + right->getSource() + ".");
       }
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(% ";
-      left->Write(out);
+      left->write(out);
       out << " ";
-      right->Write(out);
+      right->write(out);
       out << ")";
     }
 

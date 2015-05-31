@@ -16,36 +16,36 @@ class ExpressionBlobs : public Expression {
       Expression() {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
+    Co<Expression> evaluate(Environment& env) const {
       Co<ExpressionClosure> closure = env["grain"];
       if (closure.IsNull()) {
-        throw MessagedException(GetSourceLocation().toAnchor() + ": Function blobs expects a value named grain. No value named grain is defined.");
+        throw MessagedException(getSourceLocation().toAnchor() + ": Function blobs expects a value named grain. No value named grain is defined.");
       }
 
-      Co<Expression> v = closure->Evaluate(env);
+      Co<Expression> v = closure->evaluate(env);
       ExpressionNumber *number = dynamic_cast<ExpressionNumber *>(v.GetPointer());
       if (!number) {
-        throw MessagedException(v->GetSourceLocation().toAnchor() + ": Function blobs expects grain to be a number, but it is not.");
+        throw MessagedException(v->getSourceLocation().toAnchor() + ": Function blobs expects grain to be a number, but it is not.");
       }
-      float grain = number->GetReal();
+      float grain = number->toReal();
 
       closure = env["iso"];
       if (closure.IsNull()) {
-        throw MessagedException(GetSourceLocation().toAnchor() + ": Function blob expects a value named iso. No value named iso is defined.");
+        throw MessagedException(getSourceLocation().toAnchor() + ": Function blob expects a value named iso. No value named iso is defined.");
       }
-      v = closure->Evaluate(env);
+      v = closure->evaluate(env);
       number = dynamic_cast<ExpressionNumber *>(v.GetPointer());
       if (!number) {
-        throw MessagedException(v->GetSourceLocation().toAnchor() + ": Function blobs expects iso to be a number, but it is not.");
+        throw MessagedException(v->getSourceLocation().toAnchor() + ": Function blobs expects iso to be a number, but it is not.");
       }
-      float iso = number->GetReal();
+      float iso = number->toReal();
 
-      env.Blobs(grain, iso);
+      env.blobs(grain, iso);
 
       return Co<Expression>(new ExpressionUnit());
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(blobs)";
     }
 

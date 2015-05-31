@@ -21,12 +21,12 @@ class ExpressionCenter : public Expression {
       Expression() {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
-      env.Center();
+    Co<Expression> evaluate(Environment& env) const {
+      env.center();
       return Co<Expression>(new ExpressionUnit());
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(center)";
     }
 

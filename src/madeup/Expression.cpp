@@ -51,13 +51,13 @@ Expression::~Expression() {
 
 /* ------------------------------------------------------------------------- */
 
-const std::string& Expression::GetSource() const {
+const std::string& Expression::getSource() const {
   return source;
 }
 
 /* ------------------------------------------------------------------------- */
 
-void Expression::SetSource(const std::string& source,
+void Expression::setSource(const std::string& source,
                            const SourceLocation &location) {
   this->source = source;
   this->location = location;
@@ -65,21 +65,21 @@ void Expression::SetSource(const std::string& source,
 
 /* ------------------------------------------------------------------------- */
 
-const SourceLocation &Expression::GetSourceLocation() const {
+const SourceLocation &Expression::getSourceLocation() const {
   return location;
 }
 
 /* ------------------------------------------------------------------------- */
 
 ostream& operator<<(ostream& out, const Co<Expression> e) {
-  e->Write(out);
+  e->write(out);
   return out;
 }
 
 /* ------------------------------------------------------------------------- */
 
 ostream& operator<<(ostream& out, const Expression& e) {
-  e.Write(out);
+  e.write(out);
   return out;
 }
 
@@ -87,7 +87,7 @@ ostream& operator<<(ostream& out, const Expression& e) {
 
 using std::stringstream;
 
-Co<Expression> Parse(stringstream& ss) {
+Co<Expression> parse(stringstream& ss) {
   // First consume left parenthesis.
   int c = ss.get();
 
@@ -113,7 +113,7 @@ Co<Expression> Parse(stringstream& ss) {
     std::cerr << "block started" << std::endl;
     while (ss.peek() == ' ') {
       ss.get(); // eat space
-      block->Append(Parse(ss));
+      block->append(parse(ss));
       std::cerr << "block added" << std::endl;
     }
     std::cerr << "block done" << std::endl;
@@ -122,23 +122,23 @@ Co<Expression> Parse(stringstream& ss) {
   
   else if (token.compare("if") == 0) {
     ss.get(); // eat space
-    Co<Expression> condition = Parse(ss);
+    Co<Expression> condition = parse(ss);
     std::cerr << "condition: " << condition << std::endl;
     ss.get(); // eat space
-    Co<ExpressionBlock> then_block = Parse(ss);
+    Co<ExpressionBlock> then_block = parse(ss);
     std::cerr << "then_block: " << then_block << std::endl;
     ss.get(); // eat space
-    Co<ExpressionBlock> else_block = Parse(ss);
+    Co<ExpressionBlock> else_block = parse(ss);
     std::cerr << "else_block: " << else_block << std::endl;
     expr = Co<Expression>(new ExpressionIf(condition, then_block, else_block));
   }
   
   else if (token.compare("while") == 0) {
     ss.get(); // eat space
-    Co<Expression> condition = Parse(ss);
+    Co<Expression> condition = parse(ss);
     std::cerr << "condition: " << condition << std::endl;
     ss.get(); // eat space
-    Co<ExpressionBlock> block = Parse(ss);
+    Co<ExpressionBlock> block = parse(ss);
     expr = Co<Expression>(new ExpressionWhile(condition, block));
   }
 
@@ -147,22 +147,22 @@ Co<Expression> Parse(stringstream& ss) {
     string iterator;
     ss >> iterator;
     ss.get(); // eat space
-    Co<Expression> start = Parse(ss);
+    Co<Expression> start = parse(ss);
     ss.get(); // eat space
-    Co<Expression> end = Parse(ss);
+    Co<Expression> end = parse(ss);
     ss.get(); // eat space
-    Co<Expression> delta = Parse(ss);
+    Co<Expression> delta = parse(ss);
     ss.get(); // eat space
-    Co<ExpressionBlock> block = Parse(ss);
+    Co<ExpressionBlock> block = parse(ss);
     expr = Co<Expression>(new ExpressionFor(iterator, start, end, delta, block, false));
   }
   
 #define BINOP(op, clazz) \
   else if (token.compare(op) == 0) { \
     ss.get(); \
-    Co<Expression> a = Parse(ss); \
+    Co<Expression> a = parse(ss); \
     ss.get(); \
-    Co<Expression> b = Parse(ss); \
+    Co<Expression> b = parse(ss); \
     expr = Co<Expression>(new clazz(a, b)); \
   }
 
@@ -215,7 +215,7 @@ Co<Expression> Parse(stringstream& ss) {
       ss.get(); // eat space
     }
 
-    Co<Expression> body = Parse(ss);
+    Co<Expression> body = parse(ss);
 
     expr = Co<Expression>(new ExpressionDefine(name, body, formals));
   }
@@ -232,7 +232,7 @@ Co<Expression> Parse(stringstream& ss) {
 
     while (ss.peek() == ' ') {
       ss.get(); // eat space
-      call->AddParameter(Parse(ss));
+      call->addParameter(parse(ss));
     }
 
     expr = Co<Expression>(call);
@@ -254,9 +254,9 @@ Co<Expression> Parse(stringstream& ss) {
   return expr;
 }
 
-Co<Expression> Expression::Parse(const std::string& s) {
+Co<Expression> Expression::parse(const std::string& s) {
   stringstream ss(s);
-  return madeup::Parse(ss);
+  return madeup::parse(ss);
 }
 
 /* ------------------------------------------------------------------------- */

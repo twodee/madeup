@@ -10,11 +10,11 @@ class ExpressionUnit : public Expression {
     ExpressionUnit() {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
+    Co<Expression> evaluate(Environment& env) const {
       return Co<Expression>();
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(unit)";
     }
 

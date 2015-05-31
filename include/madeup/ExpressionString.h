@@ -18,7 +18,7 @@ class ExpressionString : public Expression {
       value(value) {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
+    Co<Expression> evaluate(Environment& env) const {
       return Co<Expression>(new ExpressionString(value));
     }
 
@@ -26,7 +26,7 @@ class ExpressionString : public Expression {
       return value;
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(STRING " << value << ")";
     }
 

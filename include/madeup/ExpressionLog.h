@@ -18,31 +18,31 @@ class ExpressionLog : public Expression {
       Expression() {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
+    Co<Expression> evaluate(Environment& env) const {
       Co<ExpressionClosure> base_closure = env["base"];
       Co<ExpressionClosure> x_closure = env["x"];
       if (base_closure.IsNull() || x_closure.IsNull()) {
-        throw MessagedException(GetSourceLocation().toAnchor() + ": I expect log to be given two parameters: a base and a value x whose logarithm you want to compute.");
+        throw MessagedException(getSourceLocation().toAnchor() + ": I expect log to be given two parameters: a base and a value x whose logarithm you want to compute.");
       }
 
-      Co<Expression> base_value = base_closure->Evaluate(env);
+      Co<Expression> base_value = base_closure->evaluate(env);
       ExpressionNumber *base_number = dynamic_cast<ExpressionNumber *>(base_value.GetPointer());
       if (!base_number) {
-        throw MessagedException(base_closure->GetSourceLocation().toAnchor() + ": I expect log's base to be a number. That thing you gave me sure isn't a number.");
+        throw MessagedException(base_closure->getSourceLocation().toAnchor() + ": I expect log's base to be a number. That thing you gave me sure isn't a number.");
       }
 
-      Co<Expression> x_value = x_closure->Evaluate(env);
+      Co<Expression> x_value = x_closure->evaluate(env);
       ExpressionNumber *x_number = dynamic_cast<ExpressionNumber *>(x_value.GetPointer());
       if (!x_number) {
-        throw MessagedException(x_closure->GetSourceLocation().toAnchor() + ": I expect log's x to be a number. That thing you gave me sure isn't a number.");
+        throw MessagedException(x_closure->getSourceLocation().toAnchor() + ": I expect log's x to be a number. That thing you gave me sure isn't a number.");
       }
 
-      float base = base_number->GetReal();
-      float x = x_number->GetReal();
+      float base = base_number->toReal();
+      float x = x_number->toReal();
       return Co<Expression>(new ExpressionReal(log(x) / log(base)));
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(tan x)";
     }
 

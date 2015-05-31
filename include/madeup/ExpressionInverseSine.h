@@ -18,23 +18,23 @@ class ExpressionInverseSine : public Expression {
       Expression() {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
+    Co<Expression> evaluate(Environment& env) const {
       Co<ExpressionClosure> ratio_closure = env["ratio"];
       if (ratio_closure.IsNull()) {
-        throw MessagedException(GetSourceLocation().toAnchor() + ": I expect function asin to given a value named ratio, but I couldn't find any ratio.");
+        throw MessagedException(getSourceLocation().toAnchor() + ": I expect function asin to given a value named ratio, but I couldn't find any ratio.");
       }
 
-      Co<Expression> v = ratio_closure->Evaluate(env);
+      Co<Expression> v = ratio_closure->evaluate(env);
       ExpressionNumber *number = dynamic_cast<ExpressionNumber *>(v.GetPointer());
       if (!number) {
-        throw MessagedException(ratio_closure->GetSourceLocation().toAnchor() + ": I expect the ratio given to asin to be a number. But that thing you gave it is not a number.");
+        throw MessagedException(ratio_closure->getSourceLocation().toAnchor() + ": I expect the ratio given to asin to be a number. But that thing you gave it is not a number.");
       }
       
-      float value = number->GetReal();
+      float value = number->toReal();
       return Co<Expression>(new ExpressionReal(asin(value) * 180.0f / td::PI));
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(asin x)";
     }
 

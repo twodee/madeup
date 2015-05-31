@@ -21,31 +21,31 @@ class ExpressionIf : public Expression {
       else_block(else_block) {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
-      Co<Expression> v = condition->Evaluate(env);
+    Co<Expression> evaluate(Environment& env) const {
+      Co<Expression> v = condition->evaluate(env);
       ExpressionBoolean *bexpr = dynamic_cast<ExpressionBoolean *>(v.GetPointer());
 
       if (!bexpr) {
-        throw MessagedException(condition->GetSourceLocation().toAnchor() + ": An if statement expects a boolean condition. " + condition->GetSource() + " is not boolean.");
+        throw MessagedException(condition->getSourceLocation().toAnchor() + ": An if statement expects a boolean condition. " + condition->getSource() + " is not boolean.");
       } else {
-        if (bexpr->GetBoolean()) {
-          return then_block->Evaluate(env);
+        if (bexpr->toBoolean()) {
+          return then_block->evaluate(env);
         } else if (!else_block.IsNull()) {
-          return else_block->Evaluate(env);
+          return else_block->evaluate(env);
         } else {
           return Co<Expression>(new ExpressionUnit());
         }
       }
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(if ";
-      condition->Write(out);
+      condition->write(out);
       out << " ";
-      then_block->Write(out);
+      then_block->write(out);
       if (!else_block.IsNull()) {
         out << " ";
-        else_block->Write(out);
+        else_block->write(out);
       }
       out << ")";
     }

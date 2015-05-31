@@ -121,18 +121,18 @@ int main(int argc, char **argv) {
     }
 
     Environment env;
-    env.Prime();
-    env.SetGeometryMode(geometry_mode);
+    env.prime();
+    env.setGeometryMode(geometry_mode);
     srand(time(NULL));
 
-    program->Evaluate(env);
+    program->evaluate(env);
 
-    Trimesh *trimesh = env.GetMesh();
+    Trimesh *trimesh = env.getMesh();
 
     if (out_path.length() > 0) {
       if (geometry_mode == GeometryMode::PATH) {
         std::ofstream out(out_path.c_str());
-        out << env.GetPathsJSON();
+        out << env.getPathsJSON();
         out.close();
       } else if (geometry_mode == GeometryMode::SURFACE) {
         if (out_path.find_first_of('.') == std::string::npos ||

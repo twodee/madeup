@@ -21,12 +21,12 @@ class ExpressionIdentity : public Expression {
       Expression() {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
-      env.Identity();
+    Co<Expression> evaluate(Environment& env) const {
+      env.identity();
       return Co<Expression>(new ExpressionUnit());
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(identity)";
     }
 

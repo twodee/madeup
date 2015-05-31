@@ -14,31 +14,31 @@ ExpressionDefineArrayElement::ExpressionDefineArrayElement(Co<Expression> array,
 
 /* ------------------------------------------------------------------------- */
 
-Co<Expression> ExpressionDefineArrayElement::Evaluate(Environment& env) {
-  Co<Expression> rhs_value = rhs->Evaluate(env);
-  rhs_value->SetSource(rhs->GetSource(), rhs->GetSourceLocation());
+Co<Expression> ExpressionDefineArrayElement::evaluate(Environment& env) const {
+  Co<Expression> rhs_value = rhs->evaluate(env);
+  rhs_value->setSource(rhs->getSource(), rhs->getSourceLocation());
 
-  Co<ExpressionArrayReference> array = subscript->EvaluateArrayReference(env); 
-  Co<ExpressionInteger> index = subscript->EvaluateIndex(env, array); 
+  Co<ExpressionArrayReference> array = subscript->evaluateArrayReference(env); 
+  Co<ExpressionInteger> index = subscript->evaluateIndex(env, array); 
 
-  array->GetArray()->SetElement(index->GetInteger(), rhs_value);
+  array->GetArray()->setElement(index->toInteger(), rhs_value);
   
   return rhs_value;
 }
 
 /* ------------------------------------------------------------------------- */
 
-Co<Expression> ExpressionDefineArrayElement::GetRightHandSide() const {
+Co<Expression> ExpressionDefineArrayElement::getRightHandSide() const {
   return rhs;
 }
 
 /* ------------------------------------------------------------------------- */
 
-void ExpressionDefineArrayElement::Write(ostream& out) const {
+void ExpressionDefineArrayElement::write(ostream& out) const {
   out << "(define-array-element ";
-  subscript->Write(out);
+  subscript->write(out);
   out << " ";
-  rhs->Write(out);
+  rhs->write(out);
   out << ")";
 }
 

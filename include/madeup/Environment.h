@@ -48,47 +48,47 @@ class Environment {
     Environment();
     Environment(const Environment& other);
 
-    void Add(const string& id, Co<ExpressionClosure> expression);
-    bool IsBound(const string& id) const;
+    void add(const string& id, Co<ExpressionClosure> expression);
+    bool isBound(const string& id) const;
 
     Co<ExpressionClosure> operator[](const string& id);
 
-    void Prime();
-    void RecordVertex();
-    void RecordPreview();
-    void Move(float distance);
-    void MoveTo(float x, float y, float z);
-    void Scale(float x, float y, float z);
-    void Translate(float x, float y, float z);
-    void Rotate(float x, float y, float z, float degrees);
-    void Center();
-    void Identity();
-    void Echo();
-    void Yaw(float degrees);
-    void Pitch(float degrees);
-    void Roll(float degrees);
-    void Dowel();
-    void Revolve();
-    void Extrude(const QVector3<float>& axis, float length);
-    void Dot();
-    void Box();
-    void Blobs(float grain, float iso);
-    void Surface(int width, int height);
-    void Forget();
-    void Axis(float x, float y, float z);
+    void prime();
+    void recordVertex();
+    void recordPreview();
+    void move(float distance);
+    void moveTo(float x, float y, float z);
+    void scale(float x, float y, float z);
+    void translate(float x, float y, float z);
+    void rotate(float x, float y, float z, float degrees);
+    void center();
+    void identity();
+    void echo();
+    void yaw(float degrees);
+    void pitch(float degrees);
+    void roll(float degrees);
+    void dowel();
+    void revolve();
+    void extrude(const QVector3<float>& axis, float length);
+    void dot();
+    void box();
+    void blobs(float grain, float iso);
+    void surface(int width, int height);
+    void forget();
+    void axis(float x, float y, float z);
 
-    void Push();
-    void Pop();
+    void push();
+    void pop();
 
-    Trimesh *GetMesh();
-    std::string GetPathsJSON() const;
-    void SetGeometryMode(GeometryMode::geometry_mode_t mode);
+    Trimesh *getMesh();
+    std::string getPathsJSON() const;
+    void setGeometryMode(GeometryMode::geometry_mode_t mode);
 
-    float GetVariableAsFloat(const std::string& id);
-    const Turtle& GetTurtle() const;
+    float getVariableAsFloat(const std::string& id);
+    const Turtle& getTurtle() const;
 
   private:
-    bool HasMoved() const;
+    bool hasMoved() const;
 
     map<string, Co<ExpressionClosure> > id_to_expression;
 

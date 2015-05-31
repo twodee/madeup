@@ -21,30 +21,30 @@ class ExpressionAnd : public Expression {
       right(right) {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
-      Co<Expression> lvalue = left->Evaluate(env);
-      Co<Expression> rvalue = right->Evaluate(env);
+    Co<Expression> evaluate(Environment& env) const {
+      Co<Expression> lvalue = left->evaluate(env);
+      Co<Expression> rvalue = right->evaluate(env);
 
       ExpressionBoolean *lboolean = dynamic_cast<ExpressionBoolean *>(lvalue.GetPointer());
       ExpressionBoolean *rboolean = dynamic_cast<ExpressionBoolean *>(rvalue.GetPointer());
       
       Co<Expression> value;
       if (lboolean && rboolean) {
-        value = Co<Expression>(new ExpressionBoolean(lboolean->GetBoolean() && rboolean->GetBoolean()));
+        value = Co<Expression>(new ExpressionBoolean(lboolean->toBoolean() && rboolean->toBoolean()));
       } else if (!lboolean) {
-        throw MessagedException(left->GetSourceLocation().toAnchor() + ": Operator and expects boolean operands. " + left->GetSource() + " is not boolean.");
+        throw MessagedException(left->getSourceLocation().toAnchor() + ": Operator and expects boolean operands. " + left->getSource() + " is not boolean.");
       } else if (!rboolean) {
-        throw MessagedException(right->GetSourceLocation().toAnchor() + ": Operator or expects boolean operands. " + right->GetSource() + " is not boolean.");
+        throw MessagedException(right->getSourceLocation().toAnchor() + ": Operator or expects boolean operands. " + right->getSource() + " is not boolean.");
       }
 
       return value;
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(and ";
-      left->Write(out);
+      left->write(out);
       out << " ";
-      right->Write(out);
+      right->write(out);
       out << ")";
     }
 

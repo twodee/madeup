@@ -71,217 +71,217 @@ Environment::Environment(const Environment& other) :
   for (map<string, Co<ExpressionClosure> >::const_iterator i = other.id_to_expression.begin();
        i != other.id_to_expression.end();
        ++i) {
-    Add(i->first, i->second);
+    add(i->first, i->second);
   }
 }
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Prime() {
+void Environment::prime() {
   shapes = new Trimesh(0, 0);
-  Add("radius", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("radius", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
-  Add("nsides", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("nsides", Co<Expression>(new ExpressionInteger(4)))), Environment())));
-  Add("fracture", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("fracture", Co<Expression>(new ExpressionReal(100)))), Environment())));
-  Add("pi", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("pi", Co<Expression>(new ExpressionReal(td::PI)))), Environment())));
-  Add("e", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("e", Co<Expression>(new ExpressionReal(td::E)))), Environment())));
-  Add("twist", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("twist", Co<Expression>(new ExpressionReal(45.0f)))), Environment())));
-  Add("axisx", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisx", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
-  Add("axisy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisy", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
-  Add("axisz", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisz", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
-  Add("energy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("energy", Co<Expression>(new ExpressionReal(100.0f)))), Environment())));
-  Add("halflife", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("halflife", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
+  add("radius", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("radius", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
+  add("nsides", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("nsides", Co<Expression>(new ExpressionInteger(4)))), Environment())));
+  add("fracture", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("fracture", Co<Expression>(new ExpressionReal(100)))), Environment())));
+  add("pi", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("pi", Co<Expression>(new ExpressionReal(td::PI)))), Environment())));
+  add("e", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("e", Co<Expression>(new ExpressionReal(td::E)))), Environment())));
+  add("twist", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("twist", Co<Expression>(new ExpressionReal(45.0f)))), Environment())));
+  add("axisx", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisx", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
+  add("axisy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisy", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
+  add("axisz", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisz", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
+  add("energy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("energy", Co<Expression>(new ExpressionReal(100.0f)))), Environment())));
+  add("halflife", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("halflife", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
 
   Environment globals;
-  globals.Add("nsides", (*this)["nsides"]);
-  globals.Add("radius", (*this)["radius"]);
-  globals.Add("fracture", (*this)["fracture"]);
-  globals.Add("twist", (*this)["twist"]);
-  globals.Add("axisx", (*this)["axisx"]);
-  globals.Add("axisy", (*this)["axisy"]);
-  globals.Add("axisz", (*this)["axisz"]);
-  globals.Add("energy", (*this)["energy"]);
-  globals.Add("halflife", (*this)["halflife"]);
+  globals.add("nsides", (*this)["nsides"]);
+  globals.add("radius", (*this)["radius"]);
+  globals.add("fracture", (*this)["fracture"]);
+  globals.add("twist", (*this)["twist"]);
+  globals.add("axisx", (*this)["axisx"]);
+  globals.add("axisy", (*this)["axisy"]);
+  globals.add("axisz", (*this)["axisz"]);
+  globals.add("energy", (*this)["energy"]);
+  globals.add("halflife", (*this)["halflife"]);
 
   Co<ExpressionDefine> define_sine(new ExpressionDefine("sin", Co<Expression>(new ExpressionSine())));
-  define_sine->AddFormal("degrees");
-  Add("sin", Co<ExpressionClosure>(new ExpressionClosure(define_sine, globals)));
+  define_sine->addFormal("degrees");
+  add("sin", Co<ExpressionClosure>(new ExpressionClosure(define_sine, globals)));
 
   Co<ExpressionDefine> define_cosine(new ExpressionDefine("cos", Co<Expression>(new ExpressionCosine())));
-  define_cosine->AddFormal("degrees");
-  Add("cos", Co<ExpressionClosure>(new ExpressionClosure(define_cosine, globals)));
+  define_cosine->addFormal("degrees");
+  add("cos", Co<ExpressionClosure>(new ExpressionClosure(define_cosine, globals)));
 
   Co<ExpressionDefine> define_log(new ExpressionDefine("log", Co<Expression>(new ExpressionLog())));
-  define_log->AddFormal("base");
-  define_log->AddFormal("x");
-  Add("log", Co<ExpressionClosure>(new ExpressionClosure(define_log, globals)));
+  define_log->addFormal("base");
+  define_log->addFormal("x");
+  add("log", Co<ExpressionClosure>(new ExpressionClosure(define_log, globals)));
 
   Co<ExpressionDefine> define_tangent(new ExpressionDefine("tan", Co<Expression>(new ExpressionTangent())));
-  define_tangent->AddFormal("degrees");
-  Add("tan", Co<ExpressionClosure>(new ExpressionClosure(define_tangent, globals)));
+  define_tangent->addFormal("degrees");
+  add("tan", Co<ExpressionClosure>(new ExpressionClosure(define_tangent, globals)));
 
   Co<ExpressionDefine> define_inverse_sine(new ExpressionDefine("asin", Co<Expression>(new ExpressionInverseTangent())));
-  define_inverse_sine->AddFormal("ratio");
-  Add("asin", Co<ExpressionClosure>(new ExpressionClosure(define_inverse_sine, globals)));
+  define_inverse_sine->addFormal("ratio");
+  add("asin", Co<ExpressionClosure>(new ExpressionClosure(define_inverse_sine, globals)));
 
   Co<ExpressionDefine> define_inverse_cosine(new ExpressionDefine("acos", Co<Expression>(new ExpressionInverseTangent())));
-  define_inverse_cosine->AddFormal("ratio");
-  Add("acos", Co<ExpressionClosure>(new ExpressionClosure(define_inverse_cosine, globals)));
+  define_inverse_cosine->addFormal("ratio");
+  add("acos", Co<ExpressionClosure>(new ExpressionClosure(define_inverse_cosine, globals)));
 
   Co<ExpressionDefine> define_inverse_tangent(new ExpressionDefine("atan", Co<Expression>(new ExpressionInverseTangent())));
-  define_inverse_tangent->AddFormal("ratio");
-  Add("atan", Co<ExpressionClosure>(new ExpressionClosure(define_inverse_tangent, globals)));
+  define_inverse_tangent->addFormal("ratio");
+  add("atan", Co<ExpressionClosure>(new ExpressionClosure(define_inverse_tangent, globals)));
 
   Co<ExpressionDefine> define_inverse_tangent2(new ExpressionDefine("atan2", Co<Expression>(new ExpressionInverseTangent2())));
-  define_inverse_tangent2->AddFormal("opposite");
-  define_inverse_tangent2->AddFormal("adjacent");
-  Add("atan2", Co<ExpressionClosure>(new ExpressionClosure(define_inverse_tangent2, globals)));
+  define_inverse_tangent2->addFormal("opposite");
+  define_inverse_tangent2->addFormal("adjacent");
+  add("atan2", Co<ExpressionClosure>(new ExpressionClosure(define_inverse_tangent2, globals)));
 
   Co<ExpressionDefine> define_yaw(new ExpressionDefine("yaw", Co<Expression>(new ExpressionYaw())));
-  define_yaw->AddFormal("degrees");
-  Add("yaw", Co<ExpressionClosure>(new ExpressionClosure(define_yaw, globals)));
+  define_yaw->addFormal("degrees");
+  add("yaw", Co<ExpressionClosure>(new ExpressionClosure(define_yaw, globals)));
 
   Co<ExpressionDefine> define_pitch(new ExpressionDefine("pitch", Co<Expression>(new ExpressionPitch())));
-  define_pitch->AddFormal("degrees");
-  Add("pitch", Co<ExpressionClosure>(new ExpressionClosure(define_pitch, globals)));
+  define_pitch->addFormal("degrees");
+  add("pitch", Co<ExpressionClosure>(new ExpressionClosure(define_pitch, globals)));
 
   Co<ExpressionDefine> define_roll(new ExpressionDefine("roll", Co<Expression>(new ExpressionRoll())));
-  define_roll->AddFormal("degrees");
-  Add("roll", Co<ExpressionClosure>(new ExpressionClosure(define_roll, globals)));
+  define_roll->addFormal("degrees");
+  add("roll", Co<ExpressionClosure>(new ExpressionClosure(define_roll, globals)));
 
   Co<ExpressionDefine> define_push(new ExpressionDefine("push", Co<Expression>(new ExpressionPush())));
-  Add("push", Co<ExpressionClosure>(new ExpressionClosure(define_push, globals)));
+  add("push", Co<ExpressionClosure>(new ExpressionClosure(define_push, globals)));
 
   Co<ExpressionDefine> define_pop(new ExpressionDefine("pop", Co<Expression>(new ExpressionPop())));
-  Add("pop", Co<ExpressionClosure>(new ExpressionClosure(define_pop, globals)));
+  add("pop", Co<ExpressionClosure>(new ExpressionClosure(define_pop, globals)));
 
   Co<ExpressionDefine> define_print(new ExpressionDefine("print", Co<Expression>(new ExpressionPrint())));
-  define_print->AddFormal("message");
-  Add("print", Co<ExpressionClosure>(new ExpressionClosure(define_print, globals)));
+  define_print->addFormal("message");
+  add("print", Co<ExpressionClosure>(new ExpressionClosure(define_print, globals)));
 
   Co<ExpressionDefine> define_debug(new ExpressionDefine("debug", Co<Expression>(new ExpressionDebug())));
-  define_debug->AddFormal("message", FormalParameter::LAZY);
-  Add("debug", Co<ExpressionClosure>(new ExpressionClosure(define_debug, globals)));
+  define_debug->addFormal("message", FormalParameter::LAZY);
+  add("debug", Co<ExpressionClosure>(new ExpressionClosure(define_debug, globals)));
 
   Co<ExpressionDefine> define_where(new ExpressionDefine("where", Co<Expression>(new ExpressionWhere())));
-  Add("where", Co<ExpressionClosure>(new ExpressionClosure(define_where, globals)));
+  add("where", Co<ExpressionClosure>(new ExpressionClosure(define_where, globals)));
 
   Co<ExpressionDefine> define_move(new ExpressionDefine("move", Co<Expression>(new ExpressionMove())));
-  define_move->AddFormal("length");
-  Add("move", Co<ExpressionClosure>(new ExpressionClosure(define_move, globals)));
+  define_move->addFormal("length");
+  add("move", Co<ExpressionClosure>(new ExpressionClosure(define_move, globals)));
 
   Co<ExpressionDefine> define_moveto(new ExpressionDefine("moveto", Co<Expression>(new ExpressionMoveTo())));
-  define_moveto->AddFormal("x");
-  define_moveto->AddFormal("y");
-  define_moveto->AddFormal("z");
-  Add("moveto", Co<ExpressionClosure>(new ExpressionClosure(define_moveto, globals)));
+  define_moveto->addFormal("x");
+  define_moveto->addFormal("y");
+  define_moveto->addFormal("z");
+  add("moveto", Co<ExpressionClosure>(new ExpressionClosure(define_moveto, globals)));
 
   Co<ExpressionDefine> define_scale(new ExpressionDefine("scale", Co<Expression>(new ExpressionScale())));
-  define_scale->AddFormal("x");
-  define_scale->AddFormal("y");
-  define_scale->AddFormal("z");
-  Add("scale", Co<ExpressionClosure>(new ExpressionClosure(define_scale, globals)));
+  define_scale->addFormal("x");
+  define_scale->addFormal("y");
+  define_scale->addFormal("z");
+  add("scale", Co<ExpressionClosure>(new ExpressionClosure(define_scale, globals)));
 
   Co<ExpressionDefine> define_translate(new ExpressionDefine("translate", Co<Expression>(new ExpressionTranslate())));
-  define_translate->AddFormal("x");
-  define_translate->AddFormal("y");
-  define_translate->AddFormal("z");
-  Add("translate", Co<ExpressionClosure>(new ExpressionClosure(define_translate, globals)));
+  define_translate->addFormal("x");
+  define_translate->addFormal("y");
+  define_translate->addFormal("z");
+  add("translate", Co<ExpressionClosure>(new ExpressionClosure(define_translate, globals)));
 
   Co<ExpressionDefine> define_rotate(new ExpressionDefine("rotate", Co<Expression>(new ExpressionRotate())));
-  define_rotate->AddFormal("x");
-  define_rotate->AddFormal("y");
-  define_rotate->AddFormal("z");
-  define_rotate->AddFormal("degrees");
-  Add("rotate", Co<ExpressionClosure>(new ExpressionClosure(define_rotate, globals)));
+  define_rotate->addFormal("x");
+  define_rotate->addFormal("y");
+  define_rotate->addFormal("z");
+  define_rotate->addFormal("degrees");
+  add("rotate", Co<ExpressionClosure>(new ExpressionClosure(define_rotate, globals)));
 
   Co<ExpressionDefine> define_identity(new ExpressionDefine("identity", Co<Expression>(new ExpressionIdentity())));
-  Add("identity", Co<ExpressionClosure>(new ExpressionClosure(define_identity, globals)));
+  add("identity", Co<ExpressionClosure>(new ExpressionClosure(define_identity, globals)));
 
   Co<ExpressionDefine> define_center(new ExpressionDefine("center", Co<Expression>(new ExpressionCenter())));
-  Add("center", Co<ExpressionClosure>(new ExpressionClosure(define_center, globals)));
+  add("center", Co<ExpressionClosure>(new ExpressionClosure(define_center, globals)));
 
   Co<ExpressionDefine> define_echo(new ExpressionDefine("echo", Co<Expression>(new ExpressionEcho())));
-  Add("echo", Co<ExpressionClosure>(new ExpressionClosure(define_echo, globals)));
+  add("echo", Co<ExpressionClosure>(new ExpressionClosure(define_echo, globals)));
 
   Co<ExpressionDefine> define_axis(new ExpressionDefine("axis", Co<Expression>(new ExpressionAxis())));
-  define_axis->AddFormal("x");
-  define_axis->AddFormal("y");
-  define_axis->AddFormal("z");
-  Add("axis", Co<ExpressionClosure>(new ExpressionClosure(define_axis, globals)));
+  define_axis->addFormal("x");
+  define_axis->addFormal("y");
+  define_axis->addFormal("z");
+  add("axis", Co<ExpressionClosure>(new ExpressionClosure(define_axis, globals)));
 
   Co<ExpressionDefine> define_surface(new ExpressionDefine("surface", Co<Expression>(new ExpressionSurface())));
-  define_surface->AddFormal("width");
-  define_surface->AddFormal("height");
-  Add("surface", Co<ExpressionClosure>(new ExpressionClosure(define_surface, globals)));
+  define_surface->addFormal("width");
+  define_surface->addFormal("height");
+  add("surface", Co<ExpressionClosure>(new ExpressionClosure(define_surface, globals)));
 
   Co<ExpressionDefine> define_blobs(new ExpressionDefine("blobs", Co<Expression>(new ExpressionBlobs())));
-  define_blobs->AddFormal("grain");
-  define_blobs->AddFormal("iso");
-  Add("blobs", Co<ExpressionClosure>(new ExpressionClosure(define_blobs, globals)));
+  define_blobs->addFormal("grain");
+  define_blobs->addFormal("iso");
+  add("blobs", Co<ExpressionClosure>(new ExpressionClosure(define_blobs, globals)));
 
   Co<ExpressionDefine> define_random(new ExpressionDefine("random", Co<Expression>(new ExpressionRandom())));
-  define_random->AddFormal("min");
-  define_random->AddFormal("max");
-  Add("random", Co<ExpressionClosure>(new ExpressionClosure(define_random, globals)));
+  define_random->addFormal("min");
+  define_random->addFormal("max");
+  add("random", Co<ExpressionClosure>(new ExpressionClosure(define_random, globals)));
 
   Co<ExpressionDefine> define_max(new ExpressionDefine("max", Co<Expression>(new ExpressionMax())));
-  define_max->AddFormal("a");
-  define_max->AddFormal("b");
-  Add("max", Co<ExpressionClosure>(new ExpressionClosure(define_max, globals)));
+  define_max->addFormal("a");
+  define_max->addFormal("b");
+  add("max", Co<ExpressionClosure>(new ExpressionClosure(define_max, globals)));
 
   Co<ExpressionDefine> define_min(new ExpressionDefine("min", Co<Expression>(new ExpressionMin())));
-  define_min->AddFormal("a");
-  define_min->AddFormal("b");
-  Add("min", Co<ExpressionClosure>(new ExpressionClosure(define_min, globals)));
+  define_min->addFormal("a");
+  define_min->addFormal("b");
+  add("min", Co<ExpressionClosure>(new ExpressionClosure(define_min, globals)));
 
   Co<ExpressionDefine> define_sign(new ExpressionDefine("sign", Co<Expression>(new ExpressionSign())));
-  define_sign->AddFormal("n");
-  Add("sign", Co<ExpressionClosure>(new ExpressionClosure(define_sign, globals)));
+  define_sign->addFormal("n");
+  add("sign", Co<ExpressionClosure>(new ExpressionClosure(define_sign, globals)));
 
   Co<ExpressionDefine> define_dowel(new ExpressionDefine("dowel", Co<Expression>(new ExpressionDowel())));
-  Add("dowel", Co<ExpressionClosure>(new ExpressionClosure(define_dowel, globals)));
-  Add("stick", Co<ExpressionClosure>(new ExpressionClosure(define_dowel, globals)));
+  add("dowel", Co<ExpressionClosure>(new ExpressionClosure(define_dowel, globals)));
+  add("stick", Co<ExpressionClosure>(new ExpressionClosure(define_dowel, globals)));
 
   Co<ExpressionDefine> define_dot(new ExpressionDefine("dot", Co<Expression>(new ExpressionDot())));
-  Add("dot", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
-  Add("ball", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
-  Add("dots", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
+  add("dot", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
+  add("ball", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
+  add("dots", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
 
   Co<ExpressionDefine> define_box(new ExpressionDefine("box", Co<Expression>(new ExpressionBox())));
-  Add("box", Co<ExpressionClosure>(new ExpressionClosure(define_box, globals)));
-  Add("boxes", Co<ExpressionClosure>(new ExpressionClosure(define_box, globals)));
+  add("box", Co<ExpressionClosure>(new ExpressionClosure(define_box, globals)));
+  add("boxes", Co<ExpressionClosure>(new ExpressionClosure(define_box, globals)));
 
   Co<ExpressionDefine> define_revolve(new ExpressionDefine("revolve", Co<Expression>(new ExpressionRevolve())));
-  define_revolve->AddFormal("x");
-  define_revolve->AddFormal("y");
-  define_revolve->AddFormal("z");
-  define_revolve->AddFormal("degrees");
-  Add("revolve", Co<ExpressionClosure>(new ExpressionClosure(define_revolve, globals)));
+  define_revolve->addFormal("x");
+  define_revolve->addFormal("y");
+  define_revolve->addFormal("z");
+  define_revolve->addFormal("degrees");
+  add("revolve", Co<ExpressionClosure>(new ExpressionClosure(define_revolve, globals)));
 
   Co<ExpressionDefine> define_extrude(new ExpressionDefine("extrude", Co<Expression>(new ExpressionExtrude())));
-  define_extrude->AddFormal("x");
-  define_extrude->AddFormal("y");
-  define_extrude->AddFormal("z");
-  define_extrude->AddFormal("length");
-  Add("extrude", Co<ExpressionClosure>(new ExpressionClosure(define_extrude, globals)));
+  define_extrude->addFormal("x");
+  define_extrude->addFormal("y");
+  define_extrude->addFormal("z");
+  define_extrude->addFormal("length");
+  add("extrude", Co<ExpressionClosure>(new ExpressionClosure(define_extrude, globals)));
 
   Co<ExpressionDefine> define_forget(new ExpressionDefine("forget", Co<Expression>(new ExpressionForget())));
-  Add("forget", Co<ExpressionClosure>(new ExpressionClosure(define_forget, globals)));
+  add("forget", Co<ExpressionClosure>(new ExpressionClosure(define_forget, globals)));
 
   xforms.push(QMatrix4<float>(1.0f));
 }
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Add(const string& id, Co<ExpressionClosure> closure) {
+void Environment::add(const string& id, Co<ExpressionClosure> closure) {
   // If a binding already exists for this closure, let's replace the innards of
   // the old one.  Other environments may have an alias to this closure, so we
   // don't want to insert a brand new closure instance.
   map<string, Co<ExpressionClosure> >::iterator match = id_to_expression.find(id);
   if (match != id_to_expression.end()) {
-    match->second->SetDefine(closure->GetDefine());
-    match->second->SetEnvironment(*closure->GetEnvironment());
-    match->second->SetSource(closure->GetSource(), closure->GetSourceLocation());
+    match->second->setDefine(closure->getDefine());
+    match->second->setEnvironment(*closure->getEnvironment());
+    match->second->setSource(closure->getSource(), closure->getSourceLocation());
   } else {
     id_to_expression[id] = closure;
   }
@@ -303,30 +303,30 @@ Co<ExpressionClosure> Environment::operator[](const string& id) {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::RecordVertex() {
-  Co<Expression> v = (*this)["radius"]->Evaluate(*this);
+void Environment::recordVertex() {
+  Co<Expression> v = (*this)["radius"]->evaluate(*this);
   ExpressionReal *radius_value = dynamic_cast<ExpressionReal *>(v.GetPointer());
   float radius;
   if (radius_value) {
-    radius = radius_value->GetReal();
+    radius = radius_value->toReal();
   } else {
     ExpressionInteger *radius_value = dynamic_cast<ExpressionInteger *>(v.GetPointer());
-    radius = radius_value->GetInteger();
+    radius = radius_value->toInteger();
   }
 
-  v = (*this)["energy"]->Evaluate(*this);
+  v = (*this)["energy"]->evaluate(*this);
   ExpressionNumber *energy_value = dynamic_cast<ExpressionNumber *>(v.GetPointer());
   float energy;
   if (energy_value) {
-    energy = energy_value->GetReal();
+    energy = energy_value->toReal();
   } else {
   }
 
-  v = (*this)["halflife"]->Evaluate(*this);
+  v = (*this)["halflife"]->evaluate(*this);
   ExpressionNumber *halflife_value = dynamic_cast<ExpressionNumber *>(v.GetPointer());
   float halflife;
   if (halflife_value) {
-    halflife = halflife_value->GetReal();
+    halflife = halflife_value->toReal();
   } else {
   }
 
@@ -336,7 +336,7 @@ void Environment::RecordVertex() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::RecordPreview() {
+void Environment::recordPreview() {
   if (paths.size() == 0) {
     paths.push_back(vector<Turtle>());
   }
@@ -347,25 +347,25 @@ void Environment::RecordPreview() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Move(float distance) {
+void Environment::move(float distance) {
   turtle.position += turtle.camera.GetTo() * distance;
-  RecordVertex();
-  RecordPreview();
+  recordVertex();
+  recordPreview();
 }
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::MoveTo(float x, float y, float z) {
+void Environment::moveTo(float x, float y, float z) {
   turtle.position[0] = x;
   turtle.position[1] = y;
   turtle.position[2] = z;
-  RecordVertex();
-  RecordPreview();
+  recordVertex();
+  recordPreview();
 }
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Scale(float x, float y, float z) {
+void Environment::scale(float x, float y, float z) {
   QMatrix4<float> xform = xforms.top();
   xforms.pop();
   xform = QMatrix4<float>::GetScale(x, y, z) * xform;
@@ -374,7 +374,7 @@ void Environment::Scale(float x, float y, float z) {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Translate(float x, float y, float z) {
+void Environment::translate(float x, float y, float z) {
   QMatrix4<float> xform = xforms.top();
   xforms.pop();
   xform = QMatrix4<float>::GetTranslate(x, y, z) * xform;
@@ -383,7 +383,7 @@ void Environment::Translate(float x, float y, float z) {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Rotate(float x, float y, float z, float degrees) {
+void Environment::rotate(float x, float y, float z, float degrees) {
   QMatrix4<float> xform = xforms.top();
   xforms.pop();
   xform = QMatrix4<float>::GetRotate(degrees, QVector3<float>(x, y, z)) * xform;
@@ -392,14 +392,14 @@ void Environment::Rotate(float x, float y, float z, float degrees) {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Identity() {
+void Environment::identity() {
   xforms.pop();
   xforms.push(QMatrix4<float>(1.0f));
 }
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Center() {
+void Environment::center() {
   if (run.size() == 0) {
     return;
   }
@@ -427,7 +427,7 @@ void Environment::Center() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Echo() {
+void Environment::echo() {
   for (unsigned int i = 0; i < run.size(); ++i) {
     /* Node cursor = {xforms.top() * run[run.size() - 1 - i].position, run[run.size() - 1 - i].radius}; */
     /* run.push_back(cursor); */
@@ -436,42 +436,42 @@ void Environment::Echo() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Roll(float degrees) {
+void Environment::roll(float degrees) {
   turtle.camera.Roll(degrees);
  
   // Only issue a node in the preview path if we've moved at least once.
   // Otherwise, it looks like we're generating a node in the geometry when
   // we really aren't.
-  if (HasMoved()) {
-    RecordPreview();
+  if (hasMoved()) {
+    recordPreview();
   }
 }
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Pitch(float degrees) {
+void Environment::pitch(float degrees) {
   turtle.camera.Pitch(degrees);
  
   // See Roll.
-  if (HasMoved()) {
-    RecordPreview();
+  if (hasMoved()) {
+    recordPreview();
   }
 }
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Yaw(float degrees) {
+void Environment::yaw(float degrees) {
   turtle.camera.Yaw(degrees);
 
   // See Roll.
-  if (HasMoved()) {
-    RecordPreview();
+  if (hasMoved()) {
+    recordPreview();
   }
 }
 
 /* ------------------------------------------------------------------------- */
 
-Trimesh *Environment::GetMesh() {
+Trimesh *Environment::getMesh() {
   shapes->ComputeNormals();
   shapes->DisconnectFaces();
   return shapes;
@@ -479,14 +479,14 @@ Trimesh *Environment::GetMesh() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Push() {
+void Environment::push() {
   previous_turtles.push(turtle);
   xforms.push(xforms.top());
 }
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Pop() {
+void Environment::pop() {
   if (previous_turtles.size() == 0) {
     throw MessagedException("Turtle stack is empty");
   }
@@ -502,7 +502,7 @@ void Environment::Pop() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Dowel() {
+void Environment::dowel() {
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() >= 2) {
       QVector3<float> diff = run[0].position - run[run.size() - 1].position;
@@ -529,34 +529,34 @@ void Environment::Dowel() {
         }
         /* line->Write("line.f20"); */
 
-        Co<Expression> nsides_value = (*this)["nsides"]->Evaluate(*this);
-        int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->GetInteger();
+        Co<Expression> nsides_value = (*this)["nsides"]->evaluate(*this);
+        int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->toInteger();
 
-        Co<Expression> fracture_value = (*this)["fracture"]->Evaluate(*this);
+        Co<Expression> fracture_value = (*this)["fracture"]->evaluate(*this);
         ExpressionReal *fracture_number = dynamic_cast<ExpressionReal *>(fracture_value.GetPointer());
         float fracture;
         if (fracture_number) {
-          fracture = fracture_number->GetReal();
+          fracture = fracture_number->toReal();
         } else {
           ExpressionInteger *fracture_number = dynamic_cast<ExpressionInteger *>(fracture_value.GetPointer());
-          fracture = fracture_number->GetInteger();
+          fracture = fracture_number->toInteger();
         }
 
-        Co<Expression> twist_value = (*this)["twist"]->Evaluate(*this);
+        Co<Expression> twist_value = (*this)["twist"]->evaluate(*this);
         ExpressionReal *twist_number = dynamic_cast<ExpressionReal *>(twist_value.GetPointer());
         float twist;
         if (twist_number) {
-          twist = twist_number->GetReal();
+          twist = twist_number->toReal();
         } else {
           ExpressionInteger *twist_number = dynamic_cast<ExpressionInteger *>(twist_value.GetPointer());
-          twist = twist_number->GetInteger();
+          twist = twist_number->toInteger();
         }
 
         /* line->Fracture(fracture); */
         /* line->AdaptiveFracture(30.0f, 1.0f); */
 
         // Output for Desmos.
-#if 1
+#if 0
         std::cout << "(" << (*line)(0)[0] << ", " << (*line)(0)[1] << ")";
         for (int i = 1; i < line->GetElementCount(); ++i) {
           std::cout << ",(" << (*line)(i)[0] << ", " << (*line)(i)[1] << ")";
@@ -583,7 +583,7 @@ void Environment::Dowel() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Revolve() {
+void Environment::revolve() {
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() >= 2) {
       QVector3<float> diff = run[0].position - run[run.size() - 1].position;
@@ -608,24 +608,24 @@ void Environment::Revolve() {
           (*line)(i)[2] = run[i].position[2];
         }
 
-        Co<Expression> nsides_value = (*this)["nsides"]->Evaluate(*this);
-        int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->GetInteger();
+        Co<Expression> nsides_value = (*this)["nsides"]->evaluate(*this);
+        int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->toInteger();
 
-        Co<Expression> x_value = (*this)["x"]->Evaluate(*this);
-        float x = dynamic_cast<ExpressionNumber *>(x_value.GetPointer())->GetReal();
-        Co<Expression> y_value = (*this)["y"]->Evaluate(*this);
-        float y = dynamic_cast<ExpressionNumber *>(y_value.GetPointer())->GetReal();
-        Co<Expression> z_value = (*this)["z"]->Evaluate(*this);
-        float z = dynamic_cast<ExpressionNumber *>(z_value.GetPointer())->GetReal();
+        Co<Expression> x_value = (*this)["x"]->evaluate(*this);
+        float x = dynamic_cast<ExpressionNumber *>(x_value.GetPointer())->toReal();
+        Co<Expression> y_value = (*this)["y"]->evaluate(*this);
+        float y = dynamic_cast<ExpressionNumber *>(y_value.GetPointer())->toReal();
+        Co<Expression> z_value = (*this)["z"]->evaluate(*this);
+        float z = dynamic_cast<ExpressionNumber *>(z_value.GetPointer())->toReal();
 
-        Co<Expression> fracture_value = (*this)["fracture"]->Evaluate(*this);
+        Co<Expression> fracture_value = (*this)["fracture"]->evaluate(*this);
         ExpressionNumber *fracture_number = dynamic_cast<ExpressionNumber *>(fracture_value.GetPointer());
-        float fracture = fracture_number->GetReal();
+        float fracture = fracture_number->toReal();
         line->Fracture(fracture);
 
-        Co<Expression> degrees_expr = (*this)["degrees"]->Evaluate(*this);
+        Co<Expression> degrees_expr = (*this)["degrees"]->evaluate(*this);
         ExpressionNumber *degrees_number = dynamic_cast<ExpressionNumber *>(degrees_expr.GetPointer());
-        float degrees = degrees_number->GetReal();
+        float degrees = degrees_number->toReal();
 
         Trimesh *trimesh = line->Revolve(QVector3<float>(x, y, z), nsides, degrees);
 
@@ -640,7 +640,7 @@ void Environment::Revolve() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Extrude(const QVector3<float>& axis, float length) {
+void Environment::extrude(const QVector3<float>& axis, float length) {
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() > 0) {
       Polyline<float> *line = new Polyline<float>(run.size(), 3, Polyline<float>::CLOSED);
@@ -661,10 +661,10 @@ void Environment::Extrude(const QVector3<float>& axis, float length) {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Dot() {
+void Environment::dot() {
   if (geometry_mode == GeometryMode::SURFACE) {
-    Co<Expression> nsides_value = (*this)["nsides"]->Evaluate(*this);
-    int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->GetInteger();
+    Co<Expression> nsides_value = (*this)["nsides"]->evaluate(*this);
+    int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->toInteger();
 
     for (unsigned int i = 0; i < run.size(); ++i) {
       Trimesh *trimesh = Trimesh::GetSphere(nsides, nsides / 2, run[i].radius);
@@ -681,7 +681,7 @@ void Environment::Dot() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Box() {
+void Environment::box() {
   if (geometry_mode == GeometryMode::SURFACE) {
     for (unsigned int i = 0; i < run.size(); ++i) {
       Trimesh *trimesh = Trimesh::GetBox(run[i].radius);
@@ -697,7 +697,7 @@ void Environment::Box() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Blobs(float grain, float iso) {
+void Environment::blobs(float grain, float iso) {
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() > 0) {
 
@@ -791,7 +791,7 @@ void Environment::Blobs(float grain, float iso) {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Surface(int width, int height) {
+void Environment::surface(int width, int height) {
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() != (unsigned int) (width * height)) {
       std::stringstream ss;
@@ -822,7 +822,7 @@ void Environment::Surface(int width, int height) {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Forget() {
+void Environment::forget() {
   // Erase last preview path.
   paths.pop_back();
 
@@ -832,10 +832,10 @@ void Environment::Forget() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::Axis(float x, float y, float z) {
-  Add("axisx", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisx", new ExpressionReal(x))), Environment())));
-  Add("axisy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisy", new ExpressionReal(y))), Environment())));
-  Add("axisz", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisz", new ExpressionReal(z))), Environment())));
+void Environment::axis(float x, float y, float z) {
+  add("axisx", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisx", new ExpressionReal(x))), Environment())));
+  add("axisy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisy", new ExpressionReal(y))), Environment())));
+  add("axisz", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisz", new ExpressionReal(z))), Environment())));
 }
 
 /* ------------------------------------------------------------------------- */
@@ -854,19 +854,19 @@ std::ostream& operator<<(std::ostream& out, const Environment env) {
 
 /* ------------------------------------------------------------------------- */
 
-bool Environment::IsBound(const string& id) const {
+bool Environment::isBound(const string& id) const {
   return id_to_expression.find(id) != id_to_expression.end();
 }
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::SetGeometryMode(GeometryMode::geometry_mode_t mode) {
+void Environment::setGeometryMode(GeometryMode::geometry_mode_t mode) {
   geometry_mode = mode; 
 }
 
 /* ------------------------------------------------------------------------- */
 
-std::string Environment::GetPathsJSON() const {
+std::string Environment::getPathsJSON() const {
   std::stringstream out;
 
   out << std::fixed;
@@ -898,18 +898,18 @@ std::string Environment::GetPathsJSON() const {
 
 /* ------------------------------------------------------------------------- */
 
-float Environment::GetVariableAsFloat(const std::string& id) {
+float Environment::getVariableAsFloat(const std::string& id) {
   Co<ExpressionClosure> closure = (*this)[id];
-  Co<Expression> v = closure->Evaluate(*this);
+  Co<Expression> v = closure->evaluate(*this);
 
   ExpressionReal *decimal = dynamic_cast<ExpressionReal *>(v.GetPointer());
   if (decimal) {
-    return decimal->GetReal();
+    return decimal->toReal();
   }
 
   ExpressionInteger *integer = dynamic_cast<ExpressionInteger *>(v.GetPointer());
   if (integer) {
-    return integer->GetInteger();
+    return integer->toInteger();
   }
 
   std::stringstream ss;
@@ -919,13 +919,13 @@ float Environment::GetVariableAsFloat(const std::string& id) {
 
 /* ------------------------------------------------------------------------- */
 
-bool Environment::HasMoved() const {
+bool Environment::hasMoved() const {
   return paths.size() > 0 && paths[paths.size() - 1].size() > 0; 
 }
 
 /* ------------------------------------------------------------------------- */
 
-const Turtle& Environment::GetTurtle() const {
+const Turtle& Environment::getTurtle() const {
   return turtle;
 }
 

@@ -14,15 +14,15 @@ class ExpressionBoolean : public Expression {
       value(value) {
     }
 
-    Co<Expression> Evaluate(Environment& env) {
+    Co<Expression> evaluate(Environment& env) const {
       return Co<Expression>(new ExpressionBoolean(value));
     }
 
-    bool GetBoolean() const {
+    bool toBoolean() const {
       return value;
     }
 
-    void Write(ostream& out) const {
+    void write(ostream& out) const {
       out << "(BOOLEAN " << (value ? "true" : "false") << ")";
     }
 
