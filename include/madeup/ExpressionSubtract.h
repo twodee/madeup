@@ -39,7 +39,7 @@ class ExpressionSubtract : public Expression {
       } else if (lnumber && rnumber) {
         r = Co<Expression>(new ExpressionReal(lnumber->GetReal() - rnumber->GetReal()));
       } else {
-        throw MessagedException(GetSourceLocation() + ": Operator - doesn't know how to subtract " + right->GetSource() + " from " + left->GetSource() + ".");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Operator - doesn't know how to subtract " + right->GetSource() + " from " + left->GetSource() + ".");
       }
 
       return r;

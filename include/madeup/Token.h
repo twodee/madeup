@@ -64,6 +64,7 @@ class Token {
 
     token_t getType() const;
     const std::string getText() const;
+    const std::string getQuotedText() const;
     const SourceLocation &getLocation() const;
     const std::string getTypeString() const;
 

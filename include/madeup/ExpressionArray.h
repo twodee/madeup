@@ -93,7 +93,7 @@ class ExpressionArrayConstructor : public Expression {
       ExpressionInteger *length = dynamic_cast<ExpressionInteger *>(length_value.GetPointer());
 
       if (!length) {
-        throw MessagedException(length_expression->GetSourceLocation() + ": An array expects its number of elements to be an integer. " + length_expression->GetSource() + " is not an integer.");
+        throw MessagedException(length_expression->GetSourceLocation().toAnchor() + ": An array expects its number of elements to be an integer. " + length_expression->GetSource() + " is not an integer.");
       }
 
       Co<ExpressionArray> array = Co<Expression>(new ExpressionArray(length->GetInteger(), Co<Expression>(new ExpressionUnit())));
@@ -131,7 +131,7 @@ class ExpressionArrayLength : public Expression {
       ExpressionArrayReference *array = dynamic_cast<ExpressionArrayReference *>(array_value.GetPointer());
 
       if (!array) {
-        throw MessagedException(array_expression->GetSourceLocation() + ": Length expects to be applied to an array. " + array_expression->GetSource() + " is not an array.");
+        throw MessagedException(array_expression->GetSourceLocation().toAnchor() + ": Length expects to be applied to an array. " + array_expression->GetSource() + " is not an array.");
       }
 
       return Co<Expression>(new ExpressionInteger(array->GetArray()->GetLength()));
@@ -161,7 +161,7 @@ class ExpressionArraySubscript : public Expression {
       Co<Expression> array_value = array_expression->Evaluate(env);
       ExpressionArrayReference *array = dynamic_cast<ExpressionArrayReference *>(array_value.GetPointer());
       if (!array) {
-        throw MessagedException(array_expression->GetSourceLocation() + ": Operator [] expects to be applied to an array. " + array_expression->GetSource() + " is not an array.");
+        throw MessagedException(array_expression->GetSourceLocation().toAnchor() + ": Operator [] expects to be applied to an array. " + array_expression->GetSource() + " is not an array.");
       }
 
       return Co<ExpressionArrayReference>(array_value);
@@ -171,7 +171,7 @@ class ExpressionArraySubscript : public Expression {
       Co<Expression> index_value = index_expression->Evaluate(env);
       ExpressionInteger *index = dynamic_cast<ExpressionInteger *>(index_value.GetPointer());
       if (!index) {
-        throw MessagedException(index_expression->GetSourceLocation() + ": Operator [] expects index to be an integer. " + index_expression->GetSource() + " is not an integer.");
+        throw MessagedException(index_expression->GetSourceLocation().toAnchor() + ": Operator [] expects index to be an integer. " + index_expression->GetSource() + " is not an integer.");
       }
 
       if (index->GetInteger() < 0) {
@@ -180,7 +180,7 @@ class ExpressionArraySubscript : public Expression {
 
       if (index->GetInteger() < 0 || index->GetInteger() >= array->GetArray()->GetLength()) {
         std::stringstream ss;
-        ss << index_expression->GetSourceLocation();
+        ss << index_expression->GetSourceLocation().toAnchor();
         ss << ": Operator [] expects a valid index. The array has ";
         ss << array->GetArray()->GetLength();
         ss << " elements, indexed 0 through " << (array->GetArray()->GetLength() - 1) << ". " << index_expression->GetSource() << " is not a valid index.";

@@ -39,11 +39,8 @@ namespace madeup {
 /* ------------------------------------------------------------------------- */
 
 Expression::Expression() :
-  start_line(0),
-  start_index(0),
-  end_line(0),
-  end_index(0),
-  source("n/a") {
+  source("n/a"),
+  location() {
 }
 
 /* ------------------------------------------------------------------------- */
@@ -54,54 +51,22 @@ Expression::~Expression() {
 
 /* ------------------------------------------------------------------------- */
 
-int Expression::GetStartLine() const {
-  return start_line;
-}
-
-/* ------------------------------------------------------------------------- */
-
-int Expression::GetStartIndex() const {
-  return start_index;
-}
-
-/* ------------------------------------------------------------------------- */
-
-int Expression::GetEndLine() const {
-  return end_line;
-}
-
-/* ------------------------------------------------------------------------- */
-
-int Expression::GetEndIndex() const {
-  return end_index;
-}
-
-/* ------------------------------------------------------------------------- */
-
 const std::string& Expression::GetSource() const {
   return source;
 }
 
 /* ------------------------------------------------------------------------- */
 
-void Expression::SetSource(const std::string& source, int start_line, int start_index, int end_line, int end_index) {
+void Expression::SetSource(const std::string& source,
+                           const SourceLocation &location) {
   this->source = source;
-  this->start_line = start_line; 
-  this->start_index = start_index;
-  this->end_line = end_line;
-  this->end_index = end_index;
+  this->location = location;
 }
 
 /* ------------------------------------------------------------------------- */
 
-std::string Expression::GetSourceLocation() const {
-  std::stringstream ss;
-  ss << GetStartLine() << "(" << GetStartIndex();
-  if (GetStartIndex() != GetEndIndex()) {
-    ss << "-" << GetEndIndex();
-  }
-  ss << ")";
-  return ss.str();
+const SourceLocation &Expression::GetSourceLocation() const {
+  return location;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -148,7 +113,7 @@ Co<Expression> Parse(stringstream& ss) {
     std::cerr << "block started" << std::endl;
     while (ss.peek() == ' ') {
       ss.get(); // eat space
-      block->AddExpression(Parse(ss));
+      block->Append(Parse(ss));
       std::cerr << "block added" << std::endl;
     }
     std::cerr << "block done" << std::endl;

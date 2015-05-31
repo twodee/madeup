@@ -35,15 +35,15 @@ class ExpressionFor : public Expression {
       ExpressionInteger *delta_ivalue = dynamic_cast<ExpressionInteger *>(delta_value.GetPointer());
 
       if (!start_ivalue) {
-        throw MessagedException(start->GetSourceLocation() + ": A for loop's starting value must be an integer. " + start->GetSource() + " is not an integer.");
+        throw MessagedException(start->GetSourceLocation().toAnchor() + ": A for loop's starting value must be an integer. " + start->GetSource() + " is not an integer.");
       }
 
       if (!end_ivalue) {
-        throw MessagedException(end->GetSourceLocation() + ": A for loop's ending value must be an integer. " + end->GetSource() + " is not an integer.");
+        throw MessagedException(end->GetSourceLocation().toAnchor() + ": A for loop's ending value must be an integer. " + end->GetSource() + " is not an integer.");
       }
 
       if (!delta_ivalue) {
-        throw MessagedException(delta->GetSourceLocation() + ": A for loop's increment value must be an integer. " + delta->GetSource() + " is not an integer.");
+        throw MessagedException(delta->GetSourceLocation().toAnchor() + ": A for loop's increment value must be an integer. " + delta->GetSource() + " is not an integer.");
       }
 
       int a = start_ivalue->GetInteger();

@@ -16,28 +16,36 @@ class ExpressionBlock : public Expression {
   public:
     ExpressionBlock() :
       Expression(),
-      elements() {
+      statements() {
     }
 
-    void AddExpression(Co<Expression> element) {
-      elements.push_back(element);
+    void Append(Co<Expression> element) {
+      statements.push_back(element);
     }
 
     Co<Expression> Evaluate(Environment& env) {
       Co<Expression> value(new ExpressionUnit());
-      for (vector<Co<Expression> >::iterator i = elements.begin(); i != elements.end(); ++i) {
-        std::cerr << "evaluating " << (*i)->GetSource() << std::endl;
+      for (vector<Co<Expression> >::iterator i = statements.begin(); i != statements.end(); ++i) {
         value = (*i)->Evaluate(env);
       }
       return value;
     }
 
+    Co<Expression> operator[](int i) {
+      assert(0 <= i && i < statements.size());
+      return statements[i];
+    }
+
+    int GetLength() const {
+      return statements.size();
+    }
+
     void Write(ostream& out) const {
       out << "(block ";
-      vector<Co<Expression> >::const_iterator i = elements.begin();
-      if (i != elements.end()) {
+      vector<Co<Expression> >::const_iterator i = statements.begin();
+      if (i != statements.end()) {
         (*i)->Write(out);
-        for (++i; i != elements.end(); ++i) {
+        for (++i; i != statements.end(); ++i) {
           out << " ";
           (*i)->Write(out);
         }
@@ -46,7 +54,7 @@ class ExpressionBlock : public Expression {
     }
 
   private:
-    vector<Co<Expression> > elements;
+    vector<Co<Expression> > statements;
 };
 
 /* ------------------------------------------------------------------------- */

@@ -55,7 +55,7 @@ class ExpressionAdd : public Expression {
         } else if (rboolean) {
           ss << (rboolean->GetBoolean() ? "true" : "false");
         } else {
-          throw MessagedException(right->GetSourceLocation() + ": Operator + doesn't know how to join a string to " + right->GetSource());
+          throw MessagedException(right->GetSourceLocation().toAnchor() + ": Operator + doesn't know how to join a string to " + right->GetSource());
         }
         return Co<Expression>(new ExpressionString(ss.str()));
       }
@@ -70,7 +70,7 @@ class ExpressionAdd : public Expression {
         } else if (lboolean) {
           ss << lboolean->GetBoolean();
         } else {
-          throw MessagedException(right->GetSourceLocation() + ": Operator + doesn't know how to join a string to " + right->GetSource() + ".");
+          throw MessagedException(right->GetSourceLocation().toAnchor() + ": Operator + doesn't know how to join a string to " + right->GetSource() + ".");
         }
         ss << rstring->GetString();
         value = Co<Expression>(new ExpressionString(ss.str()));
@@ -85,7 +85,7 @@ class ExpressionAdd : public Expression {
       }
 
       else {
-        throw MessagedException(GetSourceLocation() + ": Operator + doesn't know how to join " + left->GetSource() + " and " + right->GetSource() + ".");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Operator + doesn't know how to join " + left->GetSource() + " and " + right->GetSource() + ".");
       }
 
       return value;

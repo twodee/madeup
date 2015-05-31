@@ -33,10 +33,10 @@ class ExpressionRemainder : public Expression {
         if (rinteger->GetInteger() != 0) {
           return Co<Expression>(new ExpressionInteger(linteger->GetInteger() % rinteger->GetInteger()));
         } else {
-          throw MessagedException(right->GetSourceLocation() + ": I don't know how to get the remainder of something divided by 0.");
+          throw MessagedException(right->GetSourceLocation().toAnchor() + ": I don't know how to get the remainder of something divided by 0.");
         }
       } else {
-        throw MessagedException(GetSourceLocation() + ": Operator % doesn't know how to get the remainder of " + left->GetSource() + " divided by " + right->GetSource() + ".");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Operator % doesn't know how to get the remainder of " + left->GetSource() + " divided by " + right->GetSource() + ".");
       }
     }
 

@@ -28,7 +28,7 @@ class ExpressionAbsoluteValue : public Expression {
       ExpressionNumber *number = dynamic_cast<ExpressionNumber *>(value.GetPointer());
 
       if (!number) {
-        throw MessagedException(expr->GetSourceLocation() + ": I can only compute the absolute value of a number. " + expr->GetSource() + " is not a number.");
+        throw MessagedException(expr->GetSourceLocation().toAnchor() + ": I can only compute the absolute value of a number. " + expr->GetSource() + " is not a number.");
       }
 
       ExpressionInteger *integer = dynamic_cast<ExpressionInteger *>(value.GetPointer());

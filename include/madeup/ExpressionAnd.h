@@ -32,9 +32,9 @@ class ExpressionAnd : public Expression {
       if (lboolean && rboolean) {
         value = Co<Expression>(new ExpressionBoolean(lboolean->GetBoolean() && rboolean->GetBoolean()));
       } else if (!lboolean) {
-        throw MessagedException(left->GetSourceLocation() + ": Operator and expects boolean operands. " + left->GetSource() + " is not boolean.");
+        throw MessagedException(left->GetSourceLocation().toAnchor() + ": Operator and expects boolean operands. " + left->GetSource() + " is not boolean.");
       } else if (!rboolean) {
-        throw MessagedException(right->GetSourceLocation() + ": Operator or expects boolean operands. " + right->GetSource() + " is not boolean.");
+        throw MessagedException(right->GetSourceLocation().toAnchor() + ": Operator or expects boolean operands. " + right->GetSource() + " is not boolean.");
       }
 
       return value;

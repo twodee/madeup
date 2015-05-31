@@ -26,7 +26,7 @@ class ExpressionMin : public Expression {
       Co<ExpressionClosure> b_closure = env["b"];
 
       if (a_closure.IsNull() || b_closure.IsNull()) {
-        throw MessagedException(GetSourceLocation() + ": I expect function min to be given two numbers, a and b. You didn't give min two numbers.");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": I expect function min to be given two numbers, a and b. You didn't give min two numbers.");
       }
 
       Co<Expression> a_value = a_closure->Evaluate(env);
@@ -43,9 +43,9 @@ class ExpressionMin : public Expression {
         ExpressionNumber *a_number = dynamic_cast<ExpressionNumber *>(a_value.GetPointer());
         ExpressionNumber *b_number = dynamic_cast<ExpressionNumber *>(b_value.GetPointer());
         if (!a_number) {
-          throw MessagedException(a_closure->GetSourceLocation() + ": I expect function min to be given a number. That thing you gave it wasn't a number.");
+          throw MessagedException(a_closure->GetSourceLocation().toAnchor() + ": I expect function min to be given a number. That thing you gave it wasn't a number.");
         } else if (!b_number) {
-          throw MessagedException(b_closure->GetSourceLocation() + ": I expect function min to be given a number. That thing you gave it wasn't a number.");
+          throw MessagedException(b_closure->GetSourceLocation().toAnchor() + ": I expect function min to be given a number. That thing you gave it wasn't a number.");
         } else {
           float a = a_integer->GetReal();
           float b = b_integer->GetReal();

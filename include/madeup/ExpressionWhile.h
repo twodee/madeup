@@ -26,14 +26,14 @@ class ExpressionWhile : public Expression {
       Co<Expression> v = condition->Evaluate(env);
       ExpressionBoolean *condition_value = dynamic_cast<ExpressionBoolean *>(v.GetPointer());
       if (!condition_value) {
-        throw MessagedException(condition->GetSourceLocation() + ": A while loop expects a boolean condition. " + condition->GetSource() + " is not boolean.");
+        throw MessagedException(condition->GetSourceLocation().toAnchor() + ": A while loop expects a boolean condition. " + condition->GetSource() + " is not boolean.");
       }
       while (condition_value->GetBoolean()) {
         value = block->Evaluate(env);
         v = condition->Evaluate(env);
         condition_value = dynamic_cast<ExpressionBoolean *>(v.GetPointer());
         if (!condition_value) {
-          throw MessagedException(condition->GetSourceLocation() + ": A while loop expects a boolean condition. " + condition->GetSource() + " is not boolean.");
+          throw MessagedException(condition->GetSourceLocation().toAnchor() + ": A while loop expects a boolean condition. " + condition->GetSource() + " is not boolean.");
         }
       }
 

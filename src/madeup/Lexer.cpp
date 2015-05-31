@@ -138,7 +138,7 @@ Token Lexer::getToken() {
     return getTokenAfterDigit();
   } else {
     std::stringstream ss;
-    ss << location.start_row << "(" << location.start_index << "-" << location.end_index << "): I found a character that I didn't recognize: ";
+    ss << location.toAnchor() << ": I found a character that I didn't recognize: ";
     if (isprint(c)) {
       ss << (char) c;
     } else {
@@ -223,7 +223,7 @@ Token Lexer::getTokenAfterQuote() {
     --location.end_index;
     in.putback(c);
     std::stringstream ss;
-    ss << location.start_row << "(" << location.start_index << "-" << location.end_index << "): I was reading the string \"" << text_so_far << "\", but it didn't end with a quotation mark.";
+    ss << location.toAnchor() << ": I was reading the string \"" << text_so_far << "\", but it didn't end with a quotation mark.";
     throw MessagedException(ss.str());
   }
 
@@ -298,7 +298,7 @@ Token Lexer::getTokenAfterDigit() {
 
   if (isalpha(c)) {
     std::stringstream ss;
-    ss << location.start_row << "(" << location.start_index << "-" << location.end_index << "): I was reading the integer " << text_so_far << ", when suddenly I hit '" << (char) c << "'. What do I do with that?";
+    ss << location.toAnchor() << ": I was reading the integer " << text_so_far << ", when suddenly I hit '" << (char) c << "'. What do I do with that?";
     throw MessagedException(ss.str());
   }
 
@@ -317,7 +317,7 @@ Token Lexer::getTokenAfterDigit() {
     // Must be at least one number after decimal.
     if (!isdigit(c)) {
       std::stringstream ss;
-      ss << location.start_row << "(" << location.start_index << "-" << location.end_index << "): I was reading the number " << text_so_far.substr(0, text_so_far.length() - 1) << ", but I couldn't find any digits after the decimal point. You must have at least one digit there.";
+      ss << location.toAnchor() << ": I was reading the number " << text_so_far.substr(0, text_so_far.length() - 1) << ", but I couldn't find any digits after the decimal point. You must have at least one digit there.";
       throw MessagedException(ss.str());
     }
    
@@ -330,7 +330,7 @@ Token Lexer::getTokenAfterDigit() {
 
     if (isalpha(c)) {
       std::stringstream ss;
-      ss << location.start_row << "(" << location.start_index << "-" << location.end_index << "): I was reading the number " << text_so_far << ", when suddenly I hit a '" << (char) c << "'.";
+      ss << location.toAnchor() << ": I was reading the number " << text_so_far << ", when suddenly I hit a '" << (char) c << "'.";
       throw MessagedException(ss.str());
     }
 
@@ -398,7 +398,7 @@ Token Lexer::getTokenAfterBang() {
     return makeToken(Token::NOT_EQUAL_TO);
   } else {
     std::stringstream ss;
-    ss << location.start_row << "(" << location.start_index << "-" << location.end_index << "): I ran into " << text_so_far << " and I didn't know what to do with it. It's not part of the language I speak.";
+    ss << location.toAnchor() << ": I ran into " << text_so_far << " and I didn't know what to do with it. It's not part of the language I speak.";
     throw MessagedException(ss.str());
   }
 }

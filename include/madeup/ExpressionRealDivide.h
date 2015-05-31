@@ -35,10 +35,10 @@ class ExpressionRealDivide : public Expression {
         if (rnumber->GetReal() != 0.0) {
           value = Co<Expression>(new ExpressionReal(lnumber->GetReal() / rnumber->GetReal()));
         } else {
-          throw MessagedException(right->GetSourceLocation() + ": I don't know how to divide by 0.");
+          throw MessagedException(right->GetSourceLocation().toAnchor() + ": I don't know how to divide by 0.");
         }
       } else {
-        throw MessagedException(GetSourceLocation() + ": Operator // doesn't know how to divide " + left->GetSource() + " by " + right->GetSource() + ".");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Operator // doesn't know how to divide " + left->GetSource() + " by " + right->GetSource() + ".");
       }
 
       return value;

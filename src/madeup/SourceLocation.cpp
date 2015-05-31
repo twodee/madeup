@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 
 #include "madeup/SourceLocation.h"
 
@@ -13,6 +14,18 @@ SourceLocation::SourceLocation() :
   end_column(-1),
   start_index(-1),
   end_index(-1) {
+}
+
+/* ------------------------------------------------------------------------- */
+
+SourceLocation::SourceLocation(const SourceLocation &from,
+                               const SourceLocation &to) :
+  start_row(from.start_row),
+  start_column(from.start_column),
+  end_row(to.end_row),
+  end_column(to.end_column),
+  start_index(from.start_index),
+  end_index(to.end_index) {
 }
 
 /* ------------------------------------------------------------------------- */
@@ -65,6 +78,14 @@ int SourceLocation::getStartIndex() const {
 
 int SourceLocation::getEndIndex() const {
   return end_index;
+}
+
+/* ------------------------------------------------------------------------- */
+
+std::string SourceLocation::toAnchor() const {
+  std::stringstream ss;
+  ss << start_row << "(" << start_index << "-" << end_index << ")";
+  return ss.str(); 
 }
 
 /* ------------------------------------------------------------------------- */

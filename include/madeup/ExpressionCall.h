@@ -26,7 +26,7 @@ class ExpressionCall : public Expression {
     Co<Expression> Evaluate(Environment& env) {
       Co<ExpressionClosure> closure = env[name];
       if (closure.IsNull()) {
-        throw MessagedException(GetSourceLocation() + ": I couldn't find a function or variable named " + name + ".");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": I couldn't find a function or variable named " + name + ".");
       }
 
       Co<ExpressionDefine> define = closure->GetDefine();
@@ -34,7 +34,7 @@ class ExpressionCall : public Expression {
       // Make sure there are the correct number of parameters!
       if (parameters.size() != define->GetArity()) {
         std::stringstream ss;
-        ss << GetSourceLocation() << ": I expect function " << define->GetName() << " to be given " << define->GetArity() << " parameter";
+        ss << GetSourceLocation().toAnchor() << ": I expect function " << define->GetName() << " to be given " << define->GetArity() << " parameter";
         if (define->GetArity() != 1) {
           ss << "s";
         }
@@ -58,11 +58,7 @@ class ExpressionCall : public Expression {
         Co<ExpressionDefine> parameter_define = Co<ExpressionDefine>(new ExpressionDefine(formal.GetName(), is_lazy ? parameters[i] : parameters[i]->Evaluate(env)));
 
         Co<ExpressionClosure> parameter_closure = Co<ExpressionClosure>(new ExpressionClosure(parameter_define, is_lazy ? env : Environment()));
-        parameter_closure->SetSource(parameters[i]->GetSource(),
-                                     parameters[i]->GetStartLine(),
-                                     parameters[i]->GetStartIndex(),
-                                     parameters[i]->GetEndLine(),
-                                     parameters[i]->GetEndIndex());
+        parameter_closure->SetSource(parameters[i]->GetSource(), parameters[i]->GetSourceLocation());
 
         closure_env->Add(define->GetFormal(i).GetName(), parameter_closure);
       }
@@ -70,7 +66,7 @@ class ExpressionCall : public Expression {
       try {
         return closure->Evaluate(*closure_env);
       } catch (UnlocatedException e) {
-        throw MessagedException(GetSourceLocation() + ": " + e.GetMessage());
+        throw MessagedException(GetSourceLocation().toAnchor() + ": " + e.GetMessage());
       }
     }
 

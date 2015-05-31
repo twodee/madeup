@@ -28,6 +28,18 @@ const std::string Token::getText() const {
 
 /* ------------------------------------------------------------------------- */
 
+const std::string Token::getQuotedText() const {
+  if (type == NEWLINE) {
+    return "a linebreak";
+  } else if (type == END_OF_FILE) {
+    return "the end of the file";
+  } else {
+    return "'" + getText() + "'";
+  }
+}
+
+/* ------------------------------------------------------------------------- */
+
 const SourceLocation &Token::getLocation() const {
   return location;
 }

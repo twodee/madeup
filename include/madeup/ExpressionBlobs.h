@@ -19,24 +19,24 @@ class ExpressionBlobs : public Expression {
     Co<Expression> Evaluate(Environment& env) {
       Co<ExpressionClosure> closure = env["grain"];
       if (closure.IsNull()) {
-        throw MessagedException(GetSourceLocation() + ": Function blobs expects a value named grain. No value named grain is defined.");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Function blobs expects a value named grain. No value named grain is defined.");
       }
 
       Co<Expression> v = closure->Evaluate(env);
       ExpressionNumber *number = dynamic_cast<ExpressionNumber *>(v.GetPointer());
       if (!number) {
-        throw MessagedException(v->GetSourceLocation() + ": Function blobs expects grain to be a number, but it is not.");
+        throw MessagedException(v->GetSourceLocation().toAnchor() + ": Function blobs expects grain to be a number, but it is not.");
       }
       float grain = number->GetReal();
 
       closure = env["iso"];
       if (closure.IsNull()) {
-        throw MessagedException(GetSourceLocation() + ": Function blob expects a value named iso. No value named iso is defined.");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Function blob expects a value named iso. No value named iso is defined.");
       }
       v = closure->Evaluate(env);
       number = dynamic_cast<ExpressionNumber *>(v.GetPointer());
       if (!number) {
-        throw MessagedException(v->GetSourceLocation() + ": Function blobs expects iso to be a number, but it is not.");
+        throw MessagedException(v->GetSourceLocation().toAnchor() + ": Function blobs expects iso to be a number, but it is not.");
       }
       float iso = number->GetReal();
 

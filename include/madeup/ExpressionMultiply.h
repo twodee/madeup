@@ -39,7 +39,7 @@ class ExpressionMultiply : public Expression {
       } else if (lnumber && rnumber) {
         r = Co<Expression>(new ExpressionReal(lnumber->GetReal() * rnumber->GetReal()));
       } else {
-        throw MessagedException(GetSourceLocation() + ": Operator * doesn't know how to multiply " + left->GetSource() + " and " + right->GetSource() + ".");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Operator * doesn't know how to multiply " + left->GetSource() + " and " + right->GetSource() + ".");
       }
 
       return r;

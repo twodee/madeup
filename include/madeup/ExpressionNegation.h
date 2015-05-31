@@ -33,7 +33,7 @@ class ExpressionNegation : public Expression {
         return Co<Expression>(new ExpressionReal(-ldecimal->GetReal()));
       }
 
-      throw MessagedException(left->GetSourceLocation() + ": Operator not expects a numeric operand. " + left->GetSource() + " is not numeric.");
+      throw MessagedException(left->GetSourceLocation().toAnchor() + ": Operator not expects a numeric operand. " + left->GetSource() + " is not numeric.");
     }
 
     void Write(ostream& out) const {

@@ -26,7 +26,7 @@ class ExpressionRepeat : public Expression {
       Co<Expression> v = niterations->Evaluate(env);
       ExpressionInteger *niterations_value = dynamic_cast<ExpressionInteger *>(v.GetPointer());
       if (!niterations_value) {
-        throw MessagedException(niterations->GetSourceLocation() + ": A repeat loop expects its number of iterations to be an integer. " + niterations->GetSource() + " is not an integer.");
+        throw MessagedException(niterations->GetSourceLocation().toAnchor() + ": A repeat loop expects its number of iterations to be an integer. " + niterations->GetSource() + " is not an integer.");
       }
 
       int n = niterations_value->GetInteger();

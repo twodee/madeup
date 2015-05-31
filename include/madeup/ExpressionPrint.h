@@ -27,7 +27,7 @@ class ExpressionPrint : public Expression {
     Co<Expression> Evaluate(Environment& env) {
       Co<ExpressionClosure> message = env["message"];
       if (message.IsNull()) {
-        throw MessagedException(GetSourceLocation() + ": I expect function print to be given a value named message, but no message was given.");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": I expect function print to be given a value named message, but no message was given.");
       }
 
       Co<Expression> value = message->Evaluate(env);
@@ -56,7 +56,7 @@ class ExpressionPrint : public Expression {
         return value;
       }
       
-      throw MessagedException(message->GetSourceLocation() + ": I expect function print to be given a string, boolean, or number. You gave it something I don't know how to print.");
+      throw MessagedException(message->GetSourceLocation().toAnchor() + ": I expect function print to be given a string, boolean, or number. You gave it something I don't know how to print.");
     }
 
     void Write(ostream& out) const {

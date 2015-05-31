@@ -31,11 +31,11 @@ class ExpressionPower : public Expression {
       ExpressionNumber *rnumber = dynamic_cast<ExpressionNumber *>(rvalue.GetPointer());
 
       if (!lnumber) {
-        throw MessagedException(left->GetSourceLocation() + ": Operator ^ expects a numeric base. " + left->GetSource() + " is not a number.");
+        throw MessagedException(left->GetSourceLocation().toAnchor() + ": Operator ^ expects a numeric base. " + left->GetSource() + " is not a number.");
       }
 
       if (!rnumber) {
-        throw MessagedException(right->GetSourceLocation() + ": Operator ^ expects a numeric exponent. " + right->GetSource() + " is not a number.");
+        throw MessagedException(right->GetSourceLocation().toAnchor() + ": Operator ^ expects a numeric exponent. " + right->GetSource() + " is not a number.");
       }
 
       ExpressionInteger *linteger = dynamic_cast<ExpressionInteger *>(lvalue.GetPointer());

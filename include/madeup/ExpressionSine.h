@@ -21,7 +21,7 @@ class ExpressionSine : public Expression {
     Co<Expression> Evaluate(Environment& env) {
       Co<ExpressionClosure> degrees_closure = env["degrees"];
       if (degrees_closure.IsNull()) {
-        throw MessagedException(GetSourceLocation() + ": Function sin expects a value named degrees. No value named degrees is defined.");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Function sin expects a value named degrees. No value named degrees is defined.");
       }
 
       Co<Expression> v = degrees_closure->Evaluate(env);
@@ -32,7 +32,7 @@ class ExpressionSine : public Expression {
         return Co<Expression>(new ExpressionReal(sinf(value * td::PI / 180.0f)));
       }
 
-      throw MessagedException(degrees_closure->GetSourceLocation() + ": Function sin expects a number. " + degrees_closure->GetSource() + " is not a number.");
+      throw MessagedException(degrees_closure->GetSourceLocation().toAnchor() + ": Function sin expects a number. " + degrees_closure->GetSource() + " is not a number.");
     }
 
     void Write(ostream& out) const {

@@ -20,9 +20,9 @@ ExpressionDefineVariable::ExpressionDefineVariable(const string& name, Co<Expres
 
 Co<Expression> ExpressionDefineVariable::Evaluate(Environment& env) {
   Co<Expression> rhs_value = rhs->Evaluate(env);
-  rhs_value->SetSource(rhs->GetSource(), rhs->GetStartLine(), rhs->GetStartIndex(), rhs->GetEndLine(), rhs->GetEndIndex());
+  rhs_value->SetSource(rhs->GetSource(), rhs->GetSourceLocation());
   Co<ExpressionDefine> define = Co<ExpressionDefine>(new ExpressionDefine(name, rhs_value));
-  define->SetSource(GetSource(), GetStartLine(), GetStartIndex(), GetEndLine(), GetEndIndex());
+  define->SetSource(GetSource(), GetSourceLocation());
   Co<ExpressionClosure> closure(new ExpressionClosure(define, env));
   env.Add(name, closure);
   return rhs_value;

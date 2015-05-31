@@ -19,10 +19,10 @@ class ExpressionRandom : public Expression {
       Co<ExpressionClosure> min = env["min"];
       Co<ExpressionClosure> max = env["max"];
       if (min.IsNull()) {
-        throw MessagedException(GetSourceLocation() + ": Function random expects a value named min. No value named min is defined.");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Function random expects a value named min. No value named min is defined.");
       }
       if (max.IsNull()) {
-        throw MessagedException(GetSourceLocation() + ": Function random expects a value named max. No value named max is defined.");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Function random expects a value named max. No value named max is defined.");
       }
       Co<Expression> vmin = min->Evaluate(env);
       Co<Expression> vmax = max->Evaluate(env);
@@ -31,11 +31,11 @@ class ExpressionRandom : public Expression {
       ExpressionInteger *vimax = dynamic_cast<ExpressionInteger *>(vmax.GetPointer());
 
       if (!vimin) {
-        throw MessagedException(min->GetSourceLocation() + ": Function random expects its lower bound to be an integer. " + min->GetSource() + " is not an integer.");
+        throw MessagedException(min->GetSourceLocation().toAnchor() + ": Function random expects its lower bound to be an integer. " + min->GetSource() + " is not an integer.");
       }
 
       if (!vimax) {
-        throw MessagedException(max->GetSourceLocation() + ": Function random expects its upper bound to be an integer. " + max->GetSource() + " is not an integer.");
+        throw MessagedException(max->GetSourceLocation().toAnchor() + ": Function random expects its upper bound to be an integer. " + max->GetSource() + " is not an integer.");
       }
 
       int imin = vimin->GetInteger();

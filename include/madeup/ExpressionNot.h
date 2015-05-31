@@ -29,7 +29,7 @@ class ExpressionNot : public Expression {
       if (lboolean) {
         return Co<Expression>(new ExpressionBoolean(!lboolean->GetBoolean()));
       } else {
-        throw MessagedException(left->GetSourceLocation() + ": Operator not expects a boolean operand. " + left->GetSource() + " is not boolean.");
+        throw MessagedException(left->GetSourceLocation().toAnchor() + ": Operator not expects a boolean operand. " + left->GetSource() + " is not boolean.");
       }
     }
 

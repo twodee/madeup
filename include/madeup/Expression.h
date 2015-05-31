@@ -6,6 +6,7 @@
 
 #include "madeup/Environment.h"
 #include "madeup/Expression.h"
+#include "madeup/SourceLocation.h"
 
 /* class ExpressionBlock; */
 
@@ -28,26 +29,16 @@ class Expression {
     virtual ~Expression();
 
     virtual Co<Expression> Evaluate(Environment& env) = 0;
-
     virtual void Write(ostream& out) const = 0;
+    const std::string& GetSource() const;
+    const SourceLocation &GetSourceLocation() const;
+    void SetSource(const std::string& source, const SourceLocation &location);
 
     static Co<Expression> Parse(const std::string& s);
 
-    int GetStartLine() const;
-    int GetStartIndex() const;
-    int GetEndLine() const;
-    int GetEndIndex() const;
-    const std::string& GetSource() const;
-    std::string GetSourceLocation() const;
-
-    void SetSource(const std::string& source, int start_line, int start_index, int end_line, int end_index);
-
   private:
-    int start_line;
-    int start_index;
-    int end_line;
-    int end_index;
     std::string source;
+    SourceLocation location;
 };
 
 /* ------------------------------------------------------------------------- */

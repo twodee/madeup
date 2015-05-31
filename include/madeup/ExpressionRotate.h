@@ -30,20 +30,20 @@ class ExpressionRotate : public Expression {
       float v[3];
 
       if (xyz[0].IsNull()) {
-        throw MessagedException(GetSourceLocation() + ": Function rotate expects a value named x. No value named x is defined.");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Function rotate expects a value named x. No value named x is defined.");
       }
 
       if (xyz[1].IsNull()) {
-        throw MessagedException(GetSourceLocation() + ": Function rotate expects a value named y. No value named y is defined.");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Function rotate expects a value named y. No value named y is defined.");
       }
 
       if (xyz[2].IsNull()) {
-        throw MessagedException(GetSourceLocation() + ": Function rotate expects a value named z. No value named z is defined.");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Function rotate expects a value named z. No value named z is defined.");
       }
 
       Co<ExpressionClosure> degrees_closure = env["degrees"];
       if (degrees_closure.IsNull()) {
-        throw MessagedException(GetSourceLocation() + ": Function rotate expects a value named degrees. No value named degrees is defined.");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Function rotate expects a value named degrees. No value named degrees is defined.");
       }
 
       for (int i = 0; i < 3; ++i) {
@@ -51,7 +51,7 @@ class ExpressionRotate : public Expression {
         ExpressionNumber *number = dynamic_cast<ExpressionNumber *>(vv.GetPointer());
         if (!number) {
           std::stringstream ss;
-          ss << xyz[i]->GetSourceLocation() << ": Function rotate expects a numeric " << (char) ('x' + i) << " coordinate. " << xyz[i]->GetSource() << " is not a number.";
+          ss << xyz[i]->GetSourceLocation().toAnchor() << ": Function rotate expects a numeric " << (char) ('x' + i) << " coordinate. " << xyz[i]->GetSource() << " is not a number.";
           throw MessagedException(ss.str());
         }
         v[i] = number->GetReal();
@@ -61,7 +61,7 @@ class ExpressionRotate : public Expression {
       ExpressionNumber *number = dynamic_cast<ExpressionNumber *>(vv.GetPointer());
       if (!number) {
         std::stringstream ss;
-        ss << degrees_closure->GetSourceLocation() << ": Function rotate expects degrees to be a number. " << degrees_closure->GetSource() << " is not a number.";
+        ss << degrees_closure->GetSourceLocation().toAnchor() << ": Function rotate expects degrees to be a number. " << degrees_closure->GetSource() << " is not a number.";
         throw MessagedException(ss.str());
       }
       float degrees = number->GetReal();

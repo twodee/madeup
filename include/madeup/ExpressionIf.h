@@ -26,7 +26,7 @@ class ExpressionIf : public Expression {
       ExpressionBoolean *bexpr = dynamic_cast<ExpressionBoolean *>(v.GetPointer());
 
       if (!bexpr) {
-        throw MessagedException(condition->GetSourceLocation() + ": An if statement expects a boolean condition. " + condition->GetSource() + " is not boolean.");
+        throw MessagedException(condition->GetSourceLocation().toAnchor() + ": An if statement expects a boolean condition. " + condition->GetSource() + " is not boolean.");
       } else {
         if (bexpr->GetBoolean()) {
           return then_block->Evaluate(env);

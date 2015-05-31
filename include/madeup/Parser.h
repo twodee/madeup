@@ -38,6 +38,10 @@ class Parser {
     bool isInExpressionFirst(int k = 1) const;
     Co<Expression> popExpression();
     Co<ExpressionBlock> popBlock();
+    std::string getSubsource(const SourceLocation &location) const;
+    void pushExpression(Expression *e,
+                        const SourceLocation &from,
+                        const SourceLocation &to);
 
     const std::vector<Token> tokens;
     const std::string source;
@@ -45,6 +49,7 @@ class Parser {
     std::stack<Co<ExpressionBlock> > blocks;
     int i;
     bool is_in_loop_range;
+    bool is_in_pipe;
 };
 
 /* ------------------------------------------------------------------------- */

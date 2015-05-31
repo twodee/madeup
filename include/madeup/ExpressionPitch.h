@@ -18,7 +18,7 @@ class ExpressionPitch : public Expression {
     Co<Expression> Evaluate(Environment& env) {
       Co<ExpressionClosure> degrees_closure = env["degrees"];
       if (degrees_closure.IsNull()) {
-        throw MessagedException(GetSourceLocation() + ": Function pitch expects a value named degrees. No value named degrees is defined.");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Function pitch expects a value named degrees. No value named degrees is defined.");
       }
 
       Co<Expression> v = degrees_closure->Evaluate(env);
@@ -29,7 +29,7 @@ class ExpressionPitch : public Expression {
         env.Pitch(value);
         return v;
       } else {
-        throw MessagedException(degrees_closure->GetSourceLocation() + ": Function pitch expects a number of degrees. " + degrees_closure->GetSource() + " is not a number.");
+        throw MessagedException(degrees_closure->GetSourceLocation().toAnchor() + ": Function pitch expects a number of degrees. " + degrees_closure->GetSource() + " is not a number.");
       }
     }
 

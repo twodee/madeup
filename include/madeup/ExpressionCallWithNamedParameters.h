@@ -29,7 +29,7 @@ class ExpressionCallWithNamedParameters : public Expression {
     Co<Expression> Evaluate(Environment& env) {
       Co<ExpressionClosure> closure = env[name];
       if (closure.IsNull()) {
-        throw MessagedException(GetSourceLocation() + ": No function named " + name + " is defined.");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": No function named " + name + " is defined.");
       }
 
       Co<ExpressionDefine> define = closure->GetDefine();
@@ -48,11 +48,7 @@ class ExpressionCallWithNamedParameters : public Expression {
         if (match != bindings.end()) {
           parameter_define = Co<ExpressionDefine>(new ExpressionDefine(formal.GetName(), is_lazy ? match->second : match->second->Evaluate(env)));
           parameter_closure = Co<ExpressionClosure>(new ExpressionClosure(parameter_define, is_lazy ? env : Environment()));
-          parameter_closure->SetSource(match->second->GetSource(),
-                                       match->second->GetStartLine(),
-                                       match->second->GetStartIndex(),
-                                       match->second->GetEndLine(),
-                                       match->second->GetEndIndex());
+          parameter_closure->SetSource(match->second->GetSource(), match->second->GetSourceLocation());
         }
 
         // If no such parameter was enumerated, checking for a binding with that name in the surrounding environment at the time of the call.
@@ -60,13 +56,9 @@ class ExpressionCallWithNamedParameters : public Expression {
           Co<Expression> closure = env[formal.GetName()];
           parameter_define = Co<ExpressionDefine>(new ExpressionDefine(formal.GetName(), is_lazy ? closure : closure->Evaluate(env)));
           parameter_closure = Co<ExpressionClosure>(new ExpressionClosure(parameter_define, is_lazy ? env : Environment()));
-          parameter_closure->SetSource(closure->GetSource(),
-                                       GetStartLine(),
-                                       GetStartIndex(),
-                                       GetEndLine(),
-                                       GetEndIndex());
+          parameter_closure->SetSource(closure->GetSource(), closure->GetSourceLocation());
         } else {
-          throw MessagedException(GetSourceLocation() + ": Function " + define->GetName() + " expects a parameter named " + formal.GetName() + ". No such parameter was provided and no variable with that name was defined.");
+          throw MessagedException(GetSourceLocation().toAnchor() + ": Function " + define->GetName() + " expects a parameter named " + formal.GetName() + ". No such parameter was provided and no variable with that name was defined.");
         }
 
         closure->GetEnvironment()->Add(define->GetFormal(i).GetName(), parameter_closure);
@@ -75,7 +67,7 @@ class ExpressionCallWithNamedParameters : public Expression {
       try {
         return closure->Evaluate(env);
       } catch (UnlocatedException e) {
-        throw MessagedException(GetSourceLocation() + ": " + e.GetMessage());
+        throw MessagedException(GetSourceLocation().toAnchor() + ": " + e.GetMessage());
       }
     }
 

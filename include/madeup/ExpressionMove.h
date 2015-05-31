@@ -22,7 +22,7 @@ class ExpressionMove : public Expression {
     Co<Expression> Evaluate(Environment& env) {
       Co<ExpressionClosure> distance = env["length"];
       if (distance.IsNull()) {
-        throw MessagedException(GetSourceLocation() + ": Function move expects a value named length. No value named length is defined.");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Function move expects a value named length. No value named length is defined.");
       }
       Co<Expression> v = distance->Evaluate(env);
 
@@ -32,7 +32,7 @@ class ExpressionMove : public Expression {
         env.Move(value);
         return v;
       } else {
-        throw MessagedException(distance->GetSourceLocation() + ": Function move expects a numeric length. " + distance->GetSource() + " is not a number.");
+        throw MessagedException(distance->GetSourceLocation().toAnchor() + ": Function move expects a numeric length. " + distance->GetSource() + " is not a number.");
       }
     }
 

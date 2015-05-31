@@ -19,6 +19,7 @@ void usage(const std::string &message) {
 
 int main(int argc, char **argv) {
   bool wants_tree = false;
+  bool wants_tokens = false;
   bool wants_timeout = false;
   bool wants_render = false;
   int timeout = 45;
@@ -46,6 +47,10 @@ int main(int argc, char **argv) {
 
     else if (formal == "--tree") {
       wants_tree = true;
+    }
+    
+    else if (formal == "--tokens") {
+      wants_tokens = true;
     }
 
     else if (formal == "-r") {
@@ -102,12 +107,18 @@ int main(int argc, char **argv) {
   try {
     const std::vector<Token> &tokens = lexer.lex();
 
-    for (std::vector<Token>::const_iterator i = tokens.begin(); i != tokens.end(); ++i) {
-      std::cout << *i << std::endl;
+    if (wants_tokens) {
+      for (std::vector<Token>::const_iterator i = tokens.begin(); i != tokens.end(); ++i) {
+        std::cout << *i << std::endl;
+      }
     }
     
     Parser parser(tokens, source);
     Co<ExpressionBlock> program = parser.program();
+
+    if (wants_tree) {
+      std::cout << program << std::endl;
+    }
 
     Environment env;
     env.Prime();

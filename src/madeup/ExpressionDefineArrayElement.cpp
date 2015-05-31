@@ -16,7 +16,7 @@ ExpressionDefineArrayElement::ExpressionDefineArrayElement(Co<Expression> array,
 
 Co<Expression> ExpressionDefineArrayElement::Evaluate(Environment& env) {
   Co<Expression> rhs_value = rhs->Evaluate(env);
-  rhs_value->SetSource(rhs->GetSource(), rhs->GetStartLine(), rhs->GetStartIndex(), rhs->GetEndLine(), rhs->GetEndIndex());
+  rhs_value->SetSource(rhs->GetSource(), rhs->GetSourceLocation());
 
   Co<ExpressionArrayReference> array = subscript->EvaluateArrayReference(env); 
   Co<ExpressionInteger> index = subscript->EvaluateIndex(env, array); 

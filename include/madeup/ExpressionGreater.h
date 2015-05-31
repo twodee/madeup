@@ -37,7 +37,7 @@ class ExpressionGreater : public Expression {
       } else if (lnumber && rnumber) {
         r = Co<Expression>(new ExpressionBoolean(lnumber->GetReal() > rnumber->GetReal()));
       } else {
-        throw MessagedException(GetSourceLocation() + ": Operator > doesn't know how to relate " + left->GetSource() + " and " + right->GetSource() + ".");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Operator > doesn't know how to relate " + left->GetSource() + " and " + right->GetSource() + ".");
       }
 
       return r;

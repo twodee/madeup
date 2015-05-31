@@ -21,7 +21,7 @@ class ExpressionInverseTangent : public Expression {
     Co<Expression> Evaluate(Environment& env) {
       Co<ExpressionClosure> ratio_closure = env["ratio"];
       if (ratio_closure.IsNull()) {
-        throw MessagedException(GetSourceLocation() + ": Function atan expects a value named ratio. No value named ratio is defined.");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Function atan expects a value named ratio. No value named ratio is defined.");
       }
 
       Co<Expression> v = ratio_closure->Evaluate(env);
@@ -32,7 +32,7 @@ class ExpressionInverseTangent : public Expression {
         return Co<Expression>(new ExpressionReal(atanf(value) * 180.0f / td::PI));
       }
 
-      throw MessagedException(ratio_closure->GetSourceLocation() + ": Function atan expects a number. " + ratio_closure->GetSource() + " is not a number.");
+      throw MessagedException(ratio_closure->GetSourceLocation().toAnchor() + ": Function atan expects a number. " + ratio_closure->GetSource() + " is not a number.");
     }
 
     void Write(ostream& out) const {
@@ -54,14 +54,14 @@ class ExpressionInverseTangent2 : public Expression {
       // Opposite
       Co<ExpressionClosure> opposite_closure = env["opposite"];
       if (opposite_closure.IsNull()) {
-        throw MessagedException(GetSourceLocation() + ": Function atan2 expects a value named opposite. No value named opposite is defined.");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Function atan2 expects a value named opposite. No value named opposite is defined.");
       }
 
       Co<Expression> v = opposite_closure->Evaluate(env);
 
       ExpressionNumber *opposite = dynamic_cast<ExpressionNumber *>(v.GetPointer());
       if (!opposite) {
-        throw MessagedException(opposite_closure->GetSourceLocation() + ": Function atan2 expects opposite to be a number. " + opposite_closure->GetSource() + " is not a number.");
+        throw MessagedException(opposite_closure->GetSourceLocation().toAnchor() + ": Function atan2 expects opposite to be a number. " + opposite_closure->GetSource() + " is not a number.");
       }
 
       float opposite_value = opposite->GetReal();
@@ -69,14 +69,14 @@ class ExpressionInverseTangent2 : public Expression {
       // Adjacent
       Co<ExpressionClosure> adjacent_closure = env["adjacent"];
       if (adjacent_closure.IsNull()) {
-        throw MessagedException(GetSourceLocation() + ": Function atan2 expects a value named adjacent. No value named adjacent is defined.");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Function atan2 expects a value named adjacent. No value named adjacent is defined.");
       }
 
       v = adjacent_closure->Evaluate(env);
       
       ExpressionNumber *adjacent = dynamic_cast<ExpressionNumber *>(v.GetPointer());
       if (!adjacent) {
-        throw MessagedException(adjacent_closure->GetSourceLocation() + ": Function atan2 expects adjacent to be a number. " + adjacent_closure->GetSource() + " is not a number.");
+        throw MessagedException(adjacent_closure->GetSourceLocation().toAnchor() + ": Function atan2 expects adjacent to be a number. " + adjacent_closure->GetSource() + " is not a number.");
       }
 
       float adjacent_value = adjacent->GetReal();

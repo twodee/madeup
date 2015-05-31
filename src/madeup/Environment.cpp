@@ -281,7 +281,7 @@ void Environment::Add(const string& id, Co<ExpressionClosure> closure) {
   if (match != id_to_expression.end()) {
     match->second->SetDefine(closure->GetDefine());
     match->second->SetEnvironment(*closure->GetEnvironment());
-    match->second->SetSource(closure->GetSource(), closure->GetStartLine(), closure->GetStartIndex(), closure->GetEndLine(), closure->GetEndIndex());
+    match->second->SetSource(closure->GetSource(), closure->GetSourceLocation());
   } else {
     id_to_expression[id] = closure;
   }

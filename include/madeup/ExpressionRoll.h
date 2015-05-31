@@ -17,7 +17,7 @@ class ExpressionRoll : public Expression {
     Co<Expression> Evaluate(Environment& env) {
       Co<ExpressionClosure> degrees_closure = env["degrees"];
       if (degrees_closure.IsNull()) {
-        throw MessagedException(GetSourceLocation() + ": Function roll expects a value named degrees. No value named degrees is defined.");
+        throw MessagedException(GetSourceLocation().toAnchor() + ": Function roll expects a value named degrees. No value named degrees is defined.");
       }
 
       Co<Expression> v = degrees_closure->Evaluate(env);
@@ -28,7 +28,7 @@ class ExpressionRoll : public Expression {
         env.Roll(value);
         return v;
       } else {
-        throw MessagedException(degrees_closure->GetSourceLocation() + ": Function roll expects a number of degrees. " + degrees_closure->GetSource() + " is not a number.");
+        throw MessagedException(degrees_closure->GetSourceLocation().toAnchor() + ": Function roll expects a number of degrees. " + degrees_closure->GetSource() + " is not a number.");
       }
     }
 

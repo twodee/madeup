@@ -563,7 +563,7 @@ function fit() {
 function log(message) {
   // $1 is the whole source span. $2 is the start. $3 is the end.
   var link_message = message.replace(/^((\d+)\((\d+)(?:-(\d+))?\))/gm, function(match, full, startLine, startIndex, stopIndex) {
-    return '<div style="color: #FF9999; display: inline;">Error on <a style="text-decoration: underline;" onclick="javascript:highlight(' + startIndex + ', ' + stopIndex + ')" class="srclink">line ' + startLine + ':' + startIndex + ':' + stopIndex + '</a></div>';
+    return '<div style="color: #FF9999; display: inline;">Error on <a style="text-decoration: underline;" onclick="javascript:highlight(' + startIndex + ', ' + stopIndex + ')" class="srclink">line ' + startLine + /*':' + startIndex + ':' + stopIndex +*/ '</a></div>';
   });
 
   $('#console #message').html(link_message.replace(/\n/g, '<br/>'));
