@@ -1,0 +1,6 @@
+length = 10
+nums = length of 3
+print nums.length
+for i to nums.length
+  print nums[i]
+end

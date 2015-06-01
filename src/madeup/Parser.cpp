@@ -405,11 +405,14 @@ void Parser::expressionLevel9() {
 
 void Parser::atom() {
   if (isUp(Token::LEFT_PARENTHESIS)) {
+    SourceLocation start_location = tokens[i].getLocation();
     ++i;
     expressionLevel0();
     Co<Expression> e = popExpression();
     if (isUp(Token::RIGHT_PARENTHESIS)) {
+      SourceLocation location(start_location, tokens[i].getLocation());
       ++i;
+      e->setSource(getSubsource(location), location);
       expressions.push(e);
     } else {
       std::stringstream ss;
@@ -533,6 +536,7 @@ void Parser::atom() {
     else if (isUp(Token::NEWLINE)) {
       ++i;
       block();
+      end_location = blocks.top()->getSourceLocation();
       if (isUp(Token::ELSE)) {
         ++i;
         if (isUp(Token::NEWLINE)) {
@@ -551,7 +555,9 @@ void Parser::atom() {
           ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected a linebreak.";
           throw MessagedException(ss.str());
         }
-      } else {
+      } else if (isUp(Token::END)) {
+        end_location = tokens[i].getLocation();
+        ++i;
         blocks.push(Co<ExpressionBlock>(new ExpressionBlock()));
       }
     }
@@ -580,6 +586,11 @@ void Parser::atom() {
       }
       Co<Expression> rhs;
       if (isUp(Token::ASSIGN)) {
+        if (isUp(Token::NEWLINE, 2)) {
+          std::stringstream ss;
+          ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a single-line function definition, but I couldn't find a definition on its right-hand side.";
+          throw MessagedException(ss.str());
+        }
         ++i;
         expressionLevel0();
         rhs = popExpression();
@@ -645,10 +656,10 @@ void Parser::atom() {
     }
   } else if (isUp(Token::ID)) {
     Token id_token = tokens[i];
-    SourceLocation end_location;
+    SourceLocation end_location = id_token.getLocation();;
     std::string name = tokens[i].getText();
     ++i;
-    if (isUp(Token::ID) && isUp(Token::COLON, 2)) {
+    if (!isInExpressionFirst() || (isUp(Token::ID) && isUp(Token::COLON, 2))) {
       Co<ExpressionCallWithNamedParameters> call(new ExpressionCallWithNamedParameters(name));
       while (isUp(Token::ID) && isUp(Token::COLON, 2)) {
         std::string formal = tokens[i].getText();

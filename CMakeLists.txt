@@ -21,6 +21,7 @@ endif()
 add_subdirectory(src/twodee)
 add_subdirectory(src/madeup)
 add_subdirectory(src)
+add_subdirectory(test)
 
 add_custom_target(www
   COMMAND make WWW_ROOT=${WWW_ROOT} MADEUP=$<TARGET_FILE:madeup> TWODEE=$<TARGET_FILE:twodee> MERP=$<TARGET_FILE:merp>

@@ -1,0 +1,1 @@
+(block (define plus1 x (block (+ (call-with-names x) (INTEGER 1)))) (call print (call plus1 (INTEGER 10))) (call print (call plus1 (INTEGER -5))) (call print (call plus1 (INTEGER 0))) (call print (call plus1 (INTEGER 100))))

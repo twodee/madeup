@@ -52,6 +52,7 @@ class ExpressionCall : public Expression {
       }
 
       Co<Environment> closure_env(new Environment(*closure->getEnvironment()));
+      /* std::cout << "closure_env: " << *closure_env << std::endl; */
       for (unsigned int i = 0; i < define->getArity(); ++i) {
         const FormalParameter &formal = define->getFormal(i);
         bool is_lazy = formal.getEvaluationMode() == FormalParameter::LAZY;

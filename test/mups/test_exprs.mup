@@ -1,0 +1,23 @@
+debug (min 5, 7) == 5 
+debug (min 6, 6) == 6 
+debug (max 10, -10) == 10 
+debug (max 100, 101) == 101 
+a = 3
+debug (-a) == -3
+debug 10 % 3 == 1
+debug 3 * 6 == 18
+debug |5 // 2 - 2.5| < 0.0001
+debug 5 / 2 == 2
+debug 5 ^ 3 == 125
+debug 100 - 30 == 70
+debug true and false == false
+debug true and true == true
+debug true or false == true
+debug false or false == false
+debug false or true == true
+debug true or true == true
+debug not true == false
+debug not false == true
+debug (sign 5) == 1
+debug (sign -100) == -1
+debug (sign 0) == 0

@@ -1,0 +1,9 @@
+to f x
+  if x < 4
+    print x
+    f x + 1
+    print x
+  end
+end
+
+f 0

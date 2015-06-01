@@ -79,6 +79,9 @@ Environment::Environment(const Environment& other) :
 
 void Environment::prime() {
   shapes = new Trimesh(0, 0);
+
+  Co<Environment> globals(new Environment());;
+
   add("radius", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("radius", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
   add("nsides", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("nsides", Co<Expression>(new ExpressionInteger(4)))), Environment())));
   add("fracture", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("fracture", Co<Expression>(new ExpressionReal(100)))), Environment())));
@@ -91,182 +94,225 @@ void Environment::prime() {
   add("energy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("energy", Co<Expression>(new ExpressionReal(100.0f)))), Environment())));
   add("halflife", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("halflife", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
 
-  Environment globals;
-  globals.add("nsides", (*this)["nsides"]);
-  globals.add("radius", (*this)["radius"]);
-  globals.add("fracture", (*this)["fracture"]);
-  globals.add("twist", (*this)["twist"]);
-  globals.add("axisx", (*this)["axisx"]);
-  globals.add("axisy", (*this)["axisy"]);
-  globals.add("axisz", (*this)["axisz"]);
-  globals.add("energy", (*this)["energy"]);
-  globals.add("halflife", (*this)["halflife"]);
+  globals->add("radius", (*this)["radius"]);
+  globals->add("nsides", (*this)["nsides"]);
+  globals->add("fracture", (*this)["fracture"]);
+  globals->add("pi", (*this)["pi"]);
+  globals->add("e", (*this)["e"]);
+  globals->add("twist", (*this)["twist"]);
+  globals->add("axisx", (*this)["axisx"]);
+  globals->add("axisy", (*this)["axisy"]);
+  globals->add("axisz", (*this)["axisz"]);
+  globals->add("energy", (*this)["energy"]);
+  globals->add("halflife", (*this)["halflife"]);
 
   Co<ExpressionDefine> define_sine(new ExpressionDefine("sin", Co<Expression>(new ExpressionSine())));
   define_sine->addFormal("degrees");
-  add("sin", Co<ExpressionClosure>(new ExpressionClosure(define_sine, globals)));
 
   Co<ExpressionDefine> define_cosine(new ExpressionDefine("cos", Co<Expression>(new ExpressionCosine())));
   define_cosine->addFormal("degrees");
-  add("cos", Co<ExpressionClosure>(new ExpressionClosure(define_cosine, globals)));
 
   Co<ExpressionDefine> define_log(new ExpressionDefine("log", Co<Expression>(new ExpressionLog())));
   define_log->addFormal("base");
   define_log->addFormal("x");
-  add("log", Co<ExpressionClosure>(new ExpressionClosure(define_log, globals)));
 
   Co<ExpressionDefine> define_tangent(new ExpressionDefine("tan", Co<Expression>(new ExpressionTangent())));
   define_tangent->addFormal("degrees");
-  add("tan", Co<ExpressionClosure>(new ExpressionClosure(define_tangent, globals)));
 
   Co<ExpressionDefine> define_inverse_sine(new ExpressionDefine("asin", Co<Expression>(new ExpressionInverseTangent())));
   define_inverse_sine->addFormal("ratio");
-  add("asin", Co<ExpressionClosure>(new ExpressionClosure(define_inverse_sine, globals)));
 
   Co<ExpressionDefine> define_inverse_cosine(new ExpressionDefine("acos", Co<Expression>(new ExpressionInverseTangent())));
   define_inverse_cosine->addFormal("ratio");
-  add("acos", Co<ExpressionClosure>(new ExpressionClosure(define_inverse_cosine, globals)));
 
   Co<ExpressionDefine> define_inverse_tangent(new ExpressionDefine("atan", Co<Expression>(new ExpressionInverseTangent())));
   define_inverse_tangent->addFormal("ratio");
-  add("atan", Co<ExpressionClosure>(new ExpressionClosure(define_inverse_tangent, globals)));
 
   Co<ExpressionDefine> define_inverse_tangent2(new ExpressionDefine("atan2", Co<Expression>(new ExpressionInverseTangent2())));
   define_inverse_tangent2->addFormal("opposite");
   define_inverse_tangent2->addFormal("adjacent");
-  add("atan2", Co<ExpressionClosure>(new ExpressionClosure(define_inverse_tangent2, globals)));
 
   Co<ExpressionDefine> define_yaw(new ExpressionDefine("yaw", Co<Expression>(new ExpressionYaw())));
   define_yaw->addFormal("degrees");
-  add("yaw", Co<ExpressionClosure>(new ExpressionClosure(define_yaw, globals)));
 
   Co<ExpressionDefine> define_pitch(new ExpressionDefine("pitch", Co<Expression>(new ExpressionPitch())));
   define_pitch->addFormal("degrees");
-  add("pitch", Co<ExpressionClosure>(new ExpressionClosure(define_pitch, globals)));
 
   Co<ExpressionDefine> define_roll(new ExpressionDefine("roll", Co<Expression>(new ExpressionRoll())));
   define_roll->addFormal("degrees");
-  add("roll", Co<ExpressionClosure>(new ExpressionClosure(define_roll, globals)));
 
   Co<ExpressionDefine> define_push(new ExpressionDefine("push", Co<Expression>(new ExpressionPush())));
-  add("push", Co<ExpressionClosure>(new ExpressionClosure(define_push, globals)));
 
   Co<ExpressionDefine> define_pop(new ExpressionDefine("pop", Co<Expression>(new ExpressionPop())));
-  add("pop", Co<ExpressionClosure>(new ExpressionClosure(define_pop, globals)));
 
   Co<ExpressionDefine> define_print(new ExpressionDefine("print", Co<Expression>(new ExpressionPrint())));
   define_print->addFormal("message");
-  add("print", Co<ExpressionClosure>(new ExpressionClosure(define_print, globals)));
 
   Co<ExpressionDefine> define_debug(new ExpressionDefine("debug", Co<Expression>(new ExpressionDebug())));
-  define_debug->addFormal("message", FormalParameter::LAZY);
-  add("debug", Co<ExpressionClosure>(new ExpressionClosure(define_debug, globals)));
+  define_debug->addFormal("message");
 
   Co<ExpressionDefine> define_where(new ExpressionDefine("where", Co<Expression>(new ExpressionWhere())));
-  add("where", Co<ExpressionClosure>(new ExpressionClosure(define_where, globals)));
 
   Co<ExpressionDefine> define_move(new ExpressionDefine("move", Co<Expression>(new ExpressionMove())));
   define_move->addFormal("length");
-  add("move", Co<ExpressionClosure>(new ExpressionClosure(define_move, globals)));
 
   Co<ExpressionDefine> define_moveto(new ExpressionDefine("moveto", Co<Expression>(new ExpressionMoveTo())));
   define_moveto->addFormal("x");
   define_moveto->addFormal("y");
   define_moveto->addFormal("z");
-  add("moveto", Co<ExpressionClosure>(new ExpressionClosure(define_moveto, globals)));
 
   Co<ExpressionDefine> define_scale(new ExpressionDefine("scale", Co<Expression>(new ExpressionScale())));
   define_scale->addFormal("x");
   define_scale->addFormal("y");
   define_scale->addFormal("z");
-  add("scale", Co<ExpressionClosure>(new ExpressionClosure(define_scale, globals)));
 
   Co<ExpressionDefine> define_translate(new ExpressionDefine("translate", Co<Expression>(new ExpressionTranslate())));
   define_translate->addFormal("x");
   define_translate->addFormal("y");
   define_translate->addFormal("z");
-  add("translate", Co<ExpressionClosure>(new ExpressionClosure(define_translate, globals)));
 
   Co<ExpressionDefine> define_rotate(new ExpressionDefine("rotate", Co<Expression>(new ExpressionRotate())));
   define_rotate->addFormal("x");
   define_rotate->addFormal("y");
   define_rotate->addFormal("z");
   define_rotate->addFormal("degrees");
-  add("rotate", Co<ExpressionClosure>(new ExpressionClosure(define_rotate, globals)));
 
   Co<ExpressionDefine> define_identity(new ExpressionDefine("identity", Co<Expression>(new ExpressionIdentity())));
-  add("identity", Co<ExpressionClosure>(new ExpressionClosure(define_identity, globals)));
 
   Co<ExpressionDefine> define_center(new ExpressionDefine("center", Co<Expression>(new ExpressionCenter())));
-  add("center", Co<ExpressionClosure>(new ExpressionClosure(define_center, globals)));
 
   Co<ExpressionDefine> define_echo(new ExpressionDefine("echo", Co<Expression>(new ExpressionEcho())));
-  add("echo", Co<ExpressionClosure>(new ExpressionClosure(define_echo, globals)));
 
   Co<ExpressionDefine> define_axis(new ExpressionDefine("axis", Co<Expression>(new ExpressionAxis())));
   define_axis->addFormal("x");
   define_axis->addFormal("y");
   define_axis->addFormal("z");
-  add("axis", Co<ExpressionClosure>(new ExpressionClosure(define_axis, globals)));
 
   Co<ExpressionDefine> define_surface(new ExpressionDefine("surface", Co<Expression>(new ExpressionSurface())));
   define_surface->addFormal("width");
   define_surface->addFormal("height");
-  add("surface", Co<ExpressionClosure>(new ExpressionClosure(define_surface, globals)));
 
   Co<ExpressionDefine> define_blobs(new ExpressionDefine("blobs", Co<Expression>(new ExpressionBlobs())));
   define_blobs->addFormal("grain");
   define_blobs->addFormal("iso");
-  add("blobs", Co<ExpressionClosure>(new ExpressionClosure(define_blobs, globals)));
 
   Co<ExpressionDefine> define_random(new ExpressionDefine("random", Co<Expression>(new ExpressionRandom())));
   define_random->addFormal("min");
   define_random->addFormal("max");
-  add("random", Co<ExpressionClosure>(new ExpressionClosure(define_random, globals)));
 
   Co<ExpressionDefine> define_max(new ExpressionDefine("max", Co<Expression>(new ExpressionMax())));
   define_max->addFormal("a");
   define_max->addFormal("b");
-  add("max", Co<ExpressionClosure>(new ExpressionClosure(define_max, globals)));
 
   Co<ExpressionDefine> define_min(new ExpressionDefine("min", Co<Expression>(new ExpressionMin())));
   define_min->addFormal("a");
   define_min->addFormal("b");
-  add("min", Co<ExpressionClosure>(new ExpressionClosure(define_min, globals)));
 
   Co<ExpressionDefine> define_sign(new ExpressionDefine("sign", Co<Expression>(new ExpressionSign())));
   define_sign->addFormal("n");
-  add("sign", Co<ExpressionClosure>(new ExpressionClosure(define_sign, globals)));
 
   Co<ExpressionDefine> define_dowel(new ExpressionDefine("dowel", Co<Expression>(new ExpressionDowel())));
-  add("dowel", Co<ExpressionClosure>(new ExpressionClosure(define_dowel, globals)));
-  add("stick", Co<ExpressionClosure>(new ExpressionClosure(define_dowel, globals)));
 
   Co<ExpressionDefine> define_dot(new ExpressionDefine("dot", Co<Expression>(new ExpressionDot())));
-  add("dot", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
-  add("ball", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
-  add("dots", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
 
   Co<ExpressionDefine> define_box(new ExpressionDefine("box", Co<Expression>(new ExpressionBox())));
-  add("box", Co<ExpressionClosure>(new ExpressionClosure(define_box, globals)));
-  add("boxes", Co<ExpressionClosure>(new ExpressionClosure(define_box, globals)));
 
   Co<ExpressionDefine> define_revolve(new ExpressionDefine("revolve", Co<Expression>(new ExpressionRevolve())));
   define_revolve->addFormal("x");
   define_revolve->addFormal("y");
   define_revolve->addFormal("z");
   define_revolve->addFormal("degrees");
-  add("revolve", Co<ExpressionClosure>(new ExpressionClosure(define_revolve, globals)));
 
   Co<ExpressionDefine> define_extrude(new ExpressionDefine("extrude", Co<Expression>(new ExpressionExtrude())));
   define_extrude->addFormal("x");
   define_extrude->addFormal("y");
   define_extrude->addFormal("z");
   define_extrude->addFormal("length");
-  add("extrude", Co<ExpressionClosure>(new ExpressionClosure(define_extrude, globals)));
 
   Co<ExpressionDefine> define_forget(new ExpressionDefine("forget", Co<Expression>(new ExpressionForget())));
+
+  add("sin", Co<ExpressionClosure>(new ExpressionClosure(define_sine, globals)));
+  add("cos", Co<ExpressionClosure>(new ExpressionClosure(define_cosine, globals)));
+  add("log", Co<ExpressionClosure>(new ExpressionClosure(define_log, globals)));
+  add("tan", Co<ExpressionClosure>(new ExpressionClosure(define_tangent, globals)));
+  add("asin", Co<ExpressionClosure>(new ExpressionClosure(define_inverse_sine, globals)));
+  add("acos", Co<ExpressionClosure>(new ExpressionClosure(define_inverse_cosine, globals)));
+  add("atan", Co<ExpressionClosure>(new ExpressionClosure(define_inverse_tangent, globals)));
+  add("atan2", Co<ExpressionClosure>(new ExpressionClosure(define_inverse_tangent2, globals)));
+  add("pitch", Co<ExpressionClosure>(new ExpressionClosure(define_pitch, globals)));
+  add("yaw", Co<ExpressionClosure>(new ExpressionClosure(define_yaw, globals)));
+  add("roll", Co<ExpressionClosure>(new ExpressionClosure(define_roll, globals)));
+  add("debug", Co<ExpressionClosure>(new ExpressionClosure(define_debug, globals)));
+  add("where", Co<ExpressionClosure>(new ExpressionClosure(define_where, globals)));
+  add("move", Co<ExpressionClosure>(new ExpressionClosure(define_move, globals)));
+  add("moveto", Co<ExpressionClosure>(new ExpressionClosure(define_moveto, globals)));
+  add("scale", Co<ExpressionClosure>(new ExpressionClosure(define_scale, globals)));
+  add("translate", Co<ExpressionClosure>(new ExpressionClosure(define_translate, globals)));
+  add("rotate", Co<ExpressionClosure>(new ExpressionClosure(define_rotate, globals)));
+  add("identity", Co<ExpressionClosure>(new ExpressionClosure(define_identity, globals)));
+  add("center", Co<ExpressionClosure>(new ExpressionClosure(define_center, globals)));
+  add("echo", Co<ExpressionClosure>(new ExpressionClosure(define_echo, globals)));
+  add("axis", Co<ExpressionClosure>(new ExpressionClosure(define_axis, globals)));
+  add("blobs", Co<ExpressionClosure>(new ExpressionClosure(define_blobs, globals)));
+  add("surface", Co<ExpressionClosure>(new ExpressionClosure(define_surface, globals)));
+  add("random", Co<ExpressionClosure>(new ExpressionClosure(define_random, globals)));
+  add("sign", Co<ExpressionClosure>(new ExpressionClosure(define_sign, globals)));
+  add("max", Co<ExpressionClosure>(new ExpressionClosure(define_max, globals)));
+  add("min", Co<ExpressionClosure>(new ExpressionClosure(define_min, globals)));
+  add("dowel", Co<ExpressionClosure>(new ExpressionClosure(define_dowel, globals)));
+  add("stick", Co<ExpressionClosure>(new ExpressionClosure(define_dowel, globals)));
+  add("dot", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
+  add("ball", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
+  add("dots", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
+  add("box", Co<ExpressionClosure>(new ExpressionClosure(define_box, globals)));
+  add("boxes", Co<ExpressionClosure>(new ExpressionClosure(define_box, globals)));
+  add("revolve", Co<ExpressionClosure>(new ExpressionClosure(define_revolve, globals)));
+  add("extrude", Co<ExpressionClosure>(new ExpressionClosure(define_extrude, globals)));
   add("forget", Co<ExpressionClosure>(new ExpressionClosure(define_forget, globals)));
+  add("push", Co<ExpressionClosure>(new ExpressionClosure(define_push, globals)));
+  add("pop", Co<ExpressionClosure>(new ExpressionClosure(define_pop, globals)));
+  add("print", Co<ExpressionClosure>(new ExpressionClosure(define_print, globals)));
+
+  globals->add("atan", (*this)["atan"]);
+  globals->add("yaw", (*this)["yaw"]);
+  globals->add("pitch", (*this)["pitch"]);
+  globals->add("roll", (*this)["roll"]);
+  globals->add("push", (*this)["push"]);
+  globals->add("pop", (*this)["pop"]);
+  globals->add("dowel", (*this)["dowel"]);
+  globals->add("ball", (*this)["ball"]);
+  globals->add("box", (*this)["box"]);
+  globals->add("revolve", (*this)["revolve"]);
+  globals->add("boxes", (*this)["boxes"]);
+  globals->add("dot", (*this)["dot"]);
+  globals->add("dots", (*this)["dots"]);
+  globals->add("stick", (*this)["stick"]);
+  globals->add("print", (*this)["print"]);
+  globals->add("debug", (*this)["debug"]);
+  globals->add("atan2", (*this)["atan2"]);
+  globals->add("where", (*this)["where"]);
+  globals->add("acos", (*this)["acos"]);
+  globals->add("move", (*this)["move"]);
+  globals->add("moveto", (*this)["moveto"]);
+  globals->add("scale", (*this)["scale"]);
+  globals->add("translate", (*this)["translate"]);
+  globals->add("rotate", (*this)["rotate"]);
+  globals->add("identity", (*this)["identity"]);
+  globals->add("center", (*this)["center"]);
+  globals->add("echo", (*this)["echo"]);
+  globals->add("axis", (*this)["axis"]);
+  globals->add("surface", (*this)["surface"]);
+  globals->add("random", (*this)["random"]);
+  globals->add("max", (*this)["max"]);
+  globals->add("min", (*this)["min"]);
+  globals->add("sign", (*this)["sign"]);
+  globals->add("asin", (*this)["asin"]);
+  globals->add("tan", (*this)["tan"]);
+  globals->add("log", (*this)["log"]);
+  globals->add("cos", (*this)["cos"]);
+  globals->add("sin", (*this)["sin"]);
+  globals->add("extrude", (*this)["extrude"]);
+  globals->add("forget", (*this)["forget"]);
 
   xforms.push(QMatrix4<float>(1.0f));
 }

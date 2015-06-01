@@ -1,0 +1,12 @@
+1(0-3) ID: nums
+1(5-5) ASSIGN: =
+1(7-8) INTEGER: 10
+1(10-11) OF: of
+1(13-13) INTEGER: 0
+1(14-14) NEWLINE: \n
+2(15-19) ID: print
+2(21-24) ID: nums
+2(25-25) DOT: .
+2(26-28) ID: len
+2(29-29) NEWLINE: \n
+3(30-30) END_OF_FILE: END OF FILE

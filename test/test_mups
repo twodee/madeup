@@ -1,0 +1,74 @@
+#!/usr/bin/env zsh
+
+# ---------------------------------------------------------------------------- 
+
+function diffit {
+  label=$1
+  test_case=$2
+  expected=$3
+  actual=$4
+
+  if [[ ! -f $expected ]]; then
+    echo "$test_case appears to be a new test case. Initializing expected $label."
+    cp $actual $expected
+  fi
+
+  diff $actual $expected
+  if [[ $? -ne 0 ]]; then
+    echo -n "Regression alert! The $label differs for test case $test_case. View in vimdiff? [y]/n: "
+    read ok
+    if [[ $ok != "n" ]]; then
+      vimdiff $actual $expected
+    fi
+
+    echo -n "Do you want to update the expected $label? y/[n]: "
+    read ok
+    if [[ $ok == "y" ]]; then
+      \cp $actual $expected
+    fi
+    echo
+  fi
+}
+
+# ---------------------------------------------------------------------------- 
+
+mupsdir=@CMAKE_SOURCE_DIR@/test/mups
+merp=@CMAKE_RUNTIME_OUTPUT_DIRECTORY@/merp
+
+actual_out=/tmp/mup.out
+actual_err=/tmp/mup.err
+actual_tree=/tmp/mup.tree
+actual_tokens=/tmp/mup.tokens
+
+for mup in $mupsdir/*.mup; do
+  test_case=${mup:t:r}
+  expected_out=$mupsdir/expecteds/$test_case.out
+  expected_err=$mupsdir/expecteds/$test_case.err
+  expected_tree=$mupsdir/expecteds/$test_case.tree
+  expected_tokens=$mupsdir/expecteds/$test_case.tokens
+
+  echo "Test case: $test_case..."
+
+  # Compare tree.
+  $merp -q --tree $mup >$actual_tree 2>/dev/null
+  if [[ ! -f $expected_tree ]]; then
+    echo "$test_case appears to be a new test case. Initializing expected tree."
+    cp $actual_tree $expected_tree
+  fi
+  diffit tree $test_case $expected_tree $actual_tree
+
+  # Compare tokens.
+  $merp -q --tokens $mup >$actual_tokens 2>/dev/null
+  if [[ ! -f $expected_tree ]]; then
+    echo "$test_case appears to be a new test case. Initializing expected tree."
+    cp $actual_tokens $expected_tokens
+  fi
+  diffit tokens $test_case $expected_tokens $actual_tokens
+
+  # Compare output and err.
+  $merp --geometry NONE $mup >$actual_out 2>$actual_err
+  diffit output $test_case $expected_out $actual_out
+  diffit err $test_case $expected_err $actual_err
+done
+
+rm -f /tmp/mup.out /tmp/mup.err /tmp/mup.tree /tmp/mup.tokens

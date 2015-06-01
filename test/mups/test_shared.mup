@@ -1,0 +1,5 @@
+x = 10
+to f = x = 30
+print x
+f
+print x

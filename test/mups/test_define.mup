@@ -1,0 +1,8 @@
+to plus1 x
+  x + 1
+end
+
+print plus1 10
+print plus1 -5
+print plus1 0
+print plus1 100

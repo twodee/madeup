@@ -1,0 +1,1 @@
+(block (define-variable seed (INTEGER 17)) (repeat (INTEGER 30) (block (call print (call random (INTEGER 0) (INTEGER 17))))))

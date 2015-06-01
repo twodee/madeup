@@ -10,6 +10,7 @@ namespace madeup {
 
 class ExpressionClosure : public Expression {
   public:
+    ExpressionClosure(Co<ExpressionDefine> define, Co<Environment> shared_env);
     ExpressionClosure(Co<ExpressionDefine> define, const Environment& env);
 
     Co<Expression> evaluate(Environment& env) const;

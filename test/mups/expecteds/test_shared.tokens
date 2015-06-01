@@ -1,0 +1,20 @@
+1(0-0) ID: x
+1(2-2) ASSIGN: =
+1(4-5) INTEGER: 10
+1(6-6) NEWLINE: \n
+2(7-8) TO: to
+2(10-10) ID: f
+2(12-12) ASSIGN: =
+2(14-14) ID: x
+2(16-16) ASSIGN: =
+2(18-19) INTEGER: 30
+2(20-20) NEWLINE: \n
+3(21-25) ID: print
+3(27-27) ID: x
+3(28-28) NEWLINE: \n
+4(29-29) ID: f
+4(30-30) NEWLINE: \n
+5(31-35) ID: print
+5(37-37) ID: x
+5(38-38) NEWLINE: \n
+6(39-39) END_OF_FILE: END OF FILE

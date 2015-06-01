@@ -1,0 +1,4 @@
+seed = 17
+repeat 30
+  print (random 0, 17)
+end

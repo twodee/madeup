@@ -1,0 +1,9 @@
+1(0-4) ID: print
+1(6-7) ID: pi
+1(8-8) NEWLINE: \n
+2(9-13) ID: print
+2(15-17) ID: sin
+2(19-21) ID: cos
+2(23-24) ID: pi
+2(25-25) NEWLINE: \n
+3(26-26) END_OF_FILE: END OF FILE

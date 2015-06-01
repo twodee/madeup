@@ -33,7 +33,7 @@ class ExpressionCallWithNamedParameters : public Expression {
       }
 
       Co<ExpressionDefine> define = closure->getDefine();
-      /* Environment sub_env(define->IsDynamicallyScoped() ? env : *closure->getEnvironment()); */
+      Co<Environment> closure_env(new Environment(*closure->getEnvironment()));
 
       for (unsigned int i = 0; i < define->getArity(); ++i) {
         // lookup getFormal in bindings list
@@ -61,11 +61,11 @@ class ExpressionCallWithNamedParameters : public Expression {
           throw MessagedException(getSourceLocation().toAnchor() + ": Function " + define->getName() + " expects a parameter named " + formal.getName() + ". No such parameter was provided and no variable with that name was defined.");
         }
 
-        closure->getEnvironment()->add(define->getFormal(i).getName(), parameter_closure);
+        closure_env->add(define->getFormal(i).getName(), parameter_closure);
       }
 
       try {
-        return closure->evaluate(env);
+        return closure->evaluate(*closure_env);
       } catch (UnlocatedException e) {
         throw MessagedException(getSourceLocation().toAnchor() + ": " + e.GetMessage());
       }

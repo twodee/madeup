@@ -6,10 +6,18 @@ namespace madeup {
 
 /* ----------------------------------------------------------------------- */
 
+ExpressionClosure::ExpressionClosure(Co<ExpressionDefine> define, Co<Environment> shared_env) :
+  Expression(),
+  define(define),
+  env(shared_env) {
+}
+
+/* ------------------------------------------------------------------------- */
+
 ExpressionClosure::ExpressionClosure(Co<ExpressionDefine> define, const Environment& env) :
   Expression(),
-  define(define) {
-  this->env = Co<Environment>(new Environment(env));
+  define(define),
+  env(new Environment(env)) {
 }
 
 /* ------------------------------------------------------------------------- */

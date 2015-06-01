@@ -12,7 +12,7 @@
 using namespace madeup;
 
 void usage(const std::string &message) {
-  std::cerr << "Usage: merp [-r] [--timeout #] [--tree] -i in.mup [-o out.obj] [--geometry (SURFACE|PATH|NONE)]" << std::endl;
+  std::cerr << "Usage: merp [-q] [-r] [--timeout #] [--tree] -i in.mup [-o out.obj] [--geometry (SURFACE|PATH|NONE)]" << std::endl;
   std::cerr << message << std::endl;
   exit(1);
 }
@@ -22,6 +22,7 @@ int main(int argc, char **argv) {
   bool wants_tokens = false;
   bool wants_timeout = false;
   bool wants_render = false;
+  bool wants_quiet = false;
   int timeout = 45;
   std::string out_path = "";
   GeometryMode::geometry_mode_t geometry_mode = GeometryMode::SURFACE;
@@ -55,6 +56,10 @@ int main(int argc, char **argv) {
 
     else if (formal == "-r") {
       wants_render = true;
+    }
+
+    else if (formal == "-q") {
+      wants_quiet = true;
     }
 
     else if (formal == "-o") {
@@ -120,37 +125,40 @@ int main(int argc, char **argv) {
       std::cout << program << std::endl;
     }
 
-    Environment env;
-    env.prime();
-    env.setGeometryMode(geometry_mode);
-    srand(time(NULL));
+    if (!wants_quiet) {
+      Environment env;
+      env.prime();
+      env.setGeometryMode(geometry_mode);
+      srand(time(NULL));
 
-    program->evaluate(env);
+      program->evaluate(env);
 
-    Trimesh *trimesh = env.getMesh();
+      Trimesh *trimesh = env.getMesh();
 
-    if (out_path.length() > 0) {
-      if (geometry_mode == GeometryMode::PATH) {
-        std::ofstream out(out_path.c_str());
-        out << env.getPathsJSON();
-        out.close();
-      } else if (geometry_mode == GeometryMode::SURFACE) {
-        if (out_path.find_first_of('.') == std::string::npos ||
-            out_path.find(".json") == out_path.length() - 5) {
-          trimesh->WriteJSON(out_path);
-        } else {
-          trimesh->WriteObj(out_path);
+      if (out_path.length() > 0) {
+        if (geometry_mode == GeometryMode::PATH) {
+          std::ofstream out(out_path.c_str());
+          out << env.getPathsJSON();
+          out.close();
+        } else if (geometry_mode == GeometryMode::SURFACE) {
+          if (out_path.find_first_of('.') == std::string::npos ||
+              out_path.find(".json") == out_path.length() - 5) {
+            trimesh->WriteJSON(out_path);
+          } else {
+            trimesh->WriteObj(out_path);
+          }
         }
-      }
 
-      if (wants_render) {
-        std::string command = "runx /Users/johnch/checkouts/cj_graphics/build/projects/mesher/mesher.app -m " + out_path;
-        system(command.c_str());
+        if (wants_render) {
+          std::string command = "runx /Users/johnch/checkouts/cj_graphics/build/projects/mesher/mesher.app -m " + out_path;
+          system(command.c_str());
+        }
       }
     }
 
   } catch (td::MessagedException e) {
     std::cerr << e.GetMessage() << std::endl;
+  in.close();
     exit(1);
   }
   in.close();

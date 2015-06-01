@@ -1,0 +1,1 @@
+(block (call print (call-with-names pi)) (call print (call sin (call cos (call-with-names pi)))))

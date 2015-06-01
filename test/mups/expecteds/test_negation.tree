@@ -1,0 +1,1 @@
+(block (call print (INTEGER -5)) (define-variable a (INTEGER 7)) (call print (negate (call-with-names a))) (define-variable jump (INTEGER 37)) (call roll (negate (call-with-names jump))))

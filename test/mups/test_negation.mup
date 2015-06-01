@@ -1,0 +1,6 @@
+print (-5)
+a = 7
+print (-a)
+
+jump = 37
+roll (-jump)

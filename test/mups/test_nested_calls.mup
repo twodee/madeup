@@ -1,0 +1,2 @@
+print pi
+print sin cos pi
