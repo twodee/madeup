@@ -2,21 +2,21 @@
 #define EXPRESSION_H
 
 #include <iostream>
-#include <sstream>
+#include <string>
 
 #include "madeup/Environment.h"
 #include "madeup/Expression.h"
 #include "madeup/SourceLocation.h"
 
-/* class ExpressionBlock; */
-
 using std::ostream;
 
 namespace madeup {
 
+/* ------------------------------------------------------------------------- */
+
 class UnlocatedException : public td::MessagedException {
   public:
-    UnlocatedException(const std::string& message) :
+    UnlocatedException(const std::string &message) :
       MessagedException(message) {
     }
 };
@@ -28,13 +28,13 @@ class Expression {
     Expression();
     virtual ~Expression();
 
-    virtual Co<Expression> evaluate(Environment& env) const = 0;
-    virtual void write(ostream& out) const = 0;
-    const std::string& getSource() const;
+    virtual Co<Expression> evaluate(Environment &env) const = 0;
+    virtual void write(ostream &out) const = 0;
+    const std::string &getSource() const;
     const SourceLocation &getSourceLocation() const;
-    void setSource(const std::string& source, const SourceLocation &location);
+    void setSource(const std::string &source, const SourceLocation &location);
 
-    static Co<Expression> parse(const std::string& s);
+    static Co<Expression> parse(const std::string &s);
 
   private:
     std::string source;
@@ -43,11 +43,11 @@ class Expression {
 
 /* ------------------------------------------------------------------------- */
 
-std::ostream& operator<<(std::ostream& out, const Co<Expression> e);
+ostream &operator<<(ostream &out, const Co<Expression> e);
 
 /* ------------------------------------------------------------------------- */
 
-std::ostream& operator<<(std::ostream& out, const Expression& e);
+std::ostream &operator<<(std::ostream &out, const Expression &e);
 
 /* ------------------------------------------------------------------------- */
 

@@ -2,7 +2,6 @@
 #define ELEMENTPUSH_H
 
 #include "madeup/Expression.h"
-#include "madeup/ExpressionUnit.h"
 
 namespace madeup {
 
@@ -10,18 +9,10 @@ namespace madeup {
 
 class ExpressionPush : public Expression {
   public:
-    ExpressionPush() :
-      Expression() {
-    }
+    ExpressionPush();
 
-    Co<Expression> evaluate(Environment& env) const {
-      env.push();
-      return Co<Expression>(new ExpressionUnit());
-    }
-
-    void write(ostream& out) const {
-      out << "(push)";
-    }
+    Co<Expression> evaluate(Environment &env) const;
+    void write(ostream &out) const;
 
   private:
 };

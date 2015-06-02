@@ -9,26 +9,12 @@ namespace madeup {
 
 class ExpressionReal : public ExpressionNumber {
   public:
-    ExpressionReal(float value) :
-      ExpressionNumber(),
-      value(value) {
-    }
+    ExpressionReal(float value);
 
-    Co<Expression> evaluate(Environment& env) const {
-      return Co<Expression>(new ExpressionReal(value));
-    }
-
-    float toReal() const {
-      return value;
-    }
-
-    int toInteger() const {
-      return (int) value;
-    }
-
-    void write(ostream& out) const {
-      out << "(REAL " << value << ")";
-    }
+    Co<Expression> evaluate(Environment &env) const;
+    float toReal() const;
+    int toInteger() const;
+    void write(ostream &out) const;
 
   private:
     float value;

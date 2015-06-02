@@ -4,9 +4,9 @@
 #include <stack>
 #include <vector>
 
-#include "madeup/Token.h"
 #include "madeup/Expression.h"
 #include "madeup/ExpressionBlock.h"
+#include "madeup/Token.h"
 #include "twodee/Co.h"
 
 namespace madeup {

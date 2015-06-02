@@ -9,30 +9,13 @@ namespace madeup {
 
 class ExpressionInteger : public ExpressionNumber {
   public:
-    ExpressionInteger(int value) :
-      ExpressionNumber(),
-      value(value) {
-    }
+    ExpressionInteger(int value);
 
-    Co<Expression> evaluate(Environment& env) const {
-      return Co<Expression>(new ExpressionInteger(value));
-    }
-
-    int toInteger() const {
-      return value;
-    }
-
-    void setInteger(int i) {
-      value = i;
-    }
-
-    float toReal() const {
-      return value;
-    }
-
-    void write(ostream& out) const {
-      out << "(INTEGER " << value << ")";
-    }
+    Co<Expression> evaluate(Environment &env) const;
+    int toInteger() const;
+    void setInteger(int i);
+    float toReal() const;
+    void write(ostream &out) const;
 
   private:
     int value;

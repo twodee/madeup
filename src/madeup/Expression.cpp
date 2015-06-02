@@ -1,18 +1,16 @@
+#include "madeup/Expression.h"
 #include "madeup/ExpressionAdd.h"
 #include "madeup/ExpressionAnd.h"
 #include "madeup/ExpressionBlock.h"
 #include "madeup/ExpressionBoolean.h"
 #include "madeup/ExpressionCall.h"
 #include "madeup/ExpressionClosure.h"
-#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionDefine.h"
 #include "madeup/ExpressionDivide.h"
-#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionEqual.h"
 #include "madeup/ExpressionFor.h"
 #include "madeup/ExpressionGreater.h"
 #include "madeup/ExpressionGreaterOrEqual.h"
-#include "madeup/Expression.h"
 #include "madeup/ExpressionIf.h"
 #include "madeup/ExpressionInteger.h"
 #include "madeup/ExpressionLesser.h"
@@ -20,9 +18,11 @@
 #include "madeup/ExpressionMove.h"
 #include "madeup/ExpressionMoveTo.h"
 #include "madeup/ExpressionMultiply.h"
-#include "madeup/ExpressionNotEqual.h"
 #include "madeup/ExpressionNot.h"
+#include "madeup/ExpressionNotEqual.h"
 #include "madeup/ExpressionOr.h"
+#include "madeup/ExpressionReal.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionRemainder.h"
 #include "madeup/ExpressionRepeat.h"
 #include "madeup/ExpressionString.h"
@@ -51,13 +51,13 @@ Expression::~Expression() {
 
 /* ------------------------------------------------------------------------- */
 
-const std::string& Expression::getSource() const {
+const std::string &Expression::getSource() const {
   return source;
 }
 
 /* ------------------------------------------------------------------------- */
 
-void Expression::setSource(const std::string& source,
+void Expression::setSource(const std::string &source,
                            const SourceLocation &location) {
   this->source = source;
   this->location = location;
@@ -71,14 +71,14 @@ const SourceLocation &Expression::getSourceLocation() const {
 
 /* ------------------------------------------------------------------------- */
 
-ostream& operator<<(ostream& out, const Co<Expression> e) {
+ostream &operator<<(ostream &out, const Co<Expression> e) {
   e->write(out);
   return out;
 }
 
 /* ------------------------------------------------------------------------- */
 
-ostream& operator<<(ostream& out, const Expression& e) {
+ostream &operator<<(ostream &out, const Expression &e) {
   e.write(out);
   return out;
 }
@@ -87,7 +87,7 @@ ostream& operator<<(ostream& out, const Expression& e) {
 
 using std::stringstream;
 
-Co<Expression> parse(stringstream& ss) {
+Co<Expression> parse(stringstream &ss) {
   // First consume left parenthesis.
   int c = ss.get();
 
@@ -254,7 +254,7 @@ Co<Expression> parse(stringstream& ss) {
   return expr;
 }
 
-Co<Expression> Expression::parse(const std::string& s) {
+Co<Expression> Expression::parse(const std::string &s) {
   stringstream ss(s);
   return madeup::parse(ss);
 }

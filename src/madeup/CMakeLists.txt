@@ -2,10 +2,78 @@ add_library(madeup
   STATIC
   Environment.cpp
   Expression.cpp
+  ExpressionAbsoluteValue.cpp
+  ExpressionAdd.cpp
+  ExpressionAnd.cpp
+  ExpressionArray.cpp
+  ExpressionAxis.cpp
+  ExpressionBlobs.cpp
+  ExpressionBlock.cpp
+  ExpressionBoolean.cpp
+  ExpressionBox.cpp
+  ExpressionCall.cpp
+  ExpressionCallWithNamedParameters.cpp
+  ExpressionCenter.cpp
   ExpressionClosure.cpp
+  ExpressionCosine.cpp
+  ExpressionDebug.cpp
   ExpressionDefine.cpp
-  ExpressionDefineVariable.cpp
   ExpressionDefineArrayElement.cpp
+  ExpressionDefineVariable.cpp
+  ExpressionDivide.cpp
+  ExpressionDot.cpp
+  ExpressionDowel.cpp
+  ExpressionEcho.cpp
+  ExpressionEqual.cpp
+  ExpressionExtrude.cpp
+  ExpressionFor.cpp
+  ExpressionForget.cpp
+  ExpressionGreater.cpp
+  ExpressionGreaterOrEqual.cpp
+  ExpressionIdentity.cpp
+  ExpressionIf.cpp
+  ExpressionInteger.cpp
+  ExpressionInverseCosine.cpp
+  ExpressionInverseSine.cpp
+  ExpressionInverseTangent.cpp
+  ExpressionLesser.cpp
+  ExpressionLesserOrEqual.cpp
+  ExpressionLog.cpp
+  ExpressionMax.cpp
+  ExpressionMin.cpp
+  ExpressionMove.cpp
+  ExpressionMoveTo.cpp
+  ExpressionMultiply.cpp
+  ExpressionNegation.cpp
+  ExpressionNot.cpp
+  ExpressionNotEqual.cpp
+  ExpressionNumber.cpp
+  ExpressionOr.cpp
+  ExpressionPitch.cpp
+  ExpressionPop.cpp
+  ExpressionPower.cpp
+  ExpressionPrint.cpp
+  ExpressionPush.cpp
+  ExpressionRandom.cpp
+  ExpressionReal.cpp
+  ExpressionRealDivide.cpp
+  ExpressionRemainder.cpp
+  ExpressionRepeat.cpp
+  ExpressionRevolve.cpp
+  ExpressionRoll.cpp
+  ExpressionRotate.cpp
+  ExpressionScale.cpp
+  ExpressionSign.cpp
+  ExpressionSine.cpp
+  ExpressionString.cpp
+  ExpressionSubtract.cpp
+  ExpressionSurface.cpp
+  ExpressionTangent.cpp
+  ExpressionTranslate.cpp
+  ExpressionUnit.cpp
+  ExpressionWhere.cpp
+  ExpressionWhile.cpp
+  ExpressionYaw.cpp
   Lexer.cpp
   Token.cpp
   SourceLocation.cpp

@@ -1,17 +1,17 @@
 #include <iostream>
 #include <sstream>
 
-#include "madeup/ExpressionBlobs.h"
 #include "madeup/Environment.h"
 #include "madeup/ExpressionAbsoluteValue.h"
 #include "madeup/ExpressionAxis.h"
+#include "madeup/ExpressionBlobs.h"
 #include "madeup/ExpressionBox.h"
 #include "madeup/ExpressionCenter.h"
 #include "madeup/ExpressionClosure.h"
 #include "madeup/ExpressionCosine.h"
 #include "madeup/ExpressionDebug.h"
-#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionDot.h"
+#include "madeup/ExpressionDowel.h"
 #include "madeup/ExpressionEcho.h"
 #include "madeup/ExpressionExtrude.h"
 #include "madeup/ExpressionForget.h"
@@ -28,6 +28,7 @@
 #include "madeup/ExpressionPrint.h"
 #include "madeup/ExpressionPush.h"
 #include "madeup/ExpressionRandom.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionRevolve.h"
 #include "madeup/ExpressionRoll.h"
 #include "madeup/ExpressionRotate.h"
@@ -37,7 +38,6 @@
 #include "madeup/ExpressionSurface.h"
 #include "madeup/ExpressionTangent.h"
 #include "madeup/ExpressionTranslate.h"
-#include "madeup/ExpressionDowel.h"
 #include "madeup/ExpressionWhere.h"
 #include "madeup/ExpressionYaw.h"
 #include "twodee/Log.h"
@@ -66,7 +66,7 @@ Environment::Environment() :
 
 /* ------------------------------------------------------------------------- */
 
-Environment::Environment(const Environment& other) :
+Environment::Environment(const Environment &other) :
   id_to_expression() {
   for (map<string, Co<ExpressionClosure> >::const_iterator i = other.id_to_expression.begin();
        i != other.id_to_expression.end();
@@ -319,7 +319,7 @@ void Environment::prime() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::add(const string& id, Co<ExpressionClosure> closure) {
+void Environment::add(const string &id, Co<ExpressionClosure> closure) {
   // If a binding already exists for this closure, let's replace the innards of
   // the old one.  Other environments may have an alias to this closure, so we
   // don't want to insert a brand new closure instance.
@@ -335,7 +335,7 @@ void Environment::add(const string& id, Co<ExpressionClosure> closure) {
 
 /* ------------------------------------------------------------------------- */
 
-Co<ExpressionClosure> Environment::operator[](const string& id) {
+Co<ExpressionClosure> Environment::operator[](const string &id) {
   map<string, Co<ExpressionClosure> >::iterator match = id_to_expression.find(id);
   if (match != id_to_expression.end()) {
     return match->second;
@@ -366,6 +366,7 @@ void Environment::recordVertex() {
   if (energy_value) {
     energy = energy_value->toReal();
   } else {
+    energy = 0.0f;
   }
 
   v = (*this)["halflife"]->evaluate(*this);
@@ -374,6 +375,7 @@ void Environment::recordVertex() {
   if (halflife_value) {
     halflife = halflife_value->toReal();
   } else {
+    halflife = 0.0f;
   }
 
   Node cursor = {xforms.top() * turtle.position, radius, energy, halflife};
@@ -387,7 +389,7 @@ void Environment::recordPreview() {
     paths.push_back(vector<Turtle>());
   }
   paths[paths.size() - 1].push_back(turtle);
-  vector<Turtle>& last_path = paths[paths.size() - 1];
+  vector<Turtle> &last_path = paths[paths.size() - 1];
   last_path[last_path.size() - 1].position = xforms.top() * last_path[last_path.size() - 1].position;
 }
 
@@ -453,7 +455,7 @@ void Environment::center() {
   QVector3<float> min = run[0].position;
   QVector3<float> max = run[0].position;
   for (unsigned int i = 1; i < run.size(); ++i) {
-    const QVector3<float>& position = run[i].position;
+    const QVector3<float> &position = run[i].position;
 
     for (int d = 0; d < 3; ++d) {
       if (position[d] < min[d]) {
@@ -686,7 +688,7 @@ void Environment::revolve() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::extrude(const QVector3<float>& axis, float length) {
+void Environment::extrude(const QVector3<float> &axis, float length) {
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() > 0) {
       Polyline<float> *line = new Polyline<float>(run.size(), 3, Polyline<float>::CLOSED);
@@ -886,7 +888,7 @@ void Environment::axis(float x, float y, float z) {
 
 /* ------------------------------------------------------------------------- */
 
-std::ostream& operator<<(std::ostream& out, const Environment env) {
+std::ostream &operator<<(std::ostream &out, const Environment env) {
   for (map<string, Co<ExpressionClosure> >::const_iterator i = env.id_to_expression.begin();
        i != env.id_to_expression.end();
        ++i) {
@@ -900,7 +902,7 @@ std::ostream& operator<<(std::ostream& out, const Environment env) {
 
 /* ------------------------------------------------------------------------- */
 
-bool Environment::isBound(const string& id) const {
+bool Environment::isBound(const string &id) const {
   return id_to_expression.find(id) != id_to_expression.end();
 }
 
@@ -921,14 +923,14 @@ std::string Environment::getPathsJSON() const {
     out << "  {" << std::endl;
     out << "    \"vertices\": [";
     for (unsigned int vi = 0; vi < paths[pi].size(); ++vi) {
-      const QVector3<float>& position = paths[pi][vi].position;
+      const QVector3<float> &position = paths[pi][vi].position;
       out << "[" << position[0] << "," << position[1] << "," << position[2] << "]" << (vi == paths[pi].size() - 1 ? "" : ",");
     }
     out << "], " << std::endl;
     out << "    \"orientation\": [";
     if (paths[pi].size()) {
-      const Camera& camera = paths[pi][paths[pi].size() - 1].camera;
-      const QMatrix4<float>& matrix = camera.GetViewMatrix();
+      const Camera &camera = paths[pi][paths[pi].size() - 1].camera;
+      const QMatrix4<float> &matrix = camera.GetViewMatrix();
       out << matrix(0, 0) << "," << matrix(0, 1) << "," << matrix(0, 2) << "," << matrix(0, 3) << ","
           << matrix(1, 0) << "," << matrix(1, 1) << "," << matrix(1, 2) << "," << matrix(1, 3) << ","
           << matrix(2, 0) << "," << matrix(2, 1) << "," << matrix(2, 2) << "," << matrix(2, 3) << ","
@@ -944,7 +946,7 @@ std::string Environment::getPathsJSON() const {
 
 /* ------------------------------------------------------------------------- */
 
-float Environment::getVariableAsFloat(const std::string& id) {
+float Environment::getVariableAsFloat(const std::string &id) {
   Co<ExpressionClosure> closure = (*this)[id];
   Co<Expression> v = closure->evaluate(*this);
 
@@ -971,7 +973,7 @@ bool Environment::hasMoved() const {
 
 /* ------------------------------------------------------------------------- */
 
-const Turtle& Environment::getTurtle() const {
+const Turtle &Environment::getTurtle() const {
   return turtle;
 }
 

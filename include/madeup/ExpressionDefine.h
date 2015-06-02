@@ -2,12 +2,12 @@
 #define ELEMENTDEFINE_H
 
 #include "madeup/Expression.h"
-/* #include "madeup/ExpressionClosure.h" */
-#include "madeup/ExpressionUnit.h"
 
 namespace madeup {
 
 class ExpressionClosure;
+
+/* ------------------------------------------------------------------------- */
 
 class FormalParameter {
   public:
@@ -17,18 +17,10 @@ class FormalParameter {
     };
 
     FormalParameter(const std::string &name,
-                    evaluation_mode_t evaluation_mode) :
-      name(name),
-      evaluation_mode(evaluation_mode) {
-    }
+                    evaluation_mode_t evaluation_mode);
 
-    evaluation_mode_t getEvaluationMode() const {
-      return evaluation_mode;
-    }
-
-    const std::string &getName() const {
-      return name;
-    }
+    evaluation_mode_t getEvaluationMode() const;
+    const std::string &getName() const;
 
   private:
     std::string name;
@@ -43,17 +35,17 @@ std::ostream &operator<<(std::ostream &out, const FormalParameter &parameter);
 
 class ExpressionDefine : public Expression {
   public:
-    ExpressionDefine(const std::string& name, Co<Expression> body);
-    ExpressionDefine(const std::string& name, Co<Expression> body, const std::vector<FormalParameter>& formals);
-    void addFormal(const std::string& name, FormalParameter::evaluation_mode_t evaluation_mode = FormalParameter::EAGER);
-    const FormalParameter& getFormal(int i);
+    ExpressionDefine(const std::string &name, Co<Expression> body);
+    ExpressionDefine(const std::string &name, Co<Expression> body, const std::vector<FormalParameter> &formals);
+    void addFormal(const std::string &name, FormalParameter::evaluation_mode_t evaluation_mode = FormalParameter::EAGER);
+    const FormalParameter &getFormal(int i);
     unsigned int getArity() const;
-    Co<Expression> evaluate(Environment& env) const;
+    Co<Expression> evaluate(Environment &env) const;
     Co<Expression> getBody() const;
-    void write(ostream& out) const;
+    void write(ostream &out) const;
     void isDynamicallyScoped(bool enable);
     bool isDynamicallyScoped() const;
-    const std::string& getName() const { return name; }
+    const std::string &getName() const { return name; }
 
   private:
     std::string name;

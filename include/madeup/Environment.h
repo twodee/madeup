@@ -6,16 +6,15 @@
 #include <vector>
 #include <stack>
 
-#include "twodee/Co.h"
+#include "madeup/GeometryMode.h"
 #include "twodee/Camera.h"
+#include "twodee/Co.h"
 #include "twodee/Polyline.h"
 #include "twodee/QMath.h"
 #include "twodee/QMatrix4.h"
 #include "twodee/QVector3.h"
 #include "twodee/QVector4.h"
 #include "twodee/Trimesh.h"
-
-#include "madeup/GeometryMode.h"
 
 using std::map;
 using std::pair;
@@ -43,15 +42,15 @@ class ExpressionClosure;
 /* ------------------------------------------------------------------------- */
 
 class Environment {
-  friend std::ostream& operator<<(std::ostream& out, const Environment env);
+  friend std::ostream &operator<<(std::ostream &out, const Environment env);
   public:
     Environment();
-    Environment(const Environment& other);
+    Environment(const Environment &other);
 
-    void add(const string& id, Co<ExpressionClosure> expression);
-    bool isBound(const string& id) const;
+    void add(const string &id, Co<ExpressionClosure> expression);
+    bool isBound(const string &id) const;
 
-    Co<ExpressionClosure> operator[](const string& id);
+    Co<ExpressionClosure> operator[](const string &id);
 
     void prime();
     void recordVertex();
@@ -69,7 +68,7 @@ class Environment {
     void roll(float degrees);
     void dowel();
     void revolve();
-    void extrude(const QVector3<float>& axis, float length);
+    void extrude(const QVector3<float> &axis, float length);
     void dot();
     void box();
     void blobs(float grain, float iso);
@@ -84,8 +83,8 @@ class Environment {
     std::string getPathsJSON() const;
     void setGeometryMode(GeometryMode::geometry_mode_t mode);
 
-    float getVariableAsFloat(const std::string& id);
-    const Turtle& getTurtle() const;
+    float getVariableAsFloat(const std::string &id);
+    const Turtle &getTurtle() const;
 
   private:
     bool hasMoved() const;
@@ -103,7 +102,7 @@ class Environment {
 
 /* ------------------------------------------------------------------------- */
 
-std::ostream& operator<<(std::ostream& out, const Environment env);
+std::ostream &operator<<(std::ostream &out, const Environment env);
 
 /* ------------------------------------------------------------------------- */
 

@@ -42,7 +42,6 @@
 #include "madeup/Parser.h"
 #include "madeup/SourceLocation.h"
 #include "madeup/Token.h"
-#include "madeup/Parser.h"
 #include "twodee/MessagedException.h"
 
 using namespace td;

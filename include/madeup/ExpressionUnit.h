@@ -1,22 +1,18 @@
 #ifndef EXPRESSIONUNIT_H
 #define EXPRESSIONUNIT_H
 
+#include "madeup/Expression.h"
+
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */
 
 class ExpressionUnit : public Expression {
   public:
-    ExpressionUnit() {
-    }
+    ExpressionUnit();
 
-    Co<Expression> evaluate(Environment& env) const {
-      return Co<Expression>();
-    }
-
-    void write(ostream& out) const {
-      out << "(unit)";
-    }
+    Co<Expression> evaluate(Environment &env) const;
+    void write(ostream &out) const;
 
   private:
 };

@@ -9,9 +9,7 @@ namespace madeup {
 
 class ExpressionNumber : public Expression {
   public:
-    ExpressionNumber() :
-      Expression() {
-    }
+    ExpressionNumber();
 
     virtual float toReal() const = 0;
     virtual int toInteger() const = 0;

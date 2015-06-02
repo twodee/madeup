@@ -1,6 +1,6 @@
 #include "madeup/ExpressionClosure.h"
-#include "madeup/ExpressionDefineVariable.h"
 #include "madeup/ExpressionDefine.h"
+#include "madeup/ExpressionDefineVariable.h"
 #include "madeup/ExpressionNumber.h"
 
 using std::string;
@@ -10,7 +10,7 @@ namespace madeup {
 
 /* ------------------------------------------------------------------------- */
 
-ExpressionDefineVariable::ExpressionDefineVariable(const string& name, Co<Expression> rhs) :
+ExpressionDefineVariable::ExpressionDefineVariable(const string &name, Co<Expression> rhs) :
   Expression(),
   name(name),
   rhs(rhs) {
@@ -18,7 +18,7 @@ ExpressionDefineVariable::ExpressionDefineVariable(const string& name, Co<Expres
 
 /* ------------------------------------------------------------------------- */
 
-Co<Expression> ExpressionDefineVariable::evaluate(Environment& env) const {
+Co<Expression> ExpressionDefineVariable::evaluate(Environment &env) const {
   Co<Expression> rhs_value = rhs->evaluate(env);
   rhs_value->setSource(rhs->getSource(), rhs->getSourceLocation());
   Co<ExpressionDefine> define = Co<ExpressionDefine>(new ExpressionDefine(name, rhs_value));
@@ -36,7 +36,7 @@ Co<Expression> ExpressionDefineVariable::getRightHandSide() const {
 
 /* ------------------------------------------------------------------------- */
 
-void ExpressionDefineVariable::write(ostream& out) const {
+void ExpressionDefineVariable::write(ostream &out) const {
   out << "(define-variable " << name << " ";
   rhs->write(out);
   out << ")";
@@ -44,13 +44,13 @@ void ExpressionDefineVariable::write(ostream& out) const {
 
 /* ------------------------------------------------------------------------- */
 
-ExpressionDefineVariableSeed::ExpressionDefineVariableSeed(const std::string& name, Co<Expression> rhs) :
+ExpressionDefineVariableSeed::ExpressionDefineVariableSeed(const std::string &name, Co<Expression> rhs) :
   ExpressionDefineVariable(name, rhs) {
 }
 
 /* ------------------------------------------------------------------------- */
 
-Co<Expression> ExpressionDefineVariableSeed::evaluate(Environment& env) const {
+Co<Expression> ExpressionDefineVariableSeed::evaluate(Environment &env) const {
   Co<Expression> expr = ExpressionDefineVariable::evaluate(env);
   ExpressionNumber *number = dynamic_cast<ExpressionNumber *>(expr.GetPointer());
 

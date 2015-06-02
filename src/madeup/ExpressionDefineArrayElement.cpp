@@ -14,7 +14,7 @@ ExpressionDefineArrayElement::ExpressionDefineArrayElement(Co<Expression> array,
 
 /* ------------------------------------------------------------------------- */
 
-Co<Expression> ExpressionDefineArrayElement::evaluate(Environment& env) const {
+Co<Expression> ExpressionDefineArrayElement::evaluate(Environment &env) const {
   Co<Expression> rhs_value = rhs->evaluate(env);
   rhs_value->setSource(rhs->getSource(), rhs->getSourceLocation());
 
@@ -34,7 +34,7 @@ Co<Expression> ExpressionDefineArrayElement::getRightHandSide() const {
 
 /* ------------------------------------------------------------------------- */
 
-void ExpressionDefineArrayElement::write(ostream& out) const {
+void ExpressionDefineArrayElement::write(ostream &out) const {
   out << "(define-array-element ";
   subscript->write(out);
   out << " ";

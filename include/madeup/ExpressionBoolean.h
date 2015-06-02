@@ -1,7 +1,7 @@
 #ifndef EXPRESSIONBOOLEAN_H
 #define EXPRESSIONBOOLEAN_H
 
-#include "madeup/ExpressionBoolean.h"
+#include "madeup/Expression.h"
 
 namespace madeup {
 
@@ -9,22 +9,11 @@ namespace madeup {
 
 class ExpressionBoolean : public Expression {
   public:
-    ExpressionBoolean(bool value) :
-      Expression(),
-      value(value) {
-    }
+    ExpressionBoolean(bool value);
 
-    Co<Expression> evaluate(Environment& env) const {
-      return Co<Expression>(new ExpressionBoolean(value));
-    }
-
-    bool toBoolean() const {
-      return value;
-    }
-
-    void write(ostream& out) const {
-      out << "(BOOLEAN " << (value ? "true" : "false") << ")";
-    }
+    Co<Expression> evaluate(Environment &env) const;
+    bool toBoolean() const;
+    void write(ostream &out) const;
 
   private:
     bool value;

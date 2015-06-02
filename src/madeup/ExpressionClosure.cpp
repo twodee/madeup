@@ -14,7 +14,7 @@ ExpressionClosure::ExpressionClosure(Co<ExpressionDefine> define, Co<Environment
 
 /* ------------------------------------------------------------------------- */
 
-ExpressionClosure::ExpressionClosure(Co<ExpressionDefine> define, const Environment& env) :
+ExpressionClosure::ExpressionClosure(Co<ExpressionDefine> define, const Environment &env) :
   Expression(),
   define(define),
   env(new Environment(env)) {
@@ -22,13 +22,13 @@ ExpressionClosure::ExpressionClosure(Co<ExpressionDefine> define, const Environm
 
 /* ------------------------------------------------------------------------- */
 
-void ExpressionClosure::setEnvironment(const Environment& env) {
+void ExpressionClosure::setEnvironment(const Environment &env) {
   this->env = Co<Environment>(new Environment(env));
 }
 
 /* ------------------------------------------------------------------------- */
 
-Co<Expression> ExpressionClosure::evaluate(Environment& env) const {
+Co<Expression> ExpressionClosure::evaluate(Environment &env) const {
   // Assumes that the environment being passed is a modification of its own,
   // including the state at the time it was created and any temporaries for
   // parameters.
@@ -64,7 +64,7 @@ void ExpressionClosure::setDefine(Co<ExpressionDefine> define) {
 
 /* ------------------------------------------------------------------------- */
 
-void ExpressionClosure::write(ostream& out) const {
+void ExpressionClosure::write(ostream &out) const {
   out << "(closure ";
   define->getBody()->write(out);
   out << ")";

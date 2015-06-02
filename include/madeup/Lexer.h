@@ -1,9 +1,8 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-#include <vector>
-#include <iostream>
 #include <string>
+#include <vector>
 
 #include "madeup/Token.h"
 

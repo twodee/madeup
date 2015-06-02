@@ -1,10 +1,31 @@
 #include "madeup/ExpressionClosure.h"
 #include "madeup/ExpressionDefine.h"
+#include "madeup/ExpressionUnit.h"
 
 using std::string;
 using std::vector;
 
 namespace madeup {
+
+/* ------------------------------------------------------------------------- */
+
+FormalParameter::FormalParameter(const std::string &name,
+                evaluation_mode_t evaluation_mode) :
+  name(name),
+  evaluation_mode(evaluation_mode) {
+}
+
+/* ------------------------------------------------------------------------- */
+
+FormalParameter::evaluation_mode_t FormalParameter::getEvaluationMode() const {
+  return evaluation_mode;
+}
+
+/* ------------------------------------------------------------------------- */
+
+const std::string &FormalParameter::getName() const {
+  return name;
+}
 
 /* ------------------------------------------------------------------------- */
 
@@ -15,7 +36,7 @@ std::ostream &operator<<(std::ostream &out, const FormalParameter &parameter) {
 
 /* ------------------------------------------------------------------------- */
 
-ExpressionDefine::ExpressionDefine(const string& name, Co<Expression> body) :
+ExpressionDefine::ExpressionDefine(const string &name, Co<Expression> body) :
   Expression(),
   name(name),
   body(body),
@@ -25,7 +46,7 @@ ExpressionDefine::ExpressionDefine(const string& name, Co<Expression> body) :
 
 /* ------------------------------------------------------------------------- */
 
-ExpressionDefine::ExpressionDefine(const string& name, Co<Expression> body, const vector<FormalParameter>& formals) :
+ExpressionDefine::ExpressionDefine(const string &name, Co<Expression> body, const vector<FormalParameter> &formals) :
   Expression(),
   name(name),
   body(body),
@@ -34,13 +55,13 @@ ExpressionDefine::ExpressionDefine(const string& name, Co<Expression> body, cons
 
 /* ------------------------------------------------------------------------- */
 
-void ExpressionDefine::addFormal(const string& name, FormalParameter::evaluation_mode_t evaluation_mode) {
+void ExpressionDefine::addFormal(const string &name, FormalParameter::evaluation_mode_t evaluation_mode) {
   formals.push_back(FormalParameter(name, evaluation_mode));
 }
 
 /* ------------------------------------------------------------------------- */
 
-const FormalParameter& ExpressionDefine::getFormal(int i) {
+const FormalParameter &ExpressionDefine::getFormal(int i) {
   return formals[i];
 }
 
@@ -52,7 +73,7 @@ unsigned int ExpressionDefine::getArity() const {
 
 /* ------------------------------------------------------------------------- */
 
-Co<Expression> ExpressionDefine::evaluate(Environment& env) const {
+Co<Expression> ExpressionDefine::evaluate(Environment &env) const {
   Co<ExpressionDefine> define = Co<ExpressionDefine>(new ExpressionDefine(name, body, formals));
   Co<ExpressionClosure> closure(new ExpressionClosure(define, env));
   if (!env.isBound(name)) {
@@ -72,7 +93,7 @@ Co<Expression> ExpressionDefine::getBody() const {
 
 /* ------------------------------------------------------------------------- */
 
-void ExpressionDefine::write(ostream& out) const {
+void ExpressionDefine::write(ostream &out) const {
   out << "(define " << name << " ";
   for (vector<FormalParameter>::const_iterator i = formals.begin(); i != formals.end(); ++i) {
     out << *i << " ";
