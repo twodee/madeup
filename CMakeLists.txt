@@ -27,3 +27,8 @@ add_custom_target(www
   COMMAND make WWW_ROOT=${WWW_ROOT} MADEUP=$<TARGET_FILE:madeup> TWODEE=$<TARGET_FILE:twodee> MERP=$<TARGET_FILE:merp>
   DEPENDS madeup twodee merp
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/www)
+
+add_custom_target(wwwdeps
+  COMMAND make WWW_ROOT=${WWW_ROOT} MADEUP=$<TARGET_FILE:madeup> TWODEE=$<TARGET_FILE:twodee> MERP=$<TARGET_FILE:merp> libdeps
+  DEPENDS madeup twodee merp
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/www)

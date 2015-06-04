@@ -1,17 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Madeup</title>
-<link rel="stylesheet" href="jquery-ui/jquery-ui.css">
-<script src="jquery.js"></script>
-<script src="jquery-ui/jquery-ui.js"></script>
-<script src="jquery-cookie/src/jquery.cookie.js"></script>
-<link rel="stylesheet" media="screen" type="text/css" href="colorpicker/css/colorpicker.css" />
-<script type="text/javascript" src="colorpicker/js/colorpicker.js"></script>
-<script src="three-js/build/three.js"></script>
-<script src="three-js/examples/js/controls/OrbitControls.js"></script>
-<script src="keystrokes.js"></script>
-<style type="text/css" media="screen">
+  <title>Madeup</title>
+
+  <!-- JQuery dependencies -->
+  <link rel="stylesheet" href="jquery-ui/jquery-ui.css">
+  <script src="jquery.js"></script>
+  <script src="jquery-ui/jquery-ui.js"></script>
+  <script src="jquery-cookie/src/jquery.cookie.js"></script>
+  <link rel="stylesheet" media="screen" type="text/css" href="colorpicker/css/colorpicker.css" />
+  <script type="text/javascript" src="colorpicker/js/colorpicker.js"></script>
+
+  <!-- ThreeJS dependencies -->
+  <script src="three-js/build/three.js"></script>
+  <script src="three-js/examples/js/controls/OrbitControls.js"></script>
+
+  <!-- Blockly dependencies -->
+  <script src="blockly/blockly_compressed.js"></script>
+  <script src="blockly/blocks_compressed.js"></script>
+  <script src="blockly_blocks_madeup.js"></script>
+  <script src="blockly_generator_madeup.js"></script>
+
+  <!-- script src="keystrokes.js"></script -->
+
+  <style type="text/css" media="screen">
 html {
   height: 100%;
   width: 100%;
@@ -63,9 +75,21 @@ body {
   overflow: hidden;
 }
 
-#editor { 
+#text_editor { 
   margin: 0px;
   height: 300px;
+  display: none;
+}
+
+#blocks_panel {
+  background-color: green;
+  margin: 0px;
+}
+
+#blocks_editor { 
+  position: absolute;
+  /* margin: 0px; */
+  background-color: red;
 }
 
 #console {
@@ -82,7 +106,7 @@ body {
   overflow: auto;
 }
 
-/* Fattens the handle for resizing the console. Needed because the editor seems 
+/* Fattens the handle for resizing the console. Needed because the text_editor seems 
    to snarf up its size of the boundary. */
 #console > .ui-resizable-n {
   top: 0;
@@ -161,9 +185,9 @@ body {
   width: 420px;
 }
 
-</style>
+    </style>
 
-<script type="text/javascript">
+    <script type="text/javascript">
 var GeometryMode = Object.freeze({
   PATH: 'PATH',
   SURFACE: 'SURFACE'
@@ -213,7 +237,7 @@ $(document).ready(function() {
 
   $(window).load(function() {
     if ($.cookie('last')) {
-      editor.setValue($.cookie('last'), -1);
+      text_editor.setValue($.cookie('last'), -1);
     }
 
     if ($.cookie('fontSize')) {
@@ -221,7 +245,7 @@ $(document).ready(function() {
     } else {
       fontSize = 14;
     }
-    editor.setFontSize(fontSize);
+    text_editor.setFontSize(fontSize);
     $('#console')[0].style.fontSize = fontSize + 'px';
 
     if ($.cookie('showHeadings')) {
@@ -243,7 +267,7 @@ $(document).ready(function() {
   });
 
   $(window).unload(function() {
-    $.cookie('last', editor.getValue());
+    $.cookie('last', getSource());
     $.cookie('fontSize', fontSize);
     $.cookie('showHeadings', showHeadings ? 1 : 0);
     $.cookie('modelColor', modelColor);
@@ -252,7 +276,7 @@ $(document).ready(function() {
 
   $('#clear').click(function() {
     log('');
-    editor.focus();
+    text_editor.focus();
   });
 
   $('#smaller').click(function() {
@@ -260,29 +284,45 @@ $(document).ready(function() {
     $('#widgets input').each(function (i) {
       this.style.fontSize = (parseInt($(this).css('font-size')) - 1) + 'px';
     });
-    editor.setFontSize(fontSize);
+    text_editor.setFontSize(fontSize);
     $('#console')[0].style.fontSize = fontSize + 'px';
-    editor.focus();
+    text_editor.focus();
   });
   $('#bigger').click(function() {
     fontSize += 2;
     $('#widgets input').each(function (i) {
       this.style.fontSize = (parseInt($(this).css('font-size')) + 1) + 'px';
     });
-    editor.setFontSize(fontSize);
+    text_editor.setFontSize(fontSize);
     $('#console')[0].style.fontSize = fontSize + 'px';
-    editor.focus();
+    text_editor.focus();
   });
   /* $('#lastfit').click(function() { */
     /* controls.reset();  */
   /* }); */
   $('#fit').click(function() {
     fit();
-    editor.focus();
+    text_editor.focus();
+  });
+  $('#editor_mode').change(function() {
+    var editor_mode = $(this).val();
+    console.log(editor_mode);
+    if (editor_mode == "Blocks") {
+      console.log("switch to blocks");
+      var workspace = Blockly.inject('blocks_editor', {toolbox: document.getElementById('toolbox')});
+      workspace.addChangeListener(function() {
+        var code = Blockly.Madeup.workspaceToCode(workspace);
+        /* document.getElementById('source_code').value = code; */
+        text_editor.setValue(code);
+        console.log(code);
+      });
+    } else {
+      console.log("switch to text");
+    }
   });
   $('#showHeadings').click(function() {
     showHeadings = this.checked;
-    editor.focus();
+    text_editor.focus();
     render();
   });
   $('#autopreview').click(function() {
@@ -294,7 +334,7 @@ $(document).ready(function() {
     } else {
       console.log('off');
       $('#nSecondsTillPreview').prop('disabled', true);
-      editor.getSession().off('change', onEditorChange);
+      text_editor.getSession().off('change', onEditorChange);
       if (preview) {
         clearTimeout(preview); 
       }
@@ -316,20 +356,21 @@ $(document).ready(function() {
     render();
   });
   $('#download').click(function() {
-    $('#source').val(editor.getValue());
+    $('#source').val(getSource());
     $('#downloader').submit();
-    editor.focus();
+    text_editor.focus();
   });
   $('#run').click(function() {
-    $.cookie('last', editor.getValue());
+    $.cookie('last', getSource());
     run(GeometryMode.SURFACE);
-    editor.focus();
+    text_editor.focus();
   });
 
   $('#left').resizable({
     handles: "e",
     resize: function(event, ui) {
       resize();
+      Blockly.fireUiEvent(window, 'resize');
       render();
     } 
   });
@@ -338,6 +379,7 @@ $(document).ready(function() {
     handles: "n",
     resize: function(event, ui) {
       resize();
+      Blockly.fireUiEvent(window, 'resize');
       // Need this because console is relatively positioned.
       $('#console').css('top', '0px');
     } 
@@ -346,7 +388,7 @@ $(document).ready(function() {
   $('#nSecondsTillPreview').val(nSecondsTillPreview + '');
   $('#nSecondsTillPreview').change(function () {
     nSecondsTillPreview = parseFloat($('#nSecondsTillPreview').val());
-    editor.getSession().off('change', onEditorChange);
+    text_editor.getSession().off('change', onEditorChange);
     if (preview) {
       clearTimeout(preview); 
     }
@@ -383,7 +425,11 @@ var onEditorChange = function(delta) {
 
 var preview = undefined;
 function schedulePreview() {
-  editor.getSession().on('change', onEditorChange);
+  text_editor.getSession().on('change', onEditorChange);
+}
+
+function getSource() {
+  return text_editor.getValue();
 }
 
 var allGeometry = undefined;
@@ -391,7 +437,7 @@ function run(mode) {
   $.ajax({
     type: 'POST',
     url: 'interpret.php',
-    data: JSON.stringify({source: editor.getValue(), extension: 'json', mode: mode}),
+    data: JSON.stringify({source: getSource(), extension: 'json', mode: mode}),
     contentType: 'application/json; charset=utf-8',
     dataType: 'json',
     success: function(data) {
@@ -575,12 +621,34 @@ function resize() {
   renderer.setSize(width, height);
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
-  $("#editor").height($(document).height() - ($('#scrubber').is(':visible') ? $('#scrubber').height() : 0) - $('#widgets').height() - ($('#console').is(':visible') ? $('#console').height() : 0));
-  editor.resize();
+  $("#text_editor").height($(document).height() - ($('#scrubber').is(':visible') ? $('#scrubber').height() : 0) - $('#widgets').height() - ($('#console').is(':visible') ? $('#console').height() : 0));
+  $("#blocks_panel").height($(document).height() - ($('#scrubber').is(':visible') ? $('#scrubber').height() : 0) - $('#widgets').height() - ($('#console').is(':visible') ? $('#console').height() : 0));
+
+  var blocklyArea = document.getElementById('blocks_panel');
+  var blocklyDiv = document.getElementById('blocks_editor');
+  var element = blocklyArea;
+  var x = 0;
+  var y = 0;
+  do {
+    x += element.offsetLeft;
+    y += element.offsetTop;
+    element = element.offsetParent;
+  } while (element);
+  // Position blocklyDiv over blocklyArea.
+  blocklyDiv.style.left = x + 'px';
+  blocklyDiv.style.top = y + 'px';
+  /* blocklyDiv.style.width = blocklyArea.offsetWidth + 'px'; */
+  blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
+  $("#blocks_editor").width(blocklyArea.offsetWidth);
+
+  console.log(blocklyArea.offsetWidth);
+
+  /* console.log($('#left').width()); */
+  text_editor.resize();
 }
 
 function highlight(startIndex, stopIndex) {
-  var doc = editor.getSession().getDocument();
+  var doc = text_editor.getSession().getDocument();
   var lines = doc.getAllLines();
   console.log(lines);
 
@@ -606,7 +674,7 @@ function highlight(startIndex, stopIndex) {
   var start = indexToRowColumn(startIndex);
   var stop = indexToRowColumn(stopIndex);
 
-  editor.getSelection().setSelectionRange(new Range(start.row, start.column, stop.row, stop.column + 1));
+  text_editor.getSelection().setSelectionRange(new Range(start.row, start.column, stop.row, stop.column + 1));
 }
 
 function init() {
@@ -704,58 +772,120 @@ function render() {
 
   renderer.render(scene, camera);
 }
-</script>
-
+  </script>
 </head>
+
 <body>
+  <!-- The Blockly toolbox __________________________________________________ -->
+  <xml id="toolbox" style="display: none">
+    <category name="Loops">
+      <block type="madeup_loop_repeat"></block>
+      <block type="madeup_loop_while"></block>
+      <block type="madeup_loop_for_to"></block>
+      <block type="madeup_loop_for_through"></block>
+      <block type="madeup_loop_for_in"></block>
+    </category>
+    <category name="Logic">
+      <block type="madeup_logic_boolean"></block>
+      <block type="madeup_logic_junction"></block>
+      <block type="madeup_logic_not"></block>
+      <block type="madeup_logic_if_expr"></block>
+      <block type="madeup_logic_if_statement"></block>
+      <block type="madeup_logic_if_else_statement"></block>
+    </category>
+    <category name="I/O">
+      <block type="madeup_io_print"></block>
+      <block type="madeup_io_debug"></block>
+      <block type="madeup_io_where"></block>
+    </category>
+    <category name="Movement">
+      <block type="madeup_movement_moveto"></block>
+      <block type="madeup_movement_move"></block>
+      <block type="madeup_movement_turn"></block>
+      <block type="madeup_movement_center"></block>
+      <block type="madeup_movement_rotate"></block>
+      <block type="madeup_movement_scale"></block>
+      <block type="madeup_movement_translate"></block>
+      <block type="madeup_movement_identity"></block>
+    </category>
+    <category name="Generate">
+      <block type="madeup_generate_ball"></block>
+      <block type="madeup_generate_box"></block>
+      <block type="madeup_generate_dowel"></block>
+      <block type="madeup_generate_extrude"></block>
+      <block type="madeup_generate_revolve"></block>
+      <block type="madeup_generate_surface"></block>
+    </category>
+    <category name="Math">
+      <block type="madeup_math_integer"></block>
+      <block type="madeup_math_real"></block>
+      <block type="madeup_math_binary_arithmetic_operator"></block>
+      <block type="madeup_math_relational_operator"></block>
+      <block type="madeup_math_unary_operator"></block>
+      <block type="madeup_math_sincostan"></block>
+      <block type="madeup_math_inverse_sincostan"></block>
+      <block type="madeup_math_minmax"></block>
+      <block type="madeup_math_abs"></block>
+      <block type="madeup_math_sign"></block>
+      <block type="madeup_math_log"></block>
+    </category>
+    <category name="Variables" custom="VARIABLE"></category>
+    <category name="Functions" custom="PROCEDURE"></category>
+  </xml>
 
-<div id="entire">
-  <div id="left">
-    <div id="widgets">
-      <input id="run" type="button" value="Run" />
-      <input id="smaller" type="button" value="-" />
-      <input id="bigger" type="button" value="+" />
-      <input id="tools_menu" type="button" value="Tools" />
-      <input id="fit" type="button" value="Fit" />
-      <br />
+  <div id="entire">
+    <div id="left">
+      <div id="widgets">
+        <input id="run" type="button" value="Run" />
+        <input id="smaller" type="button" value="-" />
+        <input id="bigger" type="button" value="+" />
+        <input id="tools_menu" type="button" value="Tools" />
+        <input id="fit" type="button" value="Fit" />
+        <select id="editor_mode">
+          <option>Text</option>
+          <option>Blocks</option>
+        </select>
+        <br />
+      </div>
+      <div id="editor_pane">
+        <div id="text_editor"></div>
+        <div id="blocks_panel"></div>
+        <div id="blocks_editor"></div>
+      </div>
+      <div id="console"><div id="message"></div></div>
+   
+      <script src="ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+      <script>
+var text_editor = ace.edit("text_editor");
+var Range = ace.require('ace/range').Range;
+text_editor.setTheme("ace/theme/twilight");
+text_editor.getSession().setMode("ace/mode/madeup");
+text_editor.setHighlightSelectedWord(false);
+text_editor.setHighlightActiveLine(false);
+      </script>
     </div>
-    <div id="editor"></div>
-    <div id="console"><div id="message"></div></div>
- 
-    <script src="ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-    <script>
-    var editor = ace.edit("editor");
-    var Range = ace.require('ace/range').Range;
-    editor.setTheme("ace/theme/twilight");
-    editor.getSession().setMode("ace/mode/madeup");
-    editor.setHighlightSelectedWord(false);
-    editor.setHighlightActiveLine(false);
-    </script>
-  </div>
-  <div>
-    <div id="glcanvas" bgcolor="#00FF00"></div>
-    <div id="tools" title="Tools">
-      <span id="tools_close">close</span>
-      <div style="padding: 10px;">
-        <h2>Model</h2>
-        <a id="download" class="settingslink">Download model</a><br/>
-        <input type="checkbox" id="autopreview" checked="checked"/>Preview <input type="text" id="nSecondsTillPreview" size="2"/> seconds after last edit<br/>
-        <input type="checkbox" id="isWireframe" />Wireframe<br/>
-        Model color: <div id="modelColor" style="width: 50px; height: 18px; display: inline-block"></div>
+    <div>
+      <div id="glcanvas" bgcolor="#00FF00"></div>
+      <div id="tools" title="Tools">
+        <span id="tools_close">close</span>
+        <div style="padding: 10px;">
+          <h2>Model</h2>
+          <a id="download" class="settingslink">Download model</a><br/>
+          <input type="checkbox" id="autopreview" checked="checked"/>Preview <input type="text" id="nSecondsTillPreview" size="2"/> seconds after last edit<br/>
+          <input type="checkbox" id="isWireframe" />Wireframe<br/>
+          Model color: <div id="modelColor" style="width: 50px; height: 18px; display: inline-block"></div>
 
-        <h2>View</h2>
-        <input type="checkbox" id="showHeadings">Show Headings</input><br/>
+          <h2>View</h2>
+          <input type="checkbox" id="showHeadings">Show Headings</input><br/>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<form id="downloader" action="interpret.php" method="post" style="display: none">
-<input id="extension" type="text" value="obj" name="extension" />
-<input id="mode" type="text" value="SURFACE" name="mode" />
-<textarea id="source" name="source"></textarea>
-</form>
-
-
+  <form id="downloader" action="interpret.php" method="post" style="display: none">
+    <input id="extension" type="text" value="obj" name="extension" />
+    <input id="mode" type="text" value="SURFACE" name="mode" />
+    <textarea id="source" name="source"></textarea>
+  </form>
 </body>
 </html>

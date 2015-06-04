@@ -1,4 +1,4 @@
-SRC = index.php interpret.php keystrokes.js
+SRC = index.php interpret.php keystrokes.js blockly_generator_madeup.js blockly_blocks_madeup.js
 DST = $(addprefix $(WWW_ROOT)/, $(SRC))
 JQUERY_UI_VERSION = 1.11.2
 
@@ -8,7 +8,7 @@ DST_BINARIES = $(WWW_ROOT)/$(notdir $(MERP))
 .PHONY: madeup
 
 all: $(DST) $(WWW_ROOT)/ace/src-noconflict/mode-madeup.js $(DST_BINARIES)
-libdeps: $(WWW_ROOT)/ace $(WWW_ROOT)/three-js $(WWW_ROOT)/jquery.js $(WWW_ROOT)/jquery-cookie $(WWW_ROOT)/jquery-ui $(WWW_ROOT)/colorpicker
+libdeps: $(WWW_ROOT)/ace $(WWW_ROOT)/three-js $(WWW_ROOT)/jquery.js $(WWW_ROOT)/jquery-cookie $(WWW_ROOT)/jquery-ui $(WWW_ROOT)/colorpicker $(WWW_ROOT)/blockly
 init: libdeps madeup all
 
 run: all
@@ -49,6 +49,10 @@ $(WWW_ROOT)/colorpicker:
 $(WWW_ROOT)/three-js:
 	sudo git clone https://github.com/mrdoob/three.js.git $(WWW_ROOT)/three-js
 	sudo chmod -R a+rX $(WWW_ROOT)/three-js
+
+$(WWW_ROOT)/blockly:
+	sudo git clone https://github.com/google/blockly.git $(WWW_ROOT)/blockly
+	sudo chmod -R a+rX $(WWW_ROOT)/blockly
 
 $(DST): $(WWW_ROOT)/%: %
 	sudo cp $^ $@
