@@ -18,6 +18,7 @@
   <!-- Blockly dependencies -->
   <script src="blockly/blockly_compressed.js"></script>
   <script src="blockly/blocks_compressed.js"></script>
+  <script src="blockly/msg/js/en.js"></script>
   <script src="blockly_blocks_madeup.js"></script>
   <script src="blockly_generator_madeup.js"></script>
 
@@ -78,15 +79,15 @@ body {
 #text_editor { 
   margin: 0px;
   height: 300px;
-  display: none;
 }
 
-#blocks_panel {
+#blocks_editor {
+  display: none;
   background-color: green;
   margin: 0px;
 }
 
-#blocks_editor { 
+#blocks_canvas { 
   position: absolute;
   /* margin: 0px; */
   background-color: red;
@@ -210,6 +211,21 @@ var isWireframe = false;
 var arrow_shafts = [];
 var showHeadings = true;
 var modelColor = 'FF0000';
+var workspace = null;
+var fontSize = 14;
+
+function saveInCookies() {
+  $.cookie('last', getSource());
+  if (workspace) {
+    var xml = Blockly.Xml.workspaceToDom(workspace);
+    var xml_text = Blockly.Xml.domToText(xml);
+    $.cookie('last_blocks', xml_text);
+  }
+  $.cookie('fontSize', fontSize);
+  $.cookie('showHeadings', showHeadings ? 1 : 0);
+  $.cookie('modelColor', modelColor);
+  $.cookie('isWireframe', isWireframe ? 1 : 0);
+}
 
 $(document).ready(function() {
   scrubber = $('#scrubber')[0];
@@ -221,8 +237,6 @@ $(document).ready(function() {
   $('#scrubber').bind('seeking', function() {
     show(scrubber.currentTime);
   });
-
-  var fontSize = 14;
 
   var periodicID;
   $('#scrubber').bind('play', function() {
@@ -267,11 +281,7 @@ $(document).ready(function() {
   });
 
   $(window).unload(function() {
-    $.cookie('last', getSource());
-    $.cookie('fontSize', fontSize);
-    $.cookie('showHeadings', showHeadings ? 1 : 0);
-    $.cookie('modelColor', modelColor);
-    $.cookie('isWireframe', isWireframe ? 1 : 0);
+    saveInCookies();
   });
 
   $('#clear').click(function() {
@@ -306,19 +316,29 @@ $(document).ready(function() {
   });
   $('#editor_mode').change(function() {
     var editor_mode = $(this).val();
-    console.log(editor_mode);
     if (editor_mode == "Blocks") {
-      console.log("switch to blocks");
-      var workspace = Blockly.inject('blocks_editor', {toolbox: document.getElementById('toolbox')});
-      workspace.addChangeListener(function() {
-        var code = Blockly.Madeup.workspaceToCode(workspace);
-        /* document.getElementById('source_code').value = code; */
-        text_editor.setValue(code);
-        console.log(code);
-      });
+      $('#text_editor').hide();
+      $('#blocks_editor').show();
+
+      if (!workspace) {
+        workspace = Blockly.inject('blocks_canvas', {toolbox: document.getElementById('toolbox')});
+        workspace.addChangeListener(function() {
+          var code = Blockly.Madeup.workspaceToCode(workspace);
+          text_editor.setValue(code);
+          console.log(code);
+        });
+        if ($.cookie('last_blocks')) {
+          var xml = Blockly.Xml.textToDom($.cookie('last_blocks'));
+          Blockly.Xml.domToWorkspace(workspace, xml);
+        }
+      } else {
+      }
     } else {
-      console.log("switch to text");
+      $('#blocks_editor').hide();
+      $('#text_editor').show();
     }
+    resize();
+    Blockly.fireUiEvent(window, 'resize');
   });
   $('#showHeadings').click(function() {
     showHeadings = this.checked;
@@ -361,7 +381,7 @@ $(document).ready(function() {
     text_editor.focus();
   });
   $('#run').click(function() {
-    $.cookie('last', getSource());
+    saveInCookies();
     run(GeometryMode.SURFACE);
     text_editor.focus();
   });
@@ -622,10 +642,10 @@ function resize() {
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
   $("#text_editor").height($(document).height() - ($('#scrubber').is(':visible') ? $('#scrubber').height() : 0) - $('#widgets').height() - ($('#console').is(':visible') ? $('#console').height() : 0));
-  $("#blocks_panel").height($(document).height() - ($('#scrubber').is(':visible') ? $('#scrubber').height() : 0) - $('#widgets').height() - ($('#console').is(':visible') ? $('#console').height() : 0));
+  $("#blocks_editor").height($(document).height() - ($('#scrubber').is(':visible') ? $('#scrubber').height() : 0) - $('#widgets').height() - ($('#console').is(':visible') ? $('#console').height() : 0));
 
-  var blocklyArea = document.getElementById('blocks_panel');
-  var blocklyDiv = document.getElementById('blocks_editor');
+  var blocklyArea = document.getElementById('blocks_editor');
+  var blocklyDiv = document.getElementById('blocks_canvas');
   var element = blocklyArea;
   var x = 0;
   var y = 0;
@@ -639,7 +659,7 @@ function resize() {
   blocklyDiv.style.top = y + 'px';
   /* blocklyDiv.style.width = blocklyArea.offsetWidth + 'px'; */
   blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
-  $("#blocks_editor").width(blocklyArea.offsetWidth);
+  $("#blocks_canvas").width(blocklyArea.offsetWidth);
 
   console.log(blocklyArea.offsetWidth);
 
@@ -778,25 +798,17 @@ function render() {
 <body>
   <!-- The Blockly toolbox __________________________________________________ -->
   <xml id="toolbox" style="display: none">
+    <category name="Primitives">
+      <block type="madeup_math_integer"></block>
+      <block type="madeup_math_real"></block>
+      <block type="madeup_logic_boolean"></block>
+    </category>
     <category name="Loops">
       <block type="madeup_loop_repeat"></block>
       <block type="madeup_loop_while"></block>
       <block type="madeup_loop_for_to"></block>
       <block type="madeup_loop_for_through"></block>
       <block type="madeup_loop_for_in"></block>
-    </category>
-    <category name="Logic">
-      <block type="madeup_logic_boolean"></block>
-      <block type="madeup_logic_junction"></block>
-      <block type="madeup_logic_not"></block>
-      <block type="madeup_logic_if_expr"></block>
-      <block type="madeup_logic_if_statement"></block>
-      <block type="madeup_logic_if_else_statement"></block>
-    </category>
-    <category name="I/O">
-      <block type="madeup_io_print"></block>
-      <block type="madeup_io_debug"></block>
-      <block type="madeup_io_where"></block>
     </category>
     <category name="Movement">
       <block type="madeup_movement_moveto"></block>
@@ -816,11 +828,13 @@ function render() {
       <block type="madeup_generate_revolve"></block>
       <block type="madeup_generate_surface"></block>
     </category>
+    <category name="I/O">
+      <block type="madeup_io_print"></block>
+      <block type="madeup_io_debug"></block>
+      <block type="madeup_io_where"></block>
+    </category>
     <category name="Math">
-      <block type="madeup_math_integer"></block>
-      <block type="madeup_math_real"></block>
       <block type="madeup_math_binary_arithmetic_operator"></block>
-      <block type="madeup_math_relational_operator"></block>
       <block type="madeup_math_unary_operator"></block>
       <block type="madeup_math_sincostan"></block>
       <block type="madeup_math_inverse_sincostan"></block>
@@ -831,6 +845,14 @@ function render() {
     </category>
     <category name="Variables" custom="VARIABLE"></category>
     <category name="Functions" custom="PROCEDURE"></category>
+    <category name="Logic">
+      <block type="madeup_logic_junction"></block>
+      <block type="madeup_logic_not"></block>
+      <block type="madeup_logic_if_expr"></block>
+      <block type="madeup_logic_if_statement"></block>
+      <block type="madeup_logic_if_else_statement"></block>
+      <block type="madeup_math_relational_operator"></block>
+    </category>
   </xml>
 
   <div id="entire">
@@ -849,8 +871,9 @@ function render() {
       </div>
       <div id="editor_pane">
         <div id="text_editor"></div>
-        <div id="blocks_panel"></div>
-        <div id="blocks_editor"></div>
+        <div id="blocks_editor">
+          <div id="blocks_canvas"></div>
+        </div>
       </div>
       <div id="console"><div id="message"></div></div>
    

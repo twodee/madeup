@@ -1,0 +1,1 @@
+(block (define-variable x (INTEGER 3)) (define f (block (define-variable x (+ (call-with-names x) (INTEGER 1))) (call debug (call-with-names x)))) (define g (block (define-variable x (* (call-with-names x) (INTEGER 2))) (call debug (call-with-names x)))) (call-with-names f) (call-with-names g) (call-with-names f))

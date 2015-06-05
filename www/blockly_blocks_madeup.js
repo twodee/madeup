@@ -3,16 +3,21 @@
 goog.provide('Blockly.Blocks.madeup');
 goog.require('Blockly.Blocks');
 
-Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE = 180;
-Blockly.Blocks.madeup.LITERALS_HUE = 75;
-Blockly.Blocks.madeup.LOOP_HUE = 240;
+Blockly.Blocks.madeup.STATEMENT_HUE = 210;
+Blockly.Blocks.madeup.INTEGER_HUE = 45;
+Blockly.Blocks.madeup.REAL_HUE = 160;
+Blockly.Blocks.madeup.NUMBER_HUE = 180;
+Blockly.Blocks.madeup.BOOLEAN_HUE = 20;
+Blockly.Blocks.madeup.STRING_HUE = 180;
+Blockly.Blocks.madeup.LOOP_HUE = 330;
+Blockly.Blocks.madeup.UNKNOWN_TYPE_HUE = 330;
 
 // ----------------------------------------------------------------------------
 // https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#23r8y7
 Blockly.Blocks['madeup_math_sign'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE);
+    this.setColour(Blockly.Blocks.madeup.NUMBER_HUE);
     this.appendValueInput("X").appendField("sign");
     this.setInputsInline(true);
     this.setOutput(true);
@@ -23,7 +28,7 @@ Blockly.Blocks['madeup_math_sign'] = {
 Blockly.Blocks['madeup_math_abs'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE);
+    this.setColour(Blockly.Blocks.madeup.NUMBER_HUE);
     this.appendValueInput("X").appendField("abs");
     this.setInputsInline(true);
     this.setOutput(true);
@@ -36,7 +41,7 @@ Blockly.Blocks['madeup_math_abs'] = {
 Blockly.Blocks['madeup_io_print'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE);
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
     this.appendValueInput("MESSAGE").setCheck(["Boolean", "Integer", "String", "Real"]).appendField("print");
     this.setPreviousStatement(true);
     this.setNextStatement(true);
@@ -47,7 +52,7 @@ Blockly.Blocks['madeup_io_print'] = {
 Blockly.Blocks['madeup_io_debug'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE);
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
     this.appendValueInput("MESSAGE")
         .setCheck(["Boolean", "Integer", "String", "Real"])
         .appendField("debug");
@@ -62,7 +67,7 @@ Blockly.Blocks['madeup_io_debug'] = {
 Blockly.Blocks['madeup_math_integer'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.LITERALS_HUE);
+    this.setColour(Blockly.Blocks.madeup.INTEGER_HUE);
     this.appendDummyInput().appendField(new Blockly.FieldTextInput("0"), "INTEGER");
     this.setOutput(true, "Integer");
     this.setTooltip('');
@@ -72,7 +77,7 @@ Blockly.Blocks['madeup_math_integer'] = {
 Blockly.Blocks['madeup_math_real'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.LITERALS_HUE);
+    this.setColour(Blockly.Blocks.madeup.REAL_HUE);
     this.appendDummyInput().appendField(new Blockly.FieldTextInput("0.0"), "REAL");
     this.setOutput(true, "Real");
     this.setTooltip('');
@@ -84,7 +89,7 @@ Blockly.Blocks['madeup_math_real'] = {
 Blockly.Blocks['madeup_logic_boolean'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.madeup.BOOLEAN_HUE);
     this.appendDummyInput().appendField(new Blockly.FieldDropdown([["true", "TRUE"], ["false", "FALSE"]]), "BOOLEAN");
     this.setOutput(true, "Boolean");
     this.setTooltip('');
@@ -96,7 +101,7 @@ Blockly.Blocks['madeup_logic_boolean'] = {
 Blockly.Blocks['madeup_movement_moveto'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE);
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
     this.appendValueInput("X")
         .setCheck(["Integer", "Real"])
         .setAlign(Blockly.ALIGN_RIGHT)
@@ -120,7 +125,7 @@ Blockly.Blocks['madeup_movement_moveto'] = {
 Blockly.Blocks['madeup_movement_move'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE);
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
     this.appendValueInput("DISTANCE")
         .setCheck(["Integer", "Real"])
         .setAlign(Blockly.ALIGN_RIGHT)
@@ -154,7 +159,7 @@ Blockly.Blocks['madeup_loop_repeat'] = {
 Blockly.Blocks['madeup_movement_turn'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE);
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
     this.appendValueInput("DEGREES")
         .setAlign(Blockly.ALIGN_RIGHT)
         .appendField(new Blockly.FieldDropdown([["yaw", "YAW"], ["pitch", "PITCH"], ["roll", "ROLL"]]), "TYPE");
@@ -169,7 +174,7 @@ Blockly.Blocks['madeup_movement_turn'] = {
 Blockly.Blocks['madeup_math_sincostan'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE);
+    this.setColour(Blockly.Blocks.madeup.REAL_HUE);
     this.appendValueInput("DEGREES")
         .appendField(new Blockly.FieldDropdown([["sin", "SIN"], ["cos", "COS"], ["tan", "TAN"]]), "F");
     this.setInputsInline(true);
@@ -181,7 +186,7 @@ Blockly.Blocks['madeup_math_sincostan'] = {
 Blockly.Blocks['madeup_math_inverse_sincostan'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE);
+    this.setColour(Blockly.Blocks.madeup.REAL_HUE);
     this.appendValueInput("RATIO")
         .appendField(new Blockly.FieldDropdown([["asin", "ASIN"], ["acos", "ACOS"], ["atan", "ATAN"]]), "F");
     this.setInputsInline(true);
@@ -195,7 +200,7 @@ Blockly.Blocks['madeup_math_inverse_sincostan'] = {
 Blockly.Blocks['madeup_logic_junction'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE);
+    this.setColour(Blockly.Blocks.madeup.BOOLEAN_HUE);
     this.appendValueInput("A");
     this.appendValueInput("B")
         .appendField(new Blockly.FieldDropdown([["and", "AND"], ["or", "OR"]]), "F");
@@ -210,7 +215,7 @@ Blockly.Blocks['madeup_logic_junction'] = {
 Blockly.Blocks['madeup_logic_not'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE);
+    this.setColour(Blockly.Blocks.madeup.BOOLEAN_HUE);
     this.appendValueInput("A").appendField("not");
     this.setInputsInline(true);
     this.setOutput(true);
@@ -223,7 +228,7 @@ Blockly.Blocks['madeup_logic_not'] = {
 Blockly.Blocks['madeup_movement_center'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE);
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
     this.appendDummyInput().appendField("center");
     this.setPreviousStatement(true);
     this.setNextStatement(true);
@@ -234,7 +239,7 @@ Blockly.Blocks['madeup_movement_center'] = {
 Blockly.Blocks['madeup_movement_identity'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE);
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
     this.appendDummyInput().appendField("identity");
     this.setPreviousStatement(true);
     this.setNextStatement(true);
@@ -245,7 +250,7 @@ Blockly.Blocks['madeup_movement_identity'] = {
 Blockly.Blocks['madeup_io_where'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE);
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
     this.appendDummyInput().appendField("where");
     this.setPreviousStatement(true);
     this.setNextStatement(true);
@@ -256,7 +261,7 @@ Blockly.Blocks['madeup_io_where'] = {
 Blockly.Blocks['madeup_generate_dowel'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE);
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
     this.appendDummyInput().appendField("dowel");
     this.setPreviousStatement(true);
     this.setNextStatement(true);
@@ -267,7 +272,7 @@ Blockly.Blocks['madeup_generate_dowel'] = {
 Blockly.Blocks['madeup_generate_ball'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE);
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
     this.appendDummyInput().appendField("ball");
     this.setPreviousStatement(true);
     this.setNextStatement(true);
@@ -278,7 +283,7 @@ Blockly.Blocks['madeup_generate_ball'] = {
 Blockly.Blocks['madeup_generate_box'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE);
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
     this.appendDummyInput().appendField("box");
     this.setPreviousStatement(true);
     this.setNextStatement(true);
@@ -291,7 +296,7 @@ Blockly.Blocks['madeup_generate_box'] = {
 Blockly.Blocks['madeup_generate_extrude'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE);
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
     this.appendValueInput("X")
         .setCheck(["Integer", "Real"])
         .setAlign(Blockly.ALIGN_RIGHT)
@@ -317,7 +322,7 @@ Blockly.Blocks['madeup_generate_extrude'] = {
 Blockly.Blocks['madeup_generate_revolve'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BUILTIN_FUNCTIONS_HUE);
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
     this.appendValueInput("X")
         .setCheck(["Integer", "Real"])
         .setAlign(Blockly.ALIGN_RIGHT)
@@ -345,7 +350,7 @@ Blockly.Blocks['madeup_generate_revolve'] = {
 Blockly.Blocks['madeup_generate_surface'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
     this.appendValueInput("COLUMNS")
         .setCheck("Integer")
         .appendField("surface columns");
@@ -364,7 +369,7 @@ Blockly.Blocks['madeup_generate_surface'] = {
 Blockly.Blocks['madeup_math_binary_arithmetic_operator'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.madeup.NUMBER_HUE);
     this.appendValueInput("A")
         .setCheck(["Integer", "Real"]);
     this.appendDummyInput()
@@ -382,7 +387,7 @@ Blockly.Blocks['madeup_math_binary_arithmetic_operator'] = {
 Blockly.Blocks['madeup_math_relational_operator'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.madeup.BOOLEAN_HUE);
     this.appendValueInput("A").setCheck(["Integer", "Real"]);
     this.appendDummyInput().appendField(new Blockly.FieldDropdown([[">", ">"], [">=", ">="], ["<", "<"], ["<=", "<="], ["==", "=="], ["!=", "!="]]), "OPERATOR");
     this.appendValueInput("B").setCheck(["Integer", "Real"]);
@@ -397,7 +402,7 @@ Blockly.Blocks['madeup_math_relational_operator'] = {
 Blockly.Blocks['madeup_math_unary_operator'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.madeup.NUMBER_HUE);
     this.appendValueInput("A")
         .setCheck(["Integer", "Real"])
         .appendField("-");
@@ -412,7 +417,7 @@ Blockly.Blocks['madeup_math_unary_operator'] = {
 Blockly.Blocks['madeup_math_minmax'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.madeup.NUMBER_HUE);
     this.appendValueInput("A")
         .setCheck(["Integer", "Real"])
         .appendField(new Blockly.FieldDropdown([["min", "MIN"], ["max", "MAX"]]), "F");
@@ -427,7 +432,7 @@ Blockly.Blocks['madeup_math_minmax'] = {
 Blockly.Blocks['madeup_math_log'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.madeup.REAL_HUE);
     this.appendValueInput("BASE")
         .setCheck(["Integer", "Real"])
         .appendField("log");
@@ -444,7 +449,7 @@ Blockly.Blocks['madeup_math_log'] = {
 Blockly.Blocks['madeup_logic_if_expr'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.madeup.UNKNOWN_TYPE_HUE);
     this.appendValueInput("CONDITION")
         .setCheck("Boolean")
         .appendField("if");
@@ -463,7 +468,7 @@ Blockly.Blocks['madeup_logic_if_expr'] = {
 Blockly.Blocks['madeup_logic_if_statement'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.madeup.UNKNOWN_TYPE_HUE);
     this.appendValueInput("CONDITION")
         .setCheck("Boolean")
         .appendField("if");
@@ -479,7 +484,7 @@ Blockly.Blocks['madeup_logic_if_statement'] = {
 Blockly.Blocks['madeup_logic_if_else_statement'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.madeup.UNKNOWN_TYPE_HUE);
     this.appendValueInput("CONDITION")
         .setCheck("Boolean")
         .appendField("if");
@@ -499,7 +504,7 @@ Blockly.Blocks['madeup_logic_if_else_statement'] = {
 Blockly.Blocks['madeup_movement_rotate'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
     this.appendValueInput("X")
         .setCheck(["Integer", "Real"])
         .setAlign(Blockly.ALIGN_RIGHT)
@@ -525,7 +530,7 @@ Blockly.Blocks['madeup_movement_rotate'] = {
 Blockly.Blocks['madeup_movement_scale'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
     this.appendValueInput("X")
         .setCheck(["Integer", "Real"])
         .setAlign(Blockly.ALIGN_RIGHT)
@@ -547,7 +552,7 @@ Blockly.Blocks['madeup_movement_scale'] = {
 Blockly.Blocks['madeup_movement_translate'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
     this.appendValueInput("X")
         .setCheck(["Integer", "Real"])
         .setAlign(Blockly.ALIGN_RIGHT)
@@ -588,7 +593,7 @@ Blockly.Blocks['madeup_loop_while'] = {
 Blockly.Blocks['madeup_loop_for_to'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.madeup.LOOP_HUE);
     this.appendValueInput("STOP")
         .setCheck("Integer")
         .appendField("for")
@@ -605,7 +610,7 @@ Blockly.Blocks['madeup_loop_for_to'] = {
 Blockly.Blocks['madeup_loop_for_through'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.madeup.LOOP_HUE);
     this.appendValueInput("STOP")
         .setCheck("Integer")
         .appendField("for")
@@ -624,7 +629,7 @@ Blockly.Blocks['madeup_loop_for_through'] = {
 Blockly.Blocks['madeup_loop_for_in'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.madeup.LOOP_HUE);
     this.appendValueInput("START")
         .setCheck("Integer")
         .appendField("for")

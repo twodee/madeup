@@ -31,6 +31,8 @@ Co<Expression> ExpressionBlock::evaluate(Environment &env) const {
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionBlock::operator[](int i) {
+  /* throw 5; */
+  /* std::cout << "i: " << i << std::endl; */
   assert(0 <= i && i < statements.size());
   return statements[i];
 }

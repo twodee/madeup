@@ -1,0 +1,15 @@
+x = 3
+
+to f
+  x = x + 1
+  debug x
+end
+
+to g
+  x = x * 2
+  debug x
+end
+
+f
+g
+f

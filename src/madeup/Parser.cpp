@@ -149,9 +149,13 @@ void Parser::block() {
          isInExpressionFirst()) {
     statement();
   } 
+
+  // Only if the block is non-empty do we have source to register.
   Co<ExpressionBlock> block = blocks.top();
-  SourceLocation location((*block)[0]->getSourceLocation(), (*block)[block->getLength() - 1]->getSourceLocation());
-  block->setSource(getSubsource(location), location);
+  if (block->getLength() > 0) {
+    SourceLocation location((*block)[0]->getSourceLocation(), (*block)[block->getLength() - 1]->getSourceLocation());
+    block->setSource(getSubsource(location), location);
+  }
 }
 
 /* ------------------------------------------------------------------------- */

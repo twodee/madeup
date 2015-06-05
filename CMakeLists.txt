@@ -5,7 +5,6 @@ option(USE_DEBUG "Enable debug information" ON)
 
 if(APPLE)
   set(WWW_ROOT "/Library/WebServer/Documents" CACHE STRING "Directory in which to install web resources")
-  set(CMAKE_MACOSX_RPATH ON)
 elseif(UNIX)
   set(WWW_ROOT "/var/www/madeup" CACHE STRING "Directory in which to install web resources")
 endif()
@@ -30,5 +29,4 @@ add_custom_target(www
 
 add_custom_target(wwwdeps
   COMMAND make WWW_ROOT=${WWW_ROOT} MADEUP=$<TARGET_FILE:madeup> TWODEE=$<TARGET_FILE:twodee> MERP=$<TARGET_FILE:merp> libdeps
-  DEPENDS madeup twodee merp
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/www)
