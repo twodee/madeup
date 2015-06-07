@@ -42,7 +42,8 @@ Blockly.Blocks['madeup_io_print'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
     this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendValueInput("MESSAGE").setCheck(["Boolean", "Integer", "String", "Real"]).appendField("print");
+    // this.appendValueInput("MESSAGE").setCheck(["Boolean", "Integer", "String", "Real"]).appendField("print"); 
+    this.appendValueInput("MESSAGE").setCheck(null).appendField("print");
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
