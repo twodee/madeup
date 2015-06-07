@@ -1,0 +1,134 @@
+html {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+}
+
+#tools {
+  background: #000000;
+  color: #FFFFFF;
+  float: left;
+  width: 300px;
+}
+
+.popups {
+  background-color: #333333;
+  border: 0px;
+  color: white;
+  font-size: 10pt;
+  outline: none;
+  font-family: sans-serif;
+  z-index: 1000000;
+  display: none;
+  position: absolute;
+}
+
+#entire {
+  float: left;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+#left {
+  float: left;
+  padding: 0;
+  width: 420px;
+  height: auto;
+  background-color: #000000;
+}
+
+#glcanvas {
+  float: left;
+  width: auto;
+  overflow: hidden;
+  z-index: 5000;
+}
+
+#text_editor { 
+  margin: 0px;
+  height: 300px;
+}
+
+#blocks_editor {
+  display: none;
+  background-color: blue;
+  margin: 0px;
+}
+
+#blocks_canvas { 
+  position: absolute;
+  background-color: red;
+}
+
+#console {
+  font-family: Courier;
+  outline: none;
+  background-color: #333333;
+  color: #FFFFFF;
+  height: 200px;
+  overflow: auto;
+  z-index: 1000;
+}
+
+#message {
+  overflow: auto;
+}
+
+/* Fattens the handle for resizing the console. Needed because the text_editor seems 
+   to snarf up its size of the boundary. */
+#console > .ui-resizable-n {
+  top: 0;
+  height: 5px;
+}
+
+#menu input[type="button"] {
+  background-color: #333333;
+  border: 0px;
+  margin: 4px;
+  color: white;
+  font-size: 10pt;
+  outline: none;
+}
+
+#menu input[type="button"]:active {
+  background-color: #999999;
+}
+
+.srclink:link {
+  color: #FF9999; 
+}
+
+.srclink:visited {
+  color: #000000; 
+}
+
+.srclink:hover {
+  color: #FF9900; 
+}
+
+.srclink:active {
+  color: #FF99FF; 
+}
+
+#menu {
+  background-color: #000000;
+  position: relative;
+  margin: 0px;
+  padding: 0px;
+}
+
+#downloader {
+  position: fixed;
+  top: 600px;
+  left: 0px;
+  width: 420px;
+}
