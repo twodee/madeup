@@ -22,6 +22,9 @@ var showHeadings = true;
 var modelColor = 'FF0000';
 var workspace = null;
 var fontSize = 14;
+var xy_mesh = null;
+var xz_mesh = null;
+var yz_mesh = null;
 
 function saveInCookies() {
   $.cookie('last', getSource());
@@ -132,6 +135,66 @@ $(document).ready(function() {
   $('#showHeadings').click(function() {
     showHeadings = this.checked;
     text_editor.focus();
+    render();
+  });
+  $('#grid_xy').click(function() {
+    if (this.checked) {
+      var geometry = new THREE.Geometry();
+      for (var i = -10; i <= 10; ++i) {
+        geometry.vertices.push(new THREE.Vector3(-10, i, 0));
+        geometry.vertices.push(new THREE.Vector3(10, i, 0));
+        geometry.vertices.push(new THREE.Vector3(i, -10, 0));
+        geometry.vertices.push(new THREE.Vector3(i, 10, 0));
+      }
+      xy_mesh = new THREE.Line(geometry, new THREE.LineBasicMaterial({
+        color: 0x0000FF,
+        linewidth: 1
+      }), THREE.LinePieces);
+      scene.add(xy_mesh);
+    } else {
+      scene.remove(xy_mesh);
+      xy_mesh = null;
+    }
+    render();
+  });
+  $('#grid_xz').click(function() {
+    if (this.checked) {
+      var geometry = new THREE.Geometry();
+      for (var i = -10; i <= 10; ++i) {
+        geometry.vertices.push(new THREE.Vector3(i, 0, -10));
+        geometry.vertices.push(new THREE.Vector3(i, 0, 10));
+        geometry.vertices.push(new THREE.Vector3(-10, 0, i));
+        geometry.vertices.push(new THREE.Vector3(10, 0, i));
+      }
+      xz_mesh = new THREE.Line(geometry, new THREE.LineBasicMaterial({
+        color: 0x00FF00,
+        linewidth: 1
+      }), THREE.LinePieces);
+      scene.add(xz_mesh);
+    } else {
+      scene.remove(xz_mesh);
+      xz_mesh = null;
+    }
+    render();
+  });
+  $('#grid_yz').click(function() {
+    if (this.checked) {
+      var geometry = new THREE.Geometry();
+      for (var i = -10; i <= 10; ++i) {
+        geometry.vertices.push(new THREE.Vector3(0, i, -10));
+        geometry.vertices.push(new THREE.Vector3(0, i, 10));
+        geometry.vertices.push(new THREE.Vector3(0, -10, i));
+        geometry.vertices.push(new THREE.Vector3(0, 10, i));
+      }
+      yz_mesh = new THREE.Line(geometry, new THREE.LineBasicMaterial({
+        color: 0xFF0000,
+        linewidth: 1
+      }), THREE.LinePieces);
+      scene.add(yz_mesh);
+    } else {
+      scene.remove(yz_mesh);
+      yz_mesh = null;
+    }
     render();
   });
   $('#autopreview').click(function() {
@@ -257,7 +320,7 @@ function run(mode) {
     success: function(data) {
       var sansDebug = data['output'].replace(/^Debug:.*$\n/gm, '');
       if (sansDebug.length > 0) {
-        // TODO console.log(sansDebug);
+        console.log(sansDebug);
       }
 
       if (data['exit_status'] == 0) {
@@ -267,7 +330,7 @@ function run(mode) {
         meshes = [];
         arrow_shafts = [];
 
-        //TODO log(sansDebug);
+        log(sansDebug);
         
         if (mode == GeometryMode.SURFACE) {
           var loader = new THREE.JSONLoader();
