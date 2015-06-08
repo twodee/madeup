@@ -107,9 +107,14 @@
       <input type="checkbox" id="autopreview" checked="checked"/>Preview <input type="text" id="nSecondsTillPreview" size="2"/> seconds after last edit<br/>
     </div>
     <div id="grid_popup" class="popups">
-      <input type="checkbox" id="grid_xy"/>XY<br/>
-      <input type="checkbox" id="grid_yz"/>YZ<br/>
-      <input type="checkbox" id="grid_xz"/>XZ<br/>
+      <input type="checkbox" id="grid_yz"/>X = 0<br/>
+      <input type="checkbox" id="grid_xz"/>Y = 0<br/>
+      <input type="checkbox" id="grid_xy"/>Z = 0<br/>
+      <input type="checkbox" id="axis_x"/>X axis<br/>
+      <input type="checkbox" id="axis_y"/>Y axis<br/>
+      <input type="checkbox" id="axis_z"/>Z axis<br/>
+      Grid Extent: <input type="text" id="grid_extent" size="5"/><br/>
+      Grid Spacing: <input type="text" id="grid_spacing" size="5"/><br/>
     </div>
     <div id="display_popup" class="popups">
       <input type="checkbox" id="isWireframe"/>Wireframe<br/>

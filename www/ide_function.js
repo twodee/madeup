@@ -22,9 +22,8 @@ var showHeadings = true;
 var modelColor = 'FF0000';
 var workspace = null;
 var fontSize = 14;
-var xy_mesh = null;
-var xz_mesh = null;
-var yz_mesh = null;
+var gridSpacing = 1.0;
+var gridExtent = 10.0;
 
 function saveInCookies() {
   $.cookie('last', getSource());
@@ -137,66 +136,130 @@ $(document).ready(function() {
     text_editor.focus();
     render();
   });
-  $('#grid_xy').click(function() {
-    if (this.checked) {
-      var geometry = new THREE.Geometry();
-      for (var i = -10; i <= 10; ++i) {
-        geometry.vertices.push(new THREE.Vector3(-10, i, 0));
-        geometry.vertices.push(new THREE.Vector3(10, i, 0));
-        geometry.vertices.push(new THREE.Vector3(i, -10, 0));
-        geometry.vertices.push(new THREE.Vector3(i, 10, 0));
-      }
-      xy_mesh = new THREE.Line(geometry, new THREE.LineBasicMaterial({
-        color: 0x0000FF,
-        linewidth: 1
-      }), THREE.LinePieces);
-      scene.add(xy_mesh);
-    } else {
-      scene.remove(xy_mesh);
-      xy_mesh = null;
+
+  var red = 0xB80000;
+  var green = 0x006100;
+  var blue = 0x0000FF;
+  var colors = [red, green, blue];
+  var axes = new Array(3);
+  var planes = new Array(3);
+
+  function generateAxis(d) {
+    if (axes[d]) {
+      removeAxis(d);
     }
+
+    var geometry = new THREE.Geometry();
+    var a = new THREE.Vector3(0, 0, 0);
+    var b = new THREE.Vector3(0, 0, 0);
+    a.setComponent(d, -gridExtent);
+    b.setComponent(d, gridExtent);
+    geometry.vertices.push(a);
+    geometry.vertices.push(b);
+    axes[d] = new THREE.Line(geometry, new THREE.LineBasicMaterial({
+      color: colors[d],
+      linewidth: 5
+    }), THREE.LinePieces);
+    scene.add(axes[d]);
     render();
-  });
-  $('#grid_xz').click(function() {
-    if (this.checked) {
-      var geometry = new THREE.Geometry();
-      for (var i = -10; i <= 10; ++i) {
-        geometry.vertices.push(new THREE.Vector3(i, 0, -10));
-        geometry.vertices.push(new THREE.Vector3(i, 0, 10));
-        geometry.vertices.push(new THREE.Vector3(-10, 0, i));
-        geometry.vertices.push(new THREE.Vector3(10, 0, i));
-      }
-      xz_mesh = new THREE.Line(geometry, new THREE.LineBasicMaterial({
-        color: 0x00FF00,
-        linewidth: 1
-      }), THREE.LinePieces);
-      scene.add(xz_mesh);
-    } else {
-      scene.remove(xz_mesh);
-      xz_mesh = null;
+  }
+
+  function removeAxis(d) {
+    if (axes[d]) {
+      scene.remove(axes[d]);
+      axes[d] = null;
+      render();
     }
-    render();
-  });
-  $('#grid_yz').click(function() {
-    if (this.checked) {
-      var geometry = new THREE.Geometry();
-      for (var i = -10; i <= 10; ++i) {
-        geometry.vertices.push(new THREE.Vector3(0, i, -10));
-        geometry.vertices.push(new THREE.Vector3(0, i, 10));
-        geometry.vertices.push(new THREE.Vector3(0, -10, i));
-        geometry.vertices.push(new THREE.Vector3(0, 10, i));
+  }
+
+  function toggleAxis(d) {
+    return function() {
+      if (this.checked) {
+        generateAxis(d);
+      } else {
+        removeAxis(d);
       }
-      yz_mesh = new THREE.Line(geometry, new THREE.LineBasicMaterial({
-        color: 0xFF0000,
-        linewidth: 1
-      }), THREE.LinePieces);
-      scene.add(yz_mesh);
-    } else {
-      scene.remove(yz_mesh);
-      yz_mesh = null;
     }
+  }
+
+  $('#axis_x').click(toggleAxis(0));
+  $('#axis_y').click(toggleAxis(1));
+  $('#axis_z').click(toggleAxis(2));
+  
+  function generatePlane(d) {
+    if (planes[d]) {
+      removePlane(d);
+    }
+
+    var geometry = new THREE.Geometry();
+    for (var i = -gridExtent; i <= gridExtent; i += gridSpacing) {
+      var a = new THREE.Vector3(0, 0, 0);
+      var b = new THREE.Vector3(0, 0, 0);
+      a.setComponent((d + 1) % 3, -gridExtent);
+      b.setComponent((d + 1) % 3, gridExtent);
+      a.setComponent((d + 2) % 3, i);
+      b.setComponent((d + 2) % 3, i);
+      geometry.vertices.push(a);
+      geometry.vertices.push(b);
+
+      a = new THREE.Vector3(0, 0, 0);
+      b = new THREE.Vector3(0, 0, 0);
+      a.setComponent((d + 1) % 3, i);
+      b.setComponent((d + 1) % 3, i);
+      a.setComponent((d + 2) % 3, -gridExtent);
+      b.setComponent((d + 2) % 3, gridExtent);
+      geometry.vertices.push(a);
+      geometry.vertices.push(b);
+    }
+
+    planes[d] = new THREE.Line(geometry, new THREE.LineBasicMaterial({color: colors[d], linewidth: 1}), THREE.LinePieces);
+    scene.add(planes[d]);
     render();
+  }
+
+  function removePlane(d) {
+    if (planes[d]) {
+      scene.remove(planes[d]);
+      planes[d] = null;
+      render();
+    }
+  }
+
+  function togglePlane(d) {
+    return function() {
+      if (this.checked) {
+        generatePlane(d);
+      } else {
+        removePlane(d);
+      }
+    }
+  }
+
+  $('#grid_xy').click(togglePlane(2));
+  $('#grid_xz').click(togglePlane(1));
+  $('#grid_yz').click(togglePlane(0));
+
+  $('#grid_extent').change(function() {
+    gridExtent = parseFloat($(this).val());
+    for (var d = 0; d < 3; ++d) {
+      if (axes[d]) {
+        generateAxis(d);
+      }
+      if (planes[d]) {
+        generatePlane(d);
+      }
+    }
   });
+
+  $('#grid_spacing').change(function() {
+    gridSpacing = parseFloat($(this).val());
+    for (var d = 0; d < 3; ++d) {
+      if (planes[d]) {
+        generatePlane(d);
+      }
+    }
+  });
+
   $('#autopreview').click(function() {
     if (this.checked) {
       $('#nSecondsTillPreview').prop('disabled', false);
@@ -217,22 +280,22 @@ $(document).ready(function() {
   $('#toggle_editor_popup').click(function() {
     $('#editor_popup').css('top', $('#toggle_editor_popup').position().top + $('#toggle_editor_popup').innerHeight(true)) - 8; 
     $('#editor_popup').css('left', $('#toggle_editor_popup').position().left + 4); 
-    $('#editor_popup').width(100);
-    $('#editor_popup').height(100);
+    $('#editor_popup').width(200);
+    $('#editor_popup').height(200);
     $('#editor_popup').slideToggle('fast', function() {});
   });
   $('#toggle_grid_popup').click(function() {
     $('#grid_popup').css('top', $('#toggle_grid_popup').position().top + $('#toggle_grid_popup').innerHeight(true)) - 8; 
     $('#grid_popup').css('left', $('#toggle_grid_popup').position().left + 4); 
-    $('#grid_popup').width(100);
-    $('#grid_popup').height(100);
+    $('#grid_popup').width(200);
+    $('#grid_popup').height(200);
     $('#grid_popup').slideToggle('fast', function() {});
   });
   $('#toggle_display_popup').click(function() {
     $('#display_popup').css('top', $('#toggle_display_popup').position().top + $('#toggle_display_popup').innerHeight(true)) - 8; 
     $('#display_popup').css('left', $('#toggle_display_popup').position().left + 4); 
-    $('#display_popup').width(100);
-    $('#display_popup').height(100);
+    $('#display_popup').width(200);
+    $('#display_popup').height(200);
     $('#display_popup').slideToggle('fast', function() {});
   });
   $('#download').click(function() {
