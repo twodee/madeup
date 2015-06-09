@@ -48,6 +48,7 @@ class Environment {
     Environment(const Environment &other);
 
     void add(const string &id, Co<ExpressionClosure> expression);
+    void replace(const string &id, Co<ExpressionClosure> expression);
     bool isBound(const string &id) const;
 
     Co<ExpressionClosure> operator[](const string &id);
@@ -67,6 +68,7 @@ class Environment {
     void pitch(float degrees);
     void roll(float degrees);
     void dowel();
+    void polygon();
     void revolve();
     void extrude(const QVector3<float> &axis, float length);
     void dot();

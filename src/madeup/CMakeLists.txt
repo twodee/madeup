@@ -50,6 +50,7 @@ add_library(madeup
   ExpressionNumber.cpp
   ExpressionOr.cpp
   ExpressionPitch.cpp
+  ExpressionPolygon.cpp
   ExpressionPop.cpp
   ExpressionPower.cpp
   ExpressionPrint.cpp

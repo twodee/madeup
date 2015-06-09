@@ -717,7 +717,9 @@ void Parser::atom() {
       if (isUp(Token::TO)) {
         ++i;
         is_inclusive = false;
+        is_in_loop_range = true;
         expressionLevel0();
+        is_in_loop_range = false;
         start = Co<Expression>(new ExpressionInteger(0));
         stop = popExpression();
         if (isUp(Token::BY)) {
@@ -729,7 +731,9 @@ void Parser::atom() {
         }
       } else if (isUp(Token::THROUGH)) {
         ++i;
+        is_in_loop_range = true;
         expressionLevel0();
+        is_in_loop_range = false;
         start = Co<Expression>(new ExpressionInteger(0));
         stop = popExpression();
         if (isUp(Token::BY)) {

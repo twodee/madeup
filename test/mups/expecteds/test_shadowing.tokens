@@ -1,0 +1,22 @@
+1(0-0) ID: i
+1(2-2) ASSIGN: =
+1(4-4) INTEGER: 7
+1(5-5) NEWLINE: \n
+2(6-6) NEWLINE: \n
+3(7-8) TO: to
+3(10-12) ID: foo
+3(14-14) ID: i
+3(15-15) NEWLINE: \n
+4(18-22) ID: print
+4(24-24) ID: i
+4(25-25) NEWLINE: \n
+5(26-28) END: end
+5(29-29) NEWLINE: \n
+6(30-30) NEWLINE: \n
+7(31-33) ID: foo
+7(35-36) INTEGER: 13
+7(37-37) NEWLINE: \n
+8(38-42) ID: print
+8(44-44) ID: i
+8(45-45) NEWLINE: \n
+9(46-46) END_OF_FILE: END OF FILE

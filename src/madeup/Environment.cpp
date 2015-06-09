@@ -24,6 +24,7 @@
 #include "madeup/ExpressionMove.h"
 #include "madeup/ExpressionMoveTo.h"
 #include "madeup/ExpressionPitch.h"
+#include "madeup/ExpressionPolygon.h"
 #include "madeup/ExpressionPop.h"
 #include "madeup/ExpressionPrint.h"
 #include "madeup/ExpressionPush.h"
@@ -213,6 +214,8 @@ void Environment::prime() {
 
   Co<ExpressionDefine> define_dowel(new ExpressionDefine("dowel", Co<Expression>(new ExpressionDowel())));
 
+  Co<ExpressionDefine> define_polygon(new ExpressionDefine("polygon", Co<Expression>(new ExpressionPolygon())));
+
   Co<ExpressionDefine> define_dot(new ExpressionDefine("dot", Co<Expression>(new ExpressionDot())));
 
   Co<ExpressionDefine> define_box(new ExpressionDefine("box", Co<Expression>(new ExpressionBox())));
@@ -261,6 +264,7 @@ void Environment::prime() {
   add("min", Co<ExpressionClosure>(new ExpressionClosure(define_min, globals)));
   add("dowel", Co<ExpressionClosure>(new ExpressionClosure(define_dowel, globals)));
   add("stick", Co<ExpressionClosure>(new ExpressionClosure(define_dowel, globals)));
+  add("polygon", Co<ExpressionClosure>(new ExpressionClosure(define_polygon, globals)));
   add("dot", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
   add("ball", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
   add("dots", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
@@ -280,6 +284,7 @@ void Environment::prime() {
   globals->add("push", (*this)["push"]);
   globals->add("pop", (*this)["pop"]);
   globals->add("dowel", (*this)["dowel"]);
+  globals->add("polygon", (*this)["polygon"]);
   globals->add("ball", (*this)["ball"]);
   globals->add("box", (*this)["box"]);
   globals->add("revolve", (*this)["revolve"]);
@@ -331,6 +336,12 @@ void Environment::add(const string &id, Co<ExpressionClosure> closure) {
   } else {
     id_to_expression[id] = closure;
   }
+}
+
+/* ------------------------------------------------------------------------- */
+
+void Environment::replace(const string &id, Co<ExpressionClosure> closure) {
+  id_to_expression[id] = closure;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -546,6 +557,27 @@ void Environment::pop() {
     throw MessagedException("Transform stack is empty");
   }
   xforms.pop();
+}
+
+/* ------------------------------------------------------------------------- */
+
+void Environment::polygon() {
+  if (geometry_mode == GeometryMode::SURFACE) {
+    if (run.size() > 0) {
+      Polyline<float> *line = new Polyline<float>(run.size(), 3, Polyline<float>::CLOSED);
+      for (unsigned int i = 0; i < run.size(); ++i) {
+        (*line)(i)[0] = run[i].position[0];
+        (*line)(i)[1] = run[i].position[1];
+        (*line)(i)[2] = run[i].position[2];
+      }
+
+      Trimesh *trimesh = line->Triangulate();
+      *shapes += *trimesh;
+    }
+  }
+
+  paths.push_back(vector<Turtle>());
+  run.clear();
 }
 
 /* ------------------------------------------------------------------------- */

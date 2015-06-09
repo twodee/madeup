@@ -1,0 +1,8 @@
+i = 7
+
+to foo i
+  print i
+end
+
+foo 13
+print i
