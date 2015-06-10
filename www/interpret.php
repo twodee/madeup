@@ -29,8 +29,7 @@ error_log(json_encode($back));
 
 // Execute the interpreter and collect its output.
 $lines = array();
-/* exec("java -Djava.library.path=. -cp antlr.jar:madeup.jar org.twodee.madeup.Interpreter --timeout 45 -i $in_path -o $out_path --geometry $mode 2>&1", $lines, $back['exit_status']); */
-exec("./merp --timeout 45 -o $out_path --geometry $mode $in_path 2>&1", $lines, $back['exit_status']);
+exec("./forn 60 ./merp --timeout 45 -o $out_path --geometry $mode $in_path 2>&1", $lines, $back['exit_status']);
 foreach ($lines as $line) {
   error_log("lineline: $line");
 }

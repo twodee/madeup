@@ -1,4 +1,4 @@
-SRC = index.php interpret.php blockly_generator_madeup.js blockly_blocks_madeup.js ide_editor.js ide_function.js ide_skin.css
+SRC = index.php interpret.php blockly_generator_madeup.js blockly_blocks_madeup.js ide_editor.js ide_function.js ide_skin.css forn
 DST = $(addprefix $(WWW_ROOT)/, $(SRC))
 JQUERY_UI_VERSION = 1.11.2
 
