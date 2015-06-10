@@ -24,7 +24,9 @@ Co<Expression> ExpressionWhile::evaluate(Environment &env) const {
   if (!condition_value) {
     throw MessagedException(condition->getSourceLocation().toAnchor() + ": A while loop expects a boolean condition. " + condition->getSource() + " is not boolean.");
   }
+
   while (condition_value->toBoolean()) {
+    env.checkTimeout(getSourceLocation());
     value = body->evaluate(env);
     v = condition->evaluate(env);
     condition_value = dynamic_cast<ExpressionBoolean *>(v.GetPointer());

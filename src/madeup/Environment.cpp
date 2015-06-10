@@ -62,13 +62,17 @@ stack<QMatrix4<float> > Environment::xforms;
 /* ------------------------------------------------------------------------- */
 
 Environment::Environment() :
-  id_to_expression() {
+  id_to_expression(),
+  start_time(std::chrono::high_resolution_clock::now()),
+  max_seconds(-1) {
 }
 
 /* ------------------------------------------------------------------------- */
 
 Environment::Environment(const Environment &other) :
-  id_to_expression() {
+  id_to_expression(),
+  start_time(other.start_time),
+  max_seconds(other.max_seconds) {
   for (map<string, Co<ExpressionClosure> >::const_iterator i = other.id_to_expression.begin();
        i != other.id_to_expression.end();
        ++i) {
@@ -1007,6 +1011,25 @@ bool Environment::hasMoved() const {
 
 const Turtle &Environment::getTurtle() const {
   return turtle;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void Environment::checkTimeout(const SourceLocation &location) {
+  if (max_seconds < 0) return;
+
+  auto now_time = std::chrono::high_resolution_clock::now();
+  if (std::chrono::duration<double>(now_time - start_time).count() > max_seconds) {
+    std::stringstream ss;
+    ss << location.toAnchor() << ": Uh oh. Your program was taking a long time to finish, and I was worried that it would run forever. I stopped it after " << max_seconds << " seconds.";
+    throw MessagedException(ss.str());
+  }
+}
+
+/* ------------------------------------------------------------------------- */
+
+void Environment::setTimeout(int max_seconds) {
+  this->max_seconds = max_seconds;
 }
 
 /* ------------------------------------------------------------------------- */

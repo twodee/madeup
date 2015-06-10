@@ -1,12 +1,14 @@
 #ifndef ENVIRONMENT_H
 #define ENVIRONMENT_H
 
+#include <chrono>
 #include <map>
 #include <string>
 #include <vector>
 #include <stack>
 
 #include "madeup/GeometryMode.h"
+#include "madeup/SourceLocation.h"
 #include "twodee/Camera.h"
 #include "twodee/Co.h"
 #include "twodee/Polyline.h"
@@ -81,17 +83,22 @@ class Environment {
     void push();
     void pop();
 
+    void checkTimeout(const SourceLocation &location);
+
     Trimesh *getMesh();
     std::string getPathsJSON() const;
     void setGeometryMode(GeometryMode::geometry_mode_t mode);
 
     float getVariableAsFloat(const std::string &id);
     const Turtle &getTurtle() const;
+    void setTimeout(int max_seconds);
 
   private:
     bool hasMoved() const;
 
     map<string, Co<ExpressionClosure> > id_to_expression;
+    std::chrono::high_resolution_clock::time_point start_time;
+    int max_seconds;
 
     static Turtle turtle;
     static stack<Turtle> previous_turtles;

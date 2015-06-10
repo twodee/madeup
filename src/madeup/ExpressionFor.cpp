@@ -56,6 +56,7 @@ Co<Expression> ExpressionFor::evaluate(Environment &env) const {
     }
 
     for (int i = a; i < b; i += idelta) {
+      env.checkTimeout(getSourceLocation());
       Co<ExpressionDefine> define = Co<ExpressionDefine>(new ExpressionDefine(id, Co<Expression>(new ExpressionInteger(i))));
       env.add(id, Co<ExpressionClosure>(new ExpressionClosure(define, env)));
       value = body->evaluate(env);
@@ -66,6 +67,7 @@ Co<Expression> ExpressionFor::evaluate(Environment &env) const {
     }
     
     for (int i = a; i > b; i += idelta) {
+      env.checkTimeout(getSourceLocation());
       Co<ExpressionDefine> define = Co<ExpressionDefine>(new ExpressionDefine(id, Co<Expression>(new ExpressionInteger(i))));
       env.add(id, Co<ExpressionClosure>(new ExpressionClosure(define, env)));
       value = body->evaluate(env);

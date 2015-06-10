@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <future>
 
 #include "madeup/ExpressionBlock.h"
 #include "madeup/ExpressionClosure.h"
@@ -131,7 +132,15 @@ int main(int argc, char **argv) {
       env.setGeometryMode(geometry_mode);
       srand(time(NULL));
 
-      program->evaluate(env);
+      if (wants_timeout) {
+        env.setTimeout(timeout);
+        std::future<void> future = std::async(std::launch::async, [&program, &env] {
+          program->evaluate(env);
+        });
+        future.get();
+      } else {
+        program->evaluate(env);
+      }
 
       Trimesh *trimesh = env.getMesh();
 
@@ -158,7 +167,7 @@ int main(int argc, char **argv) {
 
   } catch (td::MessagedException e) {
     std::cerr << e.GetMessage() << std::endl;
-  in.close();
+    in.close();
     exit(1);
   }
   in.close();
