@@ -16,8 +16,19 @@
   <script src="three-js/examples/js/controls/OrbitControls.js"></script>
 
   <!-- Blockly dependencies -->
-  <script src="blockly/blockly_compressed.js"></script>
-  <script src="blockly/blocks_compressed.js"></script>
+  <!-- <script src="blockly/blockly_compressed.js"></script> -->
+  <script src="blockly/blockly_uncompressed.js"></script>
+
+  <!-- <script src="blockly/blocks_compressed.js"></script> -->
+  <script src="blockly/blocks/logic.js"></script>
+  <script src="blockly/blocks/loops.js"></script>
+  <script src="blockly/blocks/math.js"></script>
+  <script src="blockly/blocks/text.js"></script>
+  <script src="blockly/blocks/lists.js"></script>
+  <script src="blockly/blocks/colour.js"></script>
+  <script src="blockly/blocks/variables.js"></script>
+  <script src="blockly/blocks/procedures.js"></script>
+
   <script src="blockly/msg/js/en.js"></script>
   <script src="blockly_blocks_madeup.js"></script>
   <script src="blockly_generator_madeup.js"></script>
@@ -33,7 +44,9 @@
     <category name="Primitives">
       <block type="madeup_math_integer"></block>
       <block type="madeup_math_real"></block>
+      <block type="madeup_string"></block>
       <block type="madeup_logic_boolean"></block>
+      <block type="madeup_eval"></block>
     </category>
     <category name="Loops">
       <block type="madeup_loop_repeat"></block>

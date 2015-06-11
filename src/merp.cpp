@@ -134,14 +134,13 @@ int main(int argc, char **argv) {
 
       if (wants_timeout) {
         env.setTimeout(timeout);
-        std::future<void> future = std::async(std::launch::async, [&program, &env] {
-          program->evaluate(env);
-        });
-        future.get();
-      } else {
-        program->evaluate(env);
       }
+      /* std::future<void> future = std::async(std::launch::async, [&program, &env] { */
+        /* program->evaluate(env); */
+      /* }); */
+      /* future.get(); */
 
+      program->evaluate(env);
       Trimesh *trimesh = env.getMesh();
 
       if (out_path.length() > 0) {

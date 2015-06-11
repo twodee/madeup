@@ -24,6 +24,8 @@ void ExpressionCall::addParameter(Co<Expression> parameter) {
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionCall::evaluate(Environment &env) const {
+  env.checkTimeout(getSourceLocation());
+
   Co<ExpressionClosure> closure = env[name];
   if (closure.IsNull()) {
     throw MessagedException(getSourceLocation().toAnchor() + ": I couldn't find a function or variable named " + name + ".");

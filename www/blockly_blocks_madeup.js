@@ -5,6 +5,7 @@ goog.require('Blockly.Blocks');
 
 Blockly.Blocks.madeup.STATEMENT_HUE = 210;
 Blockly.Blocks.madeup.INTEGER_HUE = 45;
+Blockly.Blocks.madeup.STRING_HUE = 260;
 Blockly.Blocks.madeup.REAL_HUE = 160;
 Blockly.Blocks.madeup.NUMBER_HUE = 180;
 Blockly.Blocks.madeup.BOOLEAN_HUE = 20;
@@ -646,3 +647,35 @@ Blockly.Blocks['madeup_loop_for_in'] = {
     this.setTooltip('');
   }
 };
+
+// ----------------------------------------------------------------------------
+// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#34x6ss
+Blockly.Blocks['madeup_string'] = {
+  init: function() {
+    this.setColour(Blockly.Blocks.madeup.STRING_HUE);
+    this.appendDummyInput().appendField(new Blockly.FieldTextInput("text"), "STRING");
+    this.setOutput(true);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
+
+// ----------------------------------------------------------------------------
+// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#c8vgu2
+Blockly.Blocks['madeup_eval'] = {
+  init: function() {
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
+    this.appendValueInput("EXPR").appendField("eval");
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
+
+// ----------------------------------------------------------------------------
+// Remove the return blocks that Blockly automatically generates in the
+// PROCEDURES node of the toolbox. Madeup doesn't support explicit return
+// statements.
+Blockly.Blocks['procedures_ifreturn'] = null;
+Blockly.Blocks['procedures_defreturn'] = null;

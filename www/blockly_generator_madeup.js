@@ -56,6 +56,7 @@ Blockly.Madeup.addReservedWords('');
  * Order of operation ENUMs.
  * http://docs.python.org/reference/expressions.html#summary
  */
+Blockly.Madeup.INDENT = '  ';            // 0 "" ...
 Blockly.Madeup.ORDER_ATOMIC = 0;            // 0 "" ...
 //Blockly.Madeup.ORDER_COLLECTION = 1;        // tuples, lists, dictionaries
 //Blockly.Madeup.ORDER_STRING_CONVERSION = 1; // `expression...`
@@ -99,13 +100,13 @@ Blockly.Madeup.init = function(workspace) {
     Blockly.Madeup.variableDB_.reset();
   }
 
-  var defvars = [];
-  var variables = Blockly.Variables.allVariables(workspace);
-  for (var x = 0; x < variables.length; x++) {
-    defvars[x] = Blockly.Madeup.variableDB_.getName(variables[x],
-        Blockly.Variables.NAME_TYPE) + ' = None';
-  }
-  Blockly.Madeup.definitions_['variables'] = defvars.join('\n');
+  //var defvars = [];
+  //var variables = Blockly.Variables.allVariables(workspace);
+  //for (var x = 0; x < variables.length; x++) {
+  //  defvars[x] = Blockly.Madeup.variableDB_.getName(variables[x],
+  //      Blockly.Variables.NAME_TYPE) + ' = None';
+  //}
+  //Blockly.Madeup.definitions_['variables'] = defvars.join('\n');
 };
 
 /**
@@ -137,16 +138,6 @@ Blockly.Madeup.finish = function(code) {
  */
 Blockly.Madeup.scrubNakedValue = function(line) {
   return line + '\n';
-};
-
-/**
- * Encode a string as a properly escaped Python string, complete with quotes.
- * @param {string} string Text to encode.
- * @return {string} Python string.
- * @private
- */
-Blockly.Madeup.quote_ = function(string) {
-  return '"' + string + '"';
 };
 
 /**
@@ -479,5 +470,66 @@ Blockly.Madeup['madeup_loop_for_in'] = function(block) {
   var value_stop = Blockly.Madeup.valueToCode(block, 'STOP', Blockly.Madeup.ORDER_NONE);
   var statements_body = Blockly.Madeup.statementToCode(block, 'BODY');
   var code = 'for ' + variable_iterator + ' in ' + value_start + '..' + value_stop + '\n' + statements_body + 'end\n';
+  return code;
+};
+
+Blockly.Madeup['variables_get'] = function(block) {
+  var code = Blockly.Madeup.variableDB_.getName(block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
+  return [code, Blockly.Madeup.ORDER_ATOMIC];
+};
+
+Blockly.Madeup['variables_set'] = function(block) {
+  var argument0 = Blockly.Madeup.valueToCode(block, 'VALUE', Blockly.Madeup.ORDER_NONE) || '0';
+  var varName = Blockly.Madeup.variableDB_.getName(block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
+  return varName + ' = ' + argument0 + '\n';
+};
+
+Blockly.Madeup['procedures_defnoreturn'] = function(block) {
+  var funcName = Blockly.Madeup.variableDB_.getName(block.getFieldValue('NAME'), Blockly.Procedures.NAME_TYPE);
+  var branch = Blockly.Madeup.statementToCode(block, 'STACK');
+  if (Blockly.Madeup.STATEMENT_PREFIX) {
+    branch = Blockly.Madeup.prefixLines(Blockly.Madeup.STATEMENT_PREFIX.replace(/%1/g, '\'' + block.id + '\''), Blockly.Madeup.INDENT) + branch;
+  }
+
+  var args = [];
+  for (var x = 0; x < block.arguments_.length; x++) {
+    args[x] = Blockly.Madeup.variableDB_.getName(block.arguments_[x], Blockly.Variables.NAME_TYPE);
+  }
+
+  var code = 'to ' + funcName + ' ' + args.join(', ') + '\n' + branch + 'end';
+  code = Blockly.Madeup.scrub_(block, code);
+  Blockly.Madeup.definitions_[funcName] = code;
+  return null;
+};
+
+Blockly.Madeup['procedures_callnoreturn'] = function(block) {
+  var funcName = Blockly.Madeup.variableDB_.getName(block.getFieldValue('NAME'), Blockly.Procedures.NAME_TYPE);
+  var args = [];
+  for (var x = 0; x < block.arguments_.length; x++) {
+    args[x] = Blockly.Madeup.valueToCode(block, 'ARG' + x, Blockly.Madeup.ORDER_NONE) || '';
+  }
+  var code = funcName + ' ' + args.join(', ') + '\n';
+  return code;
+};
+
+Blockly.Madeup['procedures_callreturn'] = function(block) {
+  var funcName = Blockly.Madeup.variableDB_.getName(block.getFieldValue('NAME'), Blockly.Procedures.NAME_TYPE);
+  var args = [];
+  for (var x = 0; x < block.arguments_.length; x++) {
+    args[x] = Blockly.Madeup.valueToCode(block, 'ARG' + x, Blockly.Madeup.ORDER_NONE) || '';
+  }
+  var code = funcName + ' ' + args.join(', ');
+  return [code, Blockly.Madeup.ORDER_ATOMIC];
+};
+
+Blockly.Madeup['madeup_string'] = function(block) {
+  var text_string = block.getFieldValue('STRING');
+  var code = '"' + text_string + '"';
+  return [code, Blockly.Madeup.ORDER_ATOMIC];
+};
+
+Blockly.Madeup['madeup_eval'] = function(block) {
+  var value_expr = Blockly.Madeup.valueToCode(block, 'EXPR', Blockly.Madeup.ORDER_NONE);
+  var code = value_expr + '\n';
   return code;
 };

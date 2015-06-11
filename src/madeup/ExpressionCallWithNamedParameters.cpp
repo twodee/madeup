@@ -23,6 +23,8 @@ void ExpressionCallWithNamedParameters::addParameter(const std::string &name, Co
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionCallWithNamedParameters::evaluate(Environment &env) const {
+  env.checkTimeout(getSourceLocation());
+
   Co<ExpressionClosure> closure = env[name];
   if (closure.IsNull()) {
     throw MessagedException(getSourceLocation().toAnchor() + ": No function named " + name + " is defined.");

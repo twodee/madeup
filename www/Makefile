@@ -8,7 +8,7 @@ DST_BINARIES = $(WWW_ROOT)/$(notdir $(MERP))
 .PHONY: madeup
 
 all: $(DST) $(WWW_ROOT)/ace/src-noconflict/mode-madeup.js $(DST_BINARIES)
-libdeps: $(WWW_ROOT)/ace $(WWW_ROOT)/three-js $(WWW_ROOT)/jquery.js $(WWW_ROOT)/jquery-cookie $(WWW_ROOT)/jquery-ui $(WWW_ROOT)/colorpicker $(WWW_ROOT)/blockly
+libdeps: $(WWW_ROOT)/ace $(WWW_ROOT)/three-js $(WWW_ROOT)/jquery.js $(WWW_ROOT)/jquery-cookie $(WWW_ROOT)/jquery-ui $(WWW_ROOT)/colorpicker $(WWW_ROOT)/blockly $(WWW_ROOT)/closure-library
 init: libdeps madeup all
 
 run: all
@@ -53,6 +53,10 @@ $(WWW_ROOT)/three-js:
 $(WWW_ROOT)/blockly:
 	sudo git clone https://github.com/google/blockly.git $(WWW_ROOT)/blockly
 	sudo chmod -R a+rX $(WWW_ROOT)/blockly
+
+$(WWW_ROOT)/closure-library:
+	sudo git clone https://github.com/google/closure-library.git $(WWW_ROOT)/closure-library
+	sudo chmod -R a+rX $(WWW_ROOT)/closure-library
 
 $(DST): $(WWW_ROOT)/%: %
 	sudo cp $^ $@
