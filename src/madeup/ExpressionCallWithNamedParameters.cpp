@@ -59,7 +59,7 @@ Co<Expression> ExpressionCallWithNamedParameters::evaluate(Environment &env) con
       throw MessagedException(getSourceLocation().toAnchor() + ": Function " + define->getName() + " expects a parameter named " + formal.getName() + ". No such parameter was provided and no variable with that name was defined.");
     }
 
-    closure_env->add(define->getFormal(i).getName(), parameter_closure);
+    closure_env->replace(define->getFormal(i).getName(), parameter_closure);
   }
 
   try {

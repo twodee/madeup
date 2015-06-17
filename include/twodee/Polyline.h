@@ -39,7 +39,7 @@ template<class T> class Polyline : public NField<T, 1> {
     ~Polyline();
 
     Trimesh *Revolve(const QVector3<T>& axis, int nstops, float degrees = 360.0f) const;
-    Trimesh *Dowel(int nstops, T radius, T twist = (T) 0) const;
+    Trimesh *Dowel(int nstops, T radius, T twist = (T) 0, float max_bend = 361.0f) const;
     void Fracture(T max_segment_length);
     bool IsOpen() const;
 
@@ -49,6 +49,8 @@ template<class T> class Polyline : public NField<T, 1> {
     std::string ToString() const;
 
   private:
+    static QVector3<T> GetConstrainedPerpendicular(const QVector3<T> &axis);
+
     /** Polyline status */
     bool is_open;
 };
@@ -147,7 +149,66 @@ Trimesh *Polyline<T>::Revolve(const QVector3<T>& axis, int nstops, float degrees
 /* ------------------------------------------------------------------------- */
 
 template<class T>
-Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist) const {
+QVector3<T> Polyline<T>::GetConstrainedPerpendicular(const QVector3<T> &axis) {
+  // We need to push out from the first node to its surrounding ring. Let's
+  // find a vector that leads us out.
+  QVector3<T> to_ring;
+
+  // We can really shoot out anywhere in this node's plane, but if this leg of
+  // the polyline is 2D and axis-aligned, let's shoot out in its 2D plane. We
+  // want a vector that is perpendicular to the normal and does not point out
+  // at all along the omitted third dimension. We start by seeing if normals[0]
+  // has a 0 somewhere. If so, we're 2D.
+  int dzero = -1;
+  for (int i = 0; i < 3 && dzero == -1; ++i) {
+    if (fabs(axis[i]) < 1.0e-6f) {
+      dzero = i;
+    }
+  }
+
+  // If we found no zeroed dimension, any old perpendicular vector will do.
+  if (dzero < 0) {
+    to_ring = axis.GetPerpendicular();
+  }
+
+  // Otherwise, we create a vector that's perpendicular but is constrained
+  // to the 2D plane.
+  else {
+
+    // We create a new normal where the zeroed dimension is omitted.
+    QVector2<T> projected_axis;
+    for (int d = 0, i = 0; d < 3; ++d) {
+      if (d != dzero) {
+        projected_axis[i] = axis[d];
+        ++i;
+      }
+    }
+
+    // Then we find vector perpendicular to this one. There are only two
+    // choices now since we've lost a dimension.
+    QVector2<T> projected_to_ring = projected_axis.GetPerpendicular();
+
+    // Now we expanded this 2D vector back into 3D, keeping the missing
+    // dimension at 0 and staying within the plane.
+    for (int d = 0, i = 0; d < 3; ++d) {
+      if (d != dzero) {
+        to_ring[d] = projected_to_ring[i];
+        ++i;
+      } else {
+        to_ring[d] = 0.0f;
+      }
+    }
+  }
+
+  return to_ring;
+}
+
+/* ------------------------------------------------------------------------- */
+
+template<class T>
+Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist, float max_bend) const {
+  assert(max_bend > 0.0f);
+
   int nvertices = this->GetElementCount();
   int ndims = this->GetChannelCount();
   bool is_adaptive_radius = radius < 0.0f;
@@ -173,18 +234,19 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist) const {
   QVector3<T> *afts = new QVector3<T>[nvertices]; 
   QVector3<T> *fores = new QVector3<T>[nvertices]; 
 
-  // If this polyline is open, then fore and aft are ill-defined on the
-  // extrema. We give the null vector for these.
+  // If this polyline is open, then aft is ill-defined on the first node and
+  // fore is ill-defined on the last. We give the null vector for these.
   if (is_open) {
     afts[0] = QVector3<T>((T) 0);
     fores[nvertices - 1] = QVector3<T>((T) 0);
   }
 
-  // Otherwise, we can compute fores and afts by finding the difference
-  // vectors from each vertex to its neighbors.
+  // We also mark the index bounds of which vertices are "internal."
   int first_successor = is_open ? 1 : 0;
   int last_predecessor = is_open ? nvertices - 2 : nvertices - 1;
 
+  // For the internal nodes, we compute fores and afts by finding the
+  // difference vectors from each vertex to its neighbors.
   for (int vi = 0; vi <= last_predecessor; ++vi) {
     fores[vi] = nodes[(vi + 1) % nvertices] - nodes[vi];
     if (fores[vi].GetLength() > EPSILON) {
@@ -199,26 +261,35 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist) const {
     }
   }
 
-  // Any node that coincides with its predecessor will have a bad aft. Share a
-  // predecessor's aft with its coinciding successor.
+  // Any node that spatially coincides with its predecessor will have a bad
+  // aft, i.e., its after will be the null vector. So, we share a predecessor's
+  // non-degenerate aft with its coinciding successor. If multiple nodes all
+  // sit atop each other, the first good aft will propogate along.
   for (int vi = 1; vi < nvertices; ++vi) {
     if (afts[vi].GetLength() < EPSILON) {
       afts[vi] = afts[vi - 1];
     }
   }
 
-  // Any node that coincides with its successor will have a bad fore. Share a
-  // successor's aft with its coinciding predecessor.
+  // Any node that coincides with its successor will have a bad fore. See
+  // above. We must work backwards to propogate in the right direction.
   for (int vi = nvertices - 2; vi >= 0; --vi) {
     if (fores[vi].GetLength() < EPSILON) {
       fores[vi] = fores[vi + 1];
     }
   }
 
-  // With fores and afts for each vertex, we can compute a vector that points
-  // away from each bend in the dowel. We want solid normals to make the
-  // geometry align, so we do some finessing here. If fore or aft are 0 or if
-  // they coincide, we just TODO.
+  // At each node in the line, we'll impose a plane that slices through it.
+  // For internal nodes, this plane bisects the angle formed by this node and
+  // its neighbors. We'll send along the solid rays from the predecessor's ring
+  // to intersect these planes. This will allow us to maintain some coherence
+  // along the solid dowel. Instead of generating afresh a ring around each
+  // node, we generate the ring once at the initiating node and trace out the
+  // ring's polylines along the overall polyline.
+  //
+  // We calculate the planes' normals according to their nodes' connectedness
+  // to its neighbors. In general, the plane will be oriented to bisect the
+  // angle formed by three nodes.
   QVector3<T> *normals = new QVector3<T>[nvertices]; 
   for (int vi = 0; vi < nvertices; ++vi) {
     if (fores[vi].GetSquaredLength() < EPSILON && afts[vi].GetSquaredLength() < EPSILON) {
@@ -230,132 +301,179 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist) const {
     } else if (fabs(fores[vi].Dot(afts[vi])) > 0.999999f) {
       normals[vi] = afts[vi] * (T) -1;
     } else {
-      QVector3<T> one_way = fores[vi] + afts[vi];
-      QVector3<T> other_way = fores[vi].Cross(afts[vi]);
-      normals[vi] = other_way.Cross(one_way);
+      QVector3<T> tangent = fores[vi] + afts[vi];
+      QVector3<T> bitangent = fores[vi].Cross(afts[vi]);
+      normals[vi] = bitangent.Cross(tangent);
       normals[vi].Normalize();
       if (vi == 0) {
         normals[vi] *= (T) -1;
       }
     }
   }
+ 
+  vector<QVector3<T>> cap_neighbors[2];
+  vector<QVector3<T>> vertices;
+  Plane<T, 3> first_plane(nodes[0], normals[0]);
 
-  // See if normals[0] has a 0 somewhere.
-  int zero_dim = -1;
-  for (int i = 0; i < 3 && zero_dim == -1; ++i) {
-    if (fabs(normals[0][i]) < 1.0e-6f) {
-      zero_dim = i;
-    }
-  }
+  // Now generate geometry for the rest of the vertices.
+  for (int vi = 0; vi < nvertices; ++vi) {
+    // Bend is measured as the angle at interior contact point of the join. At
+    // the node itself, angle is acos(fore.dot(aft)). If we walk from the node
+    // the same distance along fore and aft till we make right angles, and then
+    // walk perpendicular lines out to the internal contact point, we'll have a
+    // quadrilateral. The angles of the quad sum to 360, and with the angle at
+    // the node known and the other two being 90, we can solve for the angle at
+    // the contact point.
+    T radians_at_node = acos(fores[vi].Dot(afts[vi]));
+    T bend_degrees = 360.0f - 180.0f - radians_at_node * 180 / td::PI;
 
-  QVector3<T> away = normals[0].GetPerpendicular();
+    // See if we need to round this bend. We round if two things are true: 1)
+    // the bend exceeds the maximum allowed, and 2) we're not an endpoint node
+    // or we are an endpoint but the line is closed.
+    if (((vi != nvertices - 1 && vi != 0) || !is_open) &&
+        bend_degrees > max_bend) {
 
-  // Create a new normal without the zeroed dimension.
-  if (zero_dim >= 0) {
-    QVector2<T> projected_normal;
-    for (int d = 0, i = 0; d < 3; ++d) {
-      if (d != zero_dim) {
-        projected_normal[i] = normals[0][d];
-        ++i;
-      }
-    }
-
-    QVector2<T> projected_away = projected_normal.GetPerpendicular();
-    for (int d = 0, i = 0; d < 3; ++d) {
-      if (d != zero_dim) {
-        away[d] = projected_away[i];
-        ++i;
-      } else {
-        away[d] = 0.0f;
-      }
-    }
-  }
-
-  away = QMatrix4<float>::GetRotate(twist, normals[0]) * away;
-
-  // Choose arbitrary away axis.
-  /* QVector3<T> away = normals[0].GetPerpendicular(); */
-  if (is_adaptive_radius) {
-    away *= (*this)(0)[3];
-  } else {
-    away *= radius;
-  }
-
-  vector<QVector3<T> > cap_neighbors[2];
-  vector<QVector3<T> > vertices;
-
-  bool is_rounded = false;
-  if (is_rounded) {
-    for (int vi = 0; vi < nvertices; ++vi) {
-      QVector3<T> middle = fores[vi] + afts[vi];
-      middle.Normalize();
+      // Find a vector that bisects the angle between aft and fore.
+      QVector3<T> bisector = fores[vi] + afts[vi];
+      bisector.Normalize();
 
       if (is_adaptive_radius) {
         radius = (*this)(vi)[3];
       }
 
-      QVector3<T> pivot = nodes[vi] + middle * radius;
-      QVector3<T> fore_point = nodes[vi] + fores[vi] * fores[vi].Dot(pivot - nodes[vi]) / fores[vi].Dot(fores[vi]);
-      QVector3<T> aft_point = nodes[vi] + afts[vi] * afts[vi].Dot(pivot - nodes[vi]) / afts[vi].Dot(afts[vi]);
+      // Push out from node along bisector. Go out far enough so that the aft
+      // and fore shafts just meet and do not overlap. This point will be our
+      // pivot. We determine "far enough" by imposing a right triangle onto aft
+      // shaft. The 90-degree angle sits at the shaft and leads on to the node
+      // and out to the contact point. The hypotenuse is the distance from the
+      // node to the contact point.
+      QVector3<T> pivot = nodes[vi] + bisector * radius / sinf(radians_at_node * 0.5f);
 
-      QVector3<T> pre = aft_point - pivot;
-      QVector3<T> post = fore_point - pivot;
-      pre.Normalize();
-      post.Normalize();
+      // Project pivot onto aft. This will be the first pseudonode of the
+      // rounded joint.
+      QVector3<T> pivot_on_aft = nodes[vi] + afts[vi] * afts[vi].Dot(pivot - nodes[vi]) / afts[vi].Dot(afts[vi]);
 
-      QVector3<T> rotation_axis = pre.Cross(post);
-      rotation_axis.Normalize();
+      // Find an axis about which we can rotate.
+      QVector3<T> pivot_axis = fores[vi].Cross(afts[vi]);
+      pivot_axis.Normalize();
 
-      T bend_degrees = acos(pre.Dot(post)) * 180 / td::PI; 
-      int nrotates = 10;
-      T delta = bend_degrees / (nrotates - 1);
-      QMatrix4<T> rotator = QMatrix4<T>::GetTranslate(pivot[0], pivot[1], pivot[2]) *
-                            QMatrix4<T>::GetRotate(delta, rotation_axis) *
-                            QMatrix4<T>::GetTranslate(-pivot[0], -pivot[1], -pivot[2]);
-      QVector3<float> slice_center = aft_point;
-      QVector3<float> axis = afts[vi] * (T) -1;
-      QVector3<float> away = fores[vi].Cross(afts[vi]);
-      away.Normalize();
-      away *= radius;
-
-      for (int i = 0; i < nrotates; ++i) {
-        std::cout << "(" << slice_center[0] << ", " << slice_center[1] << ")" << ((i < nrotates - 1) ? "," : "");
+      // What's the plane of the first slice?
+      Plane<T, 3> plane(pivot_on_aft, afts[vi]);
+ 
+      // Generate ring on first slice. We'll do so by sending lines from the
+      // previous vertices (if any) along the aft vector and intersecting them
+      // with this slice's plane.
+      if (vi > 0) {
+        int i_previous_ring = vertices.size() - nstops;
         for (int si = 0; si < nstops; ++si) {
-          QVector3<T> away_neighbor = QMatrix4<float>::GetRotate(si * 360.0f / nstops, axis) * away + slice_center;
-          vertices.push_back(away_neighbor);
+          QVector3<T> previous_ring_neighbor(vertices[i_previous_ring + si]);
+          Line<T, 3> line(previous_ring_neighbor, afts[vi] * (T) -1);
+
+          QVector3<T> intersection_point;
+          plane.Intersect(line, intersection_point);
+          if (is_adaptive_radius) {
+            QVector3<T> diff = intersection_point - pivot_on_aft;
+            diff.Normalize();
+            intersection_point = pivot_on_aft + diff * radius;
+          }
+          vertices.push_back(intersection_point);
         }
-        slice_center = rotator * slice_center;
-        axis = QVector3<T>(rotator * QVector4<T>(axis, 0));
       }
-      std::cout << "" << std::endl;
-    }
-  } else {
-    // Spin around current node and drop neighbors in around it.
-    for (int si = 0; si < nstops; ++si) {
-      QVector3<T> away_neighbor = QMatrix4<float>::GetRotate(si * 360.0f / nstops, normals[0]) * away + nodes[0];
-      vertices.push_back(away_neighbor);
-      if (is_open) {
-        cap_neighbors[0].push_back(away_neighbor);
+
+      // But what if we haven't generated any vertices before? Let's do so now.
+      // We do similar to how we would have done so at a non-rounded node, but
+      // we use a plane perpendicular to aft instead of one that bisects the
+      // angle at the node.
+      else {
+        first_plane = plane;
+
+        QVector3<T> to_ring = GetConstrainedPerpendicular(afts[0]);
+        to_ring *= radius;
+        to_ring = QMatrix4<float>::GetRotate(twist, afts[0]) * to_ring;
+        for (int si = 0; si < nstops; ++si) {
+          QVector3<T> ring_neighbor = QMatrix4<float>::GetRotate(si * 360.0f / nstops, afts[0]) * to_ring + pivot_on_aft;
+          vertices.push_back(ring_neighbor);
+        }
+      }
+
+      // With the first slice emitted, let's figure out how many more we need
+      // and how much we'll have to rotate between each so as to not exceed the
+      // maximum bend. We divvy the bend up into chunks that are no larger than
+      // max_bend.
+      int nslices = ceilf(bend_degrees / max_bend);
+      T bend_delta = bend_degrees / (nslices - 1);
+      const QMatrix4<T> rotator = QMatrix4<T>::GetTranslate(pivot[0], pivot[1], pivot[2]) *
+                                  QMatrix4<T>::GetRotate(bend_delta, pivot_axis) *
+                                  QMatrix4<T>::GetTranslate(-pivot[0], -pivot[1], -pivot[2]);
+
+      // Generate remaining slices by rotating the previous slice's vertices.
+      for (int i = 1; i < nslices; ++i) {
+        int i_previous_ring = vertices.size() - nstops;
+        for (int si = 0; si < nstops; ++si) {
+          QVector3<T> previous_ring_neighbor(vertices[i_previous_ring + si]);
+          QVector3<T> ring_neighbor = rotator * previous_ring_neighbor;
+          vertices.push_back(ring_neighbor);
+        }
       }
     }
 
-    // for each remaining node
-    //   make plane (point as node, normal as fore + aft)
-    //   axis = node - previous node
-    //   for each stop
-    //     intersect line (prev, axis) with plane
+    // If this polyline is disconnected or the first node isn't sharp enough to
+    // warrant rounding, let's emit our first set of vertices around the first
+    // node.
+    else if (vi == 0) {
+      // Follow node out to surrounding ring according to the current radius. We
+      // choose a vector to stay 2D axis-aligned if possible.
+      QVector3<T> to_ring = GetConstrainedPerpendicular(fores[0]);
+      to_ring *= is_adaptive_radius ? (*this)(0)[3] : radius;
+   
+      // We let the caller apply a twist to the seed vector to perfect alignment.
+      to_ring = QMatrix4<float>::GetRotate(twist, fores[0]) * to_ring;
 
-    for (int vi = 1; vi < nvertices; ++vi) {
-      Plane<T, 3> plane(nodes[vi], normals[vi]);
-
+      // Spin that vector around the desired number of stops and emit a vertex.
       for (int si = 0; si < nstops; ++si) {
-        QVector3<T> previous_away_neighbor(vertices[si + (vi - 1) * nstops]);
-        Line<T, 3> line(previous_away_neighbor, afts[vi] * (T) -1);
+        QVector3<T> ring_neighbor = QMatrix4<float>::GetRotate(si * 360.0f / nstops, fores[0]) * to_ring + nodes[0];
+        Line<T, 3> line(ring_neighbor, fores[0] * (T) -1);
 
         QVector3<T> intersection_point;
-        plane.Intersect(line, intersection_point);
+        first_plane.Intersect(line, intersection_point);
         vertices.push_back(intersection_point);
 
+        // If this line is disconnected, let's record this vertex as also being
+        // part of the cap.
+        if (is_open) {
+          cap_neighbors[0].push_back(intersection_point);
+        }
+      }
+    }
+
+    // Okay, so this node's joint doesn't need rounding. Let's take the
+    // previous vertices and shoot a line from them along aft into this node's
+    // bisecting plane. Those intersection points are this node's ring of
+    // neighbors.
+    else {
+      Plane<T, 3> plane(nodes[vi], normals[vi]);
+      Plane<T, 3> aft_plane(nodes[vi], afts[vi]);
+
+      int i_previous_ring = vertices.size() - nstops;
+      for (int si = 0; si < nstops; ++si) {
+        QVector3<T> previous_ring_neighbor(vertices[i_previous_ring + si]);
+        Line<T, 3> line(previous_ring_neighbor, afts[vi] * (T) -1);
+
+        QVector3<T> intersection_point;
+        aft_plane.Intersect(line, intersection_point);
+        if (is_adaptive_radius) {
+          QVector3<T> diff = intersection_point - aft_plane.GetPoint();
+          diff.Normalize();
+          intersection_point = nodes[vi] + diff * (*this)(vi)[3];
+        }
+
+        line = Line<T, 3>(intersection_point, afts[vi] * (T) -1);
+        plane.Intersect(line, intersection_point);
+
+        vertices.push_back(intersection_point);
+
+        // If this is the last node on an open line, let's capture these
+        // vertices for the cap as well.
         if (vi == this->GetElementCount() - 1 && is_open) {
           cap_neighbors[1].push_back(intersection_point);
         }
@@ -363,11 +481,42 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist) const {
     }
   }
 
+  // If the line is closed, we need the fill in geometry between the last node
+  // and the first. Trimesh::GetParametric can do this for us, but the model
+  // may have gotten twist and what was the ith neighbor at the first node
+  // might not align at the end. So, we continue our previous trick of shooting
+  // the last vertices into the first node's plane. The duplicate vertices will
+  // need to be cleaned up later.
+  if (!is_open) {
+    Plane<T, 3> aft_plane(nodes[0], afts[0]);
+    int i_previous_ring = vertices.size() - nstops;
+    for (int si = 0; si < nstops; ++si) {
+      QVector3<T> previous_ring_neighbor(vertices[i_previous_ring + si]);
+      Line<T, 3> line(previous_ring_neighbor, fores[nvertices - 1] * (T) -1);
+
+      QVector3<T> intersection_point;
+      aft_plane.Intersect(line, intersection_point);
+      if (is_adaptive_radius) {
+        QVector3<T> diff = intersection_point - aft_plane.GetPoint();
+        diff.Normalize();
+        intersection_point = aft_plane.GetPoint() + diff * (*this)(0)[3];
+      }
+
+      line = Line<T, 3>(intersection_point, fores[nvertices - 1] * (T) -1);
+      first_plane.Intersect(line, intersection_point);
+
+      vertices.push_back(intersection_point);
+    }
+  }
+
+  // The vertices have all been emitted. We're done with the bookkeeping.
   delete[] nodes;
   delete[] normals;
   delete[] afts;
   delete[] fores;
 
+  // We lay out the vertices in an nstops x ~nvertices grid. At each cell is a
+  // vertex's 3D position.
   NField<float, 2> img(QVector2<int>(nstops, vertices.size() / nstops), 3);
   NFieldIterator<2> c(img.GetDimensions());
   int i = 0;
@@ -377,8 +526,12 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist) const {
     ++i;
   }
 
-  Trimesh *mesh = Trimesh::GetParametric(img, true, !is_open);
+  // We expand the parameteric surface into a full triangular mesh. The columns
+  // wrap (following the solid gerth of tube), but not the rows. We wrapped
+  // those manually as needed.
+  Trimesh *mesh = Trimesh::GetParametric(img, true, false);
 
+  // If this mesh is open, we need to generate caps as well.
   if (is_open) {
     for (int ci = 0; ci < 2; ++ci) {
       int vi = ci == 0 ? 0 : (this->GetElementCount() - 1);

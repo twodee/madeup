@@ -4,6 +4,7 @@
 #include "madeup/Environment.h"
 #include "madeup/ExpressionAbsoluteValue.h"
 #include "madeup/ExpressionAxis.h"
+#include "madeup/ExpressionBoolean.h"
 #include "madeup/ExpressionBlobs.h"
 #include "madeup/ExpressionBox.h"
 #include "madeup/ExpressionCenter.h"
@@ -42,6 +43,8 @@
 #include "madeup/ExpressionWhere.h"
 #include "madeup/ExpressionYaw.h"
 #include "twodee/Log.h"
+#include "twodee/Polyline.h"
+#include "twodee/QMath.h"
 #include "twodee/Utilities.h"
 
 namespace madeup {
@@ -93,6 +96,7 @@ void Environment::prime() {
   add("pi", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("pi", Co<Expression>(new ExpressionReal(td::PI)))), Environment())));
   add("e", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("e", Co<Expression>(new ExpressionReal(td::E)))), Environment())));
   add("twist", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("twist", Co<Expression>(new ExpressionReal(45.0f)))), Environment())));
+  add("maxBend", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("maxBend", Co<Expression>(new ExpressionReal(361.0f)))), Environment())));
   add("axisx", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisx", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
   add("axisy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisy", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
   add("axisz", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisz", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
@@ -105,6 +109,7 @@ void Environment::prime() {
   globals->add("pi", (*this)["pi"]);
   globals->add("e", (*this)["e"]);
   globals->add("twist", (*this)["twist"]);
+  globals->add("maxBend", (*this)["maxBend"]);
   globals->add("axisx", (*this)["axisx"]);
   globals->add("axisy", (*this)["axisy"]);
   globals->add("axisz", (*this)["axisz"]);
@@ -217,6 +222,8 @@ void Environment::prime() {
   define_sign->addFormal("n");
 
   Co<ExpressionDefine> define_dowel(new ExpressionDefine("dowel", Co<Expression>(new ExpressionDowel())));
+  define_dowel->addFormal("twist");
+  define_dowel->addFormal("maxBend");
 
   Co<ExpressionDefine> define_polygon(new ExpressionDefine("polygon", Co<Expression>(new ExpressionPolygon())));
 
@@ -586,7 +593,7 @@ void Environment::polygon() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::dowel() {
+void Environment::dowel(float twist, float max_bend) {
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() >= 2) {
       QVector3<float> diff = run[0].position - run[run.size() - 1].position;
@@ -604,51 +611,27 @@ void Environment::dowel() {
       }
 
       if (run.size() > 0) {
+        float radius = run[0].radius;
+        bool is_homoradius = true;
+
         Polyline<float> *line = new Polyline<float>(run.size(), 4, mode);
         for (unsigned int i = 0; i < run.size(); ++i) {
           (*line)(i)[0] = run[i].position[0];
           (*line)(i)[1] = run[i].position[1];
           (*line)(i)[2] = run[i].position[2];
           (*line)(i)[3] = run[i].radius;
+          is_homoradius = is_homoradius && fabs(run[i].radius - radius) < 1.0e-3f;
         }
-        /* line->Write("line.f20"); */
+        std::cout << "is_homoradius: " << is_homoradius << std::endl;
+
+        if (!is_homoradius) {
+          radius = -1;
+        }
 
         Co<Expression> nsides_value = (*this)["nsides"]->evaluate(*this);
         int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->toInteger();
 
-        Co<Expression> fracture_value = (*this)["fracture"]->evaluate(*this);
-        ExpressionReal *fracture_number = dynamic_cast<ExpressionReal *>(fracture_value.GetPointer());
-        float fracture;
-        if (fracture_number) {
-          fracture = fracture_number->toReal();
-        } else {
-          ExpressionInteger *fracture_number = dynamic_cast<ExpressionInteger *>(fracture_value.GetPointer());
-          fracture = fracture_number->toInteger();
-        }
-
-        Co<Expression> twist_value = (*this)["twist"]->evaluate(*this);
-        ExpressionReal *twist_number = dynamic_cast<ExpressionReal *>(twist_value.GetPointer());
-        float twist;
-        if (twist_number) {
-          twist = twist_number->toReal();
-        } else {
-          ExpressionInteger *twist_number = dynamic_cast<ExpressionInteger *>(twist_value.GetPointer());
-          twist = twist_number->toInteger();
-        }
-
-        /* line->Fracture(fracture); */
-        /* line->AdaptiveFracture(30.0f, 1.0f); */
-
-        // Output for Desmos.
-#if 0
-        std::cout << "(" << (*line)(0)[0] << ", " << (*line)(0)[1] << ")";
-        for (int i = 1; i < line->GetElementCount(); ++i) {
-          std::cout << ",(" << (*line)(i)[0] << ", " << (*line)(i)[1] << ")";
-        }
-        std::cout << "" << std::endl;
-#endif
-
-        Trimesh *trimesh = line->Dowel(nsides, -1, twist);
+        Trimesh *trimesh = line->Dowel(nsides, radius, twist, max_bend);
 
         delete line;
         line = NULL;

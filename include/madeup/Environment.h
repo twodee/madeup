@@ -11,8 +11,6 @@
 #include "madeup/SourceLocation.h"
 #include "twodee/Camera.h"
 #include "twodee/Co.h"
-#include "twodee/Polyline.h"
-#include "twodee/QMath.h"
 #include "twodee/QMatrix4.h"
 #include "twodee/QVector3.h"
 #include "twodee/QVector4.h"
@@ -69,7 +67,7 @@ class Environment {
     void yaw(float degrees);
     void pitch(float degrees);
     void roll(float degrees);
-    void dowel();
+    void dowel(float twist, float max_bend);
     void polygon();
     void revolve();
     void extrude(const QVector3<float> &axis, float length);

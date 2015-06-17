@@ -51,7 +51,7 @@ $(WWW_ROOT)/three-js:
 	sudo chmod -R a+rX $(WWW_ROOT)/three-js
 
 $(WWW_ROOT)/blockly:
-	sudo git clone https://github.com/google/blockly.git $(WWW_ROOT)/blockly
+	sudo git clone https://github.com/twodee/blockly.git $(WWW_ROOT)/blockly
 	sudo chmod -R a+rX $(WWW_ROOT)/blockly
 
 $(WWW_ROOT)/closure-library:
