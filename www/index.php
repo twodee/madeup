@@ -106,42 +106,40 @@
     <input id="run" type="button" value="Run"/>
     <input id="smaller" type="button" value="-"/>
     <input id="bigger" type="button" value="+"/>
-    <input id="toggle_editor_popup" type="button" value="Editor"/>
+    <input id="toggleEditorPopup" type="button" value="Editor"/>
 
     <input style="float: right" id="download" type="button" value="Download Model"/>
     <input style="float: right" id="fit" type="button" value="Fit"/>
-    <input style="float: right" id="toggle_grid_popup" type="button" value="Grid"/>
-    <input style="float: right" id="toggle_display_popup" type="button" value="Display"/>
+    <input style="float: right" id="toggleGridPopup" type="button" value="Grid"/>
+    <input style="float: right" id="toggleDisplayPopup" type="button" value="Display"/>
 
-    <div id="editor_popup" class="popups">
-      Mode:<br/>
-      <input type="radio" name="editor_mode" value="Text" checked="checked"/>Text<br/>
-      <input type="radio" name="editor_mode" value="Blocks"/>Blocks<br/>
-      <input type="checkbox" id="autopreview" checked="checked"/>Preview <input type="text" id="nSecondsTillPreview" size="2"/> seconds after last edit<br/>
+    <div id="editorPopup" class="popups">
+      <input type="radio" name="editorMode" value="Text" checked="checked"/>Text or <input type="radio" name="editorMode" value="Blocks"/>Blocks<br/>
+      <input type="checkbox" id="autopreview" checked="checked"/>Preview <input type="text" id="nSecondsTillPreview" size="5"/> seconds after last edit<br/>
     </div>
-    <div id="grid_popup" class="popups">
-      <input type="checkbox" id="grid_yz"/>X = 0<br/>
-      <input type="checkbox" id="grid_xz"/>Y = 0<br/>
-      <input type="checkbox" id="grid_xy"/>Z = 0<br/>
-      <input type="checkbox" id="axis_x"/>X axis<br/>
-      <input type="checkbox" id="axis_y"/>Y axis<br/>
-      <input type="checkbox" id="axis_z"/>Z axis<br/>
-      Grid Extent: <input type="text" id="grid_extent" size="5"/><br/>
-      Grid Spacing: <input type="text" id="grid_spacing" size="5"/><br/>
+    <div id="gridPopup" class="popups">
+      <input type="checkbox" id="axisX"/>X axis<br/>
+      <input type="checkbox" id="axisY"/>Y axis<br/>
+      <input type="checkbox" id="axisZ"/>Z axis<br/>
+      <input type="checkbox" id="gridX"/>X = 0 plane<br/>
+      <input type="checkbox" id="gridY"/>Y = 0 plane<br/>
+      <input type="checkbox" id="gridZ"/>Z = 0 plane<br/>
+      Grid Extent: <input type="text" id="gridExtent" size="5"/><br/>
+      Grid Spacing: <input type="text" id="gridSpacing" size="5"/><br/>
     </div>
-    <div id="display_popup" class="popups">
-      <input type="checkbox" id="isWireframe"/>Wireframe<br/>
-      Model color: <div id="modelColor" style="width: 50px; height: 18px; display: inline-block"></div>
-      <input type="checkbox" id="showHeadings">Show Headings</input><br/>
+    <div id="displayPopup" class="popups">
+      <input type="checkbox" id="isWireframe"/>Show wireframe<br/>
+      <input type="checkbox" id="showHeadings">Show heading</input><br/>
+      <div id="modelColor" style="width: 100px; display: inline-block; padding: 5px">Model color</div>
     </div>
     <br/>
   </div>
 
   <div id="left">
-    <div id="editor_pane">
+    <div id="editorPane">
       <div id="text_editor"></div>
-      <div id="blocks_editor">
-        <div id="blocks_canvas"></div>
+      <div id="blocksEditor">
+        <div id="blocksCanvas"></div>
       </div>
     </div>
     <div id="console"><div id="message"></div></div>

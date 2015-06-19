@@ -20,6 +20,7 @@ body {
 }
 
 .popups {
+  padding: 5px;
   background-color: #333333;
   border: 0px;
   color: white;
@@ -29,6 +30,10 @@ body {
   z-index: 1000000;
   display: none;
   position: absolute;
+}
+
+.popups input[type="text"] {
+  margin: 2px;
 }
 
 #entire {
@@ -58,13 +63,13 @@ body {
   height: 300px;
 }
 
-#blocks_editor {
+#blocksEditor {
   display: none;
   background-color: blue;
   margin: 0px;
 }
 
-#blocks_canvas { 
+#blocksCanvas { 
   position: absolute;
   background-color: red;
 }
@@ -83,7 +88,7 @@ body {
   overflow: auto;
 }
 
-/* Fattens the handle for resizing the console. Needed because the text_editor seems 
+/* Fattens the handle for resizing the console. Needed because the textEditor seems 
    to snarf up its size of the boundary. */
 #console > .ui-resizable-n {
   top: 0;
