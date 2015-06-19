@@ -175,6 +175,8 @@ template<class T, int ndims> class QVector {
 
     QVector<T, ndims> GetReverse() const;
 
+    T GetDistanceTo(const QVector<T, ndims> &other) const;
+
     /**
      Casts the vector to a vector of another type.
      */
@@ -718,6 +720,13 @@ QVector<T, ndims> QVector<T, ndims>::GetReverse() const {
     ans[d] = (*this)[ndims - 1 - d];
   }
   return ans;
+}
+
+/* ------------------------------------------------------------------------- */
+
+template<class T, int ndims>
+T QVector<T, ndims>::GetDistanceTo(const QVector<T, ndims> &other) const {
+  return (*this - other).GetLength(); 
 }
 
 /* ------------------------------------------------------------------------- */

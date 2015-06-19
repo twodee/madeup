@@ -262,7 +262,7 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist, float max_bend) const
   }
 
   // Any node that spatially coincides with its predecessor will have a bad
-  // aft, i.e., its after will be the null vector. So, we share a predecessor's
+  // aft, i.e., its aft will be the null vector. So, we share a predecessor's
   // non-degenerate aft with its coinciding successor. If multiple nodes all
   // sit atop each other, the first good aft will propogate along.
   for (int vi = 1; vi < nvertices; ++vi) {
@@ -271,10 +271,23 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist, float max_bend) const
     }
   }
 
+  // When previous has a move 0, afts[0] is bad.
+  if (!is_open) {
+    for (int vi = 0; vi < nvertices && afts[vi].GetLength() < EPSILON; ++vi) {
+      afts[vi] = afts[(nvertices + vi - 1) % nvertices];
+    }
+  }
+
   // Any node that coincides with its successor will have a bad fore. See
   // above. We must work backwards to propogate in the right direction.
   for (int vi = nvertices - 2; vi >= 0; --vi) {
     if (fores[vi].GetLength() < EPSILON) {
+      fores[vi] = fores[vi + 1];
+    }
+  }
+
+  if (!is_open) {
+    for (int vi = nvertices - 2; vi >= 0 && fores[vi].GetLength() < EPSILON; --vi) {
       fores[vi] = fores[vi + 1];
     }
   }
@@ -327,6 +340,12 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist, float max_bend) const
     T radians_at_node = acos(fores[vi].Dot(afts[vi]));
     T bend_degrees = 360.0f - 180.0f - radians_at_node * 180 / td::PI;
 
+    if (is_adaptive_radius) {
+      radius = (*this)(vi)[3];
+    }
+    std::cout << "vi: " << vi << std::endl;
+    std::cout << "radius: " << radius << std::endl;
+
     // See if we need to round this bend. We round if two things are true: 1)
     // the bend exceeds the maximum allowed, and 2) we're not an endpoint node
     // or we are an endpoint but the line is closed.
@@ -336,10 +355,6 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist, float max_bend) const
       // Find a vector that bisects the angle between aft and fore.
       QVector3<T> bisector = fores[vi] + afts[vi];
       bisector.Normalize();
-
-      if (is_adaptive_radius) {
-        radius = (*this)(vi)[3];
-      }
 
       // Push out from node along bisector. Go out far enough so that the aft
       // and fore shafts just meet and do not overlap. This point will be our
@@ -424,7 +439,7 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist, float max_bend) const
       // Follow node out to surrounding ring according to the current radius. We
       // choose a vector to stay 2D axis-aligned if possible.
       QVector3<T> to_ring = GetConstrainedPerpendicular(fores[0]);
-      to_ring *= is_adaptive_radius ? (*this)(0)[3] : radius;
+      to_ring *= radius;
    
       // We let the caller apply a twist to the seed vector to perfect alignment.
       to_ring = QMatrix4<float>::GetRotate(twist, fores[0]) * to_ring;
@@ -442,6 +457,23 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist, float max_bend) const
         // part of the cap.
         if (is_open) {
           cap_neighbors[0].push_back(intersection_point);
+        }
+      }
+    }
+
+    else if (nodes[vi].GetDistanceTo(nodes[vi - 1]) < EPSILON) {
+      int i_previous_ring = vertices.size() - nstops;
+      for (int si = 0; si < nstops; ++si) {
+        QVector3<T> previous_ring_neighbor(vertices[i_previous_ring + si]);
+        QVector3<T> diff = previous_ring_neighbor - nodes[vi];
+        diff.Normalize();
+        QVector3<T> scaled = nodes[vi] + diff * radius;
+        vertices.push_back(scaled);
+ 
+        // If this is the last node on an open line, let's capture these
+        // vertices for the cap as well.
+        if (vi == this->GetElementCount() - 1 && is_open) {
+          cap_neighbors[1].push_back(scaled);
         }
       }
     }
@@ -464,7 +496,7 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist, float max_bend) const
         if (is_adaptive_radius) {
           QVector3<T> diff = intersection_point - aft_plane.GetPoint();
           diff.Normalize();
-          intersection_point = nodes[vi] + diff * (*this)(vi)[3];
+          intersection_point = nodes[vi] + diff * radius;
         }
 
         line = Line<T, 3>(intersection_point, afts[vi] * (T) -1);
@@ -483,12 +515,15 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist, float max_bend) const
 
   // If the line is closed, we need the fill in geometry between the last node
   // and the first. Trimesh::GetParametric can do this for us, but the model
-  // may have gotten twist and what was the ith neighbor at the first node
+  // may have gotten twisted and what was the ith neighbor at the first node
   // might not align at the end. So, we continue our previous trick of shooting
   // the last vertices into the first node's plane. The duplicate vertices will
   // need to be cleaned up later.
   if (!is_open) {
+    std::cout << "capping" << std::endl;
     Plane<T, 3> aft_plane(nodes[0], afts[0]);
+    std::cout << "afts[0]: " << afts[0] << std::endl;
+    std::cout << "nodes[0]: " << nodes[0] << std::endl;
     int i_previous_ring = vertices.size() - nstops;
     for (int si = 0; si < nstops; ++si) {
       QVector3<T> previous_ring_neighbor(vertices[i_previous_ring + si]);
@@ -496,17 +531,22 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist, float max_bend) const
 
       QVector3<T> intersection_point;
       aft_plane.Intersect(line, intersection_point);
-      if (is_adaptive_radius) {
-        QVector3<T> diff = intersection_point - aft_plane.GetPoint();
-        diff.Normalize();
-        intersection_point = aft_plane.GetPoint() + diff * (*this)(0)[3];
-      }
 
       line = Line<T, 3>(intersection_point, fores[nvertices - 1] * (T) -1);
       first_plane.Intersect(line, intersection_point);
 
+      if (is_adaptive_radius) {
+        QVector3<T> diff = intersection_point - first_plane.GetPoint();
+        diff.Normalize();
+        std::cout << "diff: " << diff << std::endl;
+        intersection_point = first_plane.GetPoint() + diff * (*this)(0)[3];
+        std::cout << "intersection_point: " << intersection_point << std::endl;
+      }
+
       vertices.push_back(intersection_point);
     }
+  } else {
+    std::cout << "no capping" << std::endl;
   }
 
   // The vertices have all been emitted. We're done with the bookkeeping.
