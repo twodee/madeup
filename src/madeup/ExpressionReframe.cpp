@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "madeup/ExpressionUnit.h"
-#include "madeup/ExpressionWhere.h"
+#include "madeup/ExpressionReframe.h"
 
 using namespace td;
 
@@ -9,21 +9,21 @@ namespace madeup {
 
 /* ------------------------------------------------------------------------- */
 
-ExpressionWhere::ExpressionWhere() :
+ExpressionReframe::ExpressionReframe() :
   Expression() {
 }
 
 /* ------------------------------------------------------------------------- */
 
-Co<Expression> ExpressionWhere::evaluate(Environment &env) const {
-  std::cerr << env.getTurtle().position << std::endl;
+Co<Expression> ExpressionReframe::evaluate(Environment &env) const {
+  env.reframe();
   return Co<Expression>(new ExpressionUnit());
 }
 
 /* ------------------------------------------------------------------------- */
 
-void ExpressionWhere::write(ostream &out) const {
-  out << "(where)";
+void ExpressionReframe::write(ostream &out) const {
+  out << "(reframe)";
 }
 
 /* ------------------------------------------------------------------------- */

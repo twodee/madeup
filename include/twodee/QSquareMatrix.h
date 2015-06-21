@@ -32,6 +32,8 @@ template<class T, int nrows> class QSquareMatrix : public QMatrix<T, nrows, nrow
      */
     QSquareMatrix(const T *src);
 
+    QVector<T, nrows - 1> TransformVector(const QVector<T, nrows - 1> &v) const;
+
     /**
      Creates a new matrix, using the supertype matrix as a source.
      @param src The NxN matrix to be copied.
@@ -106,6 +108,30 @@ QSquareMatrix<T, nrows> QSquareMatrix<T, nrows>::GetScale(const QVector<T, nrows
   }
 
   return m;
+}
+
+/* ------------------------------------------------------------------------- */
+
+/**
+ Gets the product of the specified matrix and vector, where the vector has
+ one less dimension than the matrix and the bottom row of the matrix is
+ the vector [0 0 ... 1]. The missing component of the vector is assumed 0.
+ This method can be used to transform vectors by a transformation matrix
+ in homogeneous space.
+ @param m Matrix operand
+ @param v Vector operand
+ */
+template<class T, int nrows>
+QVector<T, nrows - 1> QSquareMatrix<T, nrows>::TransformVector(const QVector<T, nrows - 1> &v) const {
+  QVector<T, nrows - 1> ans((T) 0);
+
+  for (int r = 0; r < nrows - 1; ++r) {
+    for (int c = 0; c < nrows - 1; ++c) {
+      ans[r] += (*this)(r, c) * v[c];
+    }
+  }
+
+  return ans;
 }
 
 /* ------------------------------------------------------------------------- */

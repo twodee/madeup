@@ -16,7 +16,7 @@ var scene, renderer, camera, controls;
 var geoscene, pointerScene;
 var meshes = [];
 var nSecondsTillPreview = 1.0;
-var isWireframe = false;
+var showWireframe = false;
 var arrowShafts = [];
 var showHeadings = true;
 var modelColor = 'FF0000';
@@ -25,6 +25,16 @@ var fontSize = 14;
 var gridSpacing = 1.0;
 var gridExtent = 10.0;
 
+var isShowWireframeChanged = false;
+var isAxisChanged = [false, false, false];
+var isPlaneChanged = [false, false, false];
+var isNSecondsTillPreviewChanged = false;
+var isShowHeadingsChanged = false;
+var isModelColorChanged = false;
+var isFontSizeChanged = false;
+var isGridSpacingChanged = false;
+var isGridExtentChanged = false;
+
 function saveInCookies() {
   $.cookie('last', getSource());
   if (workspace) {
@@ -32,21 +42,39 @@ function saveInCookies() {
     var xmlText = Blockly.Xml.domToText(xml);
     $.cookie('lastBlocks', xmlText);
   }
-  if (fontSize != 14) $.cookie('fontSize', fontSize);
-  if (!showHeadings) $.cookie('showHeadings', showHeadings ? 1 : 0);
-  if (modelColor != 'FF0000') $.cookie('modelColor', modelColor);
-  if (isWireframe) $.cookie('isWireframe', isWireframe ? 1 : 0);
-  if ($('#axisX').prop('checked')) $.cookie('axisX', $('#axisX').prop('checked'));
-  if ($('#axisY').prop('checked')) $.cookie('axisY', $('#axisY').prop('checked'));
-  if ($('#axisZ').prop('checked')) $.cookie('axisZ', $('#axisZ').prop('checked'));
-  if ($('#gridX').prop('checked')) $.cookie('gridX', $('#gridX').prop('checked'));
-  if ($('#gridY').prop('checked')) $.cookie('gridY', $('#gridY').prop('checked'));
-  if ($('#gridZ').prop('checked')) $.cookie('gridZ', $('#gridZ').prop('checked'));
-  if (nSecondsTillPreview != 1.0) $.cookie('nSecondsTillPreview', nSecondsTillPreview);
-  if (gridSpacing != 1.0) $.cookie('gridSpacing', gridSpacing);
-  if (gridExtent != 10.0) $.cookie('gridExtent', gridExtent);
+
+  // Only store a cookie if a setting has changed. If we unconditionally stored
+  // these, then updates to the default value would not be seen by users, as
+  // the old defaults persisted in the cookies would override the new ones.
+  if (isFontSizeChanged) $.cookie('fontSize', fontSize);
+  if (isShowHeadingsChanged) $.cookie('showHeadings', showHeadings ? 1 : 0);
+  if (isModelColorChanged) $.cookie('modelColor', modelColor);
+  if (isShowWireframeChanged) $.cookie('showWireframe', showWireframe ? 1 : 0);
+  if (isAxisChanged[0]) $.cookie('axisX', $('#axisX').prop('checked'));
+  if (isAxisChanged[1]) $.cookie('axisY', $('#axisY').prop('checked'));
+  if (isAxisChanged[2]) $.cookie('axisZ', $('#axisZ').prop('checked'));
+  if (isPlaneChanged[0]) $.cookie('gridX', $('#gridX').prop('checked'));
+  if (isPlaneChanged[1]) $.cookie('gridY', $('#gridY').prop('checked'));
+  if (isPlaneChanged[2]) $.cookie('gridZ', $('#gridZ').prop('checked'));
+  if (isNSecondsTillPreviewChanged) $.cookie('nSecondsTillPreview', nSecondsTillPreview);
+  if (isGridSpacingChanged) $.cookie('gridSpacing', gridSpacing);
+  if (isGridExtentChanged) $.cookie('gridExtent', gridExtent);
   $.cookie('leftWidth', $('#left').width());
   $.cookie('consoleHeight', $('#console').height());
+
+  // Changes have been committed, so let's reset the dirty flags.
+  isFontSizeChanged = false;
+  isShowHeadingsChanged = false;
+  isModelColorChanged = false;
+  isShowWireframeChanged = false;
+  isShowHeadingsChanged = false;
+  isNSecondsTillPreviewChanged = false;
+  isGridSpacingChanged = false;
+  isGridExtentChanged = false;
+  for (var d = 0; d < 3; ++d) {
+    isAxisChanged[d] = false;
+    isPlaneChanged[d] = false;
+  }
 }
 
 $(document).ready(function() {
@@ -88,17 +116,18 @@ $(document).ready(function() {
       color: modelColor,
       onSubmit: function(hsb, hex, rgb) {
         modelColor = hex;
+        isModelColorChanged = true;
         $('#modelColor').css('background-color', '#' + modelColor);
         run(GeometryMode.SURFACE);
       }
     });
 
-    if ($.cookie('isWireframe')) {
-      isWireframe = parseInt($.cookie('isWireframe')) != 0;
+    if ($.cookie('showWireframe')) {
+      showWireframe = parseInt($.cookie('showWireframe')) != 0;
     } else {
-      isWireframe = false;
+      showWireframe = false;
     }
-    $('#isWireframe').prop('checked', isWireframe);
+    $('#showWireframe').prop('checked', showWireframe);
 
     if ($.cookie('gridExtent')) {
       gridExtent = parseFloat($.cookie('gridExtent'));
@@ -148,6 +177,7 @@ $(document).ready(function() {
     $('#nSecondsTillPreview').val(nSecondsTillPreview + '');
     $('#nSecondsTillPreview').change(function () {
       nSecondsTillPreview = parseFloat($('#nSecondsTillPreview').val());
+      isNSecondsTillPreviewChanged = true;
       text_editor.getSession().off('change', onEditorChange);
       if (preview) {
         clearTimeout(preview); 
@@ -168,6 +198,7 @@ $(document).ready(function() {
   });
 
   $('#smaller').click(function() {
+    isFontSizeChanged = true;
     fontSize -= 2;
     $('#menu input').each(function (i) {
       this.style.fontSize = (parseInt($(this).css('font-size')) - 1) + 'px';
@@ -176,7 +207,9 @@ $(document).ready(function() {
     $('#console')[0].style.fontSize = fontSize + 'px';
     text_editor.focus();
   });
+
   $('#bigger').click(function() {
+    isFontSizeChanged = true;
     fontSize += 2;
     $('#menu input').each(function (i) {
       this.style.fontSize = (parseInt($(this).css('font-size')) + 1) + 'px';
@@ -185,13 +218,12 @@ $(document).ready(function() {
     $('#console')[0].style.fontSize = fontSize + 'px';
     text_editor.focus();
   });
-  /* $('#lastfit').click(function() { */
-    /* controls.reset();  */
-  /* }); */
+
   $('#fit').click(function() {
     fit();
     text_editor.focus();
   });
+
   $('input[type=radio][name=editorMode]').change(function() {
     var editorMode = $(this).val();
     if (editorMode == "Blocks") {
@@ -219,7 +251,9 @@ $(document).ready(function() {
     resize();
     Blockly.fireUiEvent(window, 'resize');
   });
+
   $('#showHeadings').click(function() {
+    isShowHeadingsChanged = true;
     showHeadings = this.checked;
     text_editor.focus();
     render();
@@ -261,6 +295,7 @@ $(document).ready(function() {
   }
 
   function toggleAxis(d) {
+    isAxisChanged[d] = true;
     return function() {
       if (this.checked) {
         generateAxis(d);
@@ -314,6 +349,7 @@ $(document).ready(function() {
   }
 
   function togglePlane(d) {
+    isPlaneChanged[d] = true;
     return function() {
       if (this.checked) {
         generatePlane(d);
@@ -328,6 +364,7 @@ $(document).ready(function() {
   $('#gridZ').click(togglePlane(2));
 
   $('#gridExtent').change(function() {
+    isGridExtentChanged = true;
     gridExtent = parseFloat($(this).val());
     for (var d = 0; d < 3; ++d) {
       if (axes[d]) {
@@ -340,6 +377,7 @@ $(document).ready(function() {
   });
 
   $('#gridSpacing').change(function() {
+    isGridSpacingChanged = true;
     gridSpacing = parseFloat($(this).val());
     for (var d = 0; d < 3; ++d) {
       if (planes[d]) {
@@ -361,27 +399,31 @@ $(document).ready(function() {
       preview = undefined;
     }
   });
-  $('#isWireframe').click(function() {
-    isWireframe = this.checked;
+
+  $('#showWireframe').click(function() {
+    isShowWireframeChanged = true;
+    showWireframe = this.checked;
     run(GeometryMode.SURFACE);
   });
+
   $('#toggleEditorPopup').click(function() {
     $('.popups').not('#editorPopup').hide();
     $('#editorPopup').css('top', $('#toggleEditorPopup').position().top + $('#toggleEditorPopup').innerHeight(true)) - 8; 
     $('#editorPopup').css('left', $('#toggleEditorPopup').position().left + 4); 
-    $('#editorPopup').toggle('fast', function() {});
+    $('#editorPopup').slideToggle('fast', function() {});
   });
+
   $('#toggleGridPopup').click(function() {
     $('.popups').not('#gridPopup').hide();
     $('#gridPopup').css('top', $('#toggleGridPopup').position().top + $('#toggleGridPopup').innerHeight(true)) - 8; 
     $('#gridPopup').css('left', $('#toggleGridPopup').position().left + 4); 
-    $('#gridPopup').toggle('fast', function() {});
+    $('#gridPopup').slideToggle('fast', function() {});
   });
   $('#toggleDisplayPopup').click(function() {
     $('.popups').not('#displayPopup').hide();
     $('#displayPopup').css('top', $('#toggleDisplayPopup').position().top + $('#toggleDisplayPopup').innerHeight(true)) - 8; 
     $('#displayPopup').css('left', $('#toggleDisplayPopup').position().left + 4); 
-    $('#displayPopup').toggle('fast', function() {});
+    $('#displayPopup').slideToggle('fast', function() {});
   });
   $('#download').click(function() {
     $('#source').val(getSource());
@@ -461,9 +503,10 @@ function run(mode) {
         if (mode == GeometryMode.SURFACE) {
           var loader = new THREE.JSONLoader();
           var model = loader.parse(JSON.parse(data['model']));
-          var material = isWireframe ? new THREE.MeshBasicMaterial({color: parseInt(modelColor, 16), wireframe: isWireframe, wireframeLinewidth: 5})
-                                     : new THREE.MeshLambertMaterial({color: parseInt(modelColor, 16), wireframe: isWireframe, wireframeLinewidth: 5});
+          var material = showWireframe ? new THREE.MeshBasicMaterial({color: parseInt(modelColor, 16), wireframe: showWireframe, wireframeLinewidth: 5})
+                                       : new THREE.MeshLambertMaterial({color: parseInt(modelColor, 16), wireframe: showWireframe, wireframeLinewidth: 5});
           material.side = THREE.DoubleSide;
+          //model.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, -10));
           meshes[0] = new THREE.Mesh(model.geometry, material);
           allGeometry = model.geometry;
         } else {
@@ -488,39 +531,35 @@ function run(mode) {
             if (nvertices > 0) {
               var m = paths[pi].orientation;
               
-              // Cylinder
-              var height = 1;
-              var g2 = new THREE.CylinderGeometry(0, 0.5, height, 10, 10, false);
-              allGeometry.vertices = allGeometry.vertices.concat(g2.vertices);
+              var g2 = new THREE.Geometry();
 
-              g2.applyMatrix(new THREE.Matrix4().makeTranslation(0, height * 0.5, 0));
-              g2.applyMatrix(new THREE.Matrix4().set(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]));
-              g2.applyMatrix(new THREE.Matrix4().makeRotationX(Math.PI / 2.0));
+              g2.vertices.push(
+                new THREE.Vector3(-0.5, 0,  0),
+                new THREE.Vector3( 0.5, 0,  0),
+                new THREE.Vector3( 0, 0, -1),
+                new THREE.Vector3( 0, 0.3, -0.2)
+              );
+
+              g2.faces.push(
+                new THREE.Face3(1, 0, 2),
+                new THREE.Face3(0, 1, 3),
+                new THREE.Face3(3, 2, 0),
+                new THREE.Face3(1, 2, 3)
+              );
+
+              var mm = new THREE.Matrix4().set(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
+              var mmm = new THREE.Matrix4().getInverse(mm);
+              g2.applyMatrix(mmm);
               var offset = new THREE.Vector3(paths[pi].vertices[paths[pi].vertices.length - 1][0], paths[pi].vertices[paths[pi].vertices.length - 1][1], paths[pi].vertices[paths[pi].vertices.length - 1][2]);
               g2.applyMatrix(new THREE.Matrix4().makeTranslation(offset.x, offset.y, offset.z));
+
+              g2.computeFaceNormals();
+              allGeometry.vertices = allGeometry.vertices.concat(g2.vertices);
 
               meshes[meshes.length] = new THREE.Mesh(g2, new THREE.MeshLambertMaterial({
                 color: 0x0000ff,
               }));
               pointerScene.add(meshes[meshes.length - 1]);
-
-              /*
-              // Get the last two points on the page.
-              var ultimate = paths[pi].vertices[nvertices - 1];
-              ultimate = new THREE.Vector3(ultimate[0], ultimate[1], ultimate[2]);
-
-              arrowShafts[arrowShafts.length] = 2.0;
-
-              // Save the last point to help position the arrowhead.
-              arrowShafts[arrowShafts.length] = ultimate;
-
-              // Also get the heading, which we'll need to orient the
-              // arrowhead.
-              var dir = new THREE.Vector3(0, 1, 0);
-              dir.applyMatrix4(new THREE.Matrix4().set(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]));
-              dir.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2.0));
-              arrowShafts[arrowShafts.length] = dir;
-              */
             }
           }
 
@@ -670,10 +709,16 @@ function init() {
   document.getElementById("glcanvas").appendChild(renderer.domElement);
 
   controls = new THREE.OrbitControls(camera, renderer.domElement);
-  /* controls.autoRotate = true; */
+  //controls.autoRotate = true;
   controls.addEventListener('change', function() {
     render();
   });
+
+  /*
+  var vector = new THREE.Vector3( 0, 0, -1 );
+  vector.applyQuaternion(camera.quaternion);
+  alert(vector.toArray());
+  */
 
   window.addEventListener('resize', resize);
   resize();
@@ -710,31 +755,5 @@ function animate() {
 }
 
 function render() {
-  /*
-  pointerScene.clear();
-
-  // Keep arrowheads as screen-aligned as possible.
-  if (showHeadings) {
-    for (var i = 0; i < arrowShafts.length; i += 3) {
-      var arrowVector = arrowShafts[i + 2];
-      var screenAway = new THREE.Vector3().crossVectors(arrowVector, camera.getWorldDirection()).normalize();
-
-      var arrowVectorInverse = new THREE.Vector3().copy(arrowVector).negate();
-      var left = new THREE.Vector3().addVectors(screenAway, arrowVectorInverse).multiplyScalar(arrowShafts[i]);
-      var right = new THREE.Vector3().addVectors(new THREE.Vector3().copy(screenAway).negate(), arrowVectorInverse).multiplyScalar(arrowShafts[i]);
-
-      var geometry = new THREE.Geometry();
-      geometry.vertices.push(new THREE.Vector3().addVectors(arrowShafts[i + 1], left));
-      geometry.vertices.push(arrowShafts[i + 1]);
-      geometry.vertices.push(new THREE.Vector3().addVectors(arrowShafts[i + 1], right));
-      var mesh = new THREE.Line(geometry, new THREE.LineBasicMaterial({
-        color: 0x0000FF,
-        linewidth: 8
-      }));
-      pointerScene.add(mesh);
-    }
-  }
-  */
-
   renderer.render(scene, camera);
 }

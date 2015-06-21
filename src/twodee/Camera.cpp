@@ -144,6 +144,7 @@ void Camera::Pitch(float degrees) {
   QMatrix4<float> r = QMatrix4<float>::GetRotate(degrees, right);
   to = from;
   to += r * focal_direction;
+  up = r * up;
   LookAt(from, to, up);
 }
 
@@ -316,6 +317,12 @@ void Camera::SetOrthographicBottom(float b) {
 
 void Camera::SetOrthographicTop(float t) {
   SetOrthographic(orthographic_frustum[0], orthographic_frustum[1], orthographic_frustum[2], t, orthographic_frustum[4], orthographic_frustum[5]);
+}
+
+/* ------------------------------------------------------------------------- */
+
+const QVector3<float>& Camera::GetUp() const {
+  return up;
 }
 
 /* ------------------------------------------------------------------------- */

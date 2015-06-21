@@ -41,8 +41,8 @@ QMatrix<T, nrows, ncols_b> operator*(const QMatrix<T, nrows, ncols_a>& a,
  @param v Vector operand
  */
 template <class T, int nrows, int ncols>
-QVector<T, nrows> operator*(const QMatrix<T, nrows, ncols>& m,
-                            const QVector<T, ncols> v) {
+QVector<T, nrows> operator*(const QMatrix<T, nrows, ncols> &m,
+                            const QVector<T, ncols> &v) {
   QVector<T, nrows> ans((T) 0);
 
   for (int r = 0; r < nrows; ++r) {
@@ -66,8 +66,8 @@ QVector<T, nrows> operator*(const QMatrix<T, nrows, ncols>& m,
  @param v Vector operand
  */
 template <class T, int nrows, int ncols>
-QVector<T, nrows - 1> operator*(const QMatrix<T, nrows, ncols>& m,
-                                const QVector<T, ncols - 1> v) {
+QVector<T, nrows - 1> operator*(const QMatrix<T, nrows, ncols> &m,
+                                const QVector<T, ncols - 1> &v) {
   QVector<T, nrows - 1> ans((T) 0);
 
   for (int r = 0; r < nrows - 1; ++r) {

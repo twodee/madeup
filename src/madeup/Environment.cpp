@@ -31,6 +31,7 @@
 #include "madeup/ExpressionPush.h"
 #include "madeup/ExpressionRandom.h"
 #include "madeup/ExpressionReal.h"
+#include "madeup/ExpressionReframe.h"
 #include "madeup/ExpressionRevolve.h"
 #include "madeup/ExpressionRoll.h"
 #include "madeup/ExpressionRotate.h"
@@ -53,7 +54,7 @@ Turtle Environment::turtle = {
   QVector3<float>(0.0f),
   Camera(QVector3<float>(0.0f, 0.0f, 0.0f),
          QVector3<float>(0.0f, 1.0f, 0.0f),
-         QVector3<float>(0.0f, 0.0f, -1.0f))
+         QVector3<float>(0.0f, 0.0f, 1.0f))
 };
 stack<Turtle> Environment::previous_turtles;
 vector<Node> Environment::run;
@@ -163,6 +164,8 @@ void Environment::prime() {
 
   Co<ExpressionDefine> define_where(new ExpressionDefine("where", Co<Expression>(new ExpressionWhere())));
 
+  Co<ExpressionDefine> define_reframe(new ExpressionDefine("reframe", Co<Expression>(new ExpressionReframe())));
+
   Co<ExpressionDefine> define_move(new ExpressionDefine("move", Co<Expression>(new ExpressionMove())));
   define_move->addFormal("length");
 
@@ -258,6 +261,7 @@ void Environment::prime() {
   add("roll", Co<ExpressionClosure>(new ExpressionClosure(define_roll, globals)));
   add("debug", Co<ExpressionClosure>(new ExpressionClosure(define_debug, globals)));
   add("where", Co<ExpressionClosure>(new ExpressionClosure(define_where, globals)));
+  add("reframe", Co<ExpressionClosure>(new ExpressionClosure(define_reframe, globals)));
   add("move", Co<ExpressionClosure>(new ExpressionClosure(define_move, globals)));
   add("moveto", Co<ExpressionClosure>(new ExpressionClosure(define_moveto, globals)));
   add("scale", Co<ExpressionClosure>(new ExpressionClosure(define_scale, globals)));
@@ -307,6 +311,7 @@ void Environment::prime() {
   globals->add("debug", (*this)["debug"]);
   globals->add("atan2", (*this)["atan2"]);
   globals->add("where", (*this)["where"]);
+  globals->add("reframe", (*this)["reframe"]);
   globals->add("acos", (*this)["acos"]);
   globals->add("move", (*this)["move"]);
   globals->add("moveto", (*this)["moveto"]);
@@ -400,7 +405,7 @@ void Environment::recordVertex() {
     halflife = 0.0f;
   }
 
-  Node cursor = {xforms.top() * turtle.position, radius, energy, halflife};
+  Node cursor = {turtle.position, radius, energy, halflife};
   run.push_back(cursor);
 }
 
@@ -412,7 +417,7 @@ void Environment::recordPreview() {
   }
   paths[paths.size() - 1].push_back(turtle);
   vector<Turtle> &last_path = paths[paths.size() - 1];
-  last_path[last_path.size() - 1].position = xforms.top() * last_path[last_path.size() - 1].position;
+  last_path[last_path.size() - 1].position = last_path[last_path.size() - 1].position;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -426,9 +431,7 @@ void Environment::move(float distance) {
 /* ------------------------------------------------------------------------- */
 
 void Environment::moveTo(float x, float y, float z) {
-  turtle.position[0] = x;
-  turtle.position[1] = y;
-  turtle.position[2] = z;
+  turtle.position = xforms.top() * QVector3<float>(x, y, z);
   recordVertex();
   recordPreview();
 }
@@ -520,7 +523,7 @@ void Environment::roll(float degrees) {
 /* ------------------------------------------------------------------------- */
 
 void Environment::pitch(float degrees) {
-  turtle.camera.Pitch(degrees);
+  turtle.camera.Pitch(-degrees);
  
   // See Roll.
   if (hasMoved()) {
@@ -531,7 +534,7 @@ void Environment::pitch(float degrees) {
 /* ------------------------------------------------------------------------- */
 
 void Environment::yaw(float degrees) {
-  turtle.camera.Yaw(degrees);
+  turtle.camera.Yaw(-degrees);
 
   // See Roll.
   if (hasMoved()) {
@@ -622,7 +625,6 @@ void Environment::dowel(float twist, float max_bend) {
           (*line)(i)[3] = run[i].radius;
           is_homoradius = is_homoradius && fabs(run[i].radius - radius) < 1.0e-3f;
         }
-        std::cout << "is_homoradius: " << is_homoradius << std::endl;
 
         if (!is_homoradius) {
           radius = -1;
@@ -810,7 +812,6 @@ void Environment::blobs(float grain, float iso) {
         double energy = run[i].energy;
         double halflife = run[i].halflife;
         /* double normer = 1.0 / (stdev * stdev * stdev * pow(2 * PI, 3.0 / 2.0)); */
-        /* std::cout << "normer: " << normer << std::endl; */
 
         QVector3<int> start((mu - min) / grain - 50.0f);
         QVector3<int> end((mu - min) / grain + 50.0f);
@@ -819,16 +820,11 @@ void Environment::blobs(float grain, float iso) {
           if (end[d] > dims[d] - 1) end[d] = dims[d] - 1;
         }
 
-        std::cout << "start: " << start << std::endl;
-        std::cout << "end: " << end << std::endl;
         NFieldIterator<3> c(end + 1, start);
         while (c.HasNext()) {
           c.Next();
           QVector3<float> diff = QVector3<float>(c) * grain + min - mu;
-          /* std::cout << "c: " << c << std::endl; */
-          /* std::cout << "diff: " << diff << std::endl; */
           double boost = energy * exp((diff.GetSquaredLength() * log(0.5)) / (halflife * halflife));
-          /* std::cout << "energy: " << energy << std::endl; */
           field(c)[0] += (float) boost;
         }
       }
@@ -838,7 +834,6 @@ void Environment::blobs(float grain, float iso) {
       /* NFieldIterator<3> c(field.GetDimensions()); */
       /* while (c.HasNext()) { */
         /* c.Next(); */
-        /* std::cout << "field(" << c << "): " << field(c)[0] << std::endl; */
       /* } */
 
       int ntriangles;
@@ -949,7 +944,7 @@ std::string Environment::getPathsJSON() const {
     out << "    \"orientation\": [";
     if (paths[pi].size()) {
       const Camera &camera = paths[pi][paths[pi].size() - 1].camera;
-      const QMatrix4<float> &matrix = camera.GetViewMatrix();
+      const QMatrix4<float> matrix = camera.GetViewMatrix();
       out << matrix(0, 0) << "," << matrix(0, 1) << "," << matrix(0, 2) << "," << matrix(0, 3) << ","
           << matrix(1, 0) << "," << matrix(1, 1) << "," << matrix(1, 2) << "," << matrix(1, 3) << ","
           << matrix(2, 0) << "," << matrix(2, 1) << "," << matrix(2, 2) << "," << matrix(2, 3) << ","
@@ -1013,6 +1008,15 @@ void Environment::checkTimeout(const SourceLocation &location) {
 
 void Environment::setTimeout(int max_seconds) {
   this->max_seconds = max_seconds;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void Environment::reframe() {
+  QMatrix4<float> xform = xforms.top();
+  xforms.pop();
+  xform = xform * QMatrix4<float>::GetTranslate(turtle.position[0], turtle.position[1], turtle.position[2]) * turtle.camera.GetViewMatrix();
+  xforms.push(xform);
 }
 
 /* ------------------------------------------------------------------------- */

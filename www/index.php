@@ -128,7 +128,7 @@
       Grid Spacing: <input type="text" id="gridSpacing" size="5"/><br/>
     </div>
     <div id="displayPopup" class="popups">
-      <input type="checkbox" id="isWireframe"/>Show wireframe<br/>
+      <input type="checkbox" id="showWireframe"/>Show wireframe<br/>
       <input type="checkbox" id="showHeadings">Show heading</input><br/>
       <div id="modelColor" style="width: 100px; display: inline-block; padding: 5px">Model color</div>
     </div>

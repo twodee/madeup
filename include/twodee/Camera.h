@@ -42,6 +42,7 @@ class Camera {
      */
     const QVector3<float>& GetFrom() const;
     const QVector3<float>& GetTo() const;
+    const QVector3<float>& GetUp() const;
 
     /**
      Gets the transformation matrix that will transform to a system where the

@@ -343,8 +343,6 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist, float max_bend) const
     if (is_adaptive_radius) {
       radius = (*this)(vi)[3];
     }
-    std::cout << "vi: " << vi << std::endl;
-    std::cout << "radius: " << radius << std::endl;
 
     // See if we need to round this bend. We round if two things are true: 1)
     // the bend exceeds the maximum allowed, and 2) we're not an endpoint node
@@ -520,10 +518,7 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist, float max_bend) const
   // the last vertices into the first node's plane. The duplicate vertices will
   // need to be cleaned up later.
   if (!is_open) {
-    std::cout << "capping" << std::endl;
     Plane<T, 3> aft_plane(nodes[0], afts[0]);
-    std::cout << "afts[0]: " << afts[0] << std::endl;
-    std::cout << "nodes[0]: " << nodes[0] << std::endl;
     int i_previous_ring = vertices.size() - nstops;
     for (int si = 0; si < nstops; ++si) {
       QVector3<T> previous_ring_neighbor(vertices[i_previous_ring + si]);
@@ -538,15 +533,11 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist, float max_bend) const
       if (is_adaptive_radius) {
         QVector3<T> diff = intersection_point - first_plane.GetPoint();
         diff.Normalize();
-        std::cout << "diff: " << diff << std::endl;
         intersection_point = first_plane.GetPoint() + diff * (*this)(0)[3];
-        std::cout << "intersection_point: " << intersection_point << std::endl;
       }
 
       vertices.push_back(intersection_point);
     }
-  } else {
-    std::cout << "no capping" << std::endl;
   }
 
   // The vertices have all been emitted. We're done with the bookkeeping.

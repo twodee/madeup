@@ -77,6 +77,7 @@ class Environment {
     void surface(int width, int height);
     void forget();
     void axis(float x, float y, float z);
+    void reframe();
 
     void push();
     void pop();
