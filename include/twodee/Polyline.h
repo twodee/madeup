@@ -5,12 +5,12 @@
 
 #include "Line.h"
 #include "Log.h"
-#include "MinHeap.h"
 #include "NField.h"
 #include "Plane.h"
 #include "QMatrix4.h"
 #include "QVector2.h"
 #include "QVector3.h"
+#include "Triangle.h"
 #include "Trimesh.h"
 #include "Vector.h"
 
@@ -684,6 +684,24 @@ std::string Polyline<T>::ToString() const {
 /* ------------------------------------------------------------------------- */
 
 template<typename T>
+struct TriangulateVertex {
+  QVector3<T> vertex3;
+  QVector2<T> vertex2;
+  int array_index;
+
+  TriangulateVertex(const QVector3<T> vertex3,
+                    const QVector2<T> vertex2,
+                    int array_index) :
+    vertex3(vertex3),
+    vertex2(vertex2),
+    array_index(array_index) {
+  }
+};
+
+#if 0
+/* ------------------------------------------------------------------------- */
+
+template<typename T>
 struct TriangulateBend {
   QVector3<T> vertex3;
   QVector2<T> vertex2;
@@ -717,7 +735,7 @@ struct TriangulateBend {
 
     float signed_area = to[0] * fro[1] - to[1] * fro[0];
     if (signed_area < 0.0f) {
-      theta = 360.0f - theta;
+      theta = 2 * td::PI - theta;
     }
   }
 };
@@ -735,6 +753,7 @@ int Compare(const TriangulateBend<T>& a, const TriangulateBend<T>& b) {
     return 0;
   }
 }
+#endif
 
 /* ------------------------------------------------------------------------- */
 
@@ -767,7 +786,60 @@ Trimesh *Polyline<T>::Triangulate() const {
   }
   
   const int nvertices = this->GetElementCount();
+  vector<QVector3<T>> positions;
+  vector<QVector3<int>> faces;
+  vector<TriangulateVertex<T>> remaining;
+  for (int i = 0; i < nvertices; ++i) {
+    QVector3<float> position(QVector3<float>((*this)(i)));
+    positions.push_back(position);
+    remaining.push_back(TriangulateVertex<T>(position, QVector2<T>((*this)(i)[d[0]], (*this)(i)[d[1]]), i));
+    std::cout << i << " -> " << position << std::endl;
+  }
 
+  // While we have at least three vertices left, find an ear and make a face of it.
+  while (remaining.size() > 2) {
+    // Look for an ear starting at each vertex in the list.
+    for (int i = 0; i < remaining.size(); ++i) {
+      // Wrap around as needed.
+      int j = (i + 1) % remaining.size();
+      int k = (i + 2) % remaining.size();
+
+      // See if this angle's interior angle is < 180 degrees. If it is, we can't make
+      // a triangle here. It would fill an area outside the polygon.
+      QVector2<T> fro = remaining[i].vertex2 - remaining[j].vertex2;
+      QVector2<T> to = remaining[k].vertex2 - remaining[j].vertex2;
+      fro.Normalize();
+      to.Normalize();
+
+      float signed_area = to[0] * fro[1] - to[1] * fro[0];
+      if (signed_area < 1.0e-3f) {
+        continue;
+      }
+
+      // See if any other vertex lies inside the triangle formed by ijk.
+      bool contains_vertex = false;
+      for (int ci = 0; !contains_vertex && ci < remaining.size(); ++ci) {
+        if (ci != i && ci != j && ci != k) {
+          Triangle2<T> tri(remaining[i].vertex2, remaining[j].vertex2, remaining[k].vertex2);
+          contains_vertex = tri.Contains(remaining[ci].vertex2);
+        }
+      }
+
+      // If no vertex is inside the triangle formed by ijk, it's an ear. Let's
+      // lop it off by removing the central vertex from the polygon. The
+      // vertices form a face.
+      if (!contains_vertex || remaining.size() == 3) {
+        std::cout << "making tri of " << remaining[i].array_index << " " << remaining[j].array_index << " " << remaining[k].array_index << std::endl;
+        faces.push_back(QVector3<int>(remaining[i].array_index, remaining[j].array_index, remaining[k].array_index));
+        remaining.erase(remaining.begin() + j);
+        break;
+      } else {
+        throw MessagedException("no ear");
+      }
+    }
+  }
+
+#if 0
   vector<TriangulateBend<T> > bends;
   MinHeap<TriangulateBend<T> > queue;
   vector<QVector3<float> > positions;
@@ -783,11 +855,13 @@ Trimesh *Polyline<T>::Triangulate() const {
 
   for (int i = 0; i < nvertices; ++i) {
     bends[i].UpdateTheta(bends);
+    std::cout << "[" << positions[i] << "] " << bends[i].theta << std::endl;
     queue.Add(&bends[i]);
   }
 
   while (queue.Size() > 2) {
     TriangulateBend<T> *bend = queue.Remove();
+    std::cout << "picking off [" << bend->vertex3 << "] " << bend->theta << std::endl;
     
     // Route neighbors around this vertex.
     bends[bend->prev_index].next_index = bend->next_index;
@@ -804,6 +878,7 @@ Trimesh *Polyline<T>::Triangulate() const {
     queue.ReheapUp(bends[bend->next_index].heap_index);
     queue.ReheapDown(bends[bend->next_index].heap_index);
   }
+#endif
 
   return new Trimesh(positions, faces);;
 }

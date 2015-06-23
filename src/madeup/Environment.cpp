@@ -578,11 +578,23 @@ void Environment::pop() {
 void Environment::polygon() {
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() > 0) {
+      // We're closed if the first and last positions are pretty close to each other.
+      // In which case, let's just drop the last position all together and let the
+      // Extuber method seal up the join.
+      QVector3<float> diff = run[0].position - run[run.size() - 1].position;
+      float squared_length = diff.GetSquaredLength();
+      if (fabs(squared_length) < 1.0e-6f) {
+        run.pop_back();
+      } else {
+        throw MessagedException("polygon not closed");
+      }
+
       Polyline<float> *line = new Polyline<float>(run.size(), 3, Polyline<float>::CLOSED);
       for (unsigned int i = 0; i < run.size(); ++i) {
         (*line)(i)[0] = run[i].position[0];
         (*line)(i)[1] = run[i].position[1];
         (*line)(i)[2] = run[i].position[2];
+        std::cout << "run[i].position: " << run[i].position << std::endl;
       }
 
       Trimesh *trimesh = line->Triangulate();
