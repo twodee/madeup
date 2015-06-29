@@ -19,11 +19,14 @@ var nSecondsTillPreview = 1.0;
 var showWireframe = false;
 var arrowShafts = [];
 var showHeadings = true;
+var showCounterclockwise = true;
+var showClockwise = false;
 var modelColor = 'FF0000';
 var workspace = null;
 var fontSize = 14;
 var gridSpacing = 1.0;
 var gridExtent = 10.0;
+var isFlatShaded = true;
 
 var isShowWireframeChanged = false;
 var isAxisChanged = [false, false, false];
@@ -34,6 +37,9 @@ var isModelColorChanged = false;
 var isFontSizeChanged = false;
 var isGridSpacingChanged = false;
 var isGridExtentChanged = false;
+var isShowCounterclockwiseChanged = false;
+var isShowClockwiseChanged = false;
+var isFlatShadedChanged = false;
 
 function saveInCookies() {
   $.cookie('last', getSource());
@@ -48,8 +54,11 @@ function saveInCookies() {
   // the old defaults persisted in the cookies would override the new ones.
   if (isFontSizeChanged) $.cookie('fontSize', fontSize);
   if (isShowHeadingsChanged) $.cookie('showHeadings', showHeadings ? 1 : 0);
+  if (isShowCounterclockwiseChanged) $.cookie('showCounterclockwise', showCounterclockwise ? 1 : 0);
+  if (isShowClockwiseChanged) $.cookie('showClockwise', showClockwise ? 1 : 0);
   if (isModelColorChanged) $.cookie('modelColor', modelColor);
   if (isShowWireframeChanged) $.cookie('showWireframe', showWireframe ? 1 : 0);
+  if (isFlatShadedChanged) $.cookie('isFlatShaded', isFlatShaded ? 1 : 0);
   if (isAxisChanged[0]) $.cookie('axisX', $('#axisX').prop('checked'));
   if (isAxisChanged[1]) $.cookie('axisY', $('#axisY').prop('checked'));
   if (isAxisChanged[2]) $.cookie('axisZ', $('#axisZ').prop('checked'));
@@ -65,6 +74,9 @@ function saveInCookies() {
   // Changes have been committed, so let's reset the dirty flags.
   isFontSizeChanged = false;
   isShowHeadingsChanged = false;
+  isShowCounterclockwiseChanged = false;
+  isShowClockwiseChanged = false;
+  isFlatShadedChanged = false;
   isModelColorChanged = false;
   isShowWireframeChanged = false;
   isShowHeadingsChanged = false;
@@ -105,6 +117,22 @@ $(document).ready(function() {
       showHeadings = parseInt($.cookie('showHeadings')) != 0;
     }
     $('#showHeadings').prop('checked', showHeadings);
+
+    if ($.cookie('isFlatShaded')) {
+      isFlatShaded = parseInt($.cookie('isFlatShaded')) != 0;
+    }
+    $('#isFlatShaded').prop('checked', isFlatShaded);
+
+    if ($.cookie('showCounterclockwise')) {
+      showCounterclockwise = parseInt($.cookie('showCounterclockwise')) != 0;
+    }
+    $('#showCounterclockwise').prop('checked', showCounterclockwise);
+
+    if ($.cookie('showClockwise')) {
+      showClockwise = parseInt($.cookie('showClockwise')) != 0;
+    }
+    $('#showClockwise').prop('checked', showClockwise);
+    updateCulling();
 
     if ($.cookie('modelColor')) {
       modelColor = $.cookie('modelColor');
@@ -257,6 +285,27 @@ $(document).ready(function() {
     showHeadings = this.checked;
     text_editor.focus();
     render();
+  });
+
+  $('#isFlatShaded').click(function() {
+    isFlatShadedChanged = true;
+    isFlatShaded = this.checked;
+    text_editor.focus();
+    render();
+  });
+
+  $('#showCounterclockwise').click(function() {
+    isShowCounterclockwiseChanged = true;
+    showCounterclockwise = this.checked;
+    text_editor.focus();
+    updateCulling();
+  });
+
+  $('#showClockwise').click(function() {
+    isShowClockwiseChanged = true;
+    showClockwise = this.checked;
+    text_editor.focus();
+    updateCulling();
   });
 
   var red = 0xB80000;
@@ -482,7 +531,14 @@ function run(mode) {
   $.ajax({
     type: 'POST',
     url: 'interpret.php',
-    data: JSON.stringify({source: getSource(), extension: 'json', mode: mode}),
+    data: JSON.stringify(
+      {
+        source: getSource(),
+        extension: 'json',
+        mode: mode,
+        shadingMode: isFlatShaded ? 'FLAT' : 'SMOOTH'
+      }
+    ),
     contentType: 'application/json; charset=utf-8',
     dataType: 'json',
     success: function(data) {
@@ -505,9 +561,12 @@ function run(mode) {
           var model = loader.parse(JSON.parse(data['model']));
           var material = showWireframe ? new THREE.MeshBasicMaterial({color: parseInt(modelColor, 16), wireframe: showWireframe, wireframeLinewidth: 5})
                                        : new THREE.MeshLambertMaterial({color: parseInt(modelColor, 16), wireframe: showWireframe, wireframeLinewidth: 5});
-          material.side = THREE.DoubleSide;
+          //material.side = THREE.DoubleSide;
           //model.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, -10));
           meshes[0] = new THREE.Mesh(model.geometry, material);
+          model.geometry.computeFaceNormals();
+          model.geometry.computeVertexNormals();
+          //meshes[0].doubleSided = true;
           allGeometry = model.geometry;
         } else {
           var paths = JSON.parse(data['model']);
@@ -594,6 +653,7 @@ function run(mode) {
           /* meshes[mi].geometry.computeVertexNormals(); */
           geoscene.add(meshes[mi]);
         }
+        updateCulling();
         render();
       } else if (data['exit_status'] == 22) {
         log(data['output'] + '\nYour model was taking a long time to build. It felt like it was never going to finish! So, I stopped trying. Sorry.');
@@ -658,6 +718,9 @@ function resize() {
   $("#blocksCanvas").width(blocklyArea.offsetWidth);
 
   text_editor.resize();
+  //if (renderer_ready) {
+    render();
+  //}
 }
 
 function highlight(startIndex, stopIndex) {
@@ -690,6 +753,23 @@ function highlight(startIndex, stopIndex) {
   text_editor.getSelection().setSelectionRange(new Range(start.row, start.column, stop.row, stop.column + 1));
 }
 
+function updateCulling() {
+  var mode;
+  if (showClockwise && showCounterclockwise) {
+    mode = THREE.CullFaceNone;
+  } else if (showCounterclockwise) {
+    mode = THREE.CullFaceBack;
+  } else if (showClockwise) {
+    mode = THREE.CullFaceFront;
+  } else {
+    mode = THREE.CullFaceFrontBack;
+  }
+  console.log('Show Backs: ' + showClockwise + ' Fronts: ' + showCounterclockwise + ' ' + mode);
+  renderer.setFaceCulling(mode, THREE.FrontFaceDirectionCCW);
+  render();
+  //run(GeometryMode.SURFACE);
+}
+
 function init() {
   THREE.Camera.prototype.getWorldRight = function () {
     var quaternion = new THREE.Quaternion();
@@ -714,15 +794,6 @@ function init() {
     render();
   });
 
-  /*
-  var vector = new THREE.Vector3( 0, 0, -1 );
-  vector.applyQuaternion(camera.quaternion);
-  alert(vector.toArray());
-  */
-
-  window.addEventListener('resize', resize);
-  resize();
-
   pointerScene = new THREE.Scene();
   geoscene = new THREE.Scene();
   geoscene.matrixAutoUpdate = false;
@@ -746,7 +817,11 @@ function init() {
   // add to the scene
   camera.add(pointLight);
 
-  render();
+  updateCulling();
+  // render(); 
+
+  window.addEventListener('resize', resize);
+  resize();
 }
 
 function animate() {

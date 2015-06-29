@@ -27,15 +27,15 @@ $back['in_path'] = $in_path;
 file_put_contents($in_path, $in['source']);
 error_log(json_encode($back));
 
+$shading_mode = $in['shadingMode'];
+
 // Execute the interpreter and collect its output.
 $lines = array();
-exec("./merp --timeout 45 -o $out_path --geometry $mode $in_path 2>&1", $lines, $back['exit_status']);
+exec("./merp --timeout 45 --shading $shading_mode -o $out_path --geometry $mode $in_path 2>&1", $lines, $back['exit_status']);
 foreach ($lines as $line) {
   error_log("lineline: $line");
 }
 $back['output'] = implode("\n", $lines) . "\n";
-error_log("LINES: " . $back['output']);
-error_log("boo: " . count($lines));
 error_log(json_encode($back));
 
 if ($in['extension'] === 'obj') {

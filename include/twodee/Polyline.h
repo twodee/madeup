@@ -42,9 +42,12 @@ template<class T> class Polyline : public NField<T, 1> {
     Trimesh *Dowel(int nstops, T radius, T twist = (T) 0, float max_bend = 361.0f) const;
     void Fracture(T max_segment_length);
     bool IsOpen() const;
+    QVector3<T> GetNormal() const;
 
+    Polyline<T> *Flatten() const;
+    bool IsCounterclockwise() const;
     Trimesh *Triangulate() const;
-    Trimesh *Extrude(const QVector3<T> axis, T distance, const QMatrix4<float>& xform = QMatrix4<float>(1.0f)) const;
+    Trimesh *Extrude(const QVector3<T> &axis, T distance, const QMatrix4<float>& xform = QMatrix4<float>(1.0f)) const;
 
     std::string ToString() const;
 
@@ -74,19 +77,40 @@ Polyline<T>::~Polyline() {
 template<class T>
 Trimesh *Polyline<T>::Revolve(const QVector3<T>& axis, int nstops, float degrees) const {
   assert(nstops > 0);
+  assert(degrees <= 360.0f && degrees >= -360.0f);
+  assert(fabs(degrees) > 0);
 
+  bool is_full = false;
   if (fabs(degrees - 360.0f) < 1.0e-3f) {
     degrees = 360.0f;
+    is_full = true;
+  } else if (fabs(degrees - -360.0f) < 1.0e-3f) {
+    degrees = -360.0f;
+    is_full = true;
   }
-  bool is_full = degrees == 360.0f;
+  std::cout << "is_full: " << is_full << std::endl;
 
   NField<float, 2> img(QVector2<int>(this->GetElementCount(), nstops), 3);
   QMatrix4<float> rot;
   if (is_full) {
-    rot = QMatrix4<float>::GetRotate(-degrees / nstops, axis);
+    std::cout << "degrees / nstops: " << degrees / nstops << std::endl;
+    rot = QMatrix4<float>::GetRotate(degrees / nstops, axis);
   } else {
-    rot = QMatrix4<float>::GetRotate(-degrees / (nstops - 1), axis);
+    rot = QMatrix4<float>::GetRotate(degrees / (nstops - 1), axis);
   }
+
+  // find a point that's not the origin, rotate it a bit, subtract off the original
+  // that's our relative direction of travel
+  QVector3<T> delta;
+  for (int i = 0; i < this->GetElementCount(); ++i) {
+    QVector3<T> position((*this)(i));
+    if (position.GetLength() > 0) {
+      QMatrix4<float> xform = QMatrix4<float>::GetRotate(degrees < 0 ? -10 : 10, axis);
+      QVector3<T> rotated_position = xform * position;
+      delta = rotated_position - position;
+    }
+  }
+  std::cout << "delta: " << delta << std::endl;
 
   // Fill the first row with the polyline coordinates.
   QVector3<T> position((T) 0);
@@ -119,28 +143,53 @@ Trimesh *Polyline<T>::Revolve(const QVector3<T>& axis, int nstops, float degrees
     }
   }
 
-  Trimesh *base = Trimesh::GetParametric(img, !is_open, degrees == 360.0f);
+  Trimesh *base = Trimesh::GetParametric(img, !is_open, is_full);
+
+  Polyline<T> *flattened = this->Flatten();
+  bool is_ccw = flattened->IsCounterclockwise();
+  delete flattened;
+
+  QVector3<T> normal = this->GetNormal();
+  std::cout << "normal: " << normal << std::endl;
+  T normal_dot_direction = normal.Dot(delta);
+  std::cout << "normal_dot_direction: " << normal_dot_direction << std::endl;
+
+  std::cout << "is_ccw: " << is_ccw << std::endl;
+
+  if ((is_ccw && normal_dot_direction < 0) ||
+      (!is_ccw && normal_dot_direction < 0)) {
+    std::cout << "rrr r r r reversing" << std::endl;
+    base->ReverseWinding();
+  }
 
   // Add caps if this isn't a full revolution.
   if (!is_full) {
     // The first cap is easy. Just take our framing polyline and
     // triangulate it.
     Trimesh *cap_a_mesh = this->Triangulate(); 
-    cap_a_mesh->ReverseWinding();
-    *base += *cap_a_mesh;
-    delete cap_a_mesh;
+    if ((is_ccw && normal_dot_direction > 0) ||
+        (!is_ccw && normal_dot_direction < 0)) {
+      cap_a_mesh->ReverseWinding();
+    }
 
     // The second cap spans the final rotated framing polyline. We've already
     // calculated that rotated frame. It's in the last row of our field.
-    Polyline<T> cap_b_frame(this->GetElementCount(), this->GetChannelCount(), IsOpen());
-    for (int i = 0; i < this->GetElementCount(); ++i) {
-      QVector2<T> c(this->GetElementCount() - 1 - i, nstops - 1);
-      memcpy(cap_b_frame(i), img(c), 3 * sizeof(float));
-    }
-    Trimesh *cap_b_mesh = cap_b_frame.Triangulate();
-    cap_b_mesh->ReverseWinding();
-    *base += *cap_b_mesh;
-    delete cap_b_mesh;
+    /* Polyline<T> cap_b_frame(this->GetElementCount(), this->GetChannelCount(), IsOpen()); */
+    /* for (int i = 0; i < this->GetElementCount(); ++i) { */
+      /* QVector2<T> c(i, nstops - 1); */
+      /* memcpy(cap_b_frame(i), img(c), 3 * sizeof(float)); */
+    /* } */
+
+    QMatrix4<float> xform = QMatrix4<float>::GetRotate(degrees, axis);
+    Trimesh cap_b_mesh(*cap_a_mesh);
+    cap_b_mesh *= xform;
+    cap_b_mesh.ReverseWinding();
+
+    *base += *cap_a_mesh;
+    *base += cap_b_mesh;
+
+    delete cap_a_mesh;
+    /* delete cap_b_mesh; */
   }
 
   return base;
@@ -698,73 +747,55 @@ struct TriangulateVertex {
   }
 };
 
-#if 0
 /* ------------------------------------------------------------------------- */
 
-template<typename T>
-struct TriangulateBend {
-  QVector3<T> vertex3;
-  QVector2<T> vertex2;
+template<class T>
+bool Polyline<T>::IsCounterclockwise() const {
+  int nvertices = this->GetElementCount();
+  int ndims = this->GetChannelCount();
+  assert(ndims == 2);
+  assert(nvertices >= 3);
 
-  int array_index;
-  int heap_index;
-  int prev_index;
-  int next_index;
-
-  float theta; 
-
-  TriangulateBend(const QVector3<T> vertex3,
-                  const QVector2<T> vertex2,
-                  int array_index) :
-    vertex3(vertex3),
-    vertex2(vertex2),
-    array_index(array_index),
-    heap_index(-1),
-    prev_index(-1),
-    next_index(-1) {
+  T signed_area = 0;
+  for (int i = 0; i < nvertices; ++i) {
+    QVector2<T> a((*this)(i));
+    QVector2<T> b((*this)((i + 1) % nvertices));
+    signed_area += (b[0] - a[0]) * (b[1] + b[1]);
   }
-
-  void UpdateTheta(const vector<TriangulateBend<T> >& bends) {
-    QVector2<T> fro = bends[prev_index].vertex2 - vertex2;
-    QVector2<T> to = bends[next_index].vertex2 - vertex2;
-
-    fro.Normalize();
-    to.Normalize();
-    
-    theta = acos(fro.Dot(to));
-
-    float signed_area = to[0] * fro[1] - to[1] * fro[0];
-    if (signed_area < 0.0f) {
-      theta = 2 * td::PI - theta;
-    }
-  }
-};
-
-/* ------------------------------------------------------------------------- */
-
-template<typename T>
-int Compare(const TriangulateBend<T>& a, const TriangulateBend<T>& b) {
-  float diff = a.theta - b.theta;
-  if (diff < 0) {
-    return -1;
-  } else if (diff > 0) {
-    return 1;
-  } else {
-    return 0;
-  }
+  
+  return signed_area < 0;
 }
-#endif
 
 /* ------------------------------------------------------------------------- */
 
 template<class T>
-Trimesh *Polyline<T>::Triangulate() const {
-  // Assumes polyline traces planar polygon.
+QVector3<T> Polyline<T>::GetNormal() const {
+  int nvertices = this->GetElementCount();
+  int ndims = this->GetChannelCount();
+  assert(ndims == 3);
 
-  // Solving this problem is a lot easier in two dimensions. We project the
-  // triangle down to two dimensions. A simple way to do this is to get the
-  // polygon's normal and drop the dimension of the component with the largest
-  // magnitude.
+  QVector3<T> normal((T) 0); 
+  for (int i = 0; i < nvertices; ++i) {
+    QVector3<T> a((*this)(i));
+    QVector3<T> b((*this)((i + 1) % nvertices));
+    normal += a.Cross(b);
+  }
+
+  normal.Normalize();
+  return normal;
+}
+
+/* ------------------------------------------------------------------------- */
+
+template<class T>
+Polyline<T> *Polyline<T>::Flatten() const {
+  int nvertices = this->GetElementCount();
+  int ndims = this->GetChannelCount();
+  assert(ndims == 3);
+
+  // We project the triangle down to two dimensions. A simple way to do this is
+  // to get the polygon's normal and drop the dimension of the component with
+  // the largest magnitude.
   QVector3<T> a((*this)(0));
   QVector3<T> b((*this)(1));
   QVector3<T> c((*this)(2));
@@ -785,6 +816,27 @@ Trimesh *Polyline<T>::Triangulate() const {
     d[1] = 1;
   }
   
+  Polyline<T> *flattened = new Polyline<T>(this->GetElementCount(), 2, is_open);
+  for (int i = 0; i < nvertices; ++i) {
+    (*flattened)(i)[0] = (*this)(i)[d[0]];
+    (*flattened)(i)[1] = (*this)(i)[d[1]];
+  }
+
+  return flattened;
+}
+
+/* ------------------------------------------------------------------------- */
+
+template<class T>
+Trimesh *Polyline<T>::Triangulate() const {
+  // Assumes polyline traces planar polygon.
+
+  // Solving this problem is a lot easier in two dimensions. We project the
+  // triangle down to two dimensions. A simple way to do this is to get the
+  // polygon's normal and drop the dimension of the component with the largest
+  // magnitude.
+  Polyline<T> *flattened = this->Flatten();
+  
   const int nvertices = this->GetElementCount();
   vector<QVector3<T>> positions;
   vector<QVector3<int>> faces;
@@ -792,14 +844,24 @@ Trimesh *Polyline<T>::Triangulate() const {
   for (int i = 0; i < nvertices; ++i) {
     QVector3<float> position(QVector3<float>((*this)(i)));
     positions.push_back(position);
-    remaining.push_back(TriangulateVertex<T>(position, QVector2<T>((*this)(i)[d[0]], (*this)(i)[d[1]]), i));
+    remaining.push_back(TriangulateVertex<T>(position, QVector2<T>((*flattened)(i)), i));
     std::cout << i << " -> " << position << std::endl;
+  }
+
+  // A negative signed area means the vertices are enumerated in clockwise
+  // order in the Cartesian coordinate system with the origin at (0, 0) and
+  // they y-axis pointing up.
+  bool is_reversed = !flattened->IsCounterclockwise();
+  if (is_reversed) {
+    std::cout << "reversing" << std::endl;
+    std::reverse(remaining.begin(), remaining.end());
   }
 
   // While we have at least three vertices left, find an ear and make a face of it.
   while (remaining.size() > 2) {
     // Look for an ear starting at each vertex in the list.
-    for (int i = 0; i < remaining.size(); ++i) {
+    bool is_ear_found = false;
+    for (int i = 0; !is_ear_found && i < remaining.size(); ++i) {
       // Wrap around as needed.
       int j = (i + 1) % remaining.size();
       int k = (i + 2) % remaining.size();
@@ -808,12 +870,14 @@ Trimesh *Polyline<T>::Triangulate() const {
       // a triangle here. It would fill an area outside the polygon.
       QVector2<T> fro = remaining[i].vertex2 - remaining[j].vertex2;
       QVector2<T> to = remaining[k].vertex2 - remaining[j].vertex2;
-      fro.Normalize();
-      to.Normalize();
 
       float signed_area = to[0] * fro[1] - to[1] * fro[0];
       if (signed_area < 1.0e-3f) {
-        continue;
+        if (i == remaining.size() - 1) {
+          throw MessagedException("no good angle");
+        } else {
+          continue;
+        }
       }
 
       // See if any other vertex lies inside the triangle formed by ijk.
@@ -829,110 +893,80 @@ Trimesh *Polyline<T>::Triangulate() const {
       // lop it off by removing the central vertex from the polygon. The
       // vertices form a face.
       if (!contains_vertex || remaining.size() == 3) {
-        std::cout << "making tri of " << remaining[i].array_index << " " << remaining[j].array_index << " " << remaining[k].array_index << std::endl;
+        std::cout << "picking off " << remaining[i].array_index << " " << remaining[j].array_index << " " << remaining[k].array_index << std::endl;
         faces.push_back(QVector3<int>(remaining[i].array_index, remaining[j].array_index, remaining[k].array_index));
         remaining.erase(remaining.begin() + j);
-        break;
-      } else {
-        throw MessagedException("no ear");
+        is_ear_found = true;
       }
+    }
+
+    if (!is_ear_found) {
+      throw MessagedException("no ear");
     }
   }
 
-#if 0
-  vector<TriangulateBend<T> > bends;
-  MinHeap<TriangulateBend<T> > queue;
-  vector<QVector3<float> > positions;
-  vector<QVector3<int> > faces;
-
-  // Assemble data structures.
-  for (int i = 0; i < nvertices; ++i) {
-    positions.push_back(QVector3<float>((*this)(i)));
-    bends.push_back(TriangulateBend<T>(QVector3<float>((*this)(i)), QVector2<float>((*this)(i)[d[0]], (*this)(i)[d[1]]), i));
-    bends[i].prev_index = (i + nvertices - 1) % nvertices;
-    bends[i].next_index = (i + 1) % nvertices;
-  }
-
-  for (int i = 0; i < nvertices; ++i) {
-    bends[i].UpdateTheta(bends);
-    std::cout << "[" << positions[i] << "] " << bends[i].theta << std::endl;
-    queue.Add(&bends[i]);
-  }
-
-  while (queue.Size() > 2) {
-    TriangulateBend<T> *bend = queue.Remove();
-    std::cout << "picking off [" << bend->vertex3 << "] " << bend->theta << std::endl;
-    
-    // Route neighbors around this vertex.
-    bends[bend->prev_index].next_index = bend->next_index;
-    bends[bend->next_index].prev_index = bend->prev_index;
-
-    // emit bend->prev, bend.vertex, bend.next
-    faces.push_back(QVector3<int>(bend->prev_index, bend->array_index, bend->next_index));
-
-    bends[bend->prev_index].UpdateTheta(bends);
-    queue.ReheapUp(bends[bend->prev_index].heap_index);
-    queue.ReheapDown(bends[bend->prev_index].heap_index);
-
-    bends[bend->next_index].UpdateTheta(bends);
-    queue.ReheapUp(bends[bend->next_index].heap_index);
-    queue.ReheapDown(bends[bend->next_index].heap_index);
-  }
-#endif
-
-  return new Trimesh(positions, faces);;
+  Trimesh *mesh = new Trimesh(positions, faces);;
+  return mesh;
 }
 
 /* ------------------------------------------------------------------------- */
 
 template<class T>
-Trimesh *Polyline<T>::Extrude(const QVector3<T> axis, T distance, const QMatrix4<float>& xform) const {
+Trimesh *Polyline<T>::Extrude(const QVector3<T> &axis, T distance, const QMatrix4<float>& xform) const {
+  // assumes axis is normalized
+  int nvertices = this->GetElementCount();
+
+  // Two directions...
+  const QVector3<T> delta = axis * distance;
+  QVector3<T> normal = this->GetNormal();
+
+  // How does this compare with where we are headed?
+  float normal_dot_direction = normal.Dot(delta);
+
+  std::cout << "normal: " << normal << std::endl;
+  std::cout << "delta: " << delta << std::endl;
+  std::cout << "normal_dot_direction: " << normal_dot_direction << std::endl;
+
+  // Which way is end A wound?
+  Polyline<T> *flattened = this->Flatten();
+  bool is_ccw = flattened->IsCounterclockwise();
+  delete flattened;
+  std::cout << "is_ccw: " << is_ccw << std::endl;
+
+  vector<QVector3<float>> positions; 
+  vector<QVector3<int>> faces; 
+
+  // End A
   Trimesh *cap_a = this->Triangulate(); 
-  Trimesh *cap_b = new Trimesh(*cap_a);
-  cap_b->ReverseWinding();
-  *cap_b += axis * distance;
-  *cap_b *= xform;
-
-  const int nvertices_in_cap = cap_a->GetVertexCount();
-
-  // Replicate geometry from two caps. We can just share the vertices already
-  // in the caps, because we want the normals on the sides and caps to be
-  // distinct. We don't need the faces. We'll get those from the separate
-  // cap meshes.
-  vector<QVector3<float> > positions; 
-  vector<QVector3<int> > faces; 
-
-  // Cap A vertices
-  float *cap_positions = cap_a->GetPositions();
-  float *cap_position = cap_positions;
-  for (int i = 0; i < nvertices_in_cap; ++i, cap_position += 3) {
-    positions.push_back(QVector3<float>(cap_position));
+  for (int i = 0; i < nvertices; ++i) {
+    positions.push_back(QVector3<T>((*this)(i)));
   }
 
-  // Cap B vertices
-  cap_positions = cap_b->GetPositions();
-  cap_position = cap_positions;
-  for (int i = 0; i < nvertices_in_cap; ++i, cap_position += 3) {
-    positions.push_back(QVector3<float>(cap_position));
+  // End B
+  for (int i = 0; i < nvertices; ++i) {
+    positions.push_back(positions[i] + delta);
   }
 
-  // connect faces across caps. 
-  // *-----*
-  //      /
-  //    /
-  //  /
-  // *-----*
-  //
-  // i, (i + 1) % nvertices_in_cap, (i + 1) % nvertices_in_cap + nvertices_in_cap
-  // i, (i + 1) % nvertices_in_cap + nvertices_in_cap + nvertices_in_cap, i + nvertices_in_cap
-
-  for (int i = 0; i < nvertices_in_cap; ++i) {
-    faces.push_back(QVector3<int>(i, (i + nvertices_in_cap - 1) % nvertices_in_cap, (i + nvertices_in_cap - 1) % nvertices_in_cap + nvertices_in_cap));
-    faces.push_back(QVector3<int>(i, (i + nvertices_in_cap - 1) % nvertices_in_cap + nvertices_in_cap, i + nvertices_in_cap));
+  for (int i = 0; i < nvertices; ++i) {
+    faces.push_back(QVector3<int>(i, (i + nvertices - 1) % nvertices + nvertices, (i + nvertices - 1) % nvertices));
+    faces.push_back(QVector3<int>(i, i + nvertices, (i + nvertices - 1) % nvertices + nvertices));
   }
 
   Trimesh *extruded = new Trimesh(positions, faces);
+
+  if (!is_ccw && normal_dot_direction < 0) {
+    extruded->ReverseWinding();
+    cap_a->ReverseWinding();
+  } else if (is_ccw && normal_dot_direction > 0) {
+    cap_a->ReverseWinding();
+  } else if (is_ccw && normal_dot_direction < 0) {
+    extruded->ReverseWinding();
+  }
+
   *extruded += *cap_a;
+  Trimesh *cap_b = new Trimesh(*cap_a);
+  cap_b->ReverseWinding();
+  *cap_b += delta;
   *extruded += *cap_b;
 
   delete cap_a;

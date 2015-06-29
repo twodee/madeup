@@ -65,6 +65,7 @@ Co<Expression> ExpressionExtrude::evaluate(Environment &env) const {
   float z = number->toReal();
 
   QVector3<float> axis(x, y, z);
+  axis.Normalize();
   env.extrude(axis, length);
 
   return Co<Expression>(new ExpressionUnit());

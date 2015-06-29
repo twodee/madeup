@@ -13,7 +13,7 @@
 using namespace madeup;
 
 void usage(const std::string &message) {
-  std::cerr << "Usage: merp [-q] [-r] [--timeout #] [--tree] -i in.mup [-o out.obj] [--geometry (SURFACE|PATH|NONE)]" << std::endl;
+  std::cerr << "Usage: merp [--shading (FLAT|SMOOTH)] [-q] [-r] [--timeout #] [--tree] -i in.mup [-o out.obj] [--geometry (SURFACE|PATH|NONE)]" << std::endl;
   std::cerr << message << std::endl;
   exit(1);
 }
@@ -24,6 +24,7 @@ int main(int argc, char **argv) {
   bool wants_timeout = false;
   bool wants_render = false;
   bool wants_quiet = false;
+  bool is_flat = true;
   int timeout = 45;
   std::string out_path = "";
   GeometryMode::geometry_mode_t geometry_mode = GeometryMode::SURFACE;
@@ -69,6 +70,22 @@ int main(int argc, char **argv) {
         ++optind;
       } else {
         usage("-o given, but no path specified.");
+      }
+    }
+
+    else if (formal == "--shading") {
+      if (optind < argc - 1) {
+        std::string mode_label = argv[optind + 1];
+        if (mode_label == "FLAT") {
+          is_flat = true;
+        } else if (mode_label == "SMOOTH") {
+          is_flat = false;
+        } else {
+          usage("unknown geometry mode");
+        }
+        ++optind;
+      } else {
+        usage("--shading given, but invalid mode.");
       }
     }
 
@@ -149,6 +166,10 @@ int main(int argc, char **argv) {
           out << env.getPathsJSON();
           out.close();
         } else if (geometry_mode == GeometryMode::SURFACE) {
+          if (is_flat) {
+            trimesh->DisconnectFaces();
+          }
+
           if (out_path.find_first_of('.') == std::string::npos ||
               out_path.find(".json") == out_path.length() - 5) {
             trimesh->WriteJSON(out_path);

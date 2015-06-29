@@ -32,6 +32,7 @@
 #include "madeup/ExpressionRandom.h"
 #include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionReframe.h"
+#include "madeup/ExpressionReverse.h"
 #include "madeup/ExpressionRevolve.h"
 #include "madeup/ExpressionRoll.h"
 #include "madeup/ExpressionRotate.h"
@@ -191,6 +192,7 @@ void Environment::prime() {
   define_rotate->addFormal("degrees");
 
   Co<ExpressionDefine> define_identity(new ExpressionDefine("identity", Co<Expression>(new ExpressionIdentity())));
+  Co<ExpressionDefine> define_reverse(new ExpressionDefine("reverse", Co<Expression>(new ExpressionReverse())));
 
   Co<ExpressionDefine> define_center(new ExpressionDefine("center", Co<Expression>(new ExpressionCenter())));
 
@@ -268,6 +270,7 @@ void Environment::prime() {
   add("translate", Co<ExpressionClosure>(new ExpressionClosure(define_translate, globals)));
   add("rotate", Co<ExpressionClosure>(new ExpressionClosure(define_rotate, globals)));
   add("identity", Co<ExpressionClosure>(new ExpressionClosure(define_identity, globals)));
+  add("reverse", Co<ExpressionClosure>(new ExpressionClosure(define_reverse, globals)));
   add("center", Co<ExpressionClosure>(new ExpressionClosure(define_center, globals)));
   add("echo", Co<ExpressionClosure>(new ExpressionClosure(define_echo, globals)));
   add("axis", Co<ExpressionClosure>(new ExpressionClosure(define_axis, globals)));
@@ -319,6 +322,7 @@ void Environment::prime() {
   globals->add("translate", (*this)["translate"]);
   globals->add("rotate", (*this)["rotate"]);
   globals->add("identity", (*this)["identity"]);
+  globals->add("reverse", (*this)["reverse"]);
   globals->add("center", (*this)["center"]);
   globals->add("echo", (*this)["echo"]);
   globals->add("axis", (*this)["axis"]);
@@ -472,6 +476,13 @@ void Environment::identity() {
 
 /* ------------------------------------------------------------------------- */
 
+void Environment::reverse() {
+  std::reverse(run.begin(), run.end());  
+  std::reverse(paths[paths.size() - 1].begin(), paths[paths.size() - 1].end());
+}
+
+/* ------------------------------------------------------------------------- */
+
 void Environment::center() {
   if (run.size() == 0) {
     return;
@@ -545,8 +556,8 @@ void Environment::yaw(float degrees) {
 /* ------------------------------------------------------------------------- */
 
 Trimesh *Environment::getMesh() {
-  shapes->ComputeNormals();
-  shapes->DisconnectFaces();
+  /* shapes->ComputeNormals(); */
+  /* shapes->DisconnectFaces(); */
   return shapes;
 }
 
@@ -578,15 +589,10 @@ void Environment::pop() {
 void Environment::polygon() {
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() > 0) {
-      // We're closed if the first and last positions are pretty close to each other.
-      // In which case, let's just drop the last position all together and let the
-      // Extuber method seal up the join.
       QVector3<float> diff = run[0].position - run[run.size() - 1].position;
       float squared_length = diff.GetSquaredLength();
       if (fabs(squared_length) < 1.0e-6f) {
         run.pop_back();
-      } else {
-        throw MessagedException("polygon not closed");
       }
 
       Polyline<float> *line = new Polyline<float>(run.size(), 3, Polyline<float>::CLOSED);
@@ -594,7 +600,6 @@ void Environment::polygon() {
         (*line)(i)[0] = run[i].position[0];
         (*line)(i)[1] = run[i].position[1];
         (*line)(i)[2] = run[i].position[2];
-        std::cout << "run[i].position: " << run[i].position << std::endl;
       }
 
       Trimesh *trimesh = line->Triangulate();
@@ -724,6 +729,12 @@ void Environment::revolve() {
 void Environment::extrude(const QVector3<float> &axis, float length) {
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() > 0) {
+      QVector3<float> diff = run[0].position - run[run.size() - 1].position;
+      float squared_length = diff.GetSquaredLength();
+      if (fabs(squared_length) < 1.0e-6f) {
+        run.pop_back();
+      }
+
       Polyline<float> *line = new Polyline<float>(run.size(), 3, Polyline<float>::CLOSED);
       for (unsigned int i = 0; i < run.size(); ++i) {
         (*line)(i)[0] = run[i].position[0];

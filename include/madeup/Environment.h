@@ -63,6 +63,7 @@ class Environment {
     void rotate(float x, float y, float z, float degrees);
     void center();
     void identity();
+    void reverse();
     void echo();
     void yaw(float degrees);
     void pitch(float degrees);
