@@ -5,13 +5,47 @@ Like any language, Madeup has a grammar and meaning that must be learned in orde
 
 ##Examples
 
-##Language
-
 ##Generators
 
 ###`dot`
 
+![Random Dots](images/random_dots.png){:.center}
+
+{:.mup}
+~~~
+seed = 92
+
+repeat 30
+  radius = random 2, 10
+  x = random -20, 20
+  y = random -20, 20
+  z = random -20, 20
+  moveto x, y, z
+end
+
+nsides = 50
+dot
+~~~
+
 ###`box`
+
+![Random Dots](images/random_dots.png){:.center}
+
+{:.mup}
+~~~
+seed = 92
+
+repeat 30
+  radius = random 2, 10
+  x = random -20, 20
+  y = random -20, 20
+  z = random -20, 20
+  moveto x, y, z
+end
+
+nsides = 50
+dot
+~~~
 
 ###`extrude`
 
@@ -22,4 +56,90 @@ Like any language, Madeup has a grammar and meaning that must be learned in orde
 ###`forget`
 
 ###`surface`
+
+##Language Reference
+
+###Literals
+
+###Expressions and Operators
+
+####Association (`(expr)`)
+
+####Absolute Value (`|expr|`)
+
+####Indexing and Selection (`[]`, `.property`)
+
+####Logical Negation (`not`)
+
+####Exponential (`^`)
+
+####Multiplicative (`*`, `/`, `//`, `%`)
+
+####Additive (`+`, `-`)
+
+####Relational (`<`, `<=`, `>`, `>=`)
+
+####Equality (`==`, `!=`)
+
+####Assignment (`=`)
+
+####Conjunction (`and`)
+
+####Disjunction (`or`)
+
+###Builtin Variables
+
+###User Variables
+
+###Loops
+
+###Conditionals
+
+###Builtin Functions
+
+####`print message`
+
+####`debug message`
+
+####`moveto x, y, z`
+
+####`move length`
+
+####`yaw degrees`
+
+####`pitch degrees`
+
+####`roll degrees`
+
+####`translate x, y, z`
+
+####`rotate x, y, z, degrees`
+
+####`scale x, y, z`
+
+####`identity`
+
+####`reverse`
+
+####`sin degrees`
+
+####`cos degrees`
+
+####`tan degrees`
+
+####`asin ratio`
+
+####`acos ratio`
+
+####`atan ratio`
+
+####`atan2 opposite, adjacent`
+
+####`max a, b`
+
+####`min a, b`
+
+####`log base, x`
+
+###User Functions
 
