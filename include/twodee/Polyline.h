@@ -879,11 +879,17 @@ Trimesh *Polyline<T>::Triangulate() const {
           continue;
         }
       }
+      if (remaining[i].array_index == 0 &&
+          remaining[j].array_index == 4 &&
+          remaining[k].array_index == 6) {
+        std::cout << "on 046" << std::endl;
+      }
 
       // See if any other vertex lies inside the triangle formed by ijk.
       bool contains_vertex = false;
       for (int ci = 0; !contains_vertex && ci < remaining.size(); ++ci) {
         if (ci != i && ci != j && ci != k) {
+          std::cout << "ci: " << remaining[ci].array_index << std::endl;
           Triangle2<T> tri(remaining[i].vertex2, remaining[j].vertex2, remaining[k].vertex2);
           contains_vertex = tri.Contains(remaining[ci].vertex2);
         }

@@ -11,7 +11,7 @@ template<typename T> class Triangle2 {
               const QVector2<T> &b,
               const QVector2<T> &c);
 
-    bool Contains(const QVector2<T> &other) const;
+    bool Contains(const QVector2<T> &other, T epsilon = 1.0e-3) const;
 
   private:
     QVector2<T> a;
@@ -33,7 +33,8 @@ Triangle2<T>::Triangle2(const QVector2<T> &a,
 /* ------------------------------------------------------------------------- */
 
 template<typename T>
-bool Triangle2<T>::Contains(const QVector2<T> &other) const {
+bool Triangle2<T>::Contains(const QVector2<T> &other,
+                            T epsilon) const {
   QVector2<T> v0 = c - a;
   QVector2<T> v1 = b - a;
   QVector2<T> v2 = other - a;
@@ -49,9 +50,12 @@ bool Triangle2<T>::Contains(const QVector2<T> &other) const {
   float invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
   float u = (dot11 * dot02 - dot01 * dot12) * invDenom;
   float v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+  std::cout << "u: " << u << std::endl;
+  std::cout << "v: " << v << std::endl;
   
   // Check if point is in triangle
-  return u >= 0 && v >= 0 && u + v < 1;
+  std::cout << (u >= 0 && v >= 0 && u + v < 1) << std::endl;
+  return u >= -epsilon && v >= -epsilon && u + v < 1 + epsilon;
 }
 
 /* ------------------------------------------------------------------------- */
