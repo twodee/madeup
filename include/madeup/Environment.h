@@ -25,7 +25,8 @@ using namespace td;
 
 struct Node {
   QVector3<float> position;
-  float radius;
+  float outer_radius;
+  float inner_radius;
   float energy;
   float halflife;
 };
@@ -69,6 +70,7 @@ class Environment {
     void pitch(float degrees);
     void roll(float degrees);
     void dowel(float twist, float max_bend);
+    void tube(float twist, float max_bend);
     void polygon();
     void revolve();
     void extrude(const QVector3<float> &axis, float length);

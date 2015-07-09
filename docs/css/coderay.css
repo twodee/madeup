@@ -1,3 +1,15 @@
+h1 {
+  clear: both;
+}
+
+h2 {
+  clear: both;
+}
+
+h3 {
+  clear: both;
+}
+
 .CodeRay {
   background-color: #efefef;
   font-family: Monaco, "Courier New", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace;
@@ -8,6 +20,7 @@
 .CodeRay pre {
   margin: 0px;
   padding: 1em;
+  box-shadow: inset 0px 0px 3px 1px #999999;
 }
 
 div.CodeRay { }
@@ -132,11 +145,19 @@ ol.CodeRay li { white-space: pre }
 .CodeRay .head .head { color: #f4f; }
 
 .center {
-  width: 15%;
-  float: right;
-  text-align: center;
+  width: 150px;
+  text-align: right;
+  right: 10px;
+  margin-top: 5px;
+  position: absolute;
 }
 
 .mup {
-  width: 84%;
+  width: 100%;
+/*
+  width: -moz-calc(100% - 200px);
+  width: -webkit-calc(100% - 200px);
+  width: calc(100% - 200px);
+*/
 }
+

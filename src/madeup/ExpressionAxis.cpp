@@ -75,7 +75,7 @@ Co<Expression> ExpressionAxis::evaluate(Environment &env) const {
   }
 
   env.axis(xd, yd, zd);
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

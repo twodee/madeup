@@ -48,7 +48,7 @@ Co<Expression> ExpressionFor::evaluate(Environment &env) const {
   int b = end_ivalue->toInteger();
   int idelta = delta_ivalue->toInteger();
  
-  Co<Expression> value = new ExpressionUnit();
+  Co<Expression> value = ExpressionUnit::getSingleton();
 
   if (idelta > 0) {
     if (is_inclusive) {

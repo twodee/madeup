@@ -50,7 +50,7 @@ Co<Expression> ExpressionTranslate::evaluate(Environment &env) const {
 
   env.translate(v[0], v[1], v[2]);
 
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

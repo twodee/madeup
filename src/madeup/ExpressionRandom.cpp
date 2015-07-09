@@ -39,7 +39,9 @@ Co<Expression> ExpressionRandom::evaluate(Environment &env) const {
   int imin = vimin->toInteger();
   int imax = vimax->toInteger();
 
-  float random_weight = rand() / (float) RAND_MAX;
+  int rr = rand();
+  std::cout << "rr: " << rr << std::endl;
+  float random_weight = rr / (float) RAND_MAX;
   int r = (int) ((imax - imin + 1) * random_weight) + imin;
 
   return Co<Expression>(new ExpressionInteger(r));

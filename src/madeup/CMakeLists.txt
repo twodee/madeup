@@ -61,6 +61,7 @@ add_library(madeup
   ExpressionReframe.cpp
   ExpressionRemainder.cpp
   ExpressionRepeat.cpp
+  ExpressionRepeatwich.cpp
   ExpressionReverse.cpp
   ExpressionRevolve.cpp
   ExpressionRoll.cpp
@@ -73,6 +74,7 @@ add_library(madeup
   ExpressionSurface.cpp
   ExpressionTangent.cpp
   ExpressionTranslate.cpp
+  ExpressionTube.cpp
   ExpressionUnit.cpp
   ExpressionWhere.cpp
   ExpressionWhile.cpp

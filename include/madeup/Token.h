@@ -26,7 +26,6 @@ class Token {
       REAL,
       STRING,
       COMMA,
-      DOT,
       LESS_THAN,
       LESS_THAN_OR_EQUAL_TO,
       GREATER_THAN,
@@ -50,11 +49,14 @@ class Token {
       OF,
       OR,
       REPEAT,
+      REPEATWICH,
       THEN,
       THROUGH,
       TO,
       TRUE,
       WHILE,
+      NOTHING,
+      SURROUNDS,
       END_OF_FILE
     };
 

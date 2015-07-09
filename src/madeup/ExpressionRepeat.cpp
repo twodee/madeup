@@ -18,7 +18,7 @@ ExpressionRepeat::ExpressionRepeat(Co<Expression> niterations, Co<Expression> bo
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionRepeat::evaluate(Environment &env) const {
-  Co<Expression> r = Co<Expression>(new ExpressionUnit());
+  Co<Expression> r = Co<Expression>(ExpressionUnit::getSingleton());
 
   Co<Expression> v = niterations->evaluate(env);
   ExpressionInteger *niterations_value = dynamic_cast<ExpressionInteger *>(v.GetPointer());

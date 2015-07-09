@@ -63,12 +63,17 @@ var MadeupHighlightRules = function() {
       },
       {
         token: "keyword",
-        regex: /\b(?:repeat|while|end|for|end|else|if|through|and|or|to|in|by|then)\b/,
+        regex: /\b(?:repeat|repeatwich|not|of|surrounds|while|end|for|end|else|if|through|and|or|to|in|by|then)\b/,
+        next: "start"
+      },
+      {
+        token: "range",
+        regex: /\.\./,
         next: "start"
       },
       {
         token: "variable",
-        regex: /[a-zA-Z]\w*/,
+        regex: /(.[a-zA-Z]|[a-zA-Z])(\w|\.\w)*/,
         next: "start"
       },
       {

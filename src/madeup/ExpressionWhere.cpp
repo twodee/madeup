@@ -17,7 +17,7 @@ ExpressionWhere::ExpressionWhere() :
 
 Co<Expression> ExpressionWhere::evaluate(Environment &env) const {
   std::cerr << env.getTurtle().position << std::endl;
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

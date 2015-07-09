@@ -13,7 +13,7 @@ ExpressionDot::ExpressionDot() :
 
 Co<Expression> ExpressionDot::evaluate(Environment &env) const {
   env.dot();
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

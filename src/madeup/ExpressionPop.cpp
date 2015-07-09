@@ -13,7 +13,7 @@ ExpressionPop::ExpressionPop() :
 
 Co<Expression> ExpressionPop::evaluate(Environment &env) const {
   env.pop();
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

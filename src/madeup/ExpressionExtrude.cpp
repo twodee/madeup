@@ -68,7 +68,7 @@ Co<Expression> ExpressionExtrude::evaluate(Environment &env) const {
   axis.Normalize();
   env.extrude(axis, length);
 
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

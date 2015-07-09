@@ -1,4 +1,5 @@
 #include "madeup/ExpressionArray.h"
+#include "madeup/ExpressionClosure.h"
 #include "madeup/ExpressionInteger.h"
 #include "madeup/ExpressionUnit.h"
 #include "twodee/MessagedException.h"
@@ -100,7 +101,7 @@ Co<Expression> ExpressionArrayConstructor::evaluate(Environment &env) const {
     throw MessagedException(length_expression->getSourceLocation().toAnchor() + ": An array expects its number of elements to be an integer. " + length_expression->getSource() + " is not an integer.");
   }
 
-  Co<ExpressionArray> array = Co<Expression>(new ExpressionArray(length->toInteger(), Co<Expression>(new ExpressionUnit())));
+  Co<ExpressionArray> array = Co<Expression>(new ExpressionArray(length->toInteger(), Co<Expression>(ExpressionUnit::getSingleton())));
   for (int i = 0; i < length->toInteger(); ++i) {
     array->setElement(i, fill_expression->evaluate(env));
   }
@@ -120,19 +121,23 @@ void ExpressionArrayConstructor::write(ostream &out) const {
 
 /* ------------------------------------------------------------------------- */
 
-ExpressionArrayLength::ExpressionArrayLength(Co<Expression> array_expression) :
-  Expression(),
-  array_expression(array_expression) {
+ExpressionArrayLength::ExpressionArrayLength() :
+  Expression() {
 }
 
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionArrayLength::evaluate(Environment &env) const {
-  Co<Expression> array_value = array_expression->evaluate(env);
+  Co<ExpressionClosure> array_closure = env["array"];
+  if (array_closure.IsNull()) {
+    throw MessagedException(getSourceLocation().toAnchor() + ": I expect function length to be given a value named array. No value named array is defined.");
+  }
+
+  Co<Expression> array_value = array_closure->evaluate(env);
   ExpressionArrayReference *array = dynamic_cast<ExpressionArrayReference *>(array_value.GetPointer());
 
   if (!array) {
-    throw MessagedException(array_expression->getSourceLocation().toAnchor() + ": Length expects to be applied to an array. " + array_expression->getSource() + " is not an array.");
+    throw MessagedException(array_expression->getSourceLocation().toAnchor() + ": I expect function length to be applied to an array. " + array_expression->getSource() + " is not an array.");
   }
 
   return Co<Expression>(new ExpressionInteger(array->GetArray()->getLength()));
@@ -141,7 +146,7 @@ Co<Expression> ExpressionArrayLength::evaluate(Environment &env) const {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionArrayLength::write(ostream &out) const {
-  out << "(LENGTH ";
+  out << "(length ";
   array_expression->write(out);
   out << ")";
 }

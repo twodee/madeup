@@ -82,7 +82,7 @@ Co<Expression> ExpressionDefine::evaluate(Environment &env) const {
   } else {
     env.add(name, closure);
   }
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

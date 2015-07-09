@@ -19,7 +19,7 @@ ExpressionReverse::ExpressionReverse() :
 
 Co<Expression> ExpressionReverse::evaluate(Environment &env) const {
   env.reverse();
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

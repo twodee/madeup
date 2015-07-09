@@ -18,7 +18,7 @@ ExpressionWhile::ExpressionWhile(Co<Expression> condition, Co<Expression> body) 
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionWhile::evaluate(Environment &env) const {
-  Co<Expression> value = Co<Expression>(new ExpressionUnit());
+  Co<Expression> value = Co<Expression>(ExpressionUnit::getSingleton());
   Co<Expression> v = condition->evaluate(env);
   ExpressionBoolean *condition_value = dynamic_cast<ExpressionBoolean *>(v.GetPointer());
   if (!condition_value) {

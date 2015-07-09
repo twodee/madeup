@@ -33,6 +33,16 @@ class ExpressionDefineVariableSeed : public ExpressionDefineVariable {
 
 /* ------------------------------------------------------------------------- */
 
+class ExpressionDefineVariableRadius : public ExpressionDefineVariable {
+  public:
+    ExpressionDefineVariableRadius(const std::string &name, Co<Expression> rhs);
+    /* Co<Expression> evaluate(Environment &env) const; */
+
+  private:
+};
+
+/* ------------------------------------------------------------------------- */
+
 }
 
 #endif

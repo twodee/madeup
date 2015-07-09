@@ -609,6 +609,26 @@ Blockly.Blocks['madeup_loop_for_to'] = {
   }
 };
 
+Blockly.Blocks['madeup_loop_for_to_by'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.madeup.LOOP_HUE);
+    this.appendValueInput("STOP")
+        .setCheck("Integer")
+        .appendField("for")
+        .appendField(new Blockly.FieldVariable("i"), "ITERATOR")
+        .appendField("to");
+    this.appendValueInput("BY")
+        .setCheck("Integer")
+        .appendField("by");
+    this.appendStatementInput("BODY");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('');
+  }
+};
+
 Blockly.Blocks['madeup_loop_for_through'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');

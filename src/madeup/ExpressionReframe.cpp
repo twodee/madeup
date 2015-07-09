@@ -17,7 +17,7 @@ ExpressionReframe::ExpressionReframe() :
 
 Co<Expression> ExpressionReframe::evaluate(Environment &env) const {
   env.reframe();
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

@@ -64,7 +64,7 @@ Co<Expression> ExpressionRotate::evaluate(Environment &env) const {
 
   env.rotate(v[0], v[1], v[2], degrees);
 
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

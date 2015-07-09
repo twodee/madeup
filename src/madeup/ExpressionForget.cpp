@@ -13,7 +13,7 @@ ExpressionForget::ExpressionForget() :
 
 Co<Expression> ExpressionForget::evaluate(Environment &env) const {
   env.forget();
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */
