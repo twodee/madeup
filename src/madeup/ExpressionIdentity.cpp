@@ -19,7 +19,7 @@ ExpressionIdentity::ExpressionIdentity() :
 
 Co<Expression> ExpressionIdentity::evaluate(Environment &env) const {
   env.identity();
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

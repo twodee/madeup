@@ -50,7 +50,7 @@ Co<Expression> ExpressionScale::evaluate(Environment &env) const {
 
   env.scale(v[0], v[1], v[2]);
 
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

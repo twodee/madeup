@@ -13,7 +13,7 @@ ExpressionPolygon::ExpressionPolygon() :
 
 Co<Expression> ExpressionPolygon::evaluate(Environment &env) const {
   env.polygon();
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

@@ -13,7 +13,7 @@ ExpressionBox::ExpressionBox() :
 
 Co<Expression> ExpressionBox::evaluate(Environment &env) const {
   env.box();
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

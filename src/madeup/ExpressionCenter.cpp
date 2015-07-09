@@ -19,7 +19,7 @@ ExpressionCenter::ExpressionCenter() :
 
 Co<Expression> ExpressionCenter::evaluate(Environment &env) const {
   env.center();
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

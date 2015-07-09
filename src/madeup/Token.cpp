@@ -54,8 +54,12 @@ const std::string Token::getTypeString() const {
       return "RIGHT_PARENTHESIS";
     case COLON:
       return "COLON";
+    case NOTHING:
+      return "NOTHING";
     case CIRCUMFLEX:
       return "CIRCUMFLEX";
+    case SURROUNDS:
+      return "SURROUNDS";
     case ID:
       return "ID";
     case LEFT_BRACKET:
@@ -80,8 +84,6 @@ const std::string Token::getTypeString() const {
       return "STRING";
     case COMMA:
       return "COMMA";
-    case DOT:
-      return "DOT";
     case LESS_THAN:
       return "LESS_THAN";
     case LESS_THAN_OR_EQUAL_TO:
@@ -128,6 +130,8 @@ const std::string Token::getTypeString() const {
       return "OR";
     case REPEAT:
       return "REPEAT";
+    case REPEATWICH:
+      return "REPEATWICH";
     case THEN:
       return "THEN";
     case THROUGH:

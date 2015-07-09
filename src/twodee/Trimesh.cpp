@@ -195,86 +195,86 @@ Trimesh *Trimesh::GetBox(float r) {
   // Front
   positions[0] = -r;
   positions[1] = -r;
-  positions[2] = -r;
+  positions[2] = r;
   positions[3] = r;
   positions[4] = -r;
-  positions[5] = -r;
+  positions[5] = r;
   positions[6] = -r;
   positions[7] = r;
-  positions[8] = -r;
+  positions[8] = r;
   positions[9] = r;
   positions[10] = r;
-  positions[11] = -r;
+  positions[11] = r;
 
   // Back
   positions[12] = r;
   positions[13] = -r;
-  positions[14] = r;
+  positions[14] = -r;
   positions[15] = -r;
   positions[16] = -r;
-  positions[17] = r;
+  positions[17] = -r;
   positions[18] = r;
   positions[19] = r;
-  positions[20] = r;
+  positions[20] = -r;
   positions[21] = -r;
   positions[22] = r;
-  positions[23] = r;
+  positions[23] = -r;
  
   // Left
   positions[24] = -r;
   positions[25] = -r;
-  positions[26] = r;
+  positions[26] = -r;
   positions[27] = -r;
   positions[28] = -r;
-  positions[29] = -r;
+  positions[29] = r;
   positions[30] = -r;
   positions[31] = r;
-  positions[32] = r;
+  positions[32] = -r;
   positions[33] = -r;
   positions[34] = r;
-  positions[35] = -r;
+  positions[35] = r;
  
   // Right
   positions[36] = r;
   positions[37] = -r;
-  positions[38] = -r;
+  positions[38] = r;
   positions[39] = r;
   positions[40] = -r;
-  positions[41] = r;
+  positions[41] = -r;
   positions[42] = r;
   positions[43] = r;
-  positions[44] = -r;
+  positions[44] = r;
   positions[45] = r;
   positions[46] = r;
-  positions[47] = r;
+  positions[47] = -r;
  
   // Top
   positions[48] = -r;
   positions[49] = r;
-  positions[50] = -r;
+  positions[50] = r;
   positions[51] = r;
   positions[52] = r;
-  positions[53] = -r;
+  positions[53] = r;
   positions[54] = -r;
   positions[55] = r;
-  positions[56] = r;
+  positions[56] = -r;
   positions[57] = r;
   positions[58] = r;
-  positions[59] = r;
+  positions[59] = -r;
  
   // Bottom
   positions[60] = -r;
   positions[61] = -r;
-  positions[62] = r;
+  positions[62] = -r;
   positions[63] = r;
   positions[64] = -r;
-  positions[65] = r;
+  positions[65] = -r;
   positions[66] = -r;
   positions[67] = -r;
-  positions[68] = -r;
+  positions[68] = r;
   positions[69] = r;
   positions[70] = -r;
-  positions[71] = -r;
+  positions[71] = r;
 
   int *faces = mesh->faces;
   faces[0] = 0;

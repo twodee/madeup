@@ -13,7 +13,7 @@ ExpressionPush::ExpressionPush() :
 
 Co<Expression> ExpressionPush::evaluate(Environment &env) const {
   env.push();
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

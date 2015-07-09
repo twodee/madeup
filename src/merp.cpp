@@ -148,6 +148,7 @@ int main(int argc, char **argv) {
       env.prime();
       env.setGeometryMode(geometry_mode);
       srand(time(NULL));
+      rand();
 
       if (wants_timeout) {
         env.setTimeout(timeout);

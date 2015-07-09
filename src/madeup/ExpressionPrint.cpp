@@ -6,7 +6,7 @@
 #include "madeup/ExpressionPrint.h"
 #include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionString.h"
-#include "madeup/ExpressionString.h"
+#include "madeup/ExpressionUnit.h"
 #include "twodee/MessagedException.h"
 
 using namespace td;
@@ -50,6 +50,12 @@ Co<Expression> ExpressionPrint::evaluate(Environment &env) const {
   ExpressionBoolean *boolean_value = dynamic_cast<ExpressionBoolean *>(value.GetPointer());
   if (boolean_value) {
     std::cout << boolean_value->toBoolean() << std::endl;
+    return value;
+  }
+
+  ExpressionUnit *unit_value = dynamic_cast<ExpressionUnit *>(value.GetPointer());
+  if (unit_value) {
+    std::cout << "nothing" << std::endl;
     return value;
   }
   

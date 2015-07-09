@@ -55,7 +55,7 @@ class ExpressionArrayConstructor : public Expression {
 
 class ExpressionArrayLength : public Expression {
   public:
-    ExpressionArrayLength(Co<Expression> array_expression);
+    ExpressionArrayLength();
 
     Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;

@@ -9,12 +9,15 @@ namespace madeup {
 
 class ExpressionUnit : public Expression {
   public:
-    ExpressionUnit();
-
     Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
 
+    static Co<Expression> getSingleton();
+
   private:
+    ExpressionUnit();
+
+    static Co<Expression> singleton;
 };
 
 /* ------------------------------------------------------------------------- */

@@ -39,7 +39,7 @@ Co<Expression> ExpressionBlobs::evaluate(Environment &env) const {
 
   env.blobs(grain, iso);
 
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

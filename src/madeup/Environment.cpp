@@ -3,6 +3,7 @@
 
 #include "madeup/Environment.h"
 #include "madeup/ExpressionAbsoluteValue.h"
+#include "madeup/ExpressionArray.h"
 #include "madeup/ExpressionAxis.h"
 #include "madeup/ExpressionBoolean.h"
 #include "madeup/ExpressionBlobs.h"
@@ -18,6 +19,8 @@
 #include "madeup/ExpressionForget.h"
 #include "madeup/ExpressionIdentity.h"
 #include "madeup/ExpressionInteger.h"
+#include "madeup/ExpressionInverseSine.h"
+#include "madeup/ExpressionInverseCosine.h"
 #include "madeup/ExpressionInverseTangent.h"
 #include "madeup/ExpressionLog.h"
 #include "madeup/ExpressionMax.h"
@@ -42,6 +45,7 @@
 #include "madeup/ExpressionSurface.h"
 #include "madeup/ExpressionTangent.h"
 #include "madeup/ExpressionTranslate.h"
+#include "madeup/ExpressionTube.h"
 #include "madeup/ExpressionWhere.h"
 #include "madeup/ExpressionYaw.h"
 #include "twodee/Log.h"
@@ -92,7 +96,8 @@ void Environment::prime() {
 
   Co<Environment> globals(new Environment());;
 
-  add("radius", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("radius", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
+  add(".outerRadius", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine(".outerRadius", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
+  add(".innerRadius", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine(".innerRadius", Co<Expression>(new ExpressionReal(0.5f)))), Environment())));
   add("nsides", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("nsides", Co<Expression>(new ExpressionInteger(4)))), Environment())));
   add("fracture", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("fracture", Co<Expression>(new ExpressionReal(100)))), Environment())));
   add("pi", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("pi", Co<Expression>(new ExpressionReal(td::PI)))), Environment())));
@@ -102,10 +107,11 @@ void Environment::prime() {
   add("axisx", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisx", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
   add("axisy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisy", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
   add("axisz", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisz", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
-  add("energy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("energy", Co<Expression>(new ExpressionReal(100.0f)))), Environment())));
-  add("halflife", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("halflife", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
+  add(".energy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("energy", Co<Expression>(new ExpressionReal(100.0f)))), Environment())));
+  add(".halflife", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("halflife", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
 
-  globals->add("radius", (*this)["radius"]);
+  globals->add(".outerRadius", (*this)[".outerRadius"]);
+  globals->add(".innerRadius", (*this)[".innerRadius"]);
   globals->add("nsides", (*this)["nsides"]);
   globals->add("fracture", (*this)["fracture"]);
   globals->add("pi", (*this)["pi"]);
@@ -115,14 +121,17 @@ void Environment::prime() {
   globals->add("axisx", (*this)["axisx"]);
   globals->add("axisy", (*this)["axisy"]);
   globals->add("axisz", (*this)["axisz"]);
-  globals->add("energy", (*this)["energy"]);
-  globals->add("halflife", (*this)["halflife"]);
+  globals->add(".energy", (*this)[".energy"]);
+  globals->add(".halflife", (*this)[".halflife"]);
 
   Co<ExpressionDefine> define_sine(new ExpressionDefine("sin", Co<Expression>(new ExpressionSine())));
   define_sine->addFormal("degrees");
 
   Co<ExpressionDefine> define_cosine(new ExpressionDefine("cos", Co<Expression>(new ExpressionCosine())));
   define_cosine->addFormal("degrees");
+
+  Co<ExpressionDefine> define_length(new ExpressionDefine("length", Co<Expression>(new ExpressionArrayLength())));
+  define_length->addFormal("array");
 
   Co<ExpressionDefine> define_log(new ExpressionDefine("log", Co<Expression>(new ExpressionLog())));
   define_log->addFormal("base");
@@ -131,10 +140,10 @@ void Environment::prime() {
   Co<ExpressionDefine> define_tangent(new ExpressionDefine("tan", Co<Expression>(new ExpressionTangent())));
   define_tangent->addFormal("degrees");
 
-  Co<ExpressionDefine> define_inverse_sine(new ExpressionDefine("asin", Co<Expression>(new ExpressionInverseTangent())));
+  Co<ExpressionDefine> define_inverse_sine(new ExpressionDefine("asin", Co<Expression>(new ExpressionInverseSine())));
   define_inverse_sine->addFormal("ratio");
 
-  Co<ExpressionDefine> define_inverse_cosine(new ExpressionDefine("acos", Co<Expression>(new ExpressionInverseTangent())));
+  Co<ExpressionDefine> define_inverse_cosine(new ExpressionDefine("acos", Co<Expression>(new ExpressionInverseCosine())));
   define_inverse_cosine->addFormal("ratio");
 
   Co<ExpressionDefine> define_inverse_tangent(new ExpressionDefine("atan", Co<Expression>(new ExpressionInverseTangent())));
@@ -230,6 +239,10 @@ void Environment::prime() {
   define_dowel->addFormal("twist");
   define_dowel->addFormal("maxBend");
 
+  Co<ExpressionDefine> define_tube(new ExpressionDefine("tube", Co<Expression>(new ExpressionTube())));
+  define_tube->addFormal("twist");
+  define_tube->addFormal("maxBend");
+
   Co<ExpressionDefine> define_polygon(new ExpressionDefine("polygon", Co<Expression>(new ExpressionPolygon())));
 
   Co<ExpressionDefine> define_dot(new ExpressionDefine("dot", Co<Expression>(new ExpressionDot())));
@@ -252,6 +265,7 @@ void Environment::prime() {
 
   add("sin", Co<ExpressionClosure>(new ExpressionClosure(define_sine, globals)));
   add("cos", Co<ExpressionClosure>(new ExpressionClosure(define_cosine, globals)));
+  add("length", Co<ExpressionClosure>(new ExpressionClosure(define_length, globals)));
   add("log", Co<ExpressionClosure>(new ExpressionClosure(define_log, globals)));
   add("tan", Co<ExpressionClosure>(new ExpressionClosure(define_tangent, globals)));
   add("asin", Co<ExpressionClosure>(new ExpressionClosure(define_inverse_sine, globals)));
@@ -282,6 +296,7 @@ void Environment::prime() {
   add("min", Co<ExpressionClosure>(new ExpressionClosure(define_min, globals)));
   add("dowel", Co<ExpressionClosure>(new ExpressionClosure(define_dowel, globals)));
   add("stick", Co<ExpressionClosure>(new ExpressionClosure(define_dowel, globals)));
+  add("tube", Co<ExpressionClosure>(new ExpressionClosure(define_tube, globals)));
   add("polygon", Co<ExpressionClosure>(new ExpressionClosure(define_polygon, globals)));
   add("dot", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
   add("ball", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
@@ -302,6 +317,7 @@ void Environment::prime() {
   globals->add("push", (*this)["push"]);
   globals->add("pop", (*this)["pop"]);
   globals->add("dowel", (*this)["dowel"]);
+  globals->add("tube", (*this)["tube"]);
   globals->add("polygon", (*this)["polygon"]);
   globals->add("ball", (*this)["ball"]);
   globals->add("box", (*this)["box"]);
@@ -335,6 +351,7 @@ void Environment::prime() {
   globals->add("tan", (*this)["tan"]);
   globals->add("log", (*this)["log"]);
   globals->add("cos", (*this)["cos"]);
+  globals->add("length", (*this)["length"]);
   globals->add("sin", (*this)["sin"]);
   globals->add("extrude", (*this)["extrude"]);
   globals->add("forget", (*this)["forget"]);
@@ -381,17 +398,27 @@ Co<ExpressionClosure> Environment::operator[](const string &id) {
 /* ------------------------------------------------------------------------- */
 
 void Environment::recordVertex() {
-  Co<Expression> v = (*this)["radius"]->evaluate(*this);
+  Co<Expression> v = (*this)[".outerRadius"]->evaluate(*this);
   ExpressionReal *radius_value = dynamic_cast<ExpressionReal *>(v.GetPointer());
-  float radius;
+  float outer_radius;
   if (radius_value) {
-    radius = radius_value->toReal();
+    outer_radius = radius_value->toReal();
   } else {
     ExpressionInteger *radius_value = dynamic_cast<ExpressionInteger *>(v.GetPointer());
-    radius = radius_value->toInteger();
+    outer_radius = radius_value->toInteger();
   }
 
-  v = (*this)["energy"]->evaluate(*this);
+  v = (*this)[".innerRadius"]->evaluate(*this);
+  radius_value = dynamic_cast<ExpressionReal *>(v.GetPointer());
+  float inner_radius;
+  if (radius_value) {
+    inner_radius = radius_value->toReal();
+  } else {
+    ExpressionInteger *radius_value = dynamic_cast<ExpressionInteger *>(v.GetPointer());
+    inner_radius = radius_value->toInteger();
+  }
+
+  v = (*this)[".energy"]->evaluate(*this);
   ExpressionNumber *energy_value = dynamic_cast<ExpressionNumber *>(v.GetPointer());
   float energy;
   if (energy_value) {
@@ -400,7 +427,7 @@ void Environment::recordVertex() {
     energy = 0.0f;
   }
 
-  v = (*this)["halflife"]->evaluate(*this);
+  v = (*this)[".halflife"]->evaluate(*this);
   ExpressionNumber *halflife_value = dynamic_cast<ExpressionNumber *>(v.GetPointer());
   float halflife;
   if (halflife_value) {
@@ -409,7 +436,7 @@ void Environment::recordVertex() {
     halflife = 0.0f;
   }
 
-  Node cursor = {turtle.position, radius, energy, halflife};
+  Node cursor = {turtle.position, outer_radius, inner_radius, energy, halflife};
   run.push_back(cursor);
 }
 
@@ -427,7 +454,10 @@ void Environment::recordPreview() {
 /* ------------------------------------------------------------------------- */
 
 void Environment::move(float distance) {
-  turtle.position += turtle.camera.GetTo() * distance;
+  QVector3<float> offset(xforms.top() * QVector4<float>(turtle.camera.GetTo() * distance, 0.0f));
+  turtle.position += offset;
+  // DON'T DO THIS. Move is a relative command. We want to transform the offset.
+  /* turtle.position = xforms.top() * turtle.position; */
   recordVertex();
   recordPreview();
 }
@@ -603,6 +633,7 @@ void Environment::polygon() {
       }
 
       Trimesh *trimesh = line->Triangulate();
+      *trimesh *= xforms.top();
       *shapes += *trimesh;
     }
   }
@@ -631,7 +662,7 @@ void Environment::dowel(float twist, float max_bend) {
       }
 
       if (run.size() > 0) {
-        float radius = run[0].radius;
+        float radius = run[0].outer_radius;
         bool is_homoradius = true;
 
         Polyline<float> *line = new Polyline<float>(run.size(), 4, mode);
@@ -639,8 +670,8 @@ void Environment::dowel(float twist, float max_bend) {
           (*line)(i)[0] = run[i].position[0];
           (*line)(i)[1] = run[i].position[1];
           (*line)(i)[2] = run[i].position[2];
-          (*line)(i)[3] = run[i].radius;
-          is_homoradius = is_homoradius && fabs(run[i].radius - radius) < 1.0e-3f;
+          (*line)(i)[3] = run[i].outer_radius;
+          is_homoradius = is_homoradius && fabs(run[i].outer_radius - radius) < 1.0e-3f;
         }
 
         if (!is_homoradius) {
@@ -650,10 +681,161 @@ void Environment::dowel(float twist, float max_bend) {
         Co<Expression> nsides_value = (*this)["nsides"]->evaluate(*this);
         int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->toInteger();
 
-        Trimesh *trimesh = line->Dowel(nsides, radius, twist, max_bend);
+        Trimesh *trimesh = line->Dowel(nsides, radius, true, twist, max_bend);
+        *trimesh *= xforms.top();
 
         delete line;
         line = NULL;
+
+        *shapes += *trimesh;
+
+        delete trimesh;
+        trimesh = NULL;
+      }
+    }
+  }
+
+  paths.push_back(vector<Turtle>());
+  run.clear();
+}
+
+/* ------------------------------------------------------------------------- */
+
+void Environment::tube(float twist, float max_bend) {
+  if (geometry_mode == GeometryMode::SURFACE) {
+    if (run.size() >= 2) {
+      QVector3<float> diff = run[0].position - run[run.size() - 1].position;
+      float squared_length = diff.GetSquaredLength();
+
+      // We're closed if the first and last positions are pretty close to each other.
+      // In which case, let's just drop the last position all together and let the
+      // Extuber method seal up the join.
+      int mode;
+      if (fabs(squared_length) < 1.0e-6f) {
+        mode = Polyline<float>::CLOSED; 
+        run.pop_back();
+      } else {
+        mode = Polyline<float>::OPEN; 
+      }
+
+      if (run.size() > 0) {
+        float radius = run[0].outer_radius;
+        bool is_homoradius = true;
+
+        Polyline<float> *line = new Polyline<float>(run.size(), 4, mode);
+        for (unsigned int i = 0; i < run.size(); ++i) {
+          (*line)(i)[0] = run[i].position[0];
+          (*line)(i)[1] = run[i].position[1];
+          (*line)(i)[2] = run[i].position[2];
+          (*line)(i)[3] = run[i].outer_radius;
+          is_homoradius = is_homoradius && fabs(run[i].outer_radius - radius) < 1.0e-3f;
+        }
+
+        if (!is_homoradius) {
+          radius = -1;
+        }
+
+        Co<Expression> nsides_value = (*this)["nsides"]->evaluate(*this);
+        int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->toInteger();
+
+        Trimesh *trimesh = line->Dowel(nsides, radius, false, twist, max_bend);
+        *trimesh *= xforms.top();
+
+        delete line;
+        line = NULL;
+
+        {
+          float radius = run[0].inner_radius;
+          bool is_homoradius = true;
+
+          Polyline<float> *line = new Polyline<float>(run.size(), 4, mode);
+          for (unsigned int i = 0; i < run.size(); ++i) {
+            (*line)(i)[0] = run[i].position[0];
+            (*line)(i)[1] = run[i].position[1];
+            (*line)(i)[2] = run[i].position[2];
+            (*line)(i)[3] = run[i].inner_radius;
+            is_homoradius = is_homoradius && fabs(run[i].outer_radius - radius) < 1.0e-3f;
+          }
+
+          if (!is_homoradius) {
+            radius = -1;
+          }
+
+          Trimesh *innermesh = line->Dowel(nsides, radius, false, twist, max_bend);
+          *innermesh *= xforms.top();
+          innermesh->ReverseWinding();
+
+          delete line;
+          line = NULL;
+
+          if (mode == Polyline<float>::OPEN) {
+            Trimesh *cap_a = new Trimesh(nsides * 2, nsides * 2);
+
+            // Copy over vertex positions from two shells.
+            float *positions = cap_a->GetPositions();
+            memcpy(positions, innermesh->GetPositions(), sizeof(float) * 3 * nsides);
+            memcpy(positions + 3 * nsides, trimesh->GetPositions(), sizeof(float) * 3 * nsides);
+
+            float *position = positions;
+            for (int vi = 0; vi < nsides * 2; ++vi) {
+              /* std::cout << "position[#](# in 0,3): " << position[0] << ", " << position[1] << ", " << position[2] << std::endl; */
+              position += 3;
+            }
+
+            // Connect up the vertices.
+            int *face = cap_a->GetFaces();
+            for (int fi = 0; fi < nsides; ++fi) {
+              face[0] = fi;
+              face[1] = nsides + (fi + 1) % nsides;
+              face[2] = nsides + fi;
+              /* std::cout << "face[#](# in 0,3): " << face[0] << ", " << face[1] << ", " << face[2] << std::endl; */
+              face += 3;
+
+              face[0] = fi;
+              face[1] = (fi + 1) % nsides;
+              face[2] = nsides + (fi + 1) % nsides;
+              /* std::cout << "face[#](# in 0,3): " << face[0] << ", " << face[1] << ", " << face[2] << std::endl; */
+              face += 3;
+            }
+
+            // SECOND CAP
+            Trimesh *cap_b = new Trimesh(nsides * 2, nsides * 2);
+
+            // Copy over vertex positions from two shells.
+            positions = cap_b->GetPositions();
+            memcpy(positions, innermesh->GetPositions() + (innermesh->GetVertexCount() - nsides) * 3, sizeof(float) * 3 * nsides);
+            memcpy(positions + 3 * nsides, trimesh->GetPositions() + (trimesh->GetVertexCount() - nsides) * 3, sizeof(float) * 3 * nsides);
+
+            position = positions;
+            for (int vi = 0; vi < nsides * 2; ++vi) {
+              std::cout << "position[#](# in 0,3): " << position[0] << ", " << position[1] << ", " << position[2] << std::endl;
+              position += 3;
+            }
+
+            // Connect up the vertices.
+            face = cap_b->GetFaces();
+            for (int fi = 0; fi < nsides; ++fi) {
+              face[0] = fi;
+              face[1] = nsides + fi;
+              face[2] = nsides + (fi + 1) % nsides;
+              std::cout << "face[#](# in 0,3): " << face[0] << ", " << face[1] << ", " << face[2] << std::endl;
+              face += 3;
+
+              face[0] = fi;
+              face[1] = nsides + (fi + 1) % nsides;
+              face[2] = (fi + 1) % nsides;
+              std::cout << "face[#](# in 0,3): " << face[0] << ", " << face[1] << ", " << face[2] << std::endl;
+              face += 3;
+            }
+
+            *trimesh += *cap_a;
+            *trimesh += *cap_b;
+            delete cap_a;
+            delete cap_b;
+          }
+
+          *trimesh += *innermesh;
+        }
 
         *shapes += *trimesh;
 
@@ -714,7 +896,7 @@ void Environment::revolve() {
         float degrees = degrees_number->toReal();
 
         Trimesh *trimesh = line->Revolve(QVector3<float>(x, y, z), nsides, degrees);
-
+        *trimesh *= xforms.top();
         *shapes += *trimesh;
       }
     }
@@ -759,9 +941,10 @@ void Environment::dot() {
     int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->toInteger();
 
     for (unsigned int i = 0; i < run.size(); ++i) {
-      Trimesh *trimesh = Trimesh::GetSphere(nsides, nsides / 2, run[i].radius);
+      Trimesh *trimesh = Trimesh::GetSphere(nsides, nsides / 2, run[i].outer_radius);
 
-      *trimesh += xforms.top() * run[i].position;
+      *trimesh *= xforms.top();
+      *trimesh += run[i].position;
       *shapes += *trimesh;
       delete trimesh;
     }
@@ -776,7 +959,9 @@ void Environment::dot() {
 void Environment::box() {
   if (geometry_mode == GeometryMode::SURFACE) {
     for (unsigned int i = 0; i < run.size(); ++i) {
-      Trimesh *trimesh = Trimesh::GetBox(run[i].radius);
+      Trimesh *trimesh = Trimesh::GetBox(run[i].outer_radius);
+
+      *trimesh *= xforms.top();
       *trimesh += run[i].position;
       *shapes += *trimesh;
       delete trimesh;
@@ -796,17 +981,13 @@ void Environment::blobs(float grain, float iso) {
       // Find min and max.
       QVector3<float> min = run[0].position;
       QVector3<float> max = run[0].position;
-      /* QVector3<float> min_stdevs(run[0].radius, run[0].radius, run[0].radius); */
-      /* QVector3<float> max_stdevs(run[0].radius, run[0].radius, run[0].radius); */
 
       for (unsigned int i = 1; i < run.size(); ++i) {
         for (int d = 0; d < 3; ++d) {
           if (run[i].position[d] < min[d]) {
             min[d] = run[i].position[d];
-            /* min_stdevs[d] = run[i].radius; */
           } else if (run[i].position[d] > max[d]) {
             max[d] = run[i].position[d];
-            /* max_stdevs[d] = run[i].radius; */
           }
         }
       }
@@ -865,6 +1046,7 @@ void Environment::blobs(float grain, float iso) {
       Trimesh *trimesh = new Trimesh(ntriangles, positions);
       *shapes += *trimesh;
       *trimesh += min;
+      *trimesh *= xforms.top();
 
       delete[] positions;
     }
@@ -898,6 +1080,7 @@ void Environment::surface(int width, int height) {
     /* grid.Write("grid.f20"); */
 
     Trimesh *trimesh = Trimesh::GetParametric(grid);
+    *trimesh *= xforms.top();
     *shapes += *trimesh;
   }
 

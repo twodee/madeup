@@ -34,6 +34,7 @@
 #include "madeup/ExpressionRealDivide.h"
 #include "madeup/ExpressionRemainder.h"
 #include "madeup/ExpressionRepeat.h"
+#include "madeup/ExpressionRepeatwich.h"
 #include "madeup/ExpressionString.h"
 #include "madeup/ExpressionSubtract.h"
 #include "madeup/ExpressionUnit.h"
@@ -80,9 +81,11 @@ bool Parser::isInExpressionFirst(int k) const {
          isUp(Token::IF, k) ||
          isUp(Token::FOR, k) ||
          isUp(Token::REPEAT, k) ||
+         isUp(Token::REPEATWICH, k) ||
          isUp(Token::WHILE, k) ||
          isUp(Token::NOT, k) ||
          isUp(Token::TO, k) ||
+         isUp(Token::NOTHING, k) ||
          isUp(Token::ID, k);
 }
 
@@ -353,53 +356,43 @@ void Parser::expressionLevel8() {
 void Parser::expressionLevel9() {
   atom();
   Co<Expression> array;
-  if (isUp(Token::LEFT_BRACKET) || isUp(Token::DOT)) {
+
+  if (isUp(Token::LEFT_BRACKET)) {
     array = popExpression();
   }
-  while (isUp(Token::LEFT_BRACKET) || isUp(Token::DOT)) {
-    if (isUp(Token::DOT)) {
+
+  while (isUp(Token::LEFT_BRACKET)) {
+    ++i;
+    expressionLevel0();
+    Co<Expression> subscript = popExpression();
+    if (isUp(Token::RIGHT_BRACKET)) {
       ++i;
-      if (isUp(Token::ID) && tokens[i].getText() == "length") {
-        pushExpression(new ExpressionArrayLength(array), array->getSourceLocation(), tokens[i].getLocation());
+      if (isUp(Token::ASSIGN)) {
         ++i;
-      } else {
-        std::stringstream ss;
-        ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'length'.";
-        throw MessagedException(ss.str());
-      }
-    } else { 
-      ++i;
-      expressionLevel0();
-      Co<Expression> subscript = popExpression();
-      if (isUp(Token::RIGHT_BRACKET)) {
-        ++i;
-        if (isUp(Token::ASSIGN)) {
+        Co<Expression> rhs;
+        if (isUp(Token::NEWLINE)) {
           ++i;
-          Co<Expression> rhs;
-          if (isUp(Token::NEWLINE)) {
+          block();
+          rhs = popBlock();
+          if (isUp(Token::END)) {
             ++i;
-            block();
-            rhs = popBlock();
-            if (isUp(Token::END)) {
-              ++i;
-            } else {
-              std::stringstream ss;
-              ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'end'.";
-              throw MessagedException(ss.str());
-            }
           } else {
-            expressionLevel0();
-            rhs = popExpression();
+            std::stringstream ss;
+            ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'end'.";
+            throw MessagedException(ss.str());
           }
-          pushExpression(new ExpressionDefineArrayElement(array, subscript, rhs), array->getSourceLocation(), rhs->getSourceLocation());
         } else {
-          pushExpression(new ExpressionArraySubscript(array, subscript), array->getSourceLocation(), subscript->getSourceLocation());
+          expressionLevel0();
+          rhs = popExpression();
         }
+        pushExpression(new ExpressionDefineArrayElement(array, subscript, rhs), array->getSourceLocation(), rhs->getSourceLocation());
       } else {
-        std::stringstream ss;
-        ss << subscript->getSourceLocation().toAnchor() << ": I didn't find a ']' where I expected it.";
-        throw MessagedException(ss.str());
+        pushExpression(new ExpressionArraySubscript(array, subscript), array->getSourceLocation(), subscript->getSourceLocation());
       }
+    } else {
+      std::stringstream ss;
+      ss << subscript->getSourceLocation().toAnchor() << ": I didn't find a ']' where I expected it.";
+      throw MessagedException(ss.str());
     }
   }
 }
@@ -455,6 +448,10 @@ void Parser::atom() {
     expressions.push(Co<Expression>(new ExpressionBoolean(false)));
     expressions.top()->setSource(getSubsource(tokens[i].getLocation()), tokens[i].getLocation());
     ++i;
+  } else if (isUp(Token::NOTHING)) {
+    expressions.push(ExpressionUnit::getSingleton());
+    expressions.top()->setSource(getSubsource(tokens[i].getLocation()), tokens[i].getLocation());
+    ++i;
   } else if (isUp(Token::STRING)) {
     expressions.push(Co<Expression>(new ExpressionString(tokens[i].getText())));
     expressions.top()->setSource(getSubsource(tokens[i].getLocation()), tokens[i].getLocation());
@@ -474,6 +471,37 @@ void Parser::atom() {
       } else {
         std::stringstream ss;
         ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'end'.";
+        throw MessagedException(ss.str());
+      }
+    } else {
+      std::stringstream ss;
+      ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected a linebreak.";
+      throw MessagedException(ss.str());
+    }
+  } else if (isUp(Token::REPEATWICH)) {
+    Token repeat_token = tokens[i];
+    ++i;
+    expressionLevel0();
+    if (isUp(Token::NEWLINE)) {
+      ++i;
+      block();
+      if (isUp(Token::SURROUNDS)) {
+        ++i;
+        block();
+        if (isUp(Token::END)) {
+          Co<Expression> n = popExpression();
+          Co<ExpressionBlock> less = popBlock();
+          Co<ExpressionBlock> more = popBlock();
+          pushExpression(new ExpressionRepeatwich(n, more, less), repeat_token.getLocation(), tokens[i].getLocation());
+          ++i;
+        } else {
+          std::stringstream ss;
+          ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'end'.";
+          throw MessagedException(ss.str());
+        }
+      } else {
+        std::stringstream ss;
+        ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'surrounds'.";
         throw MessagedException(ss.str());
       }
     } else {
@@ -654,6 +682,8 @@ void Parser::atom() {
     Co<ExpressionDefineVariable> define;
     if (name == "seed") {
       pushExpression(new ExpressionDefineVariableSeed(name.c_str(), rhs), id_token.getLocation(), end_location);
+    } else if (name == ".radius") {
+      pushExpression(new ExpressionDefineVariableRadius(name.c_str(), rhs), id_token.getLocation(), end_location);
     } else {
       pushExpression(new ExpressionDefineVariable(name.c_str(), rhs), id_token.getLocation(), end_location);
     }

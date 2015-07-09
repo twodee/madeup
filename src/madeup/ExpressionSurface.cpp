@@ -40,7 +40,7 @@ Co<Expression> ExpressionSurface::evaluate(Environment &env) const {
 
   env.surface(iwidth, iheight);
 
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

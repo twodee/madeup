@@ -40,7 +40,7 @@ template<class T> class Polyline : public NField<T, 1> {
     ~Polyline();
 
     Trimesh *Revolve(const QVector3<T>& axis, int nstops, float degrees = 360.0f) const;
-    Trimesh *Dowel(int nstops, T radius, T twist = (T) 0, float max_bend = 361.0f) const;
+    Trimesh *Dowel(int nstops, T radius, bool is_capped = true, T twist = (T) 0, float max_bend = 361.0f) const;
     void Fracture(T max_segment_length);
     bool IsOpen() const;
     QVector3<T> GetNormal() const;
@@ -256,7 +256,7 @@ QVector3<T> Polyline<T>::GetConstrainedPerpendicular(const QVector3<T> &axis) {
 /* ------------------------------------------------------------------------- */
 
 template<class T>
-Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist, float max_bend) const {
+Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float max_bend) const {
   assert(max_bend > 0.0f);
 
   int nvertices = this->GetElementCount();
@@ -613,7 +613,7 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist, float max_bend) const
   Trimesh *mesh = Trimesh::GetParametric(img, true, false);
 
   // If this mesh is open, we need to generate caps as well.
-  if (is_open) {
+  if (is_open && is_capped) {
     for (int ci = 0; ci < 2; ++ci) {
       int vi = ci == 0 ? 0 : (this->GetElementCount() - 1);
       Trimesh *cap = new Trimesh(cap_neighbors[ci].size() + 1, nstops);
@@ -930,15 +930,10 @@ Trimesh *Polyline<T>::Extrude(const QVector3<T> &axis, T distance, const QMatrix
   // How does this compare with where we are headed?
   float normal_dot_direction = normal.Dot(delta);
 
-  std::cout << "normal: " << normal << std::endl;
-  std::cout << "delta: " << delta << std::endl;
-  std::cout << "normal_dot_direction: " << normal_dot_direction << std::endl;
-
   // Which way is end A wound?
   Polyline<T> *flattened = this->Flatten();
   bool is_ccw = flattened->IsCounterclockwise();
   delete flattened;
-  std::cout << "is_ccw: " << is_ccw << std::endl;
 
   vector<QVector3<float> > positions; 
   vector<QVector3<int> > faces; 
@@ -951,7 +946,7 @@ Trimesh *Polyline<T>::Extrude(const QVector3<T> &axis, T distance, const QMatrix
 
   // End B
   for (int i = 0; i < nvertices; ++i) {
-    positions.push_back(positions[i] + delta);
+    positions.push_back(xform * (positions[i] + delta));
   }
 
   for (int i = 0; i < nvertices; ++i) {
@@ -972,6 +967,7 @@ Trimesh *Polyline<T>::Extrude(const QVector3<T> &axis, T distance, const QMatrix
 
   *extruded += *cap_a;
   Trimesh *cap_b = new Trimesh(*cap_a);
+  *cap_b *= xform;
   cap_b->ReverseWinding();
   *cap_b += delta;
   *extruded += *cap_b;

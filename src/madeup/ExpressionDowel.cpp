@@ -43,7 +43,7 @@ Co<Expression> ExpressionDowel::evaluate(Environment &env) const {
 
   // Emit dowel.
   env.dowel(twist, max_bend);
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

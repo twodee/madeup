@@ -30,7 +30,7 @@ Co<Expression> ExpressionIf::evaluate(Environment &env) const {
     } else if (!else_block.IsNull()) {
       return else_block->evaluate(env);
     } else {
-      return Co<Expression>(new ExpressionUnit());
+      return Co<Expression>(ExpressionUnit::getSingleton());
     }
   }
 }

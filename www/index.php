@@ -52,6 +52,7 @@
       <block type="madeup_loop_repeat"></block>
       <block type="madeup_loop_while"></block>
       <block type="madeup_loop_for_to"></block>
+      <block type="madeup_loop_for_to_by"></block>
       <block type="madeup_loop_for_through"></block>
       <block type="madeup_loop_for_in"></block>
     </category>

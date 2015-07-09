@@ -21,7 +21,7 @@ void ExpressionBlock::append(Co<Expression> element) {
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionBlock::evaluate(Environment &env) const {
-  Co<Expression> value(new ExpressionUnit());
+  Co<Expression> value(ExpressionUnit::getSingleton());
   for (vector<Co<Expression> >::const_iterator i = statements.begin(); i != statements.end(); ++i) {
     value = (*i)->evaluate(env);
   }

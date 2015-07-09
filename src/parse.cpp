@@ -17,7 +17,8 @@ int main(int argc, char **argv) {
       std::cout << *i << std::endl;
     }
 
-    Parser parser(tokens);
+    std::string source = Utilities::Slurp(argv[1]);
+    Parser parser(tokens, source);
     parser.program();
   } catch (td::MessagedException e) {
     std::cerr << e.GetMessage() << std::endl;

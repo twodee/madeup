@@ -175,7 +175,7 @@ Token Lexer::getTokenAfterDot() {
     return makeToken(Token::RANGE);
   } else {
     in.putback(c);
-    return makeToken(Token::DOT);
+    return getTokenAfterLetter();
   }
 }
 
@@ -235,7 +235,7 @@ Token Lexer::getTokenAfterQuote() {
 Token Lexer::getTokenAfterLetter() {
   int c = in.get();
 
-  while (c != EOF && (isalpha(c) || isdigit(c))) {
+  while (c != EOF && (isalpha(c) || isdigit(c) || c == '.')) {
     ++location.end_column;
     ++location.end_index;
     text_so_far += (char) c;
@@ -261,14 +261,20 @@ Token Lexer::getTokenAfterLetter() {
     return makeToken(Token::IN);
   } else if (text_so_far == "not") {
     return makeToken(Token::NOT);
+  } else if (text_so_far == "nothing") {
+    return makeToken(Token::NOTHING);
   } else if (text_so_far == "of") {
     return makeToken(Token::OF);
   } else if (text_so_far == "or") {
     return makeToken(Token::OR);
   } else if (text_so_far == "repeat") {
     return makeToken(Token::REPEAT);
+  } else if (text_so_far == "repeatwich") {
+    return makeToken(Token::REPEATWICH);
   } else if (text_so_far == "then") {
     return makeToken(Token::THEN);
+  } else if (text_so_far == "surrounds") {
+    return makeToken(Token::SURROUNDS);
   } else if (text_so_far == "through") {
     return makeToken(Token::THROUGH);
   } else if (text_so_far == "to") {

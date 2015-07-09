@@ -19,7 +19,7 @@ ExpressionEcho::ExpressionEcho() :
 
 Co<Expression> ExpressionEcho::evaluate(Environment &env) const {
   env.echo();
-  return Co<Expression>(new ExpressionUnit());
+  return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
 /* ------------------------------------------------------------------------- */

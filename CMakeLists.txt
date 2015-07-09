@@ -30,3 +30,7 @@ add_custom_target(www
 add_custom_target(wwwdeps
   COMMAND make WWW_ROOT=${WWW_ROOT} MADEUP=$<TARGET_FILE:madeup> TWODEE=$<TARGET_FILE:twodee> MERP=$<TARGET_FILE:merp> libdeps
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/www)
+
+add_custom_target(docs
+  COMMAND make
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs)
