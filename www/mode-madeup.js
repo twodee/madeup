@@ -73,7 +73,7 @@ var MadeupHighlightRules = function() {
       },
       {
         token: "variable",
-        regex: /(.[a-zA-Z]|[a-zA-Z])(\w|\.\w)*/,
+        regex: /(\.[a-zA-Z]|[a-zA-Z])(\w|\.\w)*/,
         next: "start"
       },
       {

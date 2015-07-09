@@ -559,8 +559,9 @@ function run(mode) {
         if (mode == GeometryMode.SURFACE) {
           var loader = new THREE.JSONLoader();
           var model = loader.parse(JSON.parse(data['model']));
-          var material = showWireframe ? new THREE.MeshBasicMaterial({color: parseInt(modelColor, 16), wireframe: showWireframe, wireframeLinewidth: 5})
-                                       : new THREE.MeshLambertMaterial({color: parseInt(modelColor, 16), wireframe: showWireframe, wireframeLinewidth: 5});
+          // var material = showWireframe ? new THREE.MeshBasicMaterial({color: parseInt(modelColor, 16), wireframe: showWireframe, wireframeLinewidth: 5}) 
+                                       // : new THREE.MeshLambertMaterial({color: parseInt(modelColor, 16), wireframe: showWireframe, wireframeLinewidth: 5}); 
+          var material = new THREE.MeshLambertMaterial({color: parseInt(modelColor, 16), wireframe: showWireframe, wireframeLinewidth: 5, side: THREE.DoubleSide});
           //material.side = THREE.DoubleSide;
           //model.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, -10));
           meshes[0] = new THREE.Mesh(model.geometry, material);

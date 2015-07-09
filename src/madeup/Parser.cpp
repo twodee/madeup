@@ -86,6 +86,7 @@ bool Parser::isInExpressionFirst(int k) const {
          isUp(Token::NOT, k) ||
          isUp(Token::TO, k) ||
          isUp(Token::NOTHING, k) ||
+         isUp(Token::MINUS, k) ||
          isUp(Token::ID, k);
 }
 

@@ -1076,8 +1076,6 @@ void Environment::surface(int width, int height) {
       grid(c)[2] = run[i].position[2];
       ++i;
     }
-    
-    /* grid.Write("grid.f20"); */
 
     Trimesh *trimesh = Trimesh::GetParametric(grid);
     *trimesh *= xforms.top();
