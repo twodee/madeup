@@ -14,6 +14,7 @@
   <!-- ThreeJS dependencies -->
   <script src="three-js/build/three.js"></script>
   <script src="three-js/examples/js/controls/OrbitControls.js"></script>
+  <script src="three-js/examples/js/controls/TrackballControls.js"></script>
 
   <!-- Blockly dependencies -->
   <!-- <script src="blockly/blockly_compressed.js"></script> -->

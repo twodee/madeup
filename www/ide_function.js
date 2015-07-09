@@ -12,8 +12,12 @@ THREE.Object3D.prototype.clear = function() {
   }
 }
 
-var scene, renderer, camera, controls;
-var geoscene, pointerScene;
+var overallScene;
+// var modelsAndGlyphsScene; 
+var modelScene;
+// var pointerScene; 
+var glyphScene;
+var renderer, camera, controls;
 var meshes = [];
 var nSecondsTillPreview = 1.0;
 var showWireframe = false;
@@ -331,13 +335,13 @@ $(document).ready(function() {
       color: colors[d],
       linewidth: 5
     }), THREE.LinePieces);
-    scene.add(axes[d]);
+    glyphScene.add(axes[d]);
     render();
   }
 
   function removeAxis(d) {
     if (axes[d]) {
-      scene.remove(axes[d]);
+      glyphScene.remove(axes[d]);
       axes[d] = null;
       render();
     }
@@ -385,13 +389,13 @@ $(document).ready(function() {
     }
 
     planes[d] = new THREE.Line(geometry, new THREE.LineBasicMaterial({color: colors[d], linewidth: 1}), THREE.LinePieces);
-    scene.add(planes[d]);
+    glyphScene.add(planes[d]);
     render();
   }
 
   function removePlane(d) {
     if (planes[d]) {
-      scene.remove(planes[d]);
+      glyphScene.remove(planes[d]);
       planes[d] = null;
       render();
     }
@@ -549,7 +553,7 @@ function run(mode) {
 
       if (data['exit_status'] == 0) {
         for (var i = 0; i < meshes.length; ++i) {
-          geoscene.remove(meshes[i]);
+          modelScene.remove(meshes[i]);
         }
         meshes = [];
         arrowShafts = [];
@@ -559,15 +563,10 @@ function run(mode) {
         if (mode == GeometryMode.SURFACE) {
           var loader = new THREE.JSONLoader();
           var model = loader.parse(JSON.parse(data['model']));
-          // var material = showWireframe ? new THREE.MeshBasicMaterial({color: parseInt(modelColor, 16), wireframe: showWireframe, wireframeLinewidth: 5}) 
-                                       // : new THREE.MeshLambertMaterial({color: parseInt(modelColor, 16), wireframe: showWireframe, wireframeLinewidth: 5}); 
-          var material = new THREE.MeshLambertMaterial({color: parseInt(modelColor, 16), wireframe: showWireframe, wireframeLinewidth: 5, side: THREE.DoubleSide});
-          //material.side = THREE.DoubleSide;
-          //model.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, -10));
+          var material = new THREE.MeshLambertMaterial({color: parseInt(modelColor, 16), wireframe: showWireframe, wireframeLinewidth: 5});
           meshes[0] = new THREE.Mesh(model.geometry, material);
           model.geometry.computeFaceNormals();
           model.geometry.computeVertexNormals();
-          //meshes[0].doubleSided = true;
           allGeometry = model.geometry;
         } else {
           var paths = JSON.parse(data['model']);
@@ -619,7 +618,7 @@ function run(mode) {
               meshes[meshes.length] = new THREE.Mesh(g2, new THREE.MeshLambertMaterial({
                 color: 0x0000ff,
               }));
-              pointerScene.add(meshes[meshes.length - 1]);
+              modelScene.add(meshes[meshes.length - 1]);
             }
           }
 
@@ -628,31 +627,13 @@ function run(mode) {
             size: 8,
             sizeAttenuation: false
           }));
-
         }
-
-        /* if (isAutofit) { */
-          /* allGeometry.computeBoundingBox(); */
-          /* allGeometry.center(); */
-          /* var bounds = allGeometry.boundingBox; */
-          /* console.log(camera.fov + ' ' + camera.position.z + ' ' + bounds.max.y); */
-          /* var verticalFitZ = bounds.max.y / Math.tan(camera.fov * Math.PI / 180.0 * 0.5); */
-          /* var fovX = 2 * Math.atan(Math.tan(camera.fov * Math.PI / 180.0 * 0.5) * camera.aspect); */
-          /* var horizontalFitZ = bounds.max.x / Math.tan(fovX * 0.5); */
-          /* console.log("max z " + bounds.max.z); */
-          /* console.log("min z " + bounds.min.z); */
-          /* camera.position.z = bounds.max.z + (verticalFitZ > horizontalFitZ ? verticalFitZ : horizontalFitZ); */
-          /* camera.updateProjectionMatrix(); */
-
-          /* // Update orbit controls so that it will reset to the last fit -- instead of the camera's initial settings. */
-          /* controls.position0 = camera.position.clone(); */
-        /* } */
 
         for (var mi = 0; mi < meshes.length; ++mi) {
           /* meshes[mi].geometry.mergeVertices(); */
           /* meshes[mi].geometry.computeFaceNormals(); */
           /* meshes[mi].geometry.computeVertexNormals(); */
-          geoscene.add(meshes[mi]);
+          modelScene.add(meshes[mi]);
         }
         updateCulling();
         render();
@@ -674,22 +655,21 @@ function fit() {
   }
 
   allGeometry.computeBoundingBox();
-  /* allGeometry.center(); */
+
   var bounds = allGeometry.boundingBox;
   var centroid = bounds.center();
 
   var xform = new THREE.Matrix4().makeTranslation(-centroid.x, -centroid.y, -centroid.z);
-  geoscene.matrix = xform;
+  modelScene.matrix = xform;
+  // glyphScene.matrix = xform; 
 
   var verticalFitZ = bounds.max.y / Math.tan(camera.fov * Math.PI / 180.0 * 0.5);
   var fovX = 2 * Math.atan(Math.tan(camera.fov * Math.PI / 180.0 * 0.5) * camera.aspect);
   var horizontalFitZ = bounds.max.x / Math.tan(fovX * 0.5);
+
   controls.reset(); 
   camera.position.z = bounds.max.z + (verticalFitZ > horizontalFitZ ? verticalFitZ : horizontalFitZ);
   camera.updateProjectionMatrix();
-
-  // Update orbit controls so that it will reset to the last fit -- instead of the camera's initial settings.
-  /* controls.position0 = camera.position.clone(); */
 }
 
 function log(message) {
@@ -702,6 +682,8 @@ function log(message) {
 }
 
 function resize() {
+  controls.handleResize();
+
   var width = window.innerWidth - $('#left').width();
   var height = window.innerHeight;
   renderer.setSize(width, height);
@@ -765,13 +747,13 @@ function updateCulling() {
   } else {
     mode = THREE.CullFaceFrontBack;
   }
-  console.log('Show Backs: ' + showClockwise + ' Fronts: ' + showCounterclockwise + ' ' + mode);
   renderer.setFaceCulling(mode, THREE.FrontFaceDirectionCCW);
   render();
   //run(GeometryMode.SURFACE);
 }
 
 function init() {
+  /*
   THREE.Camera.prototype.getWorldRight = function () {
     var quaternion = new THREE.Quaternion();
     return function (optionalTarget) {
@@ -780,6 +762,7 @@ function init() {
       return result.set(1, 0, 0).applyQuaternion(quaternion);
     }
   }();
+  */
 
   camera = new THREE.PerspectiveCamera(45.0, 1.0, 0.1, 10000.0);
   camera.position.z = 30;
@@ -789,19 +772,27 @@ function init() {
   renderer.setClearColor(0xFFFFFF, 1);
   document.getElementById("glcanvas").appendChild(renderer.domElement);
 
-  controls = new THREE.OrbitControls(camera, renderer.domElement);
-  //controls.autoRotate = true;
-  controls.addEventListener('change', function() {
-    render();
-  });
+  // controls = new THREE.OrbitControls(camera, renderer.domElement);  
+  controls = new THREE.TrackballControls(camera, renderer.domElement);
+  controls.addEventListener('change', render);
 
-  pointerScene = new THREE.Scene();
-  geoscene = new THREE.Scene();
-  geoscene.matrixAutoUpdate = false;
-  scene = new THREE.Scene();
-  geoscene.add(pointerScene);
-  scene.add(geoscene);
-  scene.add(camera);
+  controls.rotateSpeed = 3.0;
+  controls.zoomSpeed = 1.2;
+  controls.panSpeed = 0.8;
+  controls.noZoom = false;
+  controls.noPan = false;
+  controls.staticMoving = true;
+
+  // pointerScene = new THREE.Scene(); 
+  modelScene = new THREE.Scene();
+  modelScene.matrixAutoUpdate = false;
+
+  glyphScene = new THREE.Scene();
+  modelScene.add(glyphScene);
+
+  overallScene = new THREE.Scene();
+  overallScene.add(modelScene);
+  overallScene.add(camera);
 
   var radius = 50,
       segments = 16,
@@ -831,5 +822,5 @@ function animate() {
 }
 
 function render() {
-  renderer.render(scene, camera);
+  renderer.render(overallScene, camera);
 }
