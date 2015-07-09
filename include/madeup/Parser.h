@@ -34,7 +34,7 @@ class Parser {
     void atom();
 
   private:
-    bool isUp(Token::token_t type, int k = 1) const;
+    bool isUp(Token::token_t type, size_t k = 1) const;
     bool isInExpressionFirst(int k = 1) const;
     Co<Expression> popExpression();
     Co<ExpressionBlock> popBlock();
@@ -47,7 +47,7 @@ class Parser {
     const std::string source;
     std::stack<Co<Expression> > expressions;
     std::stack<Co<ExpressionBlock> > blocks;
-    int i;
+    size_t i;
     bool is_in_loop_range;
     bool is_in_pipe;
 };

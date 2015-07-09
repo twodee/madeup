@@ -15,7 +15,7 @@ class ExpressionBlock : public Expression {
 
     void append(Co<Expression> element);
     Co<Expression> evaluate(Environment &env) const;
-    Co<Expression> operator[](int i);
+    Co<Expression> operator[](size_t i);
     int getLength() const;
     void write(ostream &out) const;
 

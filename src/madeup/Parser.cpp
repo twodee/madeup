@@ -64,7 +64,7 @@ Parser::Parser(const std::vector<Token> &tokens,
 
 /* ------------------------------------------------------------------------- */
 
-bool Parser::isUp(Token::token_t type, int k) const {
+bool Parser::isUp(Token::token_t type, size_t k) const {
   return i + k - 1 <= tokens.size() && tokens[i + k - 1].getType() == type;
 }
 

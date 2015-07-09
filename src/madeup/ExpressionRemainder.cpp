@@ -29,9 +29,9 @@ Co<Expression> ExpressionRemainder::evaluate(Environment &env) const {
     } else {
       throw MessagedException(right->getSourceLocation().toAnchor() + ": I don't know how to get the remainder of something divided by 0.");
     }
-  } else {
-    throw MessagedException(getSourceLocation().toAnchor() + ": Operator % doesn't know how to get the remainder of " + left->getSource() + " divided by " + right->getSource() + ".");
   }
+  
+  throw MessagedException(getSourceLocation().toAnchor() + ": Operator % doesn't know how to get the remainder of " + left->getSource() + " divided by " + right->getSource() + ".");
 }
 
 /* ------------------------------------------------------------------------- */
