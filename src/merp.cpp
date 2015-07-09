@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
     if (formal == "--timeout") {
       wants_timeout = true;
       if (optind < argc - 1) {
-        for (int i = 0; i < strlen(argv[optind + 1]); ++i) {
+        for (size_t i = 0; i < strlen(argv[optind + 1]); ++i) {
           if (!isdigit(argv[optind + 1][i])) {
             usage("Timeout must be positive integer.");
           }

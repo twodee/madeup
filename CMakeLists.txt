@@ -14,7 +14,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 if(USE_DEBUG AND CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   set(CMAKE_C_FLAGS "-g -pedantic -Wall -std=c99")
-  set(CMAKE_CXX_FLAGS "-g -pedantic -Wall -std=c++11")
+  set(CMAKE_CXX_FLAGS "-g -pedantic -Wall -std=c++0x")
 endif()
 
 add_subdirectory(src/twodee)

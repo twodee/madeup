@@ -1,6 +1,7 @@
 #ifndef POLYLINE_H
 #define POLYLINE_H
 
+#include <algorithm>
 #include <vector>
 
 #include "Line.h"
@@ -373,8 +374,8 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, T twist, float max_bend) const
     }
   }
  
-  vector<QVector3<T>> cap_neighbors[2];
-  vector<QVector3<T>> vertices;
+  vector<QVector3<T> > cap_neighbors[2];
+  vector<QVector3<T> > vertices;
   Plane<T, 3> first_plane(nodes[0], normals[0]);
 
   // Now generate geometry for the rest of the vertices.
@@ -838,9 +839,9 @@ Trimesh *Polyline<T>::Triangulate() const {
   Polyline<T> *flattened = this->Flatten();
   
   const int nvertices = this->GetElementCount();
-  vector<QVector3<T>> positions;
-  vector<QVector3<int>> faces;
-  vector<TriangulateVertex<T>> remaining;
+  vector<QVector3<T> > positions;
+  vector<QVector3<int> > faces;
+  vector<TriangulateVertex<T> > remaining;
   for (int i = 0; i < nvertices; ++i) {
     QVector3<float> position(QVector3<float>((*this)(i)));
     positions.push_back(position);
@@ -854,17 +855,17 @@ Trimesh *Polyline<T>::Triangulate() const {
   bool is_reversed = !flattened->IsCounterclockwise();
   if (is_reversed) {
     std::cout << "reversing" << std::endl;
-    std::reverse(remaining.begin(), remaining.end());
+    /* std::reverse(remaining.begin(), remaining.end()); */
   }
 
   // While we have at least three vertices left, find an ear and make a face of it.
   while (remaining.size() > 2) {
     // Look for an ear starting at each vertex in the list.
     bool is_ear_found = false;
-    for (int i = 0; !is_ear_found && i < remaining.size(); ++i) {
+    for (size_t i = 0; !is_ear_found && i < remaining.size(); ++i) {
       // Wrap around as needed.
-      int j = (i + 1) % remaining.size();
-      int k = (i + 2) % remaining.size();
+      size_t j = (i + 1) % remaining.size();
+      size_t k = (i + 2) % remaining.size();
 
       // See if this angle's interior angle is < 180 degrees. If it is, we can't make
       // a triangle here. It would fill an area outside the polygon.
@@ -887,7 +888,7 @@ Trimesh *Polyline<T>::Triangulate() const {
 
       // See if any other vertex lies inside the triangle formed by ijk.
       bool contains_vertex = false;
-      for (int ci = 0; !contains_vertex && ci < remaining.size(); ++ci) {
+      for (size_t ci = 0; !contains_vertex && ci < remaining.size(); ++ci) {
         if (ci != i && ci != j && ci != k) {
           std::cout << "ci: " << remaining[ci].array_index << std::endl;
           Triangle2<T> tri(remaining[i].vertex2, remaining[j].vertex2, remaining[k].vertex2);
@@ -939,8 +940,8 @@ Trimesh *Polyline<T>::Extrude(const QVector3<T> &axis, T distance, const QMatrix
   delete flattened;
   std::cout << "is_ccw: " << is_ccw << std::endl;
 
-  vector<QVector3<float>> positions; 
-  vector<QVector3<int>> faces; 
+  vector<QVector3<float> > positions; 
+  vector<QVector3<int> > faces; 
 
   // End A
   Trimesh *cap_a = this->Triangulate(); 
