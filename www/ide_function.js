@@ -13,9 +13,7 @@ THREE.Object3D.prototype.clear = function() {
 }
 
 var overallScene;
-// var modelsAndGlyphsScene; 
 var modelScene;
-// var pointerScene; 
 var glyphScene;
 var renderer, camera, controls;
 var meshes = [];
@@ -34,7 +32,7 @@ var isFlatShaded = true;
 
 var isShowWireframeChanged = false;
 var isAxisChanged = [false, false, false];
-var isPlaneChanged = [false, false, false];
+var isGridChanged = [false, false, false];
 var isNSecondsTillPreviewChanged = false;
 var isShowHeadingsChanged = false;
 var isModelColorChanged = false;
@@ -46,34 +44,37 @@ var isShowClockwiseChanged = false;
 var isFlatShadedChanged = false;
 
 function saveInCookies() {
-  $.cookie('last', getSource());
-  if (workspace) {
-    var xml = Blockly.Xml.workspaceToDom(workspace);
-    var xmlText = Blockly.Xml.domToText(xml);
-    $.cookie('lastBlocks', xmlText);
-  }
+  console.log("saving in cookies");
+
+  Cookies.set('last', getSource());
 
   // Only store a cookie if a setting has changed. If we unconditionally stored
   // these, then updates to the default value would not be seen by users, as
   // the old defaults persisted in the cookies would override the new ones.
-  if (isFontSizeChanged) $.cookie('fontSize', fontSize);
-  if (isShowHeadingsChanged) $.cookie('showHeadings', showHeadings ? 1 : 0);
-  if (isShowCounterclockwiseChanged) $.cookie('showCounterclockwise', showCounterclockwise ? 1 : 0);
-  if (isShowClockwiseChanged) $.cookie('showClockwise', showClockwise ? 1 : 0);
-  if (isModelColorChanged) $.cookie('modelColor', modelColor);
-  if (isShowWireframeChanged) $.cookie('showWireframe', showWireframe ? 1 : 0);
-  if (isFlatShadedChanged) $.cookie('isFlatShaded', isFlatShaded ? 1 : 0);
-  if (isAxisChanged[0]) $.cookie('axisX', $('#axisX').prop('checked'));
-  if (isAxisChanged[1]) $.cookie('axisY', $('#axisY').prop('checked'));
-  if (isAxisChanged[2]) $.cookie('axisZ', $('#axisZ').prop('checked'));
-  if (isPlaneChanged[0]) $.cookie('gridX', $('#gridX').prop('checked'));
-  if (isPlaneChanged[1]) $.cookie('gridY', $('#gridY').prop('checked'));
-  if (isPlaneChanged[2]) $.cookie('gridZ', $('#gridZ').prop('checked'));
-  if (isNSecondsTillPreviewChanged) $.cookie('nSecondsTillPreview', nSecondsTillPreview);
-  if (isGridSpacingChanged) $.cookie('gridSpacing', gridSpacing);
-  if (isGridExtentChanged) $.cookie('gridExtent', gridExtent);
-  $.cookie('leftWidth', $('#left').width());
-  $.cookie('consoleHeight', $('#console').height());
+  if (isFontSizeChanged) Cookies.set('fontSize', fontSize);
+  if (isShowHeadingsChanged) Cookies.set('showHeadings', showHeadings ? 1 : 0);
+  if (isShowCounterclockwiseChanged) Cookies.set('showCounterclockwise', showCounterclockwise ? 1 : 0);
+  if (isShowClockwiseChanged) Cookies.set('showClockwise', showClockwise ? 1 : 0);
+  if (isModelColorChanged) Cookies.set('modelColor', modelColor);
+  if (isShowWireframeChanged) Cookies.set('showWireframe', showWireframe ? 1 : 0);
+  if (isFlatShadedChanged) Cookies.set('isFlatShaded', isFlatShaded ? 1 : 0);
+  if (isAxisChanged[0]) Cookies.set('axisX', $('#axisX').prop('checked') ? 1 : 0);
+  if (isAxisChanged[1]) Cookies.set('axisY', $('#axisY').prop('checked') ? 1 : 0);
+  if (isAxisChanged[2]) Cookies.set('axisZ', $('#axisZ').prop('checked') ? 1 : 0);
+  if (isGridChanged[0]) Cookies.set('gridX', $('#gridX').prop('checked') ? 1 : 0);
+  if (isGridChanged[1]) Cookies.set('gridY', $('#gridY').prop('checked') ? 1 : 0);
+  if (isGridChanged[2]) Cookies.set('gridZ', $('#gridZ').prop('checked') ? 1 : 0);
+  if (isNSecondsTillPreviewChanged) Cookies.set('nSecondsTillPreview', nSecondsTillPreview);
+  if (isGridSpacingChanged) Cookies.set('gridSpacing', gridSpacing);
+  if (isGridExtentChanged) Cookies.set('gridExtent', gridExtent);
+  Cookies.set('leftWidth', $('#left').width());
+  Cookies.set('consoleHeight', $('#console').height());
+
+  if (workspace) {
+    var xml = Blockly.Xml.workspaceToDom(workspace);
+    var xmlText = Blockly.Xml.domToText(xml);
+    Cookies.set('lastBlocks', xmlText);
+  }
 
   // Changes have been committed, so let's reset the dirty flags.
   isFontSizeChanged = false;
@@ -89,57 +90,61 @@ function saveInCookies() {
   isGridExtentChanged = false;
   for (var d = 0; d < 3; ++d) {
     isAxisChanged[d] = false;
-    isPlaneChanged[d] = false;
+    isGridChanged[d] = false;
   }
 }
 
 $(document).ready(function() {
   $(window).load(function() {
-    if ($.cookie('leftWidth')) {
-      $('#left').width($.cookie('leftWidth'));
+    Cookies.defaults = {
+      expires: 10 * 365
+    };
+
+    if (Cookies.get('leftWidth')) {
+      $('#left').width(Cookies.get('leftWidth'));
       resize();
     }
 
-    if ($.cookie('consoleHeight')) {
-      $('#console').height($.cookie('consoleHeight'));
+    if (Cookies.get('consoleHeight')) {
+      $('#console').height(Cookies.get('consoleHeight'));
       resize();
     }
 
-    if ($.cookie('last')) {
-      text_editor.setValue($.cookie('last'), -1);
+    if (Cookies.get('last')) {
+      text_editor.setValue(Cookies.get('last'), -1);
     }
 
-    if ($.cookie('fontSize')) {
-      fontSize = parseInt($.cookie('fontSize'));
+    if (Cookies.get('fontSize')) {
+      fontSize = parseInt(Cookies.get('fontSize'));
     } else {
       fontSize = 14;
     }
     text_editor.setFontSize(fontSize);
     $('#console')[0].style.fontSize = fontSize + 'px';
 
-    if ($.cookie('showHeadings')) {
-      showHeadings = parseInt($.cookie('showHeadings')) != 0;
+    if (Cookies.get('showHeadings')) {
+      showHeadings = parseInt(Cookies.get('showHeadings')) != 0;
     }
     $('#showHeadings').prop('checked', showHeadings);
 
-    if ($.cookie('isFlatShaded')) {
-      isFlatShaded = parseInt($.cookie('isFlatShaded')) != 0;
+    if (Cookies.get('isFlatShaded')) {
+      isFlatShaded = parseInt(Cookies.get('isFlatShaded')) != 0;
     }
     $('#isFlatShaded').prop('checked', isFlatShaded);
 
-    if ($.cookie('showCounterclockwise')) {
-      showCounterclockwise = parseInt($.cookie('showCounterclockwise')) != 0;
+    if (Cookies.get('showCounterclockwise')) {
+      showCounterclockwise = parseInt(Cookies.get('showCounterclockwise')) != 0;
     }
     $('#showCounterclockwise').prop('checked', showCounterclockwise);
 
-    if ($.cookie('showClockwise')) {
-      showClockwise = parseInt($.cookie('showClockwise')) != 0;
+    if (Cookies.get('showClockwise')) {
+      showClockwise = parseInt(Cookies.get('showClockwise')) != 0;
     }
     $('#showClockwise').prop('checked', showClockwise);
     updateCulling();
 
-    if ($.cookie('modelColor')) {
-      modelColor = $.cookie('modelColor');
+    if (Cookies.get('modelColor')) {
+      modelColor = Cookies.get('modelColor');
     }
     $('#modelColor').css('background-color', '#' + modelColor);
 
@@ -154,56 +159,67 @@ $(document).ready(function() {
       }
     });
 
-    if ($.cookie('showWireframe')) {
-      showWireframe = parseInt($.cookie('showWireframe')) != 0;
+    if (Cookies.get('showWireframe')) {
+      showWireframe = parseInt(Cookies.get('showWireframe')) != 0;
     } else {
       showWireframe = false;
     }
     $('#showWireframe').prop('checked', showWireframe);
 
-    if ($.cookie('gridExtent')) {
-      gridExtent = parseFloat($.cookie('gridExtent'));
+    if (Cookies.get('gridExtent')) {
+      gridExtent = parseFloat(Cookies.get('gridExtent'));
     }
     $('#gridSpacing').val(gridSpacing + '');
 
-    if ($.cookie('gridSpacing')) {
-      gridSpacing = parseFloat($.cookie('gridSpacing'));
+    if (Cookies.get('gridSpacing')) {
+      gridSpacing = parseFloat(Cookies.get('gridSpacing'));
     }
     $('#gridExtent').val(gridExtent + '');
 
-    // JQuery Cookie stores cookies as strings, even booleans.
-    if ($.cookie('axisX') === 'true') {
-      $('#axisX').prop('checked', true);
-      generateAxis(0);
+    if (Cookies.get('axisX')) {
+      if (parseInt(Cookies.get('axisX')) != 0) {
+        $('#axisX').prop('checked', true);
+        generateAxis(0);
+      }
     }
 
-    if ($.cookie('axisY') === 'true') {
-      $('#axisY').prop('checked', true);
-      generateAxis(1);
+    if (Cookies.get('axisY')) {
+      if (parseInt(Cookies.get('axisY')) != 0) {
+        $('#axisY').prop('checked', true);
+        generateAxis(1);
+      }
     }
 
-    if ($.cookie('axisZ') === 'true') {
-      $('#axisZ').prop('checked', true);
-      generateAxis(2);
+    if (Cookies.get('axisZ')) {
+      if (parseInt(Cookies.get('axisZ')) != 0) {
+        $('#axisZ').prop('checked', true);
+        generateAxis(2);
+      }
     }
 
-    if ($.cookie('gridX') === 'true') {
-      $('#gridX').prop('checked', true);
-      generatePlane(0);
+    if (Cookies.get('gridX')) {
+      if (parseInt(Cookies.get('gridX')) != 0) {
+        $('#gridX').prop('checked', true);
+        generateGrid(0);
+      }
     }
 
-    if ($.cookie('gridY') === 'true') {
-      $('#gridY').prop('checked', true);
-      generatePlane(1);
+    if (Cookies.get('gridY')) {
+      if (parseInt(Cookies.get('gridY')) != 0) {
+        $('#gridY').prop('checked', true);
+        generateGrid(1);
+      }
     }
 
-    if ($.cookie('gridZ') === 'true') {
-      $('#gridZ').prop('checked', true);
-      generatePlane(2);
+    if (Cookies.get('gridZ')) {
+      if (parseInt(Cookies.get('gridZ')) != 0) {
+        $('#gridZ').prop('checked', true);
+        generateGrid(2);
+      }
     }
 
-    if ($.cookie('nSecondsTillPreview')) {
-      nSecondsTillPreview = parseFloat($.cookie('nSecondsTillPreview'));
+    if (Cookies.get('nSecondsTillPreview')) {
+      nSecondsTillPreview = parseFloat(Cookies.get('nSecondsTillPreview'));
     }
 
     $('#nSecondsTillPreview').val(nSecondsTillPreview + '');
@@ -270,8 +286,8 @@ $(document).ready(function() {
           log(code);
           //console.log(code);
         });
-        if ($.cookie('lastBlocks')) {
-          var xml = Blockly.Xml.textToDom($.cookie('lastBlocks'));
+        if (Cookies.get('lastBlocks')) {
+          var xml = Blockly.Xml.textToDom(Cookies.get('lastBlocks'));
           Blockly.Xml.domToWorkspace(workspace, xml);
         }
       } else {
@@ -317,7 +333,7 @@ $(document).ready(function() {
   var blue = 0x0000FF;
   var colors = [red, green, blue];
   var axes = new Array(3);
-  var planes = new Array(3);
+  var grids = new Array(3);
 
   function generateAxis(d) {
     if (axes[d]) {
@@ -362,9 +378,9 @@ $(document).ready(function() {
   $('#axisY').click(toggleAxis(1));
   $('#axisZ').click(toggleAxis(2));
   
-  function generatePlane(d) {
-    if (planes[d]) {
-      removePlane(d);
+  function generateGrid(d) {
+    if (grids[d]) {
+      removeGrid(d);
     }
 
     var geometry = new THREE.Geometry();
@@ -388,33 +404,33 @@ $(document).ready(function() {
       geometry.vertices.push(b);
     }
 
-    planes[d] = new THREE.Line(geometry, new THREE.LineBasicMaterial({color: colors[d], linewidth: 1}), THREE.LinePieces);
-    glyphScene.add(planes[d]);
+    grids[d] = new THREE.Line(geometry, new THREE.LineBasicMaterial({color: colors[d], linewidth: 1}), THREE.LinePieces);
+    glyphScene.add(grids[d]);
     render();
   }
 
-  function removePlane(d) {
-    if (planes[d]) {
-      glyphScene.remove(planes[d]);
-      planes[d] = null;
+  function removeGrid(d) {
+    if (grids[d]) {
+      glyphScene.remove(grids[d]);
+      grids[d] = null;
       render();
     }
   }
 
-  function togglePlane(d) {
-    isPlaneChanged[d] = true;
+  function toggleGrid(d) {
+    isGridChanged[d] = true;
     return function() {
       if (this.checked) {
-        generatePlane(d);
+        generateGrid(d);
       } else {
-        removePlane(d);
+        removeGrid(d);
       }
     }
   }
 
-  $('#gridX').click(togglePlane(0));
-  $('#gridY').click(togglePlane(1));
-  $('#gridZ').click(togglePlane(2));
+  $('#gridX').click(toggleGrid(0));
+  $('#gridY').click(toggleGrid(1));
+  $('#gridZ').click(toggleGrid(2));
 
   $('#gridExtent').change(function() {
     isGridExtentChanged = true;
@@ -423,8 +439,8 @@ $(document).ready(function() {
       if (axes[d]) {
         generateAxis(d);
       }
-      if (planes[d]) {
-        generatePlane(d);
+      if (grids[d]) {
+        generateGrid(d);
       }
     }
   });
@@ -433,8 +449,8 @@ $(document).ready(function() {
     isGridSpacingChanged = true;
     gridSpacing = parseFloat($(this).val());
     for (var d = 0; d < 3; ++d) {
-      if (planes[d]) {
-        generatePlane(d);
+      if (grids[d]) {
+        generateGrid(d);
       }
     }
   });
@@ -661,7 +677,6 @@ function fit() {
 
   var xform = new THREE.Matrix4().makeTranslation(-centroid.x, -centroid.y, -centroid.z);
   modelScene.matrix = xform;
-  // glyphScene.matrix = xform; 
 
   var verticalFitZ = bounds.max.y / Math.tan(camera.fov * Math.PI / 180.0 * 0.5);
   var fovX = 2 * Math.atan(Math.tan(camera.fov * Math.PI / 180.0 * 0.5) * camera.aspect);

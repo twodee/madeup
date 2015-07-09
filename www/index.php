@@ -3,11 +3,14 @@
 <head>
   <title>Madeup</title>
 
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+
   <!-- JQuery dependencies -->
   <link rel="stylesheet" href="jquery-ui/jquery-ui.css"/>
   <script src="jquery.js"></script>
   <script src="jquery-ui/jquery-ui.js"></script>
-  <script src="jquery-cookie/src/jquery.cookie.js"></script>
+  <script src="js-cookie/src/js.cookie.js"></script>
   <link rel="stylesheet" media="screen" type="text/css" href="colorpicker/css/colorpicker.css"/>
   <script type="text/javascript" src="colorpicker/js/colorpicker.js"></script>
 

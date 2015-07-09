@@ -35,7 +35,7 @@ exec("./merp --timeout 45 --shading $shading_mode -o $out_path --geometry $mode 
 foreach ($lines as $line) {
   error_log("lineline: $line");
 }
-$back['output'] = implode("\n", $lines) . "\n";
+$back['output'] = implode("\n", $lines);
 error_log(json_encode($back));
 
 if ($in['extension'] === 'obj') {
