@@ -51,6 +51,7 @@
       <block type="madeup_string"></block>
       <block type="madeup_logic_boolean"></block>
       <block type="madeup_eval"></block>
+      <block type="madeup_nothing"></block>
     </category>
     <category name="Loops">
       <block type="madeup_loop_repeat"></block>
@@ -58,7 +59,10 @@
       <block type="madeup_loop_for_to"></block>
       <block type="madeup_loop_for_to_by"></block>
       <block type="madeup_loop_for_through"></block>
+      <block type="madeup_loop_for_through_by"></block>
       <block type="madeup_loop_for_in"></block>
+      <block type="madeup_loop_for_in_by"></block>
+      <block type="madeup_loop_repeatwich"></block>
     </category>
     <category name="Movement">
       <block type="madeup_movement_moveto"></block>
@@ -69,14 +73,20 @@
       <block type="madeup_movement_scale"></block>
       <block type="madeup_movement_translate"></block>
       <block type="madeup_movement_identity"></block>
+      <block type="madeup_movement_reframe"></block>
+      <block type="madeup_movement_push"></block>
+      <block type="madeup_movement_pop"></block>
+      <block type="madeup_movement_reverse"></block>
     </category>
     <category name="Generate">
-      <block type="madeup_generate_ball"></block>
+      <block type="madeup_generate_dot"></block>
       <block type="madeup_generate_box"></block>
       <block type="madeup_generate_dowel"></block>
+      <block type="madeup_generate_tube"></block>
       <block type="madeup_generate_extrude"></block>
       <block type="madeup_generate_revolve"></block>
       <block type="madeup_generate_surface"></block>
+      <block type="madeup_generate_forget"></block>
     </category>
     <category name="I/O">
       <block type="madeup_io_print"></block>
@@ -91,6 +101,7 @@
       <block type="madeup_math_minmax"></block>
       <block type="madeup_math_abs"></block>
       <block type="madeup_math_sign"></block>
+      <block type="madeup_math_random"></block>
       <block type="madeup_math_log"></block>
     </category>
     <category name="Variables" custom="VARIABLE"></category>
@@ -119,7 +130,8 @@
     <input style="float: right" id="toggleDisplayPopup" type="button" value="Display"/>
 
     <div id="editorPopup" class="popups">
-      <input type="radio" name="editorMode" value="Text" checked="checked"/>Text or <input type="radio" name="editorMode" value="Blocks"/>Blocks<br/>
+      <input type="radio" name="editorMode" id="isEditorText" value="Text" checked="checked"/>Text or 
+      <input type="radio" name="editorMode" id="isEditorBlocks" value="Blocks"/>Blocks<br/>
       <input type="checkbox" id="autopreview" checked="checked"/>Preview <input type="text" id="nSecondsTillPreview" size="5"/> seconds after last edit<br/>
     </div>
     <div id="gridPopup" class="popups">

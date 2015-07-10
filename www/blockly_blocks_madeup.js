@@ -86,6 +86,16 @@ Blockly.Blocks['madeup_math_real'] = {
   }
 };
 
+Blockly.Blocks['madeup_nothing'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(30);
+    this.appendDummyInput().appendField("nothing");
+    this.setOutput(true);
+    this.setTooltip('');
+  }
+};
+
 // ----------------------------------------------------------------------------
 // https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#y9urpv
 Blockly.Blocks['madeup_logic_boolean'] = {
@@ -153,6 +163,26 @@ Blockly.Blocks['madeup_loop_repeat'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
+  }
+};
+
+// ----------------------------------------------------------------------------
+// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#qau5xu
+Blockly.Blocks['madeup_loop_repeatwich'] = {
+  init: function() {
+    this.appendValueInput("COUNT")
+        .appendField("repeat");
+    this.appendDummyInput()
+        .appendField("times");
+    this.appendStatementInput("SURROUNDER");
+    this.appendStatementInput("SURROUNDEE")
+        .appendField("around");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setColour(330);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
   }
 };
 
@@ -249,6 +279,50 @@ Blockly.Blocks['madeup_movement_identity'] = {
   }
 };
 
+Blockly.Blocks['madeup_movement_reframe'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
+    this.appendDummyInput().appendField("reframe");
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('');
+  }
+};
+
+Blockly.Blocks['madeup_movement_push'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
+    this.appendDummyInput().appendField("push");
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('');
+  }
+};
+
+Blockly.Blocks['madeup_movement_pop'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
+    this.appendDummyInput().appendField("pop");
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('');
+  }
+};
+
+Blockly.Blocks['madeup_movement_reverse'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
+    this.appendDummyInput().appendField("reverse");
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('');
+  }
+};
+
 Blockly.Blocks['madeup_io_where'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
@@ -264,18 +338,46 @@ Blockly.Blocks['madeup_generate_dowel'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
     this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendDummyInput().appendField("dowel");
+    this.appendValueInput("MAXBEND")
+              .setCheck(["Integer", "Real"])
+              .appendField("dowel")
+              .appendField("maxBend");
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
   }
 };
 
-Blockly.Blocks['madeup_generate_ball'] = {
+Blockly.Blocks['madeup_generate_tube'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
     this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendDummyInput().appendField("ball");
+    this.appendValueInput("MAXBEND")
+              .setCheck(["Integer", "Real"])
+              .appendField("tube")
+              .appendField("maxBend");
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('');
+  }
+};
+
+Blockly.Blocks['madeup_generate_dot'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
+    this.appendDummyInput().appendField("dot");
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('');
+  }
+};
+
+Blockly.Blocks['madeup_generate_forget'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
+    this.appendDummyInput().appendField("forget");
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
@@ -430,6 +532,27 @@ Blockly.Blocks['madeup_math_minmax'] = {
 };
 
 // ----------------------------------------------------------------------------
+// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#xpfdgx
+Blockly.Blocks['madeup_math_random'] = {
+  init: function() {
+    this.appendValueInput("MIN")
+        .setCheck("Integer")
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("random")
+        .appendField("min");
+    this.appendValueInput("MAX")
+        .setCheck("Integer")
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("max");
+    this.setInputsInline(false);
+    this.setOutput(true, "Integer");
+    this.setColour(Blockly.Blocks.madeup.NUMBER_HUE);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
+
+// ----------------------------------------------------------------------------
 // https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#a6zzhx
 Blockly.Blocks['madeup_math_log'] = {
   init: function() {
@@ -437,10 +560,14 @@ Blockly.Blocks['madeup_math_log'] = {
     this.setColour(Blockly.Blocks.madeup.REAL_HUE);
     this.appendValueInput("BASE")
         .setCheck(["Integer", "Real"])
-        .appendField("log");
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("log")
+        .appendField("base");
     this.appendValueInput("X")
-        .setCheck(["Integer", "Real"]);
-    this.setInputsInline(true);
+        .setCheck(["Integer", "Real"])
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("x");
+    this.setInputsInline(false);
     this.setOutput(true, "Real");
     this.setTooltip('');
   }
@@ -646,6 +773,26 @@ Blockly.Blocks['madeup_loop_for_through'] = {
   }
 };
 
+Blockly.Blocks['madeup_loop_for_through_by'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.madeup.LOOP_HUE);
+    this.appendValueInput("STOP")
+        .setCheck("Integer")
+        .appendField("for")
+        .appendField(new Blockly.FieldVariable("i"), "ITERATOR")
+        .appendField("through");
+    this.appendValueInput("BY")
+        .setCheck("Integer")
+        .appendField("by");
+    this.appendStatementInput("BODY");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('');
+  }
+};
+
 // ----------------------------------------------------------------------------
 // https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#5nv8s2
 Blockly.Blocks['madeup_loop_for_in'] = {
@@ -665,6 +812,31 @@ Blockly.Blocks['madeup_loop_for_in'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
+  }
+};
+
+// ----------------------------------------------------------------------------
+// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#dd8846
+Blockly.Blocks['madeup_loop_for_in_by'] = {
+  init: function() {
+    this.appendValueInput("START")
+        .setCheck("Integer")
+        .appendField("for")
+        .appendField(new Blockly.FieldVariable("i"), "ITERATOR")
+        .appendField("in");
+    this.appendValueInput("NEXT")
+        .setCheck("Integer")
+        .appendField(",");
+    this.appendValueInput("STOP")
+        .setCheck("Integer")
+        .appendField("..");
+    this.appendStatementInput("BODY");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setColour(330);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
   }
 };
 

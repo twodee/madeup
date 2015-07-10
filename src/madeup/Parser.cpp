@@ -486,7 +486,7 @@ void Parser::atom() {
     if (isUp(Token::NEWLINE)) {
       ++i;
       block();
-      if (isUp(Token::SURROUNDS)) {
+      if (isUp(Token::AROUND)) {
         ++i;
         block();
         if (isUp(Token::END)) {
@@ -708,7 +708,7 @@ void Parser::atom() {
       expressions.push(call);
     } else {
       Co<ExpressionCall> call(new ExpressionCall(name));
-      if (isInExpressionFirst()) {
+      if (!isUp(Token::MINUS) && isInExpressionFirst()) {
         expressionLevel0();
         Co<Expression> actual = popExpression();
         call->addParameter(actual);

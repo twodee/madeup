@@ -63,7 +63,7 @@ var MadeupHighlightRules = function() {
       },
       {
         token: "keyword",
-        regex: /\b(?:repeat|repeatwich|not|of|surrounds|while|end|for|end|else|if|through|and|or|to|in|by|then)\b/,
+        regex: /\b(?:repeat|repeatwich|not|of|around|while|end|for|end|else|if|through|and|or|to|in|by|then)\b/,
         next: "start"
       },
       {

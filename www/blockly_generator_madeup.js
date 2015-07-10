@@ -196,11 +196,17 @@ Blockly.Madeup['madeup_io_where'] = function(block) {
 
 Blockly.Madeup['madeup_movement_moveto'] = function(block) {
   var value_x = Blockly.Madeup.valueToCode(block, 'X', Blockly.Madeup.ORDER_FUNCTION_CALL);
-  console.log(value_x);
   var value_y = Blockly.Madeup.valueToCode(block, 'Y', Blockly.Madeup.ORDER_FUNCTION_CALL);
   var value_z = Blockly.Madeup.valueToCode(block, 'Z', Blockly.Madeup.ORDER_FUNCTION_CALL);
   var code = 'moveto ' + value_x + ', ' + value_y + ', ' + value_z + '\n';
   return code;
+};
+
+Blockly.Madeup['madeup_math_random'] = function(block) {
+  var value_min = Blockly.Madeup.valueToCode(block, 'MIN', Blockly.Madeup.ORDER_NONE);
+  var value_max = Blockly.Madeup.valueToCode(block, 'MAX', Blockly.Madeup.ORDER_NONE);
+  var code = 'random ' + value_min + ', ' + value_max;
+  return [code, Blockly.Madeup.ORDER_NONE];
 };
 
 Blockly.Madeup['madeup_movement_move'] = function(block) {
@@ -214,6 +220,11 @@ Blockly.Madeup['madeup_math_integer'] = function(block) {
   return [code, Blockly.Madeup.ORDER_ATOMIC];
 };
 
+Blockly.Madeup['madeup_nothing'] = function(block) {
+  var code = 'nothing';
+  return [code, Blockly.Madeup.ORDER_ATOMIC];
+};
+
 Blockly.Madeup['madeup_math_real'] = function(block) {
   var code = block.getFieldValue('REAL');
   return [code, Blockly.Madeup.ORDER_ATOMIC];
@@ -223,6 +234,14 @@ Blockly.Madeup['madeup_loop_repeat'] = function(block) {
   var value_count = Blockly.Madeup.valueToCode(block, 'COUNT', Blockly.Madeup.ORDER_NONE);
   var statements_block = Blockly.Madeup.statementToCode(block, 'BLOCK');
   var code = 'repeat ' + value_count + '\n' + statements_block + 'end\n';
+  return code;
+};
+
+Blockly.Madeup['madeup_loop_repeatwich'] = function(block) {
+  var value_count = Blockly.Madeup.valueToCode(block, 'COUNT', Blockly.Madeup.ORDER_NONE);
+  var surrounder_block = Blockly.Madeup.statementToCode(block, 'SURROUNDER');
+  var surroundee_block = Blockly.Madeup.statementToCode(block, 'SURROUNDEE');
+  var code = 'repeatwich ' + value_count + '\n' + surrounder_block + '\naround\n' + surroundee_block + 'end\n';
   return code;
 };
 
@@ -289,18 +308,50 @@ Blockly.Madeup['madeup_movement_identity'] = function(block) {
   return code;
 };
 
+Blockly.Madeup['madeup_movement_reframe'] = function(block) {
+  var code = 'reframe\n';
+  return code;
+};
+
+Blockly.Madeup['madeup_movement_push'] = function(block) {
+  var code = 'push\n';
+  return code;
+};
+
+Blockly.Madeup['madeup_movement_pop'] = function(block) {
+  var code = 'pop\n';
+  return code;
+};
+
+Blockly.Madeup['madeup_movement_reverse'] = function(block) {
+  var code = 'reverse\n';
+  return code;
+};
+
 Blockly.Madeup['madeup_movement_where'] = function(block) {
   var code = 'where\n';
   return code;
 };
 
 Blockly.Madeup['madeup_generate_dowel'] = function(block) {
-  var code = 'dowel\n';
+  var value_maxBend = Blockly.Madeup.valueToCode(block, 'MAXBEND', Blockly.Madeup.ORDER_NONE);
+  var code = 'dowel maxBend:' + value_maxBend + '\n';
   return code;
 };
 
-Blockly.Madeup['madeup_generate_ball'] = function(block) {
-  var code = 'ball\n';
+Blockly.Madeup['madeup_generate_tube'] = function(block) {
+  var value_maxBend = Blockly.Madeup.valueToCode(block, 'MAXBEND', Blockly.Madeup.ORDER_NONE);
+  var code = 'tube maxBend:' + value_maxBend + '\n';
+  return code;
+};
+
+Blockly.Madeup['madeup_generate_dot'] = function(block) {
+  var code = 'dot\n';
+  return code;
+};
+
+Blockly.Madeup['madeup_generate_forget'] = function(block) {
+  var code = 'forget\n';
   return code;
 };
 
@@ -474,12 +525,31 @@ Blockly.Madeup['madeup_loop_for_through'] = function(block) {
   return code;
 };
 
+Blockly.Madeup['madeup_loop_for_through_by'] = function(block) {
+  var value_stop = Blockly.Madeup.valueToCode(block, 'STOP', Blockly.Madeup.ORDER_NONE);
+  var value_by = Blockly.Madeup.valueToCode(block, 'BY', Blockly.Madeup.ORDER_NONE);
+  var variable_iterator = Blockly.Madeup.variableDB_.getName(block.getFieldValue('ITERATOR'), Blockly.Variables.NAME_TYPE);
+  var statements_body = Blockly.Madeup.statementToCode(block, 'BODY');
+  var code = 'for ' + variable_iterator + ' through ' + value_stop + ' by ' + value_by + '\n' + statements_body + 'end\n';
+  return code;
+};
+
 Blockly.Madeup['madeup_loop_for_in'] = function(block) {
   var value_start = Blockly.Madeup.valueToCode(block, 'START', Blockly.Madeup.ORDER_NONE);
   var variable_iterator = Blockly.Madeup.variableDB_.getName(block.getFieldValue('ITERATOR'), Blockly.Variables.NAME_TYPE);
   var value_stop = Blockly.Madeup.valueToCode(block, 'STOP', Blockly.Madeup.ORDER_NONE);
   var statements_body = Blockly.Madeup.statementToCode(block, 'BODY');
   var code = 'for ' + variable_iterator + ' in ' + value_start + '..' + value_stop + '\n' + statements_body + 'end\n';
+  return code;
+};
+
+Blockly.Madeup['madeup_loop_for_in_by'] = function(block) {
+  var value_start = Blockly.Madeup.valueToCode(block, 'START', Blockly.Madeup.ORDER_NONE);
+  var variable_iterator = Blockly.Madeup.variableDB_.getName(block.getFieldValue('ITERATOR'), Blockly.Variables.NAME_TYPE);
+  var value_next = Blockly.Madeup.valueToCode(block, 'NEXT', Blockly.Madeup.ORDER_NONE);
+  var value_stop = Blockly.Madeup.valueToCode(block, 'STOP', Blockly.Madeup.ORDER_NONE);
+  var statements_body = Blockly.Madeup.statementToCode(block, 'BODY');
+  var code = 'for ' + variable_iterator + ' in ' + value_start + ',' + value_next + '..' + value_stop + '\n' + statements_body + 'end\n';
   return code;
 };
 

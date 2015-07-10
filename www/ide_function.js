@@ -29,7 +29,9 @@ var fontSize = 14;
 var gridSpacing = 1.0;
 var gridExtent = 10.0;
 var isFlatShaded = true;
+var isEditorText = true;
 
+var isEditorTextChanged = false;
 var isShowWireframeChanged = false;
 var isAxisChanged = [false, false, false];
 var isGridChanged = [false, false, false];
@@ -44,8 +46,6 @@ var isShowClockwiseChanged = false;
 var isFlatShadedChanged = false;
 
 function saveInCookies() {
-  console.log("saving in cookies");
-
   Cookies.set('last', getSource());
 
   // Only store a cookie if a setting has changed. If we unconditionally stored
@@ -58,6 +58,7 @@ function saveInCookies() {
   if (isModelColorChanged) Cookies.set('modelColor', modelColor);
   if (isShowWireframeChanged) Cookies.set('showWireframe', showWireframe ? 1 : 0);
   if (isFlatShadedChanged) Cookies.set('isFlatShaded', isFlatShaded ? 1 : 0);
+  if (isEditorTextChanged) Cookies.set('isEditorText', isEditorText ? 1 : 0);
   if (isAxisChanged[0]) Cookies.set('axisX', $('#axisX').prop('checked') ? 1 : 0);
   if (isAxisChanged[1]) Cookies.set('axisY', $('#axisY').prop('checked') ? 1 : 0);
   if (isAxisChanged[2]) Cookies.set('axisZ', $('#axisZ').prop('checked') ? 1 : 0);
@@ -84,6 +85,7 @@ function saveInCookies() {
   isFlatShadedChanged = false;
   isModelColorChanged = false;
   isShowWireframeChanged = false;
+  isEditorTextChanged = false;
   isShowHeadingsChanged = false;
   isNSecondsTillPreviewChanged = false;
   isGridSpacingChanged = false;
@@ -165,6 +167,16 @@ $(document).ready(function() {
       showWireframe = false;
     }
     $('#showWireframe').prop('checked', showWireframe);
+
+    if (Cookies.get('isEditorText')) {
+      setEditor(parseInt(Cookies.get('isEditorText')) != 0);
+    }
+
+    if (isEditorText) {
+      $("#isEditorText").prop('checked', true);
+    } else {
+      $("#isEditorBlocks").prop('checked', true);
+    }
 
     if (Cookies.get('gridExtent')) {
       gridExtent = parseFloat(Cookies.get('gridExtent'));
@@ -274,30 +286,7 @@ $(document).ready(function() {
 
   $('input[type=radio][name=editorMode]').change(function() {
     var editorMode = $(this).val();
-    if (editorMode == "Blocks") {
-      $('#text_editor').hide();
-      $('#blocksEditor').show();
-
-      if (!workspace) {
-        workspace = Blockly.inject('blocksCanvas', {toolbox: document.getElementById('toolbox')});
-        workspace.addChangeListener(function() {
-          var code = Blockly.Madeup.workspaceToCode(workspace);
-          text_editor.setValue(code);
-          log(code);
-          //console.log(code);
-        });
-        if (Cookies.get('lastBlocks')) {
-          var xml = Blockly.Xml.textToDom(Cookies.get('lastBlocks'));
-          Blockly.Xml.domToWorkspace(workspace, xml);
-        }
-      } else {
-      }
-    } else {
-      $('#blocksEditor').hide();
-      $('#text_editor').show();
-    }
-    resize();
-    Blockly.fireUiEvent(window, 'resize');
+    setEditor(editorMode != "Blocks");
   });
 
   $('#showHeadings').click(function() {
@@ -335,6 +324,37 @@ $(document).ready(function() {
   var axes = new Array(3);
   var grids = new Array(3);
 
+  function setEditor(isText) {
+    if (isEditorText == isText) return;
+    isEditorText = isText;
+    isEditorTextChanged = true;
+
+    if (isEditorText) {
+      $('#blocksEditor').hide();
+      $('#text_editor').show();
+    } else {
+      $('#text_editor').hide();
+      $('#blocksEditor').show();
+
+      if (!workspace) {
+        workspace = Blockly.inject('blocksCanvas', {toolbox: document.getElementById('toolbox')});
+        workspace.addChangeListener(function() {
+          var code = Blockly.Madeup.workspaceToCode(workspace);
+          text_editor.setValue(code);
+          log(code);
+        });
+        if (Cookies.get('lastBlocks')) {
+          var xml = Blockly.Xml.textToDom(Cookies.get('lastBlocks'));
+          Blockly.Xml.domToWorkspace(workspace, xml);
+        }
+      } else {
+      }
+    }
+
+    resize();
+    Blockly.fireUiEvent(window, 'resize');
+  }
+
   function generateAxis(d) {
     if (axes[d]) {
       removeAxis(d);
@@ -364,8 +384,8 @@ $(document).ready(function() {
   }
 
   function toggleAxis(d) {
-    isAxisChanged[d] = true;
     return function() {
+      isAxisChanged[d] = true;
       if (this.checked) {
         generateAxis(d);
       } else {
@@ -418,8 +438,8 @@ $(document).ready(function() {
   }
 
   function toggleGrid(d) {
-    isGridChanged[d] = true;
     return function() {
+      isGridChanged[d] = true;
       if (this.checked) {
         generateGrid(d);
       } else {

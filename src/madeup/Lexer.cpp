@@ -273,8 +273,8 @@ Token Lexer::getTokenAfterLetter() {
     return makeToken(Token::REPEATWICH);
   } else if (text_so_far == "then") {
     return makeToken(Token::THEN);
-  } else if (text_so_far == "surrounds") {
-    return makeToken(Token::SURROUNDS);
+  } else if (text_so_far == "around") {
+    return makeToken(Token::AROUND);
   } else if (text_so_far == "through") {
     return makeToken(Token::THROUGH);
   } else if (text_so_far == "to") {

@@ -454,7 +454,7 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
         to_ring *= radius;
         to_ring = QMatrix4<float>::GetRotate(twist, afts[0]) * to_ring;
         for (int si = 0; si < nstops; ++si) {
-          QVector3<T> ring_neighbor = QMatrix4<float>::GetRotate(si * 360.0f / nstops, afts[0]) * to_ring + pivot_on_aft;
+          QVector3<T> ring_neighbor = QMatrix4<float>::GetRotate(si * -360.0f / nstops, afts[0]) * to_ring + pivot_on_aft;
           vertices.push_back(ring_neighbor);
         }
       }
@@ -855,7 +855,7 @@ Trimesh *Polyline<T>::Triangulate() const {
   bool is_reversed = !flattened->IsCounterclockwise();
   if (is_reversed) {
     std::cout << "reversing" << std::endl;
-    /* std::reverse(remaining.begin(), remaining.end()); */
+    std::reverse(remaining.begin(), remaining.end());
   }
 
   // While we have at least three vertices left, find an ear and make a face of it.

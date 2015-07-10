@@ -58,8 +58,8 @@ const std::string Token::getTypeString() const {
       return "NOTHING";
     case CIRCUMFLEX:
       return "CIRCUMFLEX";
-    case SURROUNDS:
-      return "SURROUNDS";
+    case AROUND:
+      return "AROUND";
     case ID:
       return "ID";
     case LEFT_BRACKET:

@@ -56,7 +56,7 @@ class Token {
       TRUE,
       WHILE,
       NOTHING,
-      SURROUNDS,
+      AROUND,
       END_OF_FILE
     };
 
