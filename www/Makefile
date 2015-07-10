@@ -5,16 +5,21 @@ JQUERY_UI_VERSION = 1.11.2
 # DST_BINARIES = $(WWW_ROOT)/$(notdir $(MADEUP)) $(WWW_ROOT)/$(notdir $(TWODEE)) $(WWW_ROOT)/$(notdir $(MERP)) 
 DST_BINARIES = $(WWW_ROOT)/$(notdir $(MERP))
 
-.PHONY: madeup
+.PHONY: madeup check
 
-all: $(DST) $(WWW_ROOT)/ace/src-noconflict/mode-madeup.js $(DST_BINARIES)
+all: check $(DST) $(WWW_ROOT)/ace/src-noconflict/mode-madeup.js $(DST_BINARIES)
+
+check:
+	@if [ -z "$(WWW_ROOT)" ]; then \
+		echo "WWW_ROOT is not set. Run \"make www\" from the build directory."; \
+		exit 1; \
+	fi
+
 libdeps: $(WWW_ROOT)/ace $(WWW_ROOT)/three-js $(WWW_ROOT)/jquery.js $(WWW_ROOT)/js-cookie $(WWW_ROOT)/jquery-ui $(WWW_ROOT)/colorpicker $(WWW_ROOT)/blockly $(WWW_ROOT)/closure-library
+
 init: libdeps madeup all
 
-run: all
-
 $(DST_BINARIES): $(MADEUP) $(TWODEE) $(MERP)
-	echo "$^ are getting copied"
 	sudo cp $^ $(WWW_ROOT)
 	sudo chmod a+rX $@
 

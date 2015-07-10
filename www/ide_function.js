@@ -520,6 +520,7 @@ $(document).ready(function() {
     text_editor.focus();
   });
   $('#run').click(function() {
+    log('Running...'); 
     saveInCookies();
     run(GeometryMode.SURFACE);
     text_editor.focus();
