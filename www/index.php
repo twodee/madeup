@@ -119,15 +119,23 @@
   <!-- The layout _________________________________________________________ -->
 <div id="entire">
   <div id="menu">
-    <input id="run" type="button" value="Run"/>
-    <input id="smaller" type="button" value="-"/>
-    <input id="bigger" type="button" value="+"/>
+    <input id="toggleFilePopup" type="button" value="File"/>
+    <input id="smaller" type="button" value="-abc"/>
+    <input id="bigger" type="button" value="+abc"/>
     <input id="toggleEditorPopup" type="button" value="Editor"/>
+    <input id="run" type="button" value="Run"/>
 
     <input style="float: right" id="download" type="button" value="Download Model"/>
     <input style="float: right" id="fit" type="button" value="Fit"/>
     <input style="float: right" id="toggleGridPopup" type="button" value="Grid"/>
     <input style="float: right" id="toggleDisplayPopup" type="button" value="Display"/>
+
+    <div id="filePopup" class="popups">
+      <a href="#" id="fileSaveAs" class="fileLink">save as</a><br/>
+      <a href="#" id="fileClose" class="fileLink">close</a><br/>
+      <p></p> 
+      <div id="mups"></div>
+    </div>
 
     <div id="editorPopup" class="popups">
       <input type="radio" name="editorMode" id="isEditorText" value="Text" checked="checked"/>Text or 

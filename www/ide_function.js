@@ -12,6 +12,7 @@ THREE.Object3D.prototype.clear = function() {
   }
 }
 
+var mupName = null;
 var overallScene;
 var modelScene;
 var glyphScene;
@@ -45,8 +46,12 @@ var isShowCounterclockwiseChanged = false;
 var isShowClockwiseChanged = false;
 var isFlatShadedChanged = false;
 
+function updateTitle() {
+  $('#toggleFilePopup').attr('value', mupName);
+}
+
 function saveInCookies() {
-  Cookies.set('last', getSource());
+  Cookies.set('lastMup', mupName);
 
   // Only store a cookie if a setting has changed. If we unconditionally stored
   // these, then updates to the default value would not be seen by users, as
@@ -112,8 +117,14 @@ $(document).ready(function() {
       resize();
     }
 
-    if (Cookies.get('last')) {
-      text_editor.setValue(Cookies.get('last'), -1);
+    // if (Cookies.get('last')) { 
+      // text_editor.setValue(Cookies.get('last'), -1); 
+    // } 
+
+    if (Cookies.get('lastMup')) {
+      load(Cookies.get('lastMup'));
+    } else {
+      load('untitled');
     }
 
     if (Cookies.get('fontSize')) {
@@ -250,6 +261,7 @@ $(document).ready(function() {
 
   $(window).unload(function() {
     saveInCookies();
+    save();
   });
 
   $('#clear').click(function() {
@@ -495,6 +507,20 @@ $(document).ready(function() {
     run(GeometryMode.SURFACE);
   });
 
+  $('#toggleFilePopup').click(function() {
+    $('.popups').not('#filePopup').hide();
+    $('#filePopup').css('top', $('#toggleFilePopup').position().top + $('#toggleFilePopup').innerHeight(true)) - 8; 
+    $('#filePopup').css('left', $('#toggleFilePopup').position().left + 4); 
+    $('#filePopup').slideToggle('fast', function() {});
+    var list = '';
+    for (var mup in window.localStorage) {
+      if (mup != 'untitled') {
+        list += '<a href="#" class="fileLink" onclick="load(\'' + mup + '\')">' + mup + '</a><br/>';
+      }
+    }
+    $('#mups').html(list);
+  });
+
   $('#toggleEditorPopup').click(function() {
     $('.popups').not('#editorPopup').hide();
     $('#editorPopup').css('top', $('#toggleEditorPopup').position().top + $('#toggleEditorPopup').innerHeight(true)) - 8; 
@@ -519,11 +545,28 @@ $(document).ready(function() {
     $('#downloader').submit();
     text_editor.focus();
   });
+
   $('#run').click(function() {
     log('Running...'); 
     saveInCookies();
     run(GeometryMode.SURFACE);
     text_editor.focus();
+  });
+
+  $('#fileSaveAs').click(function() {
+    $('#filePopup').hide();
+    var name = prompt('By what name shall I save thee?');
+    if (name != null) {
+      mupName = name;
+      save();
+      updateTitle();
+    }
+  });
+
+  $('#fileClose').click(function() {
+    save();
+    $('#filePopup').hide();
+    load('untitled');
   });
 
   $('#left').resizable({
@@ -561,6 +604,21 @@ var onEditorChange = function(delta) {
 var preview = undefined;
 function schedulePreview() {
   text_editor.getSession().on('change', onEditorChange);
+}
+
+function load(mup) {
+  save();
+  $('#filePopup').hide();
+  mupName = mup;
+  var source = window.localStorage.getItem(mup);
+  text_editor.setValue(source, -1);
+  updateTitle();
+}
+
+function save() {
+  if (mupName != null) {
+    window.localStorage.setItem(mupName, getSource());
+  }
 }
 
 function getSource() {
