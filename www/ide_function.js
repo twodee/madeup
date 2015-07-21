@@ -573,8 +573,8 @@ $(document).ready(function() {
   });
 
   $('#fileSaveAs').click(function() {
-    $('#filePopup').hide();
-    var name = prompt('By what name shall I save thee?');
+    hideMenus();
+    var name = prompt('Save under what name?');
     if (name != null) {
       mupName = name;
       save();
@@ -583,13 +583,14 @@ $(document).ready(function() {
   });
 
   $('#fileClose').click(function() {
+    hideMenus();
     save();
-    $('#filePopup').hide();
     load('untitled');
   });
 
   $('#fileDelete').click(function() {
-    $('#filePopup').hide();
+    hideMenus();
+    save();
     var ok = confirm('Delete ' + mupName + '?');
     if (ok) {
       window.localStorage.removeItem(mupName);
@@ -636,9 +637,15 @@ function schedulePreview() {
 }
 
 function load(mup) {
+  hideMenus();
   save();
-  $('#filePopup').hide();
   mupName = mup;
+
+  for (var i = 0; i < meshes.length; ++i) {
+    modelScene.remove(meshes[i]);
+  }
+  render();
+
   var source = window.localStorage.getItem(mup);
   textEditor.setValue(source, -1);
   updateTitle();
@@ -895,9 +902,10 @@ function init() {
   renderer.setClearColor(0xFFFFFF, 1);
   document.getElementById("glcanvas").appendChild(renderer.domElement);
 
-  // Hide menus when clicking off-menu.
-  document.getElementById('left').addEventListener('mousedown', hideMenus);
-  renderer.domElement.addEventListener('mousedown', hideMenus);
+  // Hide menus when clicking off-menu. This is not UFW. I need to explicitly
+  // omit the parameters.
+  document.getElementById('left').addEventListener('mousedown', function() {hideMenus();});
+  renderer.domElement.addEventListener('mousedown', function() {hideMenus();});
 
   // controls = new THREE.OrbitControls(camera, renderer.domElement);  
   controls = new THREE.TrackballControls(camera, renderer.domElement);
