@@ -123,16 +123,16 @@
       <input id="run" type="button" value="Run"/>
       <input id="smaller" type="button" value="-abc"/>
       <input id="bigger" type="button" value="+abc"/>
-      <input id="toggleEditorPopup" type="button" value="Editor"/>
+      <input id="toggleEditorPopup" class="togglePopup" type="button" value="Editor"/>
     </div>
 
     <div style="display: inline-block; position: absolute; left: 0px; right: 0px; text-align: center; pointer-events: none;" class="fileLink">
-      <input id="toggleFilePopup" type="button" value="File" style="background-color: #663333"/>
+      <input id="toggleFilePopup" class="togglePopup" type="button" value="File"/>
     </div>
 
     <div style="display: inline-block; position: absolute; right: 0px;">
-      <input id="toggleDisplayPopup" type="button" value="Display"/>
-      <input id="toggleGridPopup" type="button" value="Grid"/>
+      <input id="toggleDisplayPopup" class="togglePopup" type="button" value="Display"/>
+      <input id="toggleGridPopup" class="togglePopup" type="button" value="Grid"/>
       <input id="fit" type="button" value="Fit"/>
       <input id="download" type="button" value="Download Model"/>
     </div>

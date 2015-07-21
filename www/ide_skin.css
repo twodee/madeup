@@ -98,9 +98,12 @@ body {
 }
 
 #menu input[type="button"] {
-  background-color: #333333;
+  background-color: #000000;
   border: 0px;
-  margin: 4px;
+  margin-left: 4px;
+  margin-right: 4px;
+  margin-top: 0px;
+  margin-bottom: 0px;
   color: white;
   font-size: 10pt;
   outline: none;
@@ -109,7 +112,7 @@ body {
 }
 
 #menu input[type="button"]:active {
-  background-color: #999999;
+  background-color: #333333;
   /* z-index: 10000000; */
 }
 
