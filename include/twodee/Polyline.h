@@ -89,12 +89,10 @@ Trimesh *Polyline<T>::Revolve(const QVector3<T>& axis, int nstops, float degrees
     degrees = -360.0f;
     is_full = true;
   }
-  std::cout << "is_full: " << is_full << std::endl;
 
   NField<float, 2> img(QVector2<int>(this->GetElementCount(), nstops), 3);
   QMatrix4<float> rot;
   if (is_full) {
-    std::cout << "degrees / nstops: " << degrees / nstops << std::endl;
     rot = QMatrix4<float>::GetRotate(degrees / nstops, axis);
   } else {
     rot = QMatrix4<float>::GetRotate(degrees / (nstops - 1), axis);
@@ -111,7 +109,6 @@ Trimesh *Polyline<T>::Revolve(const QVector3<T>& axis, int nstops, float degrees
       delta = rotated_position - position;
     }
   }
-  std::cout << "delta: " << delta << std::endl;
 
   // Fill the first row with the polyline coordinates.
   QVector3<T> position((T) 0);
@@ -151,15 +148,10 @@ Trimesh *Polyline<T>::Revolve(const QVector3<T>& axis, int nstops, float degrees
   delete flattened;
 
   QVector3<T> normal = this->GetNormal();
-  std::cout << "normal: " << normal << std::endl;
   T normal_dot_direction = normal.Dot(delta);
-  std::cout << "normal_dot_direction: " << normal_dot_direction << std::endl;
-
-  std::cout << "is_ccw: " << is_ccw << std::endl;
 
   if ((is_ccw && normal_dot_direction < 0) ||
       (!is_ccw && normal_dot_direction < 0)) {
-    std::cout << "rrr r r r reversing" << std::endl;
     base->ReverseWinding();
   }
 
@@ -846,7 +838,6 @@ Trimesh *Polyline<T>::Triangulate() const {
     QVector3<float> position(QVector3<float>((*this)(i)));
     positions.push_back(position);
     remaining.push_back(TriangulateVertex<T>(position, QVector2<T>((*flattened)(i)), i));
-    std::cout << i << " -> " << position << std::endl;
   }
 
   // A negative signed area means the vertices are enumerated in clockwise
@@ -854,7 +845,6 @@ Trimesh *Polyline<T>::Triangulate() const {
   // they y-axis pointing up.
   bool is_reversed = !flattened->IsCounterclockwise();
   if (is_reversed) {
-    std::cout << "reversing" << std::endl;
     std::reverse(remaining.begin(), remaining.end());
   }
 
@@ -880,17 +870,11 @@ Trimesh *Polyline<T>::Triangulate() const {
           continue;
         }
       }
-      if (remaining[i].array_index == 0 &&
-          remaining[j].array_index == 4 &&
-          remaining[k].array_index == 6) {
-        std::cout << "on 046" << std::endl;
-      }
 
       // See if any other vertex lies inside the triangle formed by ijk.
       bool contains_vertex = false;
       for (size_t ci = 0; !contains_vertex && ci < remaining.size(); ++ci) {
         if (ci != i && ci != j && ci != k) {
-          std::cout << "ci: " << remaining[ci].array_index << std::endl;
           Triangle2<T> tri(remaining[i].vertex2, remaining[j].vertex2, remaining[k].vertex2);
           contains_vertex = tri.Contains(remaining[ci].vertex2);
         }
@@ -900,7 +884,6 @@ Trimesh *Polyline<T>::Triangulate() const {
       // lop it off by removing the central vertex from the polygon. The
       // vertices form a face.
       if (!contains_vertex || remaining.size() == 3) {
-        std::cout << "picking off " << remaining[i].array_index << " " << remaining[j].array_index << " " << remaining[k].array_index << std::endl;
         faces.push_back(QVector3<int>(remaining[i].array_index, remaining[j].array_index, remaining[k].array_index));
         remaining.erase(remaining.begin() + j);
         is_ear_found = true;

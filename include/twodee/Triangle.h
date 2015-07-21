@@ -50,11 +50,8 @@ bool Triangle2<T>::Contains(const QVector2<T> &other,
   float invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
   float u = (dot11 * dot02 - dot01 * dot12) * invDenom;
   float v = (dot00 * dot12 - dot01 * dot02) * invDenom;
-  std::cout << "u: " << u << std::endl;
-  std::cout << "v: " << v << std::endl;
   
   // Check if point is in triangle
-  std::cout << (u >= 0 && v >= 0 && u + v < 1) << std::endl;
   return u >= -epsilon && v >= -epsilon && u + v < 1 + epsilon;
 }
 

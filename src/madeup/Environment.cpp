@@ -778,7 +778,6 @@ void Environment::tube(float twist, float max_bend) {
 
             float *position = positions;
             for (int vi = 0; vi < nsides * 2; ++vi) {
-              /* std::cout << "position[#](# in 0,3): " << position[0] << ", " << position[1] << ", " << position[2] << std::endl; */
               position += 3;
             }
 
@@ -788,13 +787,11 @@ void Environment::tube(float twist, float max_bend) {
               face[0] = fi;
               face[1] = nsides + (fi + 1) % nsides;
               face[2] = nsides + fi;
-              /* std::cout << "face[#](# in 0,3): " << face[0] << ", " << face[1] << ", " << face[2] << std::endl; */
               face += 3;
 
               face[0] = fi;
               face[1] = (fi + 1) % nsides;
               face[2] = nsides + (fi + 1) % nsides;
-              /* std::cout << "face[#](# in 0,3): " << face[0] << ", " << face[1] << ", " << face[2] << std::endl; */
               face += 3;
             }
 
@@ -808,7 +805,6 @@ void Environment::tube(float twist, float max_bend) {
 
             position = positions;
             for (int vi = 0; vi < nsides * 2; ++vi) {
-              std::cout << "position[#](# in 0,3): " << position[0] << ", " << position[1] << ", " << position[2] << std::endl;
               position += 3;
             }
 
@@ -818,13 +814,11 @@ void Environment::tube(float twist, float max_bend) {
               face[0] = fi;
               face[1] = nsides + fi;
               face[2] = nsides + (fi + 1) % nsides;
-              std::cout << "face[#](# in 0,3): " << face[0] << ", " << face[1] << ", " << face[2] << std::endl;
               face += 3;
 
               face[0] = fi;
               face[1] = nsides + (fi + 1) % nsides;
               face[2] = (fi + 1) % nsides;
-              std::cout << "face[#](# in 0,3): " << face[0] << ", " << face[1] << ", " << face[2] << std::endl;
               face += 3;
             }
 
