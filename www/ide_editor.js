@@ -1,7 +1,7 @@
-var text_editor = ace.edit("text_editor");
-text_editor.$blockScrolling = Infinity;
+var textEditor = ace.edit("textEditor");
+textEditor.$blockScrolling = Infinity;
 var Range = ace.require('ace/range').Range;
-text_editor.setTheme("ace/theme/twilight");
-text_editor.getSession().setMode("ace/mode/madeup");
-text_editor.setHighlightSelectedWord(false);
-text_editor.setHighlightActiveLine(false);
+textEditor.setTheme("ace/theme/twilight");
+textEditor.getSession().setMode("ace/mode/madeup");
+textEditor.setHighlightSelectedWord(false);
+textEditor.setHighlightActiveLine(false);

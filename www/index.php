@@ -117,24 +117,33 @@
   </xml>
 
   <!-- The layout _________________________________________________________ -->
-<div id="entire">
+<div id="entire" style="z-index: 0">
   <div id="menu">
-    <input id="toggleFilePopup" type="button" value="File"/>
-    <input id="smaller" type="button" value="-abc"/>
-    <input id="bigger" type="button" value="+abc"/>
-    <input id="toggleEditorPopup" type="button" value="Editor"/>
-    <input id="run" type="button" value="Run"/>
+    <div style="display: inline-block; position: absolute: left: 0px;">
+      <input id="run" type="button" value="Run"/>
+      <input id="smaller" type="button" value="-abc"/>
+      <input id="bigger" type="button" value="+abc"/>
+      <input id="toggleEditorPopup" type="button" value="Editor"/>
+    </div>
 
-    <input style="float: right" id="download" type="button" value="Download Model"/>
-    <input style="float: right" id="fit" type="button" value="Fit"/>
-    <input style="float: right" id="toggleGridPopup" type="button" value="Grid"/>
-    <input style="float: right" id="toggleDisplayPopup" type="button" value="Display"/>
+    <div style="display: inline-block; position: absolute; left: 0px; right: 0px; text-align: center; pointer-events: none;" class="fileLink">
+      <input id="toggleFilePopup" type="button" value="File" style="background-color: #663333"/>
+    </div>
+
+    <div style="display: inline-block; position: absolute; right: 0px;">
+      <input id="toggleDisplayPopup" type="button" value="Display"/>
+      <input id="toggleGridPopup" type="button" value="Grid"/>
+      <input id="fit" type="button" value="Fit"/>
+      <input id="download" type="button" value="Download Model"/>
+    </div>
 
     <div id="filePopup" class="popups">
-      <a href="#" id="fileSaveAs" class="fileLink">save as</a><br/>
-      <a href="#" id="fileClose" class="fileLink">close</a><br/>
+      <a href="#" id="fileSaveAs" class="fileLink">Save As</a><br/>
+      <a href="#" id="fileClose" class="fileLink">Close</a><br/>
       <p></p> 
-      <div id="mups"></div>
+      <a href="#" id="fileDelete" class="fileLink">Delete</a><br/>
+      <p></p> 
+      <span id="mups"></span>
     </div>
 
     <div id="editorPopup" class="popups">
@@ -142,6 +151,7 @@
       <input type="radio" name="editorMode" id="isEditorBlocks" value="Blocks"/>Blocks<br/>
       <input type="checkbox" id="autopreview" checked="checked"/>Preview <input type="text" id="nSecondsTillPreview" size="5"/> seconds after last edit<br/>
     </div>
+
     <div id="gridPopup" class="popups">
       <input type="checkbox" id="axisX"/>X axis<br/>
       <input type="checkbox" id="axisY"/>Y axis<br/>
@@ -152,6 +162,7 @@
       Grid Extent: <input type="text" id="gridExtent" size="5"/><br/>
       Grid Spacing: <input type="text" id="gridSpacing" size="5"/><br/>
     </div>
+
     <div id="displayPopup" class="popups">
       <input type="checkbox" id="showWireframe"/>Show wireframe<br/>
       <input type="checkbox" id="showHeadings">Show heading</input><br/>
@@ -160,12 +171,11 @@
       <input type="checkbox" id="isFlatShaded">Flat shading</input><br/>
       <div id="modelColor" style="width: 100px; display: inline-block; padding: 5px">Model color</div>
     </div>
-    <br/>
   </div>
 
   <div id="left">
     <div id="editorPane">
-      <div id="text_editor"></div>
+      <div id="textEditor"></div>
       <div id="blocksEditor">
         <div id="blocksCanvas"></div>
       </div>
