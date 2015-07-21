@@ -12,6 +12,7 @@ THREE.Object3D.prototype.clear = function() {
   }
 }
 
+var initialized = false;
 var mupName = null;
 var overallScene;
 var modelScene;
@@ -812,6 +813,8 @@ function log(message) {
 }
 
 function resize() {
+  if (!initialized) return;
+
   controls.handleResize();
 
   var width = window.innerWidth - $('#left').width();
@@ -948,6 +951,7 @@ function init() {
   // render(); 
 
   window.addEventListener('resize', resize);
+  initialized = true;
   resize();
 }
 

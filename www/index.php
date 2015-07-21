@@ -165,10 +165,10 @@
 
     <div id="displayPopup" class="popups">
       <input type="checkbox" id="showWireframe"/>Show wireframe<br/>
-      <input type="checkbox" id="showHeadings">Show heading</input><br/>
-      <input type="checkbox" id="showCounterclockwise">Show counterclockwise faces</input><br/>
-      <input type="checkbox" id="showClockwise">Show clockwise faces</input><br/>
-      <input type="checkbox" id="isFlatShaded">Flat shading</input><br/>
+      <input type="checkbox" id="showHeadings"/>Show heading<br/>
+      <input type="checkbox" id="showCounterclockwise"/>Show counterclockwise faces<br/>
+      <input type="checkbox" id="showClockwise"/>Show clockwise faces<br/>
+      <input type="checkbox" id="isFlatShaded"/>Flat shading<br/>
       <div id="modelColor" style="width: 100px; display: inline-block; padding: 5px">Model color</div>
     </div>
   </div>
