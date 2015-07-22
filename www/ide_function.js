@@ -901,7 +901,7 @@ function init() {
   camera.position.z = 30;
 
   var glcanvas = $("#glcanvas");
-  renderer = new THREE.WebGLRenderer();
+  renderer = new THREE.WebGLRenderer({antialias: true});
 
   // Scratch out upstream implementation, which affects global culling state
   // that I rely on.
