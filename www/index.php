@@ -16,7 +16,6 @@
 
   <!-- ThreeJS dependencies -->
   <script src="three-js/build/three.js"></script>
-  <script src="three-js/examples/js/controls/OrbitControls.js"></script>
   <script src="three-js/examples/js/controls/TrackballControls.js"></script>
 
   <!-- Blockly dependencies -->
@@ -127,14 +126,14 @@
     </div>
 
     <div style="display: inline-block; position: absolute; left: 0px; right: 0px; text-align: center; pointer-events: none;" class="fileLink">
-      <input id="toggleFilePopup" class="togglePopup" type="button" value="File"/>
+      <input style="color: yellow" id="toggleFilePopup" class="togglePopup" type="button" value="File"/>
     </div>
 
     <div style="display: inline-block; position: absolute; right: 0px;">
       <input id="toggleDisplayPopup" class="togglePopup" type="button" value="Display"/>
       <input id="toggleGridPopup" class="togglePopup" type="button" value="Grid"/>
       <input id="fit" type="button" value="Fit"/>
-      <input id="download" type="button" value="Download Model"/>
+      <input id="download" type="button" value="Export"/>
     </div>
 
     <div id="filePopup" class="popups">

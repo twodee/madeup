@@ -52,7 +52,7 @@ function updateTitle() {
 }
 
 function saveInCookies() {
-  Cookies.set('lastMup', mupName);
+  // Cookies.set('lastMup', mupName); 
 
   // Only store a cookie if a setting has changed. If we unconditionally stored
   // these, then updates to the default value would not be seen by users, as
@@ -122,11 +122,11 @@ $(document).ready(function() {
       // textEditor.setValue(Cookies.get('last'), -1); 
     // } 
 
-    if (Cookies.get('lastMup')) {
-      load(Cookies.get('lastMup'));
-    } else {
-      load('untitled');
-    }
+    // if (Cookies.get('lastMup')) { 
+      // load(Cookies.get('lastMup')); 
+    // } else { 
+    load('untitled');
+    // } 
 
     if (Cookies.get('fontSize')) {
       fontSize = parseInt(Cookies.get('fontSize'));
@@ -902,6 +902,11 @@ function init() {
 
   var glcanvas = $("#glcanvas");
   renderer = new THREE.WebGLRenderer();
+
+  // Scratch out upstream implementation, which affects global culling state
+  // that I rely on.
+  renderer.setMaterialFaces = function(material) {}
+
   renderer.setClearColor(0xFFFFFF, 1);
   document.getElementById("glcanvas").appendChild(renderer.domElement);
 
