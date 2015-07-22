@@ -1,5 +1,6 @@
 #include "madeup/ExpressionClosure.h"
 #include "madeup/ExpressionExtrude.h"
+#include "madeup/ExpressionMesh.h"
 #include "madeup/ExpressionNumber.h"
 #include "madeup/ExpressionUnit.h"
 
@@ -66,9 +67,9 @@ Co<Expression> ExpressionExtrude::evaluate(Environment &env) const {
 
   QVector3<float> axis(x, y, z);
   axis.Normalize();
-  env.extrude(axis, length);
 
-  return Co<Expression>(ExpressionUnit::getSingleton());
+  Co<Trimesh> trimesh = env.extrude(axis, length);
+  return Co<Expression>(new ExpressionMesh(trimesh));
 }
 
 /* ------------------------------------------------------------------------- */

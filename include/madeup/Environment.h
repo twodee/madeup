@@ -65,7 +65,7 @@ class Environment {
     void center();
     void identity();
     void reverse();
-    void echo();
+    void echo(Co<Trimesh> mesh);
     void yaw(float degrees);
     void pitch(float degrees);
     void roll(float degrees);
@@ -73,7 +73,7 @@ class Environment {
     void tube(float twist, float max_bend);
     void polygon();
     void revolve();
-    void extrude(const QVector3<float> &axis, float length);
+    Co<Trimesh> extrude(const QVector3<float> &axis, float length);
     void dot();
     void box();
     void blobs(float grain, float iso);

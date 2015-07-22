@@ -40,6 +40,7 @@ add_library(madeup
   ExpressionLesserOrEqual.cpp
   ExpressionLog.cpp
   ExpressionMax.cpp
+  ExpressionMesh.cpp 
   ExpressionMin.cpp
   ExpressionMove.cpp
   ExpressionMoveTo.cpp

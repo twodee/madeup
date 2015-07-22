@@ -24,6 +24,7 @@
 #include "madeup/ExpressionInverseTangent.h"
 #include "madeup/ExpressionLog.h"
 #include "madeup/ExpressionMax.h"
+#include "madeup/ExpressionMesh.h"
 #include "madeup/ExpressionMin.h"
 #include "madeup/ExpressionMove.h"
 #include "madeup/ExpressionMoveTo.h"
@@ -206,6 +207,7 @@ void Environment::prime() {
   Co<ExpressionDefine> define_center(new ExpressionDefine("center", Co<Expression>(new ExpressionCenter())));
 
   Co<ExpressionDefine> define_echo(new ExpressionDefine("echo", Co<Expression>(new ExpressionEcho())));
+  define_echo->addFormal("mesh");
 
   Co<ExpressionDefine> define_axis(new ExpressionDefine("axis", Co<Expression>(new ExpressionAxis())));
   define_axis->addFormal("x");
@@ -541,11 +543,10 @@ void Environment::center() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::echo() {
-  for (unsigned int i = 0; i < run.size(); ++i) {
-    /* Node cursor = {xforms.top() * run[run.size() - 1 - i].position, run[run.size() - 1 - i].radius}; */
-    /* run.push_back(cursor); */
-  }
+void Environment::echo(Co<Trimesh> mesh) {
+  Trimesh *trimesh(new Trimesh(*mesh));
+  *trimesh *= xforms.top();
+  *shapes += *trimesh;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -902,7 +903,9 @@ void Environment::revolve() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::extrude(const QVector3<float> &axis, float length) {
+Co<Trimesh> Environment::extrude(const QVector3<float> &axis, float length) {
+  Co<Trimesh> trimesh(new Trimesh(0, 0));
+
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() > 0) {
       QVector3<float> diff = run[0].position - run[run.size() - 1].position;
@@ -918,13 +921,15 @@ void Environment::extrude(const QVector3<float> &axis, float length) {
         (*line)(i)[2] = run[i].position[2];
       }
 
-      Trimesh *trimesh = line->Extrude(axis, length, xforms.top());
+      trimesh = Co<Trimesh>(line->Extrude(axis, length, xforms.top()));
       *shapes += *trimesh;
-    }
+    } 
   }
 
   paths.push_back(vector<Turtle>());
   run.clear();
+
+  return trimesh;
 }
 
 /* ------------------------------------------------------------------------- */
