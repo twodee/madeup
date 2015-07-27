@@ -98,15 +98,18 @@ Trimesh *Polyline<T>::Revolve(const QVector3<T>& axis, int nstops, float degrees
     rot = QMatrix4<float>::GetRotate(degrees / (nstops - 1), axis);
   }
 
+  const float EPSILON = 1.0e-3f;
+
   // find a point that's not the origin, rotate it a bit, subtract off the original
   // that's our relative direction of travel
   QVector3<T> delta;
   for (int i = 0; i < this->GetElementCount(); ++i) {
     QVector3<T> position((*this)(i));
-    if (position.GetLength() > 0) {
-      QMatrix4<float> xform = QMatrix4<float>::GetRotate(degrees < 0 ? -10 : 10, axis);
-      QVector3<T> rotated_position = xform * position;
-      delta = rotated_position - position;
+    QMatrix4<float> xform = QMatrix4<float>::GetRotate(degrees < 0 ? -10 : 10, axis);
+    QVector3<T> rotated_position = xform * position;
+    delta = rotated_position - position;
+    if (delta.GetLength() > EPSILON) {
+      break;
     }
   }
 
