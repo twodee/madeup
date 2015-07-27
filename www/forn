@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+
+# ---------------------------------------------------------------------------- 
+# FILE:   forn                                                                 
+# AUTHOR: Chris Johnson                                                        
+# DATE:   Dec 03 2014                                                          
+#                                                                              
+# Executes a command with a time limit. If the command takes longer than the
+# specified number of seconds, it is killed and status 37 is returned.
+# Otherwise, the exit status of the command is returned.
+# ---------------------------------------------------------------------------- 
+
+require 'shellwords'
+require 'timeout'
+
+if ARGV.length < 1
+  puts "Usage: forn delay-in-seconds command arg1 arg2 ..."
+  exit 1
+end
+
+delay = ARGV[0].to_i
+ARGV.shift
+
+# Start command, but kill it if delay elapses.
+pid = Process.spawn(ARGV.shelljoin)
+begin
+  Timeout.timeout(delay) do
+    Process.wait pid
+    exit $?.exitstatus
+  end
+rescue Timeout::Error
+  puts "Uh oh. Execution timed out after #{delay} second#{delay == 1 ? '' : 's'}."
+  Process.kill(:SIGTERM, pid)
+  exit 37
+end
