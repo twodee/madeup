@@ -235,7 +235,7 @@ Token Lexer::getTokenAfterQuote() {
 Token Lexer::getTokenAfterLetter() {
   int c = in.get();
 
-  while (c != EOF && (isalpha(c) || isdigit(c) || c == '.')) {
+  while (c != EOF && (isalpha(c) || isdigit(c) || (c == '.' && in.peek() != '.'))) {
     ++location.end_column;
     ++location.end_index;
     text_so_far += (char) c;
