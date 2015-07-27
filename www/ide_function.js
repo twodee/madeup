@@ -12,6 +12,7 @@ THREE.Object3D.prototype.clear = function() {
   }
 }
 
+var swatch = null;
 var initialized = false;
 var mupName = null;
 var overallScene;
@@ -21,7 +22,6 @@ var renderer, camera, controls;
 var meshes = [];
 var nSecondsTillPreview = 1.0;
 var showWireframe = false;
-var arrowShafts = [];
 var showHeadings = true;
 var showCounterclockwise = true;
 var showClockwise = false;
@@ -166,7 +166,7 @@ $(document).ready(function() {
     }
     $('#modelColor').css('background-color', '#' + modelColor);
 
-    $('#modelColor').ColorPicker({
+    swatch = $('#modelColor').ColorPicker({
       flat: false,
       color: modelColor,
       onSubmit: function(hsb, hex, rgb) {
@@ -313,7 +313,7 @@ $(document).ready(function() {
     isShowHeadingsChanged = true;
     showHeadings = this.checked;
     textEditor.focus();
-    render();
+    run(GeometryMode.PATH);
   });
 
   $('#isFlatShaded').click(function() {
@@ -688,7 +688,6 @@ function run(mode) {
           modelScene.remove(meshes[i]);
         }
         meshes = [];
-        arrowShafts = [];
 
         log(sansDebug);
         
@@ -719,7 +718,7 @@ function run(mode) {
             }));
 
             var nvertices = paths[pi].vertices.length;
-            if (nvertices > 0) {
+            if (showHeadings && nvertices > 0) {
               var m = paths[pi].orientation;
               
               var g2 = new THREE.Geometry();
@@ -976,5 +975,9 @@ function hideMenus(exceptID) {
   } else {
     $('.popups').not(exceptID).hide();
     $('.togglePopup').not('#toggle' + exceptID.charAt(1).toUpperCase() + exceptID.substring(2)).css('background-color', '#000000');
+  }
+
+  if (swatch) {
+    swatch.ColorPickerHide();
   }
 }
