@@ -881,10 +881,10 @@ void Environment::revolve() {
         Co<Expression> z_value = (*this)["z"]->evaluate(*this);
         float z = dynamic_cast<ExpressionNumber *>(z_value.GetPointer())->toReal();
 
-        Co<Expression> fracture_value = (*this)["fracture"]->evaluate(*this);
-        ExpressionNumber *fracture_number = dynamic_cast<ExpressionNumber *>(fracture_value.GetPointer());
-        float fracture = fracture_number->toReal();
-        line->Fracture(fracture);
+        /* Co<Expression> fracture_value = (*this)["fracture"]->evaluate(*this); */
+        /* ExpressionNumber *fracture_number = dynamic_cast<ExpressionNumber *>(fracture_value.GetPointer()); */
+        /* float fracture = fracture_number->toReal(); */
+        /* line->Fracture(fracture); */
 
         Co<Expression> degrees_expr = (*this)["degrees"]->evaluate(*this);
         ExpressionNumber *degrees_number = dynamic_cast<ExpressionNumber *>(degrees_expr.GetPointer());
