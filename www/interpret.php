@@ -31,7 +31,7 @@ $shading_mode = $in['shadingMode'];
 
 // Execute the interpreter and collect its output.
 $lines = array();
-exec("./merp --timeout 45 --shading $shading_mode -o $out_path --geometry $mode $in_path 2>&1", $lines, $back['exit_status']);
+exec("./forn 15 ./merp --timeout 10 --shading $shading_mode -o $out_path --geometry $mode $in_path 2>&1", $lines, $back['exit_status']);
 foreach ($lines as $line) {
   error_log("lineline: $line");
 }
