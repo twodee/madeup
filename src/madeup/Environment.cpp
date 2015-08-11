@@ -110,6 +110,10 @@ void Environment::prime() {
   add("axisz", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisz", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
   add(".energy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("energy", Co<Expression>(new ExpressionReal(100.0f)))), Environment())));
   add(".halflife", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("halflife", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
+  add("x", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("x", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
+  add("y", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("y", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
+  add("z", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("z", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
+  add("flip", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("flip", Co<Expression>(new ExpressionBoolean(false)))), Environment())));
 
   globals->add(".outerRadius", (*this)[".outerRadius"]);
   globals->add(".innerRadius", (*this)[".innerRadius"]);
@@ -124,6 +128,10 @@ void Environment::prime() {
   globals->add("axisz", (*this)["axisz"]);
   globals->add(".energy", (*this)[".energy"]);
   globals->add(".halflife", (*this)[".halflife"]);
+  globals->add("x", (*this)["x"]);
+  globals->add("y", (*this)["y"]);
+  globals->add("z", (*this)["z"]);
+  globals->add("flip", (*this)["flip"]);
 
   Co<ExpressionDefine> define_sine(new ExpressionDefine("sin", Co<Expression>(new ExpressionSine())));
   define_sine->addFormal("degrees");
@@ -246,6 +254,7 @@ void Environment::prime() {
   define_tube->addFormal("maxBend");
 
   Co<ExpressionDefine> define_polygon(new ExpressionDefine("polygon", Co<Expression>(new ExpressionPolygon())));
+  define_polygon->addFormal("flip");
 
   Co<ExpressionDefine> define_dot(new ExpressionDefine("dot", Co<Expression>(new ExpressionDot())));
 
@@ -456,8 +465,9 @@ void Environment::recordPreview() {
 /* ------------------------------------------------------------------------- */
 
 void Environment::move(float distance) {
-  QVector3<float> offset(xforms.top() * QVector4<float>(turtle.camera.GetTo() * distance, 0.0f));
-  turtle.position += offset;
+  /* QVector3<float> offset(xforms.top() * QVector4<float>(turtle.camera.GetTo() * distance, 0.0f)); */
+  QVector3<float> offset(QVector4<float>(turtle.camera.GetTo() * distance, 0.0f));
+  turtle.position += xforms.top() * offset;
   // DON'T DO THIS. Move is a relative command. We want to transform the offset.
   /* turtle.position = xforms.top() * turtle.position; */
   recordVertex();
@@ -617,7 +627,7 @@ void Environment::pop() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::polygon() {
+void Environment::polygon(bool is_flipped) {
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() > 0) {
       QVector3<float> diff = run[0].position - run[run.size() - 1].position;
@@ -634,6 +644,9 @@ void Environment::polygon() {
       }
 
       Trimesh *trimesh = line->Triangulate();
+      if (is_flipped) {
+        trimesh->ReverseWinding();
+      }
       *trimesh *= xforms.top();
       *shapes += *trimesh;
     }

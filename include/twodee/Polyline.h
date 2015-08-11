@@ -756,7 +756,7 @@ bool Polyline<T>::IsCounterclockwise() const {
   for (int i = 0; i < nvertices; ++i) {
     QVector2<T> a((*this)(i));
     QVector2<T> b((*this)((i + 1) % nvertices));
-    signed_area += (b[0] - a[0]) * (b[1] + b[1]);
+    signed_area += (b[0] - a[0]) * (b[1] + a[1]);
   }
   
   return signed_area < 0;
@@ -846,8 +846,7 @@ Trimesh *Polyline<T>::Triangulate() const {
   // A negative signed area means the vertices are enumerated in clockwise
   // order in the Cartesian coordinate system with the origin at (0, 0) and
   // they y-axis pointing up.
-  bool is_reversed = !flattened->IsCounterclockwise();
-  if (is_reversed) {
+  if (!flattened->IsCounterclockwise()) {
     std::reverse(remaining.begin(), remaining.end());
   }
 

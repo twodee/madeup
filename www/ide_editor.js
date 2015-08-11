@@ -1,7 +1,10 @@
 var textEditor = ace.edit("textEditor");
 textEditor.$blockScrolling = Infinity;
 var Range = ace.require('ace/range').Range;
+
+// Creates an undo manager implicitly.
+textEditor.setSession(ace.createEditSession('', 'ace/mode/madeup'));
+
 textEditor.setTheme("ace/theme/twilight");
-textEditor.getSession().setMode("ace/mode/madeup");
 textEditor.setHighlightSelectedWord(false);
 textEditor.setHighlightActiveLine(false);

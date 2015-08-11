@@ -71,7 +71,7 @@ class Environment {
     void roll(float degrees);
     void dowel(float twist, float max_bend);
     void tube(float twist, float max_bend);
-    void polygon();
+    void polygon(bool is_flipped);
     void revolve();
     Co<Trimesh> extrude(const QVector3<float> &axis, float length);
     void dot();

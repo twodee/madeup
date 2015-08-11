@@ -540,7 +540,7 @@ $(document).ready(function() {
     var list = '';
     for (var mup in window.localStorage) {
       if (mup != 'untitled') {
-        list += '<a href="#" class="fileLink" onclick="load(\'' + mup + '\')">- ' + mup + '</a><br/>';
+        list += '<a href="#" class="fileLink" onclick="load(\'' + mup.replace(/'/g, '\\&#39;').replace(/"/g, '\\&quot;') + '\')">- ' + mup + '</a><br/>';
       }
     }
     $('#mups').html(list);
@@ -638,6 +638,8 @@ function schedulePreview() {
 }
 
 function load(mup) {
+  console.log('new mup: ' + mup);
+
   hideMenus();
   save();
   mupName = mup;
@@ -648,12 +650,13 @@ function load(mup) {
   render();
 
   var source = window.localStorage.getItem(mup);
-  textEditor.setValue(source, -1);
+  textEditor.session.setValue(source, -1);
   updateTitle();
 }
 
 function save() {
   if (mupName != null) {
+    console.log('saving ' + mupName);
     window.localStorage.setItem(mupName, getSource());
   }
 }
