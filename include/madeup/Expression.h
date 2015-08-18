@@ -33,6 +33,7 @@ class Expression {
     const std::string &getSource() const;
     const SourceLocation &getSourceLocation() const;
     void setSource(const std::string &source, const SourceLocation &location);
+    virtual void predeclare(Environment &env) const;
 
     static Co<Expression> parse(const std::string &s);
 

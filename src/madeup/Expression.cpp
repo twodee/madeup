@@ -71,6 +71,12 @@ const SourceLocation &Expression::getSourceLocation() const {
 
 /* ------------------------------------------------------------------------- */
 
+void Expression::predeclare(Environment &env) const {
+  // Nop. Only function definitions get predeclared.
+}
+
+/* ------------------------------------------------------------------------- */
+
 ostream &operator<<(ostream &out, const Co<Expression> e) {
   e->write(out);
   return out;

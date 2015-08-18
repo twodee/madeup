@@ -76,12 +76,21 @@ unsigned int ExpressionDefine::getArity() const {
 Co<Expression> ExpressionDefine::evaluate(Environment &env) const {
   Co<ExpressionDefine> define = Co<ExpressionDefine>(new ExpressionDefine(name, body, formals));
   Co<ExpressionClosure> closure(new ExpressionClosure(define, env));
+
+  // For a function to be recursive and self-aware, it needs to be available in
+  // its own environment. We update the environment first and then give the
+  // expanded environment to the function's closure.
   if (!env.isBound(name)) {
     env.add(name, closure);
     closure->setEnvironment(env);
-  } else {
+  }
+
+  // If this function had a previous definition, it will already know about
+  // itself. We just update the entry.
+  else {
     env.add(name, closure);
   }
+
   return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
@@ -112,6 +121,16 @@ void ExpressionDefine::isDynamicallyScoped(bool enable) {
 
 bool ExpressionDefine::isDynamicallyScoped() const {
   return is_dynamically_scoped;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void ExpressionDefine::predeclare(Environment &env) const {
+  if (!env.isBound(name)) {
+    Co<ExpressionDefine> define = Co<ExpressionDefine>(new ExpressionDefine(name, ExpressionUnit::getSingleton()));
+    Co<ExpressionClosure> closure(new ExpressionClosure(define));
+    env.add(name, closure);
+  }
 }
 
 /* ------------------------------------------------------------------------- */

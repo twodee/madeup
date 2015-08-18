@@ -146,9 +146,7 @@ Co<Expression> ExpressionArrayLength::evaluate(Environment &env) const {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionArrayLength::write(ostream &out) const {
-  out << "(length ";
-  array_expression->write(out);
-  out << ")";
+  out << "(length array)";
 }
 
 /* ------------------------------------------------------------------------- */

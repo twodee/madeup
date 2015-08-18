@@ -1122,9 +1122,7 @@ std::ostream &operator<<(std::ostream &out, const Environment env) {
   for (map<string, Co<ExpressionClosure> >::const_iterator i = env.id_to_expression.begin();
        i != env.id_to_expression.end();
        ++i) {
-    out << "i->first: " << i->first << std::endl;
-    out << "i->second: " << i->second << std::endl;
-    out << "" << std::endl;
+    out << i->first << " -> " << i->second << std::endl;
   }
 
   return out;

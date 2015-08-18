@@ -1,4 +1,5 @@
 #include "madeup/ExpressionBlock.h"
+#include "madeup/ExpressionClosure.h"
 #include "madeup/ExpressionUnit.h"
 
 using std::vector;
@@ -21,6 +22,10 @@ void ExpressionBlock::append(Co<Expression> element) {
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionBlock::evaluate(Environment &env) const {
+  for (vector<Co<Expression> >::const_iterator i = statements.begin(); i != statements.end(); ++i) {
+    (*i)->predeclare(env);
+  }
+
   Co<Expression> value(ExpressionUnit::getSingleton());
   for (vector<Co<Expression> >::const_iterator i = statements.begin(); i != statements.end(); ++i) {
     value = (*i)->evaluate(env);
@@ -31,8 +36,6 @@ Co<Expression> ExpressionBlock::evaluate(Environment &env) const {
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionBlock::operator[](size_t i) {
-  /* throw 5; */
-  /* std::cout << "i: " << i << std::endl; */
   assert(0 <= i && i < statements.size());
   return statements[i];
 }

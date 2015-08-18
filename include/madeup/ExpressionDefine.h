@@ -46,6 +46,7 @@ class ExpressionDefine : public Expression {
     void isDynamicallyScoped(bool enable);
     bool isDynamicallyScoped() const;
     const std::string &getName() const { return name; }
+    void predeclare(Environment &env) const;
 
   private:
     std::string name;
