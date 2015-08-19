@@ -1,0 +1,3 @@
+to double x = times 2, x
+to times a b = a * b
+print 10 == double 5

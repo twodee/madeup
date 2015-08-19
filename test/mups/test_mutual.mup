@@ -1,0 +1,17 @@
+to f i
+  if i >= 3
+    g i - 1
+  else
+    print i
+  end 
+end
+
+to g i
+  if i >= 3
+    f i - 1
+  else
+    print i
+  end 
+end
+
+f 3 

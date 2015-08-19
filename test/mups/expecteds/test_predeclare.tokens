@@ -1,0 +1,25 @@
+1(0-1) TO: to
+1(3-8) ID: double
+1(10-10) ID: x
+1(12-12) ASSIGN: =
+1(14-18) ID: times
+1(20-20) INTEGER: 2
+1(21-21) COMMA: ,
+1(23-23) ID: x
+1(24-24) NEWLINE: \n
+2(25-26) TO: to
+2(28-32) ID: times
+2(34-34) ID: a
+2(36-36) ID: b
+2(38-38) ASSIGN: =
+2(40-40) ID: a
+2(42-42) TIMES: *
+2(44-44) ID: b
+2(45-45) NEWLINE: \n
+3(46-50) ID: print
+3(52-53) INTEGER: 10
+3(55-56) EQUAL_TO: ==
+3(58-63) ID: double
+3(65-65) INTEGER: 5
+3(66-66) NEWLINE: \n
+4(67-67) END_OF_FILE: END OF FILE

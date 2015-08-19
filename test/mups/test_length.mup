@@ -1,6 +1,6 @@
-length = 10
-nums = length of 3
-print nums.length
-for i to nums.length
+n = 10
+nums = n of 3
+print length nums
+for i to length nums
   print nums[i]
 end

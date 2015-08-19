@@ -1,0 +1,1 @@
+(block (define f i (block (if (>= (call-with-names i) (INTEGER 3)) (block (call g (- (call i) (INTEGER 1)))) (block (call print (call-with-names i)))))) (define g i (block (if (>= (call-with-names i) (INTEGER 3)) (block (call f (- (call i) (INTEGER 1)))) (block (call print (call-with-names i)))))) (call f (INTEGER 3)))

@@ -1,0 +1,4 @@
+b = 5
+to a = b
+to b = 4
+print a == 4
