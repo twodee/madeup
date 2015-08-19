@@ -12,6 +12,32 @@ THREE.Object3D.prototype.clear = function() {
   }
 }
 
+function generateDownloadable(filename, text) {
+  var link = document.createElement('a');
+  link.setAttribute('download', filename);
+  link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+
+  if (document.createEvent) {
+    var event = document.createEvent('MouseEvents');
+    event.initEvent('click', true, true);
+    link.dispatchEvent(event);
+  } else {
+    link.click();
+  }
+}
+
+function yyyymmdd() {
+  var now = new Date();
+  var year = now.getFullYear();
+  var month = now.getMonth() + 1;
+  var day = now.getDate();
+
+  day = (day < 10 ? "0" : "") + day;
+  month = (month < 10 ? "0" : "") + month;
+
+  return year + '_' + month + '_' + day;
+}
+
 var swatch = null;
 var initialized = false;
 var mupName = null;
@@ -581,6 +607,20 @@ $(document).ready(function() {
       save();
       updateTitle();
     }
+  });
+
+  $('#archiveAll').click(function() {
+    hideMenus();
+
+    var s = '';
+    for (var mup in window.localStorage) {
+      if (mup != 'untitled') {
+        s += mup + ": |\n";
+        s += window.localStorage.getItem(mup).replace(/^/gm, '  ') + "\n";
+      }
+    }
+
+    generateDownloadable('mups_archive_' + yyyymmdd() + '.yaml', s);
   });
 
   $('#fileClose').click(function() {

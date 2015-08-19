@@ -140,6 +140,8 @@
       <a href="#" id="fileSaveAs" class="fileLink">Save As</a><br/>
       <a href="#" id="fileClose" class="fileLink">Close</a><br/>
       <p></p> 
+      <a href="#" id="archiveAll" class="fileLink">Archive All</a><br/>
+      <p></p> 
       <a href="#" id="fileDelete" class="fileLink">Delete</a><br/>
       <p></p> 
       <span id="mups"></span>
