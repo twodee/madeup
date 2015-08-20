@@ -27,7 +27,7 @@ Co<Expression> ExpressionArray::evaluate(Environment &env) const {
 
 /* ------------------------------------------------------------------------- */
 
-int ExpressionArray::getLength() {
+int ExpressionArray::getSize() {
   return nelements;
 }
 
@@ -121,13 +121,13 @@ void ExpressionArrayConstructor::write(ostream &out) const {
 
 /* ------------------------------------------------------------------------- */
 
-ExpressionArrayLength::ExpressionArrayLength() :
+ExpressionArraySize::ExpressionArraySize() :
   Expression() {
 }
 
 /* ------------------------------------------------------------------------- */
 
-Co<Expression> ExpressionArrayLength::evaluate(Environment &env) const {
+Co<Expression> ExpressionArraySize::evaluate(Environment &env) const {
   Co<ExpressionClosure> array_closure = env["array"];
   if (array_closure.IsNull()) {
     throw MessagedException(getSourceLocation().toAnchor() + ": I expect function length to be given a value named array. No value named array is defined.");
@@ -140,12 +140,12 @@ Co<Expression> ExpressionArrayLength::evaluate(Environment &env) const {
     throw MessagedException(array_expression->getSourceLocation().toAnchor() + ": I expect function length to be applied to an array. " + array_expression->getSource() + " is not an array.");
   }
 
-  return Co<Expression>(new ExpressionInteger(array->GetArray()->getLength()));
+  return Co<Expression>(new ExpressionInteger(array->GetArray()->getSize()));
 }
 
 /* ------------------------------------------------------------------------- */
 
-void ExpressionArrayLength::write(ostream &out) const {
+void ExpressionArraySize::write(ostream &out) const {
   out << "(length array)";
 }
 
@@ -179,15 +179,15 @@ Co<ExpressionInteger> ExpressionArraySubscript::evaluateIndex(Environment &env, 
   }
 
   if (index->toInteger() < 0) {
-    index->setInteger(index->toInteger() + array->GetArray()->getLength());
+    index->setInteger(index->toInteger() + array->GetArray()->getSize());
   }
 
-  if (index->toInteger() < 0 || index->toInteger() >= array->GetArray()->getLength()) {
+  if (index->toInteger() < 0 || index->toInteger() >= array->GetArray()->getSize()) {
     std::stringstream ss;
     ss << index_expression->getSourceLocation().toAnchor();
     ss << ": Operator [] expects a valid index. The array has ";
-    ss << array->GetArray()->getLength();
-    ss << " elements, indexed 0 through " << (array->GetArray()->getLength() - 1) << ". " << index_expression->getSource() << " is not a valid index.";
+    ss << array->GetArray()->getSize();
+    ss << " elements, indexed 0 through " << (array->GetArray()->getSize() - 1) << ". " << index_expression->getSource() << " is not a valid index.";
     throw MessagedException(ss.str());
   }
 

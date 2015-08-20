@@ -13,7 +13,7 @@ class ExpressionArray : public Expression {
     ExpressionArray(int nelements, Co<Expression> fill);
 
     Co<Expression> evaluate(Environment &env) const;
-    int getLength();
+    int getSize();
     Co<Expression> operator[](int i);
     void setElement(int i, Co<Expression> expr);
     void write(ostream &out) const;
@@ -53,9 +53,9 @@ class ExpressionArrayConstructor : public Expression {
 
 /* ------------------------------------------------------------------------- */
 
-class ExpressionArrayLength : public Expression {
+class ExpressionArraySize : public Expression {
   public:
-    ExpressionArrayLength();
+    ExpressionArraySize();
 
     Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;

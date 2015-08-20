@@ -139,8 +139,8 @@ void Environment::prime() {
   Co<ExpressionDefine> define_cosine(new ExpressionDefine("cos", Co<Expression>(new ExpressionCosine())));
   define_cosine->addFormal("degrees");
 
-  Co<ExpressionDefine> define_length(new ExpressionDefine("length", Co<Expression>(new ExpressionArrayLength())));
-  define_length->addFormal("array");
+  Co<ExpressionDefine> define_size(new ExpressionDefine("size", Co<Expression>(new ExpressionArraySize())));
+  define_size->addFormal("array");
 
   Co<ExpressionDefine> define_log(new ExpressionDefine("log", Co<Expression>(new ExpressionLog())));
   define_log->addFormal("base");
@@ -276,7 +276,7 @@ void Environment::prime() {
 
   add("sin", Co<ExpressionClosure>(new ExpressionClosure(define_sine, globals)));
   add("cos", Co<ExpressionClosure>(new ExpressionClosure(define_cosine, globals)));
-  add("length", Co<ExpressionClosure>(new ExpressionClosure(define_length, globals)));
+  add("size", Co<ExpressionClosure>(new ExpressionClosure(define_size, globals)));
   add("log", Co<ExpressionClosure>(new ExpressionClosure(define_log, globals)));
   add("tan", Co<ExpressionClosure>(new ExpressionClosure(define_tangent, globals)));
   add("asin", Co<ExpressionClosure>(new ExpressionClosure(define_inverse_sine, globals)));
@@ -362,7 +362,7 @@ void Environment::prime() {
   globals->add("tan", (*this)["tan"]);
   globals->add("log", (*this)["log"]);
   globals->add("cos", (*this)["cos"]);
-  globals->add("length", (*this)["length"]);
+  globals->add("size", (*this)["size"]);
   globals->add("sin", (*this)["sin"]);
   globals->add("extrude", (*this)["extrude"]);
   globals->add("forget", (*this)["forget"]);
