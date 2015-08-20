@@ -15,11 +15,6 @@ ExpressionExtrude::ExpressionExtrude() :
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionExtrude::evaluate(Environment &env) const {
-  /* float length = env.GetVariableAsFloat("length"); */
-  /* float x = env.GetVariableAsFloat("x"); */
-  /* float y = env.GetVariableAsFloat("y"); */
-  /* float z = env.GetVariableAsFloat("z"); */
-
   Co<ExpressionClosure> closure = env["length"];
   if (closure.IsNull()) {
     throw MessagedException(getSourceLocation().toAnchor() + ": Function extrude expects a value named length. No value named length is defined.");

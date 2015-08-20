@@ -1,3 +1,4 @@
+#include "madeup/ExpressionMesh.h"
 #include "madeup/ExpressionRevolve.h"
 #include "madeup/ExpressionUnit.h"
 
@@ -12,8 +13,8 @@ ExpressionRevolve::ExpressionRevolve() :
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionRevolve::evaluate(Environment &env) const {
-  env.revolve();
-  return Co<Expression>(ExpressionUnit::getSingleton());
+  Co<Trimesh> trimesh = env.revolve();
+  return Co<Expression>(new ExpressionMesh(trimesh));
 }
 
 /* ------------------------------------------------------------------------- */

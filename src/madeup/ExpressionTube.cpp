@@ -1,7 +1,8 @@
 #include "madeup/ExpressionBoolean.h"
 #include "madeup/ExpressionClosure.h"
-#include "madeup/ExpressionTube.h"
+#include "madeup/ExpressionMesh.h"
 #include "madeup/ExpressionNumber.h"
+#include "madeup/ExpressionTube.h"
 #include "madeup/ExpressionUnit.h"
 
 namespace madeup {
@@ -42,8 +43,8 @@ Co<Expression> ExpressionTube::evaluate(Environment &env) const {
   float max_bend = max_bend_number->toReal();
 
   // Emit dowel.
-  env.tube(twist, max_bend);
-  return Co<Expression>(ExpressionUnit::getSingleton());
+  Co<Trimesh> trimesh = env.tube(twist, max_bend);
+  return Co<Expression>(new ExpressionMesh(trimesh));
 }
 
 /* ------------------------------------------------------------------------- */

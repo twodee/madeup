@@ -1,4 +1,5 @@
 #include "madeup/ExpressionBox.h"
+#include "madeup/ExpressionMesh.h"
 #include "madeup/ExpressionUnit.h"
 
 namespace madeup {
@@ -12,8 +13,8 @@ ExpressionBox::ExpressionBox() :
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionBox::evaluate(Environment &env) const {
-  env.box();
-  return Co<Expression>(ExpressionUnit::getSingleton());
+  Co<Trimesh> trimesh = env.box();
+  return Co<Expression>(new ExpressionMesh(trimesh));
 }
 
 /* ------------------------------------------------------------------------- */

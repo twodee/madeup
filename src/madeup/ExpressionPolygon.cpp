@@ -1,5 +1,6 @@
 #include "madeup/ExpressionBoolean.h"
 #include "madeup/ExpressionClosure.h"
+#include "madeup/ExpressionMesh.h"
 #include "madeup/ExpressionPolygon.h"
 #include "madeup/ExpressionUnit.h"
 
@@ -26,8 +27,8 @@ Co<Expression> ExpressionPolygon::evaluate(Environment &env) const {
   }
   bool is_flipped = is_flipped_boolean->toBoolean();
 
-  env.polygon(is_flipped);
-  return Co<Expression>(ExpressionUnit::getSingleton());
+  Co<Trimesh> trimesh = env.polygon(is_flipped);
+  return Co<Expression>(new ExpressionMesh(trimesh));
 }
 
 /* ------------------------------------------------------------------------- */

@@ -627,7 +627,9 @@ void Environment::pop() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::polygon(bool is_flipped) {
+Co<Trimesh> Environment::polygon(bool is_flipped) {
+  Co<Trimesh> trimesh(new Trimesh(0, 0));
+  
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() > 0) {
       QVector3<float> diff = run[0].position - run[run.size() - 1].position;
@@ -643,7 +645,7 @@ void Environment::polygon(bool is_flipped) {
         (*line)(i)[2] = run[i].position[2];
       }
 
-      Trimesh *trimesh = line->Triangulate();
+      trimesh = Co<Trimesh>(line->Triangulate());
       if (is_flipped) {
         trimesh->ReverseWinding();
       }
@@ -654,11 +656,15 @@ void Environment::polygon(bool is_flipped) {
 
   paths.push_back(vector<Turtle>());
   run.clear();
+
+  return trimesh;
 }
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::dowel(float twist, float max_bend) {
+Co<Trimesh> Environment::dowel(float twist, float max_bend) {
+  Co<Trimesh> trimesh(new Trimesh(0, 0));
+
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() >= 2) {
       QVector3<float> diff = run[0].position - run[run.size() - 1].position;
@@ -695,27 +701,28 @@ void Environment::dowel(float twist, float max_bend) {
         Co<Expression> nsides_value = (*this)["nsides"]->evaluate(*this);
         int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->toInteger();
 
-        Trimesh *trimesh = line->Dowel(nsides, radius, true, twist, max_bend);
+        trimesh = Co<Trimesh>(line->Dowel(nsides, radius, true, twist, max_bend));
         *trimesh *= xforms.top();
 
         delete line;
         line = NULL;
 
         *shapes += *trimesh;
-
-        delete trimesh;
-        trimesh = NULL;
       }
     }
   }
 
   paths.push_back(vector<Turtle>());
   run.clear();
+
+  return trimesh;
 }
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::tube(float twist, float max_bend) {
+Co<Trimesh> Environment::tube(float twist, float max_bend) {
+  Co<Trimesh> trimesh(new Trimesh(0, 0));
+
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() >= 2) {
       QVector3<float> diff = run[0].position - run[run.size() - 1].position;
@@ -752,7 +759,7 @@ void Environment::tube(float twist, float max_bend) {
         Co<Expression> nsides_value = (*this)["nsides"]->evaluate(*this);
         int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->toInteger();
 
-        Trimesh *trimesh = line->Dowel(nsides, radius, false, twist, max_bend);
+        trimesh = Co<Trimesh>(line->Dowel(nsides, radius, false, twist, max_bend));
         *trimesh *= xforms.top();
 
         delete line;
@@ -846,20 +853,21 @@ void Environment::tube(float twist, float max_bend) {
         }
 
         *shapes += *trimesh;
-
-        delete trimesh;
-        trimesh = NULL;
       }
     }
   }
 
   paths.push_back(vector<Turtle>());
   run.clear();
+
+  return trimesh;
 }
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::revolve() {
+Co<Trimesh> Environment::revolve() {
+  Co<Trimesh> trimesh(new Trimesh(0, 0));
+
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() >= 2) {
       QVector3<float> diff = run[0].position - run[run.size() - 1].position;
@@ -903,7 +911,7 @@ void Environment::revolve() {
         ExpressionNumber *degrees_number = dynamic_cast<ExpressionNumber *>(degrees_expr.GetPointer());
         float degrees = degrees_number->toReal();
 
-        Trimesh *trimesh = line->Revolve(QVector3<float>(x, y, z), nsides, degrees);
+        trimesh = Co<Trimesh>(line->Revolve(QVector3<float>(x, y, z), nsides, degrees));
         *trimesh *= xforms.top();
         *shapes += *trimesh;
       }
@@ -912,6 +920,8 @@ void Environment::revolve() {
 
   paths.push_back(vector<Turtle>());
   run.clear();
+
+  return trimesh;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -947,46 +957,54 @@ Co<Trimesh> Environment::extrude(const QVector3<float> &axis, float length) {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::dot() {
+Co<Trimesh> Environment::dot() {
+  Co<Trimesh> trimesh(new Trimesh(0, 0));
+
   if (geometry_mode == GeometryMode::SURFACE) {
     Co<Expression> nsides_value = (*this)["nsides"]->evaluate(*this);
     int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->toInteger();
 
     for (unsigned int i = 0; i < run.size(); ++i) {
-      Trimesh *trimesh = Trimesh::GetSphere(nsides, nsides / 2, run[i].outer_radius);
+      trimesh = Co<Trimesh>(Trimesh::GetSphere(nsides, nsides / 2, run[i].outer_radius));
 
       *trimesh *= xforms.top();
       *trimesh += run[i].position;
       *shapes += *trimesh;
-      delete trimesh;
     }
   }
 
   paths.push_back(vector<Turtle>());
   run.clear();
+
+  return trimesh;
 }
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::box() {
+Co<Trimesh> Environment::box() {
+  Co<Trimesh> trimesh(new Trimesh(0, 0));
+
   if (geometry_mode == GeometryMode::SURFACE) {
     for (unsigned int i = 0; i < run.size(); ++i) {
-      Trimesh *trimesh = Trimesh::GetBox(run[i].outer_radius);
+      trimesh = Co<Trimesh>(Trimesh::GetBox(run[i].outer_radius));
 
       *trimesh *= xforms.top();
       *trimesh += run[i].position;
       *shapes += *trimesh;
-      delete trimesh;
     }
   }
 
   paths.push_back(vector<Turtle>());
   run.clear();
+
+  return trimesh;
 }
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::blobs(float grain, float iso) {
+Co<Trimesh> Environment::blobs(float grain, float iso) {
+  Co<Trimesh> trimesh(new Trimesh(0, 0));
+
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() > 0) {
 
@@ -1055,7 +1073,7 @@ void Environment::blobs(float grain, float iso) {
       int ntriangles;
       float *positions;
       field.GetIsocontour(iso, ntriangles, positions);
-      Trimesh *trimesh = new Trimesh(ntriangles, positions);
+      trimesh = Co<Trimesh>(new Trimesh(ntriangles, positions));
       *shapes += *trimesh;
       *trimesh += min;
       *trimesh *= xforms.top();
@@ -1066,11 +1084,15 @@ void Environment::blobs(float grain, float iso) {
 
   paths.push_back(vector<Turtle>());
   run.clear();
+
+  return trimesh;
 }
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::surface(int width, int height) {
+Co<Trimesh> Environment::surface(int width, int height) {
+  Co<Trimesh> trimesh(new Trimesh(0, 0));
+
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() != (unsigned int) (width * height)) {
       std::stringstream ss;
@@ -1089,13 +1111,15 @@ void Environment::surface(int width, int height) {
       ++i;
     }
 
-    Trimesh *trimesh = Trimesh::GetParametric(grid);
+    trimesh = Co<Trimesh>(Trimesh::GetParametric(grid));
     *trimesh *= xforms.top();
     *shapes += *trimesh;
   }
 
   paths.push_back(vector<Turtle>());
   run.clear();
+
+  return trimesh;
 }
 
 /* ------------------------------------------------------------------------- */

@@ -1,5 +1,6 @@
 #include "madeup/ExpressionClosure.h"
 #include "madeup/ExpressionInteger.h"
+#include "madeup/ExpressionMesh.h"
 #include "madeup/ExpressionSurface.h"
 #include "madeup/ExpressionUnit.h"
 #include "twodee/MessagedException.h"
@@ -38,9 +39,8 @@ Co<Expression> ExpressionSurface::evaluate(Environment &env) const {
   int iwidth = viwidth->toInteger();
   int iheight = viheight->toInteger();
 
-  env.surface(iwidth, iheight);
-
-  return Co<Expression>(ExpressionUnit::getSingleton());
+  Co<Trimesh> trimesh = env.surface(iwidth, iheight);
+  return Co<Expression>(new ExpressionMesh(trimesh));
 }
 
 /* ------------------------------------------------------------------------- */

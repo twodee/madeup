@@ -1,5 +1,6 @@
 #include "madeup/ExpressionBlobs.h"
 #include "madeup/ExpressionClosure.h"
+#include "madeup/ExpressionMesh.h"
 #include "madeup/ExpressionNumber.h"
 #include "madeup/ExpressionUnit.h"
 
@@ -37,9 +38,8 @@ Co<Expression> ExpressionBlobs::evaluate(Environment &env) const {
   }
   float iso = number->toReal();
 
-  env.blobs(grain, iso);
-
-  return Co<Expression>(ExpressionUnit::getSingleton());
+  Co<Trimesh> trimesh = env.blobs(grain, iso);
+  return Co<Expression>(new ExpressionMesh(trimesh));
 }
 
 /* ------------------------------------------------------------------------- */

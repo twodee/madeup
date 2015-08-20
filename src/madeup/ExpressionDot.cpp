@@ -1,4 +1,5 @@
 #include "madeup/ExpressionDot.h"
+#include "madeup/ExpressionMesh.h"
 #include "madeup/ExpressionUnit.h"
 
 namespace madeup {
@@ -12,8 +13,8 @@ ExpressionDot::ExpressionDot() :
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionDot::evaluate(Environment &env) const {
-  env.dot();
-  return Co<Expression>(ExpressionUnit::getSingleton());
+  Co<Trimesh> trimesh = env.dot();
+  return Co<Expression>(new ExpressionMesh(trimesh));
 }
 
 /* ------------------------------------------------------------------------- */
