@@ -23,7 +23,9 @@ THREE.Object3D.prototype.clear = function() {
 
 function populateFileMenu() {
   var list = '';
-  for (var mup in window.localStorage) {
+  var mups = Object.keys(window.localStorage).sort();
+  for (var i = 0; i < mups.length; ++i) {
+    var mup = mups[i];
     if (mup != 'untitled') {
       list += '<a href="#" class="fileLink" onclick="load(\'' + mup.replace(/'/g, '\\&#39;').replace(/"/g, '\\&quot;') + '\')">- ' + mup + '</a><br/>';
     }
@@ -734,7 +736,6 @@ function load(mup) {
   if (renderer) render();
 
   var file = JSON.parse(window.localStorage.getItem(mup));
-  console.log(file);
   textEditor.session.setValue(file.source, -1);
   // TODO toggle modes
   updateTitle();
