@@ -1,3 +1,12 @@
+function hasWebGL() {
+  try {
+    var canvas = document.createElement("canvas");
+    return !!window.WebGLRenderingContext && (canvas.getContext("webgl") || canvas.getContext("experimental-webgl"));
+  } catch(e) { 
+    return false;
+  } 
+}
+
 var GeometryMode = Object.freeze({
   PATH: 'PATH',
   SURFACE: 'SURFACE'
@@ -10,6 +19,16 @@ THREE.Object3D.prototype.clear = function() {
     child.clear();
     this.remove(child);
   }
+}
+
+function populateFileMenu() {
+  var list = '';
+  for (var mup in window.localStorage) {
+    if (mup != 'untitled') {
+      list += '<a href="#" class="fileLink" onclick="load(\'' + mup.replace(/'/g, '\\&#39;').replace(/"/g, '\\&quot;') + '\')">- ' + mup + '</a><br/>';
+    }
+  }
+  $('#mups').html(list);
 }
 
 function generateDownloadable(filename, text) {
@@ -185,23 +204,11 @@ $(document).ready(function() {
       showClockwise = parseInt(Cookies.get('showClockwise')) != 0;
     }
     $('#showClockwise').prop('checked', showClockwise);
-    updateCulling();
 
     if (Cookies.get('modelColor')) {
       modelColor = Cookies.get('modelColor');
     }
     $('#modelColor').css('background-color', '#' + modelColor);
-
-    swatch = $('#modelColor').ColorPicker({
-      flat: false,
-      color: modelColor,
-      onSubmit: function(hsb, hex, rgb) {
-        modelColor = hex;
-        isModelColorChanged = true;
-        $('#modelColor').css('background-color', '#' + modelColor);
-        run(GeometryMode.SURFACE);
-      }
-    });
 
     if (Cookies.get('showWireframe')) {
       showWireframe = parseInt(Cookies.get('showWireframe')) != 0;
@@ -230,48 +237,6 @@ $(document).ready(function() {
     }
     $('#gridExtent').val(gridExtent + '');
 
-    if (Cookies.get('axisX')) {
-      if (parseInt(Cookies.get('axisX')) != 0) {
-        $('#axisX').prop('checked', true);
-        generateAxis(0);
-      }
-    }
-
-    if (Cookies.get('axisY')) {
-      if (parseInt(Cookies.get('axisY')) != 0) {
-        $('#axisY').prop('checked', true);
-        generateAxis(1);
-      }
-    }
-
-    if (Cookies.get('axisZ')) {
-      if (parseInt(Cookies.get('axisZ')) != 0) {
-        $('#axisZ').prop('checked', true);
-        generateAxis(2);
-      }
-    }
-
-    if (Cookies.get('gridX')) {
-      if (parseInt(Cookies.get('gridX')) != 0) {
-        $('#gridX').prop('checked', true);
-        generateGrid(0);
-      }
-    }
-
-    if (Cookies.get('gridY')) {
-      if (parseInt(Cookies.get('gridY')) != 0) {
-        $('#gridY').prop('checked', true);
-        generateGrid(1);
-      }
-    }
-
-    if (Cookies.get('gridZ')) {
-      if (parseInt(Cookies.get('gridZ')) != 0) {
-        $('#gridZ').prop('checked', true);
-        generateGrid(2);
-      }
-    }
-
     if (Cookies.get('nSecondsTillPreview')) {
       nSecondsTillPreview = parseFloat(Cookies.get('nSecondsTillPreview'));
     }
@@ -288,11 +253,72 @@ $(document).ready(function() {
       schedulePreview();
     });
     schedulePreview();
-  });
 
-  $(window).unload(function() {
-    saveInCookies();
-    save();
+    // WebGL-dependent stuff.
+    if (!hasWebGL()) {
+      log('No WebGL.');
+    } else {
+      updateCulling();
+
+      swatch = $('#modelColor').ColorPicker({
+        flat: false,
+        color: modelColor,
+        onSubmit: function(hsb, hex, rgb) {
+          modelColor = hex;
+          isModelColorChanged = true;
+          $('#modelColor').css('background-color', '#' + modelColor);
+          run(GeometryMode.SURFACE);
+        }
+      });
+
+      if (Cookies.get('axisX')) {
+        if (parseInt(Cookies.get('axisX')) != 0) {
+          $('#axisX').prop('checked', true);
+          generateAxis(0);
+        }
+      }
+
+      if (Cookies.get('axisY')) {
+        if (parseInt(Cookies.get('axisY')) != 0) {
+          $('#axisY').prop('checked', true);
+          generateAxis(1);
+        }
+      }
+
+      if (Cookies.get('axisZ')) {
+        if (parseInt(Cookies.get('axisZ')) != 0) {
+          $('#axisZ').prop('checked', true);
+          generateAxis(2);
+        }
+      }
+
+      if (Cookies.get('gridX')) {
+        if (parseInt(Cookies.get('gridX')) != 0) {
+          $('#gridX').prop('checked', true);
+          generateGrid(0);
+        }
+      }
+
+      if (Cookies.get('gridY')) {
+        if (parseInt(Cookies.get('gridY')) != 0) {
+          $('#gridY').prop('checked', true);
+          generateGrid(1);
+        }
+      }
+
+      if (Cookies.get('gridZ')) {
+        if (parseInt(Cookies.get('gridZ')) != 0) {
+          $('#gridZ').prop('checked', true);
+          generateGrid(2);
+        }
+      }
+    }
+
+    // Only save cookies if they were successfully loaded.
+    $(window).unload(function() {
+      saveInCookies();
+      save();
+    });
   });
 
   $('#clear').click(function() {
@@ -563,13 +589,7 @@ $(document).ready(function() {
 
   $('#toggleFilePopup').click(function() {
     toggleMenu('#filePopup');
-    var list = '';
-    for (var mup in window.localStorage) {
-      if (mup != 'untitled') {
-        list += '<a href="#" class="fileLink" onclick="load(\'' + mup.replace(/'/g, '\\&#39;').replace(/"/g, '\\&quot;') + '\')">- ' + mup + '</a><br/>';
-      }
-    }
-    $('#mups').html(list);
+    populateFileMenu();
   });
 
   $('#toggleEditorPopup').click(function() {
@@ -609,18 +629,40 @@ $(document).ready(function() {
     }
   });
 
-  $('#archiveAll').click(function() {
+  $('#exportArchive').click(function() {
     hideMenus();
 
-    var s = '';
+    var archive = new Object;
     for (var mup in window.localStorage) {
       if (mup != 'untitled') {
-        s += mup + ": |\n";
-        s += window.localStorage.getItem(mup).replace(/^/gm, '  ') + "\n";
+        var file = JSON.parse(window.localStorage.getItem(mup));
+        archive[mup] = file;
       }
     }
 
-    generateDownloadable('mups_archive_' + yyyymmdd() + '.yaml', s);
+    generateDownloadable('mups_archive_' + yyyymmdd() + '.json', JSON.stringify(archive));
+  });
+
+  $('#importForm').hide();
+  $('#importArchive').click(function() {
+    $('#importForm').show();
+  });
+  $('#cancelImport').click(function() {
+    $('#importForm').hide();
+  });
+  $('#archive').change(function() {
+    var archive = this.files[0];
+    $('#importForm').hide();
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var mups = JSON.parse(e.target.result);
+      for (mup in mups) {
+        window.localStorage.setItem(mup, JSON.stringify(mups[mup]));
+        populateFileMenu();
+      }
+    };
+    reader.readAsText(archive);
   });
 
   $('#fileClose').click(function() {
@@ -659,8 +701,10 @@ $(document).ready(function() {
     } 
   });
 
-  init();
-  animate();
+  if (hasWebGL()) {
+    init();
+    animate();
+  }
 });
 
 var onEditorChange = function(delta) {
@@ -687,17 +731,24 @@ function load(mup) {
   for (var i = 0; i < meshes.length; ++i) {
     modelScene.remove(meshes[i]);
   }
-  render();
+  if (renderer) render();
 
-  var source = window.localStorage.getItem(mup);
-  textEditor.session.setValue(source, -1);
+  var file = JSON.parse(window.localStorage.getItem(mup));
+  console.log(file);
+  textEditor.session.setValue(file.source, -1);
+  // TODO toggle modes
   updateTitle();
 }
 
 function save() {
   if (mupName != null) {
     console.log('saving ' + mupName);
-    window.localStorage.setItem(mupName, getSource());
+    var file = {
+      'mode' : isEditorText ? 'text' : 'blocks',
+      'updated_at' : new Date().toString(),
+      'source' : getSource()
+    };
+    window.localStorage.setItem(mupName, JSON.stringify(file));
   }
 }
 
@@ -861,7 +912,7 @@ function resize() {
 
   var width = window.innerWidth - $('#left').width();
   var height = window.innerHeight;
-  renderer.setSize(width, height);
+  if (renderer) renderer.setSize(width, height);
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
   $("#textEditor").height($(document).height() - $('#menu').height() - $('#console').height());
@@ -876,9 +927,7 @@ function resize() {
   $("#blocksCanvas").width(blocklyArea.offsetWidth);
 
   textEditor.resize();
-  //if (renderer_ready) {
-    render();
-  //}
+  if (renderer) render();
 }
 
 function highlight(startIndex, stopIndex) {
@@ -928,17 +977,6 @@ function updateCulling() {
 }
 
 function init() {
-  /*
-  THREE.Camera.prototype.getWorldRight = function () {
-    var quaternion = new THREE.Quaternion();
-    return function (optionalTarget) {
-      var result = optionalTarget || new THREE.Vector3();
-      this.getWorldQuaternion(quaternion);
-      return result.set(1, 0, 0).applyQuaternion(quaternion);
-    }
-  }();
-  */
-
   camera = new THREE.PerspectiveCamera(45.0, 1.0, 0.1, 10000.0);
   camera.position.z = 30;
 
@@ -995,7 +1033,6 @@ function init() {
   camera.add(pointLight);
 
   updateCulling();
-  // render(); 
 
   window.addEventListener('resize', resize);
   initialized = true;

@@ -133,17 +133,22 @@
       <input id="toggleDisplayPopup" class="togglePopup" type="button" value="Display"/>
       <input id="toggleGridPopup" class="togglePopup" type="button" value="Grid"/>
       <input id="fit" type="button" value="Fit"/>
-      <input id="download" type="button" value="Export"/>
+      <input id="download" type="button" value="Download"/>
     </div>
 
     <div id="filePopup" class="popups">
       <a href="#" id="fileSaveAs" class="fileLink">Save As</a><br/>
       <a href="#" id="fileClose" class="fileLink">Close</a><br/>
       <p></p> 
-      <a href="#" id="archiveAll" class="fileLink">Archive All</a><br/>
+      <a href="#" id="exportArchive" class="fileLink">Export Archive</a><br/>
+      <a href="#" id="importArchive" class="fileLink">Import Archive</a><br/>
+      <form id="importForm">
+        <input type="file" id="archive"></input>
+        <a href="#" id="cancelImport" class="fileLink">Cancel Import</a>
+      </form>
       <p></p> 
       <a href="#" id="fileDelete" class="fileLink">Delete</a><br/>
-      <p></p> 
+      <hr>
       <span id="mups"></span>
     </div>
 
