@@ -56,6 +56,8 @@
 
 namespace madeup {
 
+/* ------------------------------------------------------------------------- */
+
 Turtle Environment::turtle = {
   QVector3<float>(0.0f),
   Camera(QVector3<float>(0.0f, 0.0f, 0.0f),
@@ -465,11 +467,16 @@ void Environment::recordPreview() {
 /* ------------------------------------------------------------------------- */
 
 void Environment::move(float distance) {
-  /* QVector3<float> offset(xforms.top() * QVector4<float>(turtle.camera.GetTo() * distance, 0.0f)); */
   QVector3<float> offset(QVector4<float>(turtle.camera.GetTo() * distance, 0.0f));
-  turtle.position += xforms.top() * offset;
+
+  // Do we apply the transform to the offset between our old position and 
+  // our new? No, no for the time being.
+  /* turtle.position += xforms.top() * offset; */
+  turtle.position += offset;
+
   // DON'T DO THIS. Move is a relative command. We want to transform the offset.
   /* turtle.position = xforms.top() * turtle.position; */
+
   recordVertex();
   recordPreview();
 }

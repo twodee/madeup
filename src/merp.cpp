@@ -183,6 +183,10 @@ int main(int argc, char **argv) {
           std::string command = "runx /Users/johnch/checkouts/cj_graphics/build/projects/mesher/mesher.app -m " + out_path;
           system(command.c_str());
         }
+
+        if (trimesh->GetVertexCount() == 0) {
+          std::cerr << "Uh oh. I didn't see a generator (like dots, dowel, extrude, etc.) in your code. I can't make a model without a generator." << std::endl;
+        }
       }
     }
 
