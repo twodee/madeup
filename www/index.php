@@ -119,7 +119,7 @@
 <div id="entire" style="z-index: 0">
   <div id="menu">
     <div style="display: inline-block; position: absolute: left: 0px;">
-      <input id="run" type="button" value="Run"/>
+      <input id="solidify" type="button" value="Solidify"/>
       <input id="smaller" type="button" value="-abc"/>
       <input id="bigger" type="button" value="+abc"/>
       <input id="toggleEditorPopup" class="togglePopup" type="button" value="Editor"/>

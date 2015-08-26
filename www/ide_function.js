@@ -613,7 +613,7 @@ $(document).ready(function() {
     textEditor.focus();
   });
 
-  $('#run').click(function() {
+  $('#solidify').click(function() {
     hideMenus();
     log('Running...'); 
     saveInCookies();
