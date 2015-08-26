@@ -1,4 +1,4 @@
-#Madeup
+#Madeup Language Reference
 Madeup is a programming language for generating 3D models. It is a language for makings things *up*. Its speakers use commands like `move` and `yaw` to walk through space along the cross sections or skeletons of solid models. They then use commands like `extrude` or `revolve` to generate a solid model. The models can then be printed or imported in another 3D application.
 
 Like any language, Madeup has a grammar and meaning that must be learned in order to express models. This document describes the language so that you can start making things up.
@@ -10,8 +10,6 @@ For the time being, note this important detail to understand how Madeup behaves:
 
 ###`dot`
 The `dot` command generates a sphere at each of the vertices. The number of facets on the sphere is determined by the variable `nsides`. The radius of each sphere is determined by the value of the variable `radius` at the time of the `move` or `moveto`.
-
-![Random Dots](images/random_dots.png){:.center}
 
 {:.mup}
 ~~~
@@ -29,14 +27,14 @@ nsides = 50
 dot
 ~~~
 
+![Random Dots](images/random_dots.png){:.bigimg}
+
 Printing completely round objects is a challenge for many 3D printers. You may need scaffolding material or to slice your models in half, print them flat-side-down, and glue them together.
 
 ###`box`
 The `box` command generates a rectangular prism (or right parallelipiped) at each of the vertices. The side length of each prism is twice the value of the variable `radius` at the time of the `move` or `moveto`.
 
 In the example below, we draw a pyramid of boxes recursively. All have the default `radius`.
-
-![Box Pyramid](images/box_pyramid.png){:.center}
 
 {:.mup}
 ~~~
@@ -59,10 +57,10 @@ pyramid 5
 box
 ~~~
 
+![Box Pyramid](images/box_pyramid.png){:.bigimg}
+
 ###`extrude x, y, z, length`
 The `extrude` command considers the list of vertices to trace the footprint or cross section of an object and extends that cross section along axis \[`x`, `y`, `z`\] for `length` units. The vertices are assumed all be in the same plane. Parameter `length` may be any number.
-
-![Star](images/star.png){:.center}
 
 {:.mup}
 ~~~
@@ -78,12 +76,12 @@ end
 extrude 0, 0, 1, 3
 ~~~
 
+![Star](images/star.png){:.bigimg}
+
 The path between does not need to be explicitly closed, that is, you do not need to revisit the starting vertex at the end of your path. However, it is legal to do so, as is done in the example above. If you do not revisit it explicitly, the path will be implicitly closed to avoid generating a non-solid object.
 
 ###`revolve x, y, z, degrees`
 The `revolve` command considers the list of vertices to trace the cross section of an object and spins the cross section around axis \[`x`, `y`, `z`\] for the specified number of `degrees`. The vertices are assumed all be in the same plane. Parameter `degrees` may be any number.
-
-![Revolved Thing](images/revolve_eg.png){:.center}
 
 {:.mup}
 ~~~
@@ -107,13 +105,13 @@ nsides = 10
 revolve 0, 1, 0, 270
 ~~~
 
+![Revolved Thing](images/revolve_eg.png){:.bigimg}
+
 The path between does not need to be explicitly closed, that is, you do not need to revisit the starting vertex at the end of your path. However, it is legal to do so, as is done in the example above. If you do not revisit it explicitly, two things may happen. If both the start and final vertices are on the axis of revolution, the path will remain open. Otherwise, the path will be implicitly closed to avoid generating a non-solid object.
 
 ###`polygon`
 
 The `polygon` command considers the list of vertices to trace the outline of a planar polygon.
-
-![Circle Approximation](images/polygon_eg.png){:.center}
 
 {:.mup}
 ~~~
@@ -128,12 +126,12 @@ end
 polygon
 ~~~
 
+![Circle Approximation](images/polygon_eg.png){:.bigimg}
+
 Polygons are not solid objects and are therefore not printable. However, this generator may still be useful for testing your paths before using them with more advanced generators.
 
 ###`forget`
 The `forget` command is not really a generator. Instead, it discards the list of vertices. This command can be used to temporarily disable some geometry.
-
-![Forgotten](images/forget_eg.png){:.center}
 
 {:.mup}
 ~~~
@@ -150,12 +148,12 @@ forget
 -- other independent code
 ~~~
 
+![Forgotten](images/forget_eg.png){:.bigimg}
+
 ###`surface width, height`
 The `surface` command considers the list of vertices to enumerate an `m` by `n` grid-structured mesh. The first vertex describes the mesh position at row 0, column 0. The second vertex describes the mesh position at row 0, column 1. The `n`th vertex describes the mesh position at row 1, column 0. Neighboring mesh vertices form the faces of the generated model.
 
 This generator supports the definition of 2D parametric surfaces like spheres, cones, cylinders, planes, Mobius strips, and so on. The model produced is solid only if the right column of vertices coincide with the left column, and the bottom row coincides with the top row.
-
-![Quadratic Surface](images/quadratic_surface.png){:.center}
 
 {:.mup}
 ~~~
@@ -171,9 +169,9 @@ end
 surface 100, 100
 ~~~
 
-In the example below, we see the underlying 7 by 10 grid structure of a cone. Iterator `c` visits angles 0, 60, 120, 180, 240, 300, and 360. The first and last columns coincide, so the mesh is closed horizontally.
+![Quadratic Surface](images/quadratic_surface.png){:.bigimg}
 
-![Cone](images/cone.png){:.center}
+In the example below, we see the underlying 7 by 10 grid structure of a cone. Iterator `c` visits angles 0, 60, 120, 180, 240, 300, and 360. The first and last columns coincide, so the mesh is closed horizontally.
 
 {:.mup}
 ~~~
@@ -189,6 +187,8 @@ end
 
 surface 7, 10
 ~~~
+
+![Cone](images/cone.png){:.bigimg}
 
 ##Language Reference
 Every fun thing that has ever happened started with some rules (gravitational law, oldest player rolls first, etc.), and Madeup is no exception. Let's describe the grammar of the Madeup language.

@@ -1,9 +1,9 @@
-%.html: %.md header.html footer.html Makefile tohtml
-	./tohtml $*.md > $@
+HTMLS = introduction.html reference.html
 
-README.html: README.md header.html footer.html
-	kramdown --enable-coderay --coderay-default-lang=ruby --smart-quotes "apos,apos,quot,quot" README.md > tmp.html
-	cat header.html tmp.html footer.html > README.html
+all: $(HTMLS)
+
+%.html: %.md header.html footer.html Makefile tohtml
+	./tohtml $*.md > html/$@
 
 clean:
-	rm -f README.html
+	rm -f html/*
