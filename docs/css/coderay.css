@@ -11,7 +11,6 @@ h3 {
 }
 
 .CodeRay {
-  background-color: #efefef;
   font-family: Monaco, "Courier New", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace;
   color: #000;
   margin-bottom: 14px;
@@ -19,8 +18,7 @@ h3 {
 
 .CodeRay pre {
   margin: 0px;
-  padding: 1em;
-  box-shadow: inset 0px 0px 3px 1px #999999;
+  padding: 1.5em;
 }
 
 div.CodeRay { }
@@ -46,12 +44,15 @@ table.CodeRay td {
 .CodeRay .line-numbers .highlighted { color: red }
 .CodeRay .line { display: block; float: left; width: 100%; }
 .CodeRay span.line-numbers { padding: 0px 4px }
-.CodeRay .code { width: 100% }
+.CodeRay .code {
+}
 
 ol.CodeRay { font-size: 10pt }
 ol.CodeRay li { white-space: pre }
 
-.CodeRay .code pre { overflow: auto }
+.CodeRay .code pre {
+  overflow: auto
+}
 .CodeRay .debug { color:white ! important; background:blue ! important; }
 
 .CodeRay .annotation { color:#007 }
@@ -144,20 +145,44 @@ ol.CodeRay li { white-space: pre }
 .CodeRay .change .change { color: #66f; }
 .CodeRay .head .head { color: #f4f; }
 
-.center {
-  width: 150px;
-  text-align: right;
-  right: 10px;
-  margin-top: 5px;
-  position: absolute;
-}
-
 .mup {
-  width: 100%;
-/*
-  width: -moz-calc(100% - 200px);
-  width: -webkit-calc(100% - 200px);
-  width: calc(100% - 200px);
-*/
+  /* width: -moz-calc(100% - 165px); */
+  /* width: -webkit-calc(100% - 165px); */
+  /* width: calc(100% - 165px); */
+  display: inline-block;
 }
 
+.imgcode {
+  border-radius: 10px;
+  background-color: #efefef;
+  margin: 0px;
+  padding: 0em;
+  box-shadow: inset 0px 0px 2px 1px #999999;
+
+	/* Needed to surround contained floats. */
+  width: 100%;
+	overflow: auto;
+}
+
+.imgcode img {
+  margin-top: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+	float: right;
+}
+
+.smallimg {
+  width: 50px;
+}
+
+.bigimg {
+  width: 150px;
+}
+
+p {
+	font-family: serif;
+}
+
+h1, h2 {
+	font-family: sans-serif;
+}

@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+
+require 'open3'
+
+md = IO.read(ARGV[0])
+
+# Wrap up the code/image sequences in a div for markdown to cluster.
+md.gsub!(/(^(?>{:\.mup}\n~~~+\n(.*\n)*?~~~+\n)(\n!.*\n)?)/, "<div markdown=\"1\" class=\"imgcode\">\n\n\\1\n</div>\n")
+
+# Run Kramdown.
+IO.popen('kramdown --enable-coderay --coderay-line-numbers nil --coderay-default-lang=ruby --smart-quotes "apos,apos,quot,quot"', 'r+') do |pipe|
+  pipe.puts md
+  pipe.close_write
+  md = pipe.read
+end
+ 
+# Strip p tags off imgs. Kramdown wants to make everything block-level.
+md.gsub!(/<p>(<img.*?>)<\/p>/, '\1')
+
+# Bold code snippets.
+md.gsub!(/\*\*(.*?)\*\*/, '<b style="background-color: #dcdcdc">\1</b>')
+
+# Kramdown inserts literal emdashes, which show up funny in my browser. Let's use the HTML entity instead.
+md.gsub!(/\u2014/, '&mdash;')
+
+puts IO.read('header.html')
+puts md
+puts IO.read('footer.html')
