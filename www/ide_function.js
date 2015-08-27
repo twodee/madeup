@@ -735,8 +735,12 @@ function load(mup) {
   }
   if (renderer) render();
 
-  var file = JSON.parse(window.localStorage.getItem(mup));
-  textEditor.session.setValue(file.source, -1);
+  var json = window.localStorage.getItem(mup); 
+  if (json) {
+    var file = JSON.parse(window.localStorage.getItem(mup));
+    textEditor.session.setValue(file.source, -1);
+  }
+
   // TODO toggle modes
   updateTitle();
 }
