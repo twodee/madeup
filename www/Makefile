@@ -2,7 +2,6 @@ SRC = index.php interpret.php blockly_generator_madeup.js blockly_blocks_madeup.
 DST = $(addprefix $(WWW_ROOT)/, $(SRC))
 JQUERY_UI_VERSION = 1.11.2
 
-# DST_BINARIES = $(WWW_ROOT)/$(notdir $(MADEUP)) $(WWW_ROOT)/$(notdir $(TWODEE)) $(WWW_ROOT)/$(notdir $(MERP)) 
 DST_BINARIES = $(WWW_ROOT)/$(notdir $(MERP))
 
 .PHONY: madeup check
@@ -15,7 +14,7 @@ check:
 		exit 1; \
 	fi
 
-libdeps: $(WWW_ROOT)/ace $(WWW_ROOT)/three-js $(WWW_ROOT)/jquery.js $(WWW_ROOT)/js-cookie $(WWW_ROOT)/jquery-ui $(WWW_ROOT)/colorpicker $(WWW_ROOT)/blockly $(WWW_ROOT)/closure-library
+libdeps: $(WWW_ROOT)/ace $(WWW_ROOT)/three-js $(WWW_ROOT)/jquery.js $(WWW_ROOT)/js-cookie $(WWW_ROOT)/jquery-ui $(WWW_ROOT)/colorpicker $(WWW_ROOT)/blockly $(WWW_ROOT)/closure-library $(WWW_ROOT)/filesaver
 
 init: libdeps madeup all
 
@@ -26,6 +25,10 @@ $(DST_BINARIES): $(MADEUP) $(TWODEE) $(MERP)
 $(WWW_ROOT)/ace:
 	sudo git clone https://github.com/ajaxorg/ace-builds.git $(WWW_ROOT)/ace
 	sudo chmod -R a+rX $(WWW_ROOT)/ace
+
+$(WWW_ROOT)/filesaver:
+	sudo git clone https://github.com/eligrey/FileSaver.js $(WWW_ROOT)/filesaver
+	sudo chmod -R a+rX $(WWW_ROOT)/filesaver
 
 $(WWW_ROOT)/ace/src-noconflict/mode-madeup.js: mode-madeup.js
 	sudo cp $^ $@

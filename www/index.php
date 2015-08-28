@@ -18,6 +18,8 @@
   <script src="three-js/build/three.js"></script>
   <script src="three-js/examples/js/controls/TrackballControls.js"></script>
 
+  <script src="filesaver/FileSaver.min.js"></script>
+
   <!-- Blockly dependencies -->
   <!-- <script src="blockly/blockly_compressed.js"></script> -->
   <script src="blockly/blockly_uncompressed.js"></script>

@@ -34,17 +34,8 @@ function populateFileMenu() {
 }
 
 function generateDownloadable(filename, text) {
-  var link = document.createElement('a');
-  link.setAttribute('download', filename);
-  link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-
-  if (document.createEvent) {
-    var event = document.createEvent('MouseEvents');
-    event.initEvent('click', true, true);
-    link.dispatchEvent(event);
-  } else {
-    link.click();
-  }
+  var blob = new Blob([text], {type: "application/json"});
+  saveAs(blob, filename);
 }
 
 function yyyymmdd() {
