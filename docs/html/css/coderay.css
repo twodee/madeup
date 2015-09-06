@@ -175,6 +175,10 @@ ol.CodeRay li { white-space: pre }
   width: 50px;
 }
 
+.midimg {
+  width: 100px;
+}
+
 .bigimg {
   width: 150px;
 }

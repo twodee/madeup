@@ -1,4 +1,4 @@
-HTMLS = introduction.html reference.html
+HTMLS = introduction.html reference.html surface.html extrude.html revolve.html dots.html boxes.html
 
 all: $(HTMLS)
 
@@ -6,4 +6,4 @@ all: $(HTMLS)
 	./tohtml $*.md > html/$@
 
 clean:
-	rm -f html/*
+	rm -f html/*.html

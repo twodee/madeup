@@ -196,3 +196,29 @@ dowel maxBend:1
 ~~~
 
 ![Smooth S](images/s_smooth.png){:.bigimg}
+
+In the examples above, we named our parameters. That's not strictly necessary, but it may help others understand your code. Omitting the names yields the same model:
+
+{:.mup}
+~~~
+moveto 0, 0, 0
+
+yaw 90
+move 5 -- bottom horizontal
+yaw -90
+move 5 -- right vertical
+yaw -90
+move 5 -- middle horizontal
+yaw 90
+move 5 -- left vertical
+yaw 90
+move 5 -- top horizontal
+
+nsides = 30
+dowel 1
+~~~
+
+![Smooth S](images/s_smooth.png){:.bigimg}
+
+##Next
+You've seen the `dowel` solidifier. Let's now check out [`extrude`](extrude.html).

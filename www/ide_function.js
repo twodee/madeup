@@ -156,15 +156,7 @@ $(document).ready(function() {
       resize();
     }
 
-    // if (Cookies.get('last')) { 
-      // textEditor.setValue(Cookies.get('last'), -1); 
-    // } 
-
-    // if (Cookies.get('lastMup')) { 
-      // load(Cookies.get('lastMup')); 
-    // } else { 
     load('untitled');
-    // } 
 
     if (Cookies.get('fontSize')) {
       fontSize = parseInt(Cookies.get('fontSize'));
@@ -388,37 +380,6 @@ $(document).ready(function() {
   var colors = [red, green, blue];
   var axes = new Array(3);
   var grids = new Array(3);
-
-  function setEditor(isText) {
-    if (isEditorText == isText) return;
-    isEditorText = isText;
-    isEditorTextChanged = true;
-
-    if (isEditorText) {
-      $('#blocksEditor').hide();
-      $('#textEditor').show();
-    } else {
-      $('#textEditor').hide();
-      $('#blocksEditor').show();
-
-      if (!workspace) {
-        workspace = Blockly.inject('blocksCanvas', {toolbox: document.getElementById('toolbox')});
-        workspace.addChangeListener(function() {
-          var code = Blockly.Madeup.workspaceToCode(workspace);
-          textEditor.setValue(code);
-          log(code);
-        });
-        if (Cookies.get('lastBlocks')) {
-          var xml = Blockly.Xml.textToDom(Cookies.get('lastBlocks'));
-          Blockly.Xml.domToWorkspace(workspace, xml);
-        }
-      } else {
-      }
-    }
-
-    resize();
-    Blockly.fireUiEvent(window, 'resize');
-  }
 
   function generateAxis(d) {
     if (axes[d]) {
@@ -714,6 +675,37 @@ function schedulePreview() {
   textEditor.getSession().on('change', onEditorChange);
 }
 
+function setEditor(isText) {
+  if (isEditorText == isText) return;
+  isEditorText = isText;
+  isEditorTextChanged = true;
+
+  if (isEditorText) {
+    $('#blocksEditor').hide();
+    $('#textEditor').show();
+  } else {
+    $('#textEditor').hide();
+    $('#blocksEditor').show();
+
+    if (!workspace) {
+      workspace = Blockly.inject('blocksCanvas', {toolbox: document.getElementById('toolbox')});
+      workspace.addChangeListener(function() {
+        var code = Blockly.Madeup.workspaceToCode(workspace);
+        textEditor.setValue(code);
+        log(code);
+      });
+      // if (Cookies.get('lastBlocks')) {
+        // var xml = Blockly.Xml.textToDom(Cookies.get('lastBlocks'));
+        // Blockly.Xml.domToWorkspace(workspace, xml);
+      // }
+    } else {
+    }
+  }
+
+  resize();
+  Blockly.fireUiEvent(window, 'resize');
+}
+
 function load(mup) {
   console.log('new mup: ' + mup);
 
@@ -729,7 +721,14 @@ function load(mup) {
   var json = window.localStorage.getItem(mup); 
   if (json) {
     var file = JSON.parse(window.localStorage.getItem(mup));
-    textEditor.session.setValue(file.source, -1);
+    setEditor(file.mode == 'text');
+    if (isEditorText) {
+      textEditor.session.setValue(file.source, -1);
+    } else {
+      workspace.clear();
+      var xml = Blockly.Xml.textToDom(file.source);
+      Blockly.Xml.domToWorkspace(workspace, xml);
+    }
   }
 
   // TODO toggle modes
@@ -739,11 +738,24 @@ function load(mup) {
 function save() {
   if (mupName != null) {
     console.log('saving ' + mupName);
+
+    var mode = null;
+    var source = null;
+    if (isEditorText) {
+      source = getSource();
+      mode = 'text';
+    } else {
+      var xml = Blockly.Xml.workspaceToDom(workspace);
+      source = Blockly.Xml.domToText(xml);
+      mode = 'blocks';
+    }
+
     var file = {
-      'mode' : isEditorText ? 'text' : 'blocks',
+      'mode' : mode,
       'updated_at' : new Date().toString(),
-      'source' : getSource()
+      'source' : source
     };
+
     window.localStorage.setItem(mupName, JSON.stringify(file));
   }
 }

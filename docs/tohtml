@@ -15,7 +15,7 @@ IO.popen('kramdown --enable-coderay --coderay-line-numbers nil --coderay-default
 end
  
 # Strip p tags off imgs. Kramdown wants to make everything block-level.
-md.gsub!(/<p>(<img.*?>)<\/p>/, '\1')
+md.gsub!(/<p>(<img.*?src="(.*?)".*?>)<\/p>/, '<a href="\2">\1</a>')
 
 # Bold code snippets.
 md.gsub!(/\*\*(.*?)\*\*/, '<b style="background-color: #dcdcdc">\1</b>')
