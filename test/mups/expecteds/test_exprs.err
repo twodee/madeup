@@ -15,8 +15,14 @@ true or false == true: 1
 false or false == false: 1
 false or true == true: 1
 true or true == true: 1
-true == false: 1
-false == true: 1
+(not true) == false: 1
+(not false) == true: 1
+(not true == false) == true: 1
+(not false == true) == true: 1
+(not not true) == true: 1
+(not not false) == false: 1
 (sign 5) == 1: 1
 (sign -100) == -1: 1
 (sign 0) == 0: 1
+(not 5 < 3) == true: 1
+(not 5 > 3) == false: 1

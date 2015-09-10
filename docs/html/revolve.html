@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Madeup Documentation</title>
+  <link rel="stylesheet" type="text/css" href="css/coderay.css">
+</head>
+<body>
+<h1 id="revolve">Revolve</h1>
+<p>Like <code>extrude</code>, the <code>revolve</code> solidifier interprets the walked path as the cross section. Instead of elongating it, however, it spins it around some axis. We get to choose the axis, the number of degrees we spin, and how many facets appear in the revolved model.</p>
+
+<p>For our example, let's create an axle with fixed wheels. We star by tracing out the cross section of the first wheel, the axle, and then second wheel. Let's use some variables to make the code easier to read:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>wheelThickness = <span style="color:#00D">2</span>
+wheelRadius = <span style="color:#00D">3</span>
+axleRadius = <span style="color:#00D">1</span>
+axleLength = <span style="color:#00D">5</span>
+
+yaw <span style="color:#00D">90</span>
+moveto <span style="color:#00D">0</span>, <span style="color:#00D">0</span>, <span style="color:#00D">0</span>
+move wheelRadius
+yaw <span style="color:#00D">90</span>
+move wheelThickness
+yaw <span style="color:#00D">90</span>
+move wheelRadius - axleRadius
+yaw <span style="color:#00D">-90</span>
+move axleLength
+yaw <span style="color:#00D">-90</span>
+move wheelRadius - axleRadius
+yaw <span style="color:#00D">90</span>
+move wheelThickness
+yaw <span style="color:#00D">90</span>
+move wheelRadius
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/axle_path.png"><img src="images/axle_path.png" alt="Axle Path" class="bigimg" /></a>
+
+</div>
+
+<p>Now we're ready to spin this path around. Since our axle is currently standing up, we'll spin around the y-axis:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>wheelThickness = <span style="color:#00D">2</span>
+wheelRadius = <span style="color:#00D">3</span>
+axleRadius = <span style="color:#00D">1</span>
+axleLength = <span style="color:#00D">5</span>
+
+yaw <span style="color:#00D">90</span>
+moveto <span style="color:#00D">0</span>, <span style="color:#00D">0</span>, <span style="color:#00D">0</span>
+move wheelRadius
+yaw <span style="color:#00D">90</span>
+move wheelThickness
+yaw <span style="color:#00D">90</span>
+move wheelRadius - axleRadius
+yaw <span style="color:#00D">-90</span>
+move axleLength
+yaw <span style="color:#00D">-90</span>
+move wheelRadius - axleRadius
+yaw <span style="color:#00D">90</span>
+move wheelThickness
+yaw <span style="color:#00D">90</span>
+move wheelRadius
+
+<b style="background-color: #dcdcdc">revolve <span style="color:#00D">0</span>, <span style="color:#00D">1</span>, <span style="color:#00D">0</span>, <span style="color:#00D">360</span></b>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/axle_square.png"><img src="images/axle_square.png" alt="Axle Square" class="bigimg" /></a>
+
+</div>
+
+<p>Hmm, our gas mileage is going to be pretty terrible with those square wheels. Why did this happen? The <code>revolve</code> solidifier depends on a special builtin variable named <code>nsides</code> to determine how often the cross section is replicated during the revolving. Its default value is 4.</p>
+
+<p>To smooth the model out, we can increase the value of <code>nsides</code> at any point before we call <code>revolve</code>.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>wheelThickness = <span style="color:#00D">2</span>
+wheelRadius = <span style="color:#00D">3</span>
+axleRadius = <span style="color:#00D">1</span>
+axleLength = <span style="color:#00D">5</span>
+
+yaw <span style="color:#00D">90</span>
+moveto <span style="color:#00D">0</span>, <span style="color:#00D">0</span>, <span style="color:#00D">0</span>
+move wheelRadius
+yaw <span style="color:#00D">90</span>
+move wheelThickness
+yaw <span style="color:#00D">90</span>
+move wheelRadius - axleRadius
+yaw <span style="color:#00D">-90</span>
+move axleLength
+yaw <span style="color:#00D">-90</span>
+move wheelRadius - axleRadius
+yaw <span style="color:#00D">90</span>
+move wheelThickness
+yaw <span style="color:#00D">90</span>
+move wheelRadius
+
+<b style="background-color: #dcdcdc">nsides = <span style="color:#00D">30</span></b>
+revolve <span style="color:#00D">0</span>, <span style="color:#00D">1</span>, <span style="color:#00D">0</span>, <span style="color:#00D">360</span>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/axle_rounded.png"><img src="images/axle_rounded.png" alt="Axle Rounded" class="bigimg" /></a>
+
+</div>
+
+<p>We don't have to revolve a full circle. We can get 3/4 of an axle by only revolving 270 degrees:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>wheelThickness = <span style="color:#00D">2</span>
+wheelRadius = <span style="color:#00D">3</span>
+axleRadius = <span style="color:#00D">1</span>
+axleLength = <span style="color:#00D">5</span>
+
+yaw <span style="color:#00D">90</span>
+moveto <span style="color:#00D">0</span>, <span style="color:#00D">0</span>, <span style="color:#00D">0</span>
+move wheelRadius
+yaw <span style="color:#00D">90</span>
+move wheelThickness
+yaw <span style="color:#00D">90</span>
+move wheelRadius - axleRadius
+yaw <span style="color:#00D">-90</span>
+move axleLength
+yaw <span style="color:#00D">-90</span>
+move wheelRadius - axleRadius
+yaw <span style="color:#00D">90</span>
+move wheelThickness
+yaw <span style="color:#00D">90</span>
+move wheelRadius
+
+nsides = <span style="color:#00D">30</span>
+revolve <span style="color:#00D">0</span>, <span style="color:#00D">1</span>, <span style="color:#00D">0</span>, <b style="background-color: #dcdcdc"><span style="color:#00D">270</span></b>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/axle_partial.png"><img src="images/axle_partial.png" alt="Axle Partial" class="bigimg" /></a>
+
+</div>
+
+<p>Our axle started and ended on the y-axis, which happened to be our axis of revolution. The revolved path doesn't have to be anywhere near this axis. If we move the path away, say 3 units to the right, we'll get a hole in the center of the model. After moving, we'll need to close the path to get the inner walls of this hole. Let's see what happens when we move the axle path three units to the right:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>wheelThickness = <span style="color:#00D">2</span>
+wheelRadius = <span style="color:#00D">3</span>
+axleRadius = <span style="color:#00D">1</span>
+axleLength = <span style="color:#00D">5</span>
+
+yaw <span style="color:#00D">90</span>
+moveto <b style="background-color: #dcdcdc"><span style="color:#00D">3</span></b>, <span style="color:#00D">0</span>, <span style="color:#00D">0</span>
+move wheelRadius
+yaw <span style="color:#00D">90</span>
+move wheelThickness
+yaw <span style="color:#00D">90</span>
+move wheelRadius - axleRadius
+yaw <span style="color:#00D">-90</span>
+move axleLength
+yaw <span style="color:#00D">-90</span>
+move wheelRadius - axleRadius
+yaw <span style="color:#00D">90</span>
+move wheelThickness
+yaw <span style="color:#00D">90</span>
+move wheelRadius
+<b style="background-color: #dcdcdc">moveto <span style="color:#00D">3</span>, <span style="color:#00D">0</span>, <span style="color:#00D">0</span></b>
+
+nsides = <span style="color:#00D">30</span>
+revolve <span style="color:#00D">0</span>, <span style="color:#00D">1</span>, <span style="color:#00D">0</span>, <span style="color:#00D">360</span>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/axle_hollow.png"><img src="images/axle_hollow.png" alt="Axle Hollow" class="bigimg" /></a>
+
+</div>
+
+<h2 id="next">Next</h2>
+<p>The <code>revolve</code> solidifier excels at generating radially symmetric models. Speaking of radially symmetric, let's next check out drawing with spheres using the <a href="dots.html"><code>dots</code></a> solidifier.</p>
+</body>
+</html>

@@ -209,11 +209,24 @@ void Parser::expressionLevel1() {
 /* ------------------------------------------------------------------------- */
 
 void Parser::expressionLevel2() {
-  expressionLevel3();
+  if (isUp(Token::NOT)) {
+    ++i;
+    expressionLevel2();
+    Co<Expression> e = popExpression();
+    pushExpression(new ExpressionNot(e), e->getSourceLocation(), e->getSourceLocation());
+  } else {
+    expressionLevel3();
+  }
+}
+
+/* ------------------------------------------------------------------------- */
+
+void Parser::expressionLevel3() {
+  expressionLevel4();
   while (isUp(Token::EQUAL_TO) || isUp(Token::NOT_EQUAL_TO)) {
     Token::token_t type = tokens[i].getType();
     ++i;
-    expressionLevel3();
+    expressionLevel4();
     Co<Expression> b = popExpression();
     Co<Expression> a = popExpression();
     if (type == Token::EQUAL_TO) {
@@ -226,12 +239,12 @@ void Parser::expressionLevel2() {
 
 /* ------------------------------------------------------------------------- */
 
-void Parser::expressionLevel3() {
-  expressionLevel4();
+void Parser::expressionLevel4() {
+  expressionLevel5();
   while (isUp(Token::LESS_THAN) || isUp(Token::LESS_THAN_OR_EQUAL_TO) || isUp(Token::GREATER_THAN) || isUp(Token::GREATER_THAN_OR_EQUAL_TO)) {
     Token::token_t type = tokens[i].getType();
     ++i;
-    expressionLevel4();
+    expressionLevel5();
     Co<Expression> b = popExpression();
     Co<Expression> a = popExpression();
     if (type == Token::LESS_THAN) {
@@ -248,12 +261,12 @@ void Parser::expressionLevel3() {
 
 /* ------------------------------------------------------------------------- */
 
-void Parser::expressionLevel4() {
-  expressionLevel5();
+void Parser::expressionLevel5() {
+  expressionLevel6();
   while (isUp(Token::PLUS) || isUp(Token::MINUS)) {
     Token::token_t type = tokens[i].getType();
     ++i;
-    expressionLevel5();
+    expressionLevel6();
     Co<Expression> b = popExpression();
     Co<Expression> a = popExpression();
     if (type == Token::PLUS) {
@@ -266,12 +279,12 @@ void Parser::expressionLevel4() {
 
 /* ------------------------------------------------------------------------- */
 
-void Parser::expressionLevel5() {
-  expressionLevel6();
+void Parser::expressionLevel6() {
+  expressionLevel7();
   while (isUp(Token::TIMES) || isUp(Token::DIVIDE) || isUp(Token::REAL_DIVIDE) || isUp(Token::REMAINDER)) {
     Token::token_t type = tokens[i].getType();
     ++i;
-    expressionLevel6();
+    expressionLevel7();
     Co<Expression> b = popExpression();
     Co<Expression> a = popExpression();
     if (type == Token::TIMES) {
@@ -288,11 +301,11 @@ void Parser::expressionLevel5() {
 
 /* ------------------------------------------------------------------------- */
 
-void Parser::expressionLevel6() {
-  expressionLevel7();
+void Parser::expressionLevel7() {
+  expressionLevel8();
   while (isUp(Token::CIRCUMFLEX)) {
     ++i;
-    expressionLevel7();
+    expressionLevel8();
     Co<Expression> b = popExpression();
     Co<Expression> a = popExpression();
     pushExpression(new ExpressionPower(a, b), a->getSourceLocation(), b->getSourceLocation());
@@ -301,21 +314,21 @@ void Parser::expressionLevel6() {
 
 /* ------------------------------------------------------------------------- */
 
-void Parser::expressionLevel7() {
-  expressionLevel8();
+void Parser::expressionLevel8() {
+  expressionLevel9();
   if (!is_in_loop_range && (isUp(Token::BY) || isUp(Token::OF))) {
     std::stack<Co<Expression> > dimensions;
     dimensions.push(popExpression());
 
     while (isUp(Token::BY)) {
       ++i;
-      expressionLevel8();
+      expressionLevel9();
       dimensions.push(popExpression());
     }
 
     if (isUp(Token::OF)) {
       ++i;
-      expressionLevel8();
+      expressionLevel9();
       Co<Expression> fill = popExpression();
       do {
         Co<Expression> dimension = dimensions.top();
@@ -336,25 +349,20 @@ void Parser::expressionLevel7() {
 
 /* ------------------------------------------------------------------------- */
 
-void Parser::expressionLevel8() {
-  if (isUp(Token::NOT)) {
+void Parser::expressionLevel9() {
+  if (isUp(Token::MINUS)) {
     ++i;
-    expressionLevel8();
-    Co<Expression> e = popExpression();
-    pushExpression(new ExpressionNot(e), e->getSourceLocation(), e->getSourceLocation());
-  } else if (isUp(Token::MINUS)) {
-    ++i;
-    expressionLevel8();
+    expressionLevel9();
     Co<Expression> e = popExpression();
     pushExpression(new ExpressionNegation(e), e->getSourceLocation(), e->getSourceLocation());
   } else {
-    expressionLevel9();
+    expressionLevel10();
   }
 }
 
 /* ------------------------------------------------------------------------- */
 
-void Parser::expressionLevel9() {
+void Parser::expressionLevel10() {
   atom();
   Co<Expression> array;
 

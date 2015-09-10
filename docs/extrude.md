@@ -3,7 +3,7 @@ The `extrude` solidifier interprets the walked path as the cross section of a mo
 
 As we trace out closed polygons, our thinking about the algorithm will be more fruitful if we recognize that we will need to turn a total 360 degrees. In the case of a star, we have five arms, each of which will net us 72 degrees toward the 360.
 
-Let's start with a single arm. We move out to its point, then turn and trace out the other side of the arm. Note that we effectively turn 72 degrees clockwise. At the point we turned 144 degrees clockwise, but we lost 72 when at the end we turned counterclockwise to get ready for the next arm.
+Let's start with a single arm. We move out to its point, then turn and trace out the other side of the arm. Note that we effectively turn 72 degrees clockwise. At the tip of the arm, we turned 144 degrees clockwise, but we lost 72 when at the end we turned counterclockwise to get ready for the next arm.
 
 {:.mup}
 ~~~

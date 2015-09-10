@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Madeup Documentation</title>
+  <link rel="stylesheet" type="text/css" href="css/coderay.css">
+</head>
+<body>
+<h1 id="language-reference">Language Reference</h1>
+<p>Every fun thing that has ever happened started with some rules (gravitational law, oldest player rolls first, etc.), and Madeup is no exception. Let's describe the grammar of the Madeup language.</p>
+
+<h2 id="comments">Comments</h2>
+<p>Code is mixture of executable instructions and notes for the humans working with the code. The notes are called comments and they start with <code>--</code>:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>-- <span style="color:#036;font-weight:bold">This</span> program generates a rocket ship.
+-- <span style="color:#036;font-weight:bold">It</span> will fly.
+-- <span style="color:#036;font-weight:bold">Someday</span>.
+
+print <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">&lt;=&gt;</span><span style="color:#710">&quot;</span></span> -- <span style="color:#036;font-weight:bold">See</span> it fly!
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<p>Comments can appear on their own lines or at the end of lines containing instructions.</p>
+
+<h2 id="expressions">Expressions</h2>
+<p>Madeup programs are built out of expressions, utterances that yield some value. Every construct of Madeup is an expression, but not all provide meaningful values. Like <code>yaw</code>. The <code>yaw</code> command yields a special value named <code>nothing</code>, which is good for nothing.</p>
+
+<p>In this section, we focus on expressions that do yield meaningful values. Such expressions can be assembled together to produce more interesting values yet. When multiple expressions appear on a line, we must decide which one gets evaluated first. In 5 + 3 * 8, the convention of mathematical precedence tells us to multiply first. This yields the intermediate expression <code>5 + 24</code>. After evaluating the remaining operation, we get the expression's final value of <code>29</code>.</p>
+
+<p>The expressions that Madeup supports are listed below from highest precedence to lowest.</p>
+
+<h3 id="literals">Literals</h3>
+<p>The simplest expressions in the Madeup language describe raw integers, real numbers, logical notions called booleans, or strings of text. Here are few literal expressions of various types:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span style="color:#60E">6.7</span> -- real
+<span style="color:#00D">2</span> -- integer
+<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">i: </span><span style="color:#710">&quot;</span></span> -- string
+<span style="color:#069">true</span> -- boolean
+<span style="color:#069">false</span> -- boolean
+nothing -- the <span style="color:#080;font-weight:bold">not</span>-a-thing
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<h3 id="association-expr">Association (<code>(expr)</code>)</h3>
+<p>Expressions can be surrounded by parentheses to help control the order of evaluation or to emphasize grouping:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>print (<span style="color:#00D">5</span> + <span style="color:#00D">3</span>) * <span style="color:#00D">8</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<p>Note that unlike many programming languages, Made does not require parentheses around function parameter lists:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>print <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">triangle</span><span style="color:#710">&quot;</span></span>
+print abs <span style="color:#00D">-5</span>
+a = cos pi
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<p>Given Madeup's spare use of punctuation, parentheses are often needed to enforce unary negation of variables, as in:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>x = cos (-theta)
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<p>The alternative</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>x = cos -theta
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<p>is interpreted as subtraction: the value of <code>theta</code> is being taken away from the value of <code>cos</code>.</p>
+
+<h3 id="absolute-value-expr">Absolute Value (<code>|expr|</code>)</h3>
+<p>Find the absolution value of an expression by surrounding it with pipe (<code>|</code>) characters:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>x = <span style="color:#60E">-3.14</span>
+print |x + <span style="color:#00D">1</span>| -- prints <span style="color:#60E">2.14</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<p>Note that nesting absolute value expressions is illegal:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>x = <span style="color:#60E">-3.14</span>
+print |x + |<span style="color:#00D">-1</span>|| -- illegal
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<h3 id="indexing-i">Indexing (<code>[i]</code>)</h3>
+<p>Index into an array with <code>[]</code>, the subscript operator. The index expression <code>i</code> must yield an integer.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>counts = <span style="color:#00D">10</span> of <span style="color:#00D">0</span>
+counts[<span style="color:#00D">0</span>] = <span style="color:#00D">17</span>
+counts[<span style="color:#00D">9</span>] = <span style="color:#00D">32</span>
+counts[<span style="color:#00D">10</span>] = <span style="color:#00D">5</span> -- illegal, out-of-bounds index
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<h3 id="exponential-">Exponential (<code>^</code>)</h3>
+<p>Raise a number to a power with the <code>^</code> operator. This operator is left-associative, meaning that in an expression containing multiple <code>^</code> operators at the same level of precedence, the leftmost operation will be evaluated first.</p>
+
+<p>The base and exponent are expected to be numbers. If the exponent is less than 1 and the base is negative, by the rules of mathematics, you will get a complex number. By the rules of Madeup, you will get an undefined value.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>print <span style="color:#00D">5</span> ^ <span style="color:#00D">3</span> -- prints <span style="color:#00D">125</span>
+print <span style="color:#00D">49</span> ^ <span style="color:#60E">0.5</span> -- prints <span style="color:#00D">7</span>
+print <span style="color:#00D">2</span> ^ <span style="color:#00D">3</span> ^ <span style="color:#00D">2</span> -- same as (<span style="color:#00D">2</span> ^ <span style="color:#00D">3</span>) ^ <span style="color:#00D">2</span> = <span style="color:#00D">8</span> ^ <span style="color:#00D">2</span> = <span style="color:#00D">64</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<h3 id="multiplicative----">Multiplicative (<code>*</code>, <code>/</code>, <code>//</code>, <code>%</code>)</h3>
+<p>Madeup provides the conventional multiplication and division operators, along with a real division operator and a remainder or modulus operator. The <code>/</code> operator yields an integer if its two operands are integers, and a real if at least one of the operands is a real. To ensure a real number result, even if the operands are integers, use <code>//</code>. The remainder operation has the form <code>a % b</code>, where <code>a</code> and <code>b</code> are integers. This operation yields the integer remainder of <code>a / b</code>.</p>
+
+<p>If both operands are integers, the result is an integer. Otherwise, the result is a real.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>print <span style="color:#60E">100.7</span> * <span style="color:#00D">2</span> -- <span style="color:#60E">201.4</span>
+print <span style="color:#00D">7</span> / <span style="color:#00D">3</span> -- <span style="color:#00D">2</span>
+print <span style="color:#00D">7</span> / <span style="color:#60E">3.0</span> -- <span style="color:#60E">2.3333</span>...
+print <span style="color:#00D">7</span> /<span style="background-color:hsla(300,100%,50%,0.06)"><span style="color:#404">/</span><span style="color:#808"> 3 -- 2.3333...
+print 7 % 3 -- 1
+</span></span></pre></div>
+</div>
+  </div>
+
+</div>
+
+<h3 id="additive---">Additive (<code>+</code>, <code>-</code>)</h3>
+<p>Find the sum or difference of two numbers with <code>+</code> or <code>-</code>. If both operands are integers, the result is an integer. Otherwise, the result is a real.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>print <span style="color:#00D">100</span> + <span style="color:#00D">-100</span> -- <span style="color:#00D">0</span>
+print <span style="color:#60E">0.7</span> + <span style="color:#00D">2</span> -- <span style="color:#60E">2.7</span>
+x = <span style="color:#60E">0.3</span>
+print <span style="color:#00D">6</span> - x -- <span style="color:#60E">5.7</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<h3 id="relational----">Relational (<code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code>)</h3>
+<p>Query the relationship between two numbers with these operators, which yield a boolean value indicating whether or not the relation holds.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>print <span style="color:#00D">5</span> &lt; <span style="color:#00D">3</span> -- <span style="color:#069">false</span>
+print <span style="color:#00D">6</span> &lt;= <span style="color:#00D">6</span> -- <span style="color:#069">true</span>
+print <span style="color:#00D">7</span> &gt;= <span style="color:#00D">3</span> -- <span style="color:#069">true</span>
+print <span style="color:#00D">2</span> &gt; <span style="color:#00D">-2</span> -- <span style="color:#069">true</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<h3 id="equality--">Equality (<code>==</code>, <code>!=</code>)</h3>
+<p>Query whether two values are the same with the <code>==</code> operator. Query whether two values are different with the <code>!=</code> operator. These operators can be applied to numbers, booleans, and strings.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>print <span style="color:#00D">5</span> == <span style="color:#00D">0</span> -- <span style="color:#069">false</span>
+print <span style="color:#069">true</span> == <span style="color:#080;font-weight:bold">not</span> <span style="color:#069">false</span> -- <span style="color:#069">true</span>
+print <span style="color:#00D">3</span> / <span style="color:#00D">2</span> == <span style="color:#00D">3</span> /<span style="background-color:hsla(300,100%,50%,0.06)"><span style="color:#404">/</span><span style="color:#808"> 2 -- false
+print 5.7 != 5.69 -- true
+</span></span></pre></div>
+</div>
+  </div>
+
+</div>
+
+<h3 id="assignment-">Assignment (<code>=</code>)</h3>
+<p>Bind a value to a name using the <code>=</code> operator. This operator is right-associative, meaning that in an expression with multiple <code>=</code> operations, the rightmost <code>=</code> will be evaluated first.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>a = b = <span style="color:#00D">3</span>
+print a -- <span style="color:#00D">3</span>
+print b -- <span style="color:#00D">3</span>
+sum = a + b -- sum holds <span style="color:#00D">6</span>
+diff = a - b -- diff holds <span style="color:#00D">0</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<h3 id="logical-negation-not">Logical Negation (<code>not</code>)</h3>
+<p>Flip a boolean expression to its opposite with the <code>not</code> operator:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>print <span style="color:#080;font-weight:bold">not</span> <span style="color:#069">true</span> -- prints <span style="color:#069">false</span>
+x = <span style="color:#00D">15</span>
+<span style="color:#080;font-weight:bold">if</span> <span style="color:#080;font-weight:bold">not</span> x &lt; <span style="color:#00D">15</span>
+  print <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">yes!</span><span style="color:#710">&quot;</span></span>
+<span style="color:#080;font-weight:bold">end</span> -- prints yes!
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<h3 id="conjunction-and">Conjunction (<code>and</code>)</h3>
+<p>Query whether two booleans are both true with the <code>and</code> operator.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span style="color:#080;font-weight:bold">if</span> x &gt; <span style="color:#00D">0</span> <span style="color:#080;font-weight:bold">and</span> y &gt; <span style="color:#00D">0</span>
+  print <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">in quadrant 1</span><span style="color:#710">&quot;</span></span>
+<span style="color:#080;font-weight:bold">end</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<h3 id="disjunction-or">Disjunction (<code>or</code>)</h3>
+<p>Query whether at least one of two booleans is true with the <code>or</code> operator.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span style="color:#080;font-weight:bold">if</span> i &lt; <span style="color:#00D">0</span> <span style="color:#080;font-weight:bold">or</span> i &gt;= values.length
+  print <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">bad index</span><span style="color:#710">&quot;</span></span>
+<span style="color:#080;font-weight:bold">end</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<h2 id="builtin-variables">Builtin Variables</h2>
+<p>Several variables are automatically defined by Madeup. Some are frequently-used constants while others influence the behavior of the various solidifiers.</p>
+
+<h3 id="radius-or-outerradius-default-1"><code>.radius</code> or <code>.outerRadius</code> (default: 1)</h3>
+<p>The value of <code>.outerRadius</code> is examined at each <code>move</code> and <code>moveto</code> command. Solidifiers <code>dowel</code>, <code>tube</code>, <code>dots</code>, and <code>boxes</code> will generate geometry around this vertex sized according to this value.</p>
+
+<p>Internally, this variable is identified as <code>.outerRadius</code> to distinguish it from <code>.innerRadius</code>, which is referenced only by the <code>tube</code> solidifier. When you are not dealing with <code>tube</code>, you may find it more convenient to use the synonym <code>.radius.</code></p>
+
+<h3 id="innerradius-default-05"><code>.innerRadius</code> (default: 0.5)</h3>
+<p>The value of <code>.innerRadius</code> is examined at each <code>move</code> and <code>moveto</code> command. The <code>tube</code> solidifier will generate inner geometry around this vertex sized according to its value.</p>
+
+<h3 id="nsides-default-4"><code>nsides</code> (default: 4)</h3>
+<p>The value of <code>nsides</code> controls the smoothness of the generated geometry. The cross section of <code>dowel</code>s and <code>tube</code>s will have a number of sides determined by <code>nsides</code>. Solidifier <code>dots</code> will create spheres with a number of wedges determined by <code>nsides</code>. Solidifier <code>revolve</code> will spin around its axis, placing vertices at intermediate stops during the revolution. The number of stops is determined by <code>nsides</code>.</p>
+
+<h3 id="pi-default-314159"><code>pi</code> (default: 3.14159&hellip;)</h3>
+<p>The mathematical constant. I suggest you don't reassign it, though nothing in Madeup will stop you from doing so.</p>
+
+<h3 id="e-default-271828"><code>e</code> (default: 2.71828&hellip;)</h3>
+<p>The mathematical constant. I suggest you don't reassign it, though nothing in Madeup will stop you from doing so.</p>
+
+<h2 id="user-variables">User Variables</h2>
+<p>You may also create your own variables using the <code>=</code> operator:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>a = <span style="color:#00D">1</span>
+ndogs = random <span style="color:#00D">0</span>, <span style="color:#00D">10</span>
+tau = <span style="color:#00D">2</span> * pi
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<p>Variables defined before a function definition are visible within the function.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>radius = <span style="color:#00D">10</span>
+
+to polarizeX x = radius * cos x
+to polarizeY y = radius * sin y
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<p>If the function reassigns the variable, the value also changes in the outer scope:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>n = <span style="color:#00D">3</span>
+
+to increment
+  n = n + <span style="color:#00D">1</span>
+<span style="color:#080;font-weight:bold">end</span>
+
+increment
+increment
+print n -- prints <span style="color:#00D">5</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<h2 id="loops">Loops</h2>
+<p>Madeup supports several kinds of loops to help you repeat processes.</p>
+
+<h3 id="repeat"><code>repeat</code></h3>
+<p>Running a sequence multiple times is very simply accomplished using the <code>repeat</code> loop:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>repeat <span style="color:#00D">10</span>
+  print <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">:)</span><span style="color:#710">&quot;</span></span>
+<span style="color:#080;font-weight:bold">end</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<p>The count may be any integer expression:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>sum = <span style="color:#00D">0</span>
+n = random <span style="color:#00D">0</span>, <span style="color:#00D">100</span>
+repeat n
+  sum = sum + n
+<span style="color:#080;font-weight:bold">end</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<h3 id="repeatwich">repeatwich</h3>
+<p>Sometimes half of the repeated sequence needs to run one more time than the other half. We refer to this sometimes as a "loop and a half." These situations arise frequently enough in 3D construction and path walking that Madeup provides support for such loops. The "and a half" portion sandwiches or surrounds the internal portion. Therefore, we call this a <code>repeatwich</code> loop.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>-- prints xoxox
+repeatwich <span style="color:#00D">3</span>
+  print <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">x</span><span style="color:#710">&quot;</span></span>
+around
+  print <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">o</span><span style="color:#710">&quot;</span></span>
+<span style="color:#080;font-weight:bold">end</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<p>Sometimes we need to know which iteration of a loop we are on. The <code>repeat</code> loop doesn't provide this, though we could pretty easily create and increment a variable ourselves. However, the various <code>for</code> loops will do this automatically.</p>
+
+<h3 id="for-to">for-to</h3>
+<p>Like <code>repeat</code>, the <code>for-to</code> is a count-controlled loop. However, it automatically tracks what iteration of the loop we are on in a variable of our choice. The following loop stores the iteration index in a variable named <code>i</code>:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>-- prints <span style="color:#00D">0</span>, <span style="color:#00D">1</span>, <span style="color:#00D">2</span>
+<span style="color:#080;font-weight:bold">for</span> i to <span style="color:#00D">3</span>
+  print i
+<span style="color:#080;font-weight:bold">end</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<p>The upper-bound is exclusive and must be an integer. This loop starts at 0.</p>
+
+<h3 id="for-through">for-through</h3>
+<p>The <code>for-through</code> loop is almost identical to <code>for-to</code>, except the upper-bound is inclusive:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>-- prints <span style="color:#00D">0</span>, <span style="color:#00D">1</span>, <span style="color:#00D">2</span>, <span style="color:#00D">3</span>
+<span style="color:#080;font-weight:bold">for</span> i through <span style="color:#00D">3</span>
+  print i
+<span style="color:#080;font-weight:bold">end</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<h3 id="for-in">for-in</h3>
+<p>The <code>for-in</code> loop is like <code>for-through</code>, except we can also specify the lower-bound.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>-- prints <span style="color:#00D">100</span>, <span style="color:#00D">101</span>, <span style="color:#00D">102</span>, <span style="color:#00D">103</span>
+<span style="color:#080;font-weight:bold">for</span> i <span style="color:#080;font-weight:bold">in</span> <span style="color:#00D">100</span>..<span style="color:#00D">103</span>
+  print i
+<span style="color:#080;font-weight:bold">end</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<h3 id="while">while</h3>
+<p>The <code>while</code> loop is most general. It repeats as long as its condition is true.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>-- <span style="color:#036;font-weight:bold">Stop</span> once we go past <span style="color:#00D">100</span>.
+x = <span style="color:#00D">0</span>
+<span style="color:#080;font-weight:bold">while</span> x &lt; <span style="color:#00D">100</span>
+  x = x + random <span style="color:#00D">0</span>, <span style="color:#00D">10</span>
+  moveto x, <span style="color:#00D">0</span>, <span style="color:#00D">0</span>
+<span style="color:#080;font-weight:bold">end</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<h2 id="conditionals">Conditionals</h2>
+<p>To alternate between two chunks of code, use a conditional statement. The condition must be a boolean expression. Two forms of conditional statements exist.</p>
+
+<h3 id="if-else-end">if-else-end</h3>
+<p>For alternating between possibly multiline sequences, use the block-oriented <code>if-else-end</code> statement:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>-- <span style="color:#036;font-weight:bold">Zigzag</span>.
+for i <span style="color:#080;font-weight:bold">in</span> <span style="color:#00D">10</span>
+  <span style="color:#080;font-weight:bold">if</span> i % <span style="color:#00D">2</span> == <span style="color:#00D">0</span>
+    moveto <span style="color:#00D">1</span>, <span style="color:#00D">0</span>, <span style="color:#00D">0</span>
+  <span style="color:#080;font-weight:bold">else</span>
+    moveto <span style="color:#00D">-1</span>, <span style="color:#00D">0</span>, <span style="color:#00D">0</span>
+  <span style="color:#080;font-weight:bold">end</span>
+<span style="color:#080;font-weight:bold">end</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<h3 id="if-then-else">if-then-else</h3>
+<p>For alternating between values, use the single-line ternary <code>if-then-else</code>:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>to abs x = <span style="color:#080;font-weight:bold">if</span> x &gt; <span style="color:#00D">0</span> <span style="color:#080;font-weight:bold">then</span> x <span style="color:#080;font-weight:bold">else</span> -x
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<h2 id="builtin-functions">Builtin Functions</h2>
+<p>Madeup provides a modest library of builtin functions to aid in debugging, computation, or manipulating paths. Each function along with its expected parameters is described below.</p>
+
+<h3 id="print-message"><code>print message</code></h3>
+<p>Print a given message. Message may be a string, number, boolean, or array.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>print <span style="color:#00D">9</span> * <span style="color:#00D">7</span> -- prints <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">63</span><span style="color:#710">&quot;</span></span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<h3 id="debug-message"><code>debug message</code></h3>
+<p>Print a given message, preceded by the expression that computes it. Message may be a string, number, boolean, or array.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>debug <span style="color:#00D">9</span> * <span style="color:#00D">7</span> -- prints <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">9 * 7: 63</span><span style="color:#710">&quot;</span></span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<h3 id="moveto-x-y-z"><code>moveto x, y, z</code></h3>
+<p>Move directly to location (<code>x</code>, <code>y</code>, <code>z</code>). The location is transformed by any transform modifiers (such as <code>rotate</code>, <code>scale</code>, <code>translate</code>) that have been previously applied.</p>
+
+<h3 id="move-length"><code>move length</code></h3>
+<p>Move <code>length</code> units along the current heading.</p>
+
+<h3 id="yaw-degrees"><code>yaw degrees</code></h3>
+<p>Alter the current heading by turning right or left the given number of degrees. The direction of the turn depends on the sign of <code>degrees</code> and your point of view. If you are looking down on the cursor (and it is pointing up at you) and if degrees is positive, a right turn is made.</p>
+
+<h3 id="pitch-degrees"><code>pitch degrees</code></h3>
+<p>Alter the current heading by flipping forward or backward the given number of degrees. The direction of the turn depends on the sign of <code>degrees</code> and your point of view. If you are looking at the back of the cursor and if degrees is positive, the cursor's nose is turned down.</p>
+
+<h3 id="roll-degrees"><code>roll degrees</code></h3>
+<p>Alter the current heading by rolling right or left the given number of degrees. The direction of the turn depends on the sign of <code>degrees</code> and your point of view. If you are looking at the back of the cursor and if degrees is positive, the cursor's left side comes up and its right side comes down.</p>
+
+<h3 id="translate-x-y-z"><code>translate x, y, z</code></h3>
+<p>Modify any future movement or generated geometry by shifting it by the given offsets along the x-, y-, and z-axes. This transformation will be applied after any previous modifier. See <code>identity</code> to clear the transform modifier.</p>
+
+<h3 id="rotate-x-y-z-degrees"><code>rotate x, y, z, degrees</code></h3>
+<p>Modify any future movement or generated geometry by rotating along the given axis by the given degrees. This transformation will be applied after any previous modifier. See <code>identity</code> to clear the transform modifier.</p>
+
+<h3 id="scale-x-y-z"><code>scale x, y, z</code></h3>
+<p>Modify any future movement or generated geometry by scaling by the given factors along the x-, y-, and z-axes. This transformation will be applied after any previous modifier. See <code>identity</code> to clear the transform modifier.</p>
+
+<h3 id="identity"><code>identity</code></h3>
+<p>Clear any transformation modifiers.</p>
+
+<h3 id="push"><code>push</code></h3>
+<p>Save the current transformation modifier and cursor location and heading so that it may be restored later.</p>
+
+<h3 id="pop"><code>pop</code></h3>
+<p>Restore the most recently saved transformation modifier and cursor location and heading.</p>
+
+<h3 id="reverse"><code>reverse</code></h3>
+<p>Reverse the list of vertices accumulated in the current path.</p>
+
+<h3 id="center"><code>center</code></h3>
+<p>Shift the list of vertices accumulated in the current path so they are centered on the origin.</p>
+
+<h3 id="sin-degrees-cos-degrees-tan-degrees"><code>sin degrees</code>, <code>cos degrees</code>, <code>tan degrees</code></h3>
+<p>Compute the sine, cosine, or tangent of the given degrees.</p>
+
+<h3 id="asin-ratio"><code>asin ratio</code></h3>
+<p>Compute the inverse sine of the given ratio. The ratio is expected to be in [-1, 1].</p>
+
+<h3 id="acos-ratio"><code>acos ratio</code></h3>
+<p>Compute the inverse cosine of the given ratio. The ratio is expected to be in [-1, 1].</p>
+
+<h3 id="atan-ratio"><code>atan ratio</code></h3>
+<p>Compute the inverse tangent of the given ratio.</p>
+
+<h3 id="atan2-opposite-adjacent"><code>atan2 opposite, adjacent</code></h3>
+<p>Compute the inverse tangent of the ratio <code>opposite / adjacent</code>. Unlike <code>atan</code>, this version of the inverse tangent yields a number of degrees that reflects which quadrant this ratio lands in.</p>
+
+<h3 id="max-a-b"><code>max a, b</code></h3>
+<p>Find the maximum of two numeric values.</p>
+
+<h3 id="min-a-b"><code>min a, b</code></h3>
+<p>Find the minimum of two numeric values.</p>
+
+<h3 id="log-base-x"><code>log base, x</code></h3>
+<p>Find the logarithm of <code>x</code> in the given base.</p>
+
+<h3 id="size-array"><code>size array</code></h3>
+<p>Get the number of items in <code>array</code>.</p>
+
+<h2 id="user-functions">User Functions</h2>
+<p>In addition to the builtin functions, you may write your own. Multiline functions have this form:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>to sum3 a b c
+  a + b + c
+<span style="color:#080;font-weight:bold">end</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<p>One-liners may be expressed more compactly:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>to sum3 a b c = a + b + c
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<p>Variables first appearing within the function are not visible beyond the function's lifetime. There is no explicit return statement. A function's return value is derived from the last expression executed:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>to average a b c
+  sum = a + b + c
+  sum <span style="background-color:hsla(300,100%,50%,0.06)"><span style="color:#404">/</span><span style="color:#404">/</span></span> <span style="color:#00D">3</span>
+<span style="color:#080;font-weight:bold">end</span>
+print average <span style="color:#00D">10</span>, <span style="color:#00D">20</span>, <span style="color:#00D">30</span> -- prints <span style="color:#00D">20</span>
+print sum -- illegal, sum unknown
+</pre></div>
+</div>
+  </div>
+
+</div>
+</body>
+</html>

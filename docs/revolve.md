@@ -123,7 +123,7 @@ revolve 0, 1, 0, **270**
 
 ![Axle Partial](images/axle_partial.png){:.bigimg}
 
-Our axle started and ended on the y-axis, which happened to be our axis of revolution. The revolved path doesn't have to be anywhere near this axis. If we move the path away, we'll get a hole in the center of the model. We'll need to be close the path to get the inner walls of this hole. Let's see what happens when we move the axle path three units to the right:
+Our axle started and ended on the y-axis, which happened to be our axis of revolution. The revolved path doesn't have to be anywhere near this axis. If we move the path away, say 3 units to the right, we'll get a hole in the center of the model. After moving, we'll need to close the path to get the inner walls of this hole. Let's see what happens when we move the axle path three units to the right:
 
 {:.mup}
 ~~~

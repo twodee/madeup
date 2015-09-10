@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Madeup Documentation</title>
+  <link rel="stylesheet" type="text/css" href="css/coderay.css">
+</head>
+<body>
+<h1 id="extrude">Extrude</h1>
+<p>The <code>extrude</code> solidifier interprets the walked path as the cross section of a model and elongates it along some direction. As an example, let's extrude a star.</p>
+
+<p>As we trace out closed polygons, our thinking about the algorithm will be more fruitful if we recognize that we will need to turn a total 360 degrees. In the case of a star, we have five arms, each of which will net us 72 degrees toward the 360.</p>
+
+<p>Let's start with a single arm. We move out to its point, then turn and trace out the other side of the arm. Note that we effectively turn 72 degrees clockwise. At the tip of the arm, we turned 144 degrees clockwise, but we lost 72 when at the end we turned counterclockwise to get ready for the next arm.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>moveto <span style="color:#00D">0</span>, <span style="color:#00D">0</span>, <span style="color:#00D">0</span>
+
+move <span style="color:#00D">10</span>
+yaw <span style="color:#00D">144</span>
+move <span style="color:#00D">10</span>
+yaw <span style="color:#00D">-72</span>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/star_arm_path.png"><img src="images/star_arm_path.png" alt="Star Arm Path" class="bigimg" /></a>
+
+</div>
+
+<p>Now we draw five arms instead of one. We wrap our work for one arm up in a <code>repeat</code> loop:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>moveto <span style="color:#00D">0</span>, <span style="color:#00D">0</span>, <span style="color:#00D">0</span>
+
+<b style="background-color: #dcdcdc">repeat <span style="color:#00D">5</span></b>
+  move <span style="color:#00D">10</span>
+  yaw <span style="color:#00D">144</span>
+  move <span style="color:#00D">10</span>
+  yaw <span style="color:#00D">-72</span>
+<b style="background-color: #dcdcdc"><span style="color:#080;font-weight:bold">end</span></b>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/star_path.png"><img src="images/star_path.png" alt="Star Path" class="bigimg" /></a>
+
+</div>
+
+<p>The path is closed, and now we can pull it out to make a solid. We'll pull along the positive z-axis for 4 units:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>moveto <span style="color:#00D">0</span>, <span style="color:#00D">0</span>, <span style="color:#00D">0</span>
+
+repeat <span style="color:#00D">5</span>
+  move <span style="color:#00D">10</span>
+  yaw <span style="color:#00D">144</span>
+  move <span style="color:#00D">10</span>
+  yaw <span style="color:#00D">-72</span>
+<span style="color:#080;font-weight:bold">end</span>
+
+<b style="background-color: #dcdcdc">extrude <span style="color:#00D">0</span>, <span style="color:#00D">0</span>, <span style="color:#00D">1</span>, <span style="color:#00D">4</span></b>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/star_extruded.png"><img src="images/star_extruded.png" alt="Star Extruded" class="bigimg" /></a>
+
+</div>
+
+<p>The pulling direction doesn't have to be perpendicular to the path. Also, for the extrusion to yield a solid, the path will be automatically closed if you haven't closed it yourself.</p>
+
+<h2 id="next">Next</h2>
+<p>The <code>extrude</code> solidifier is great for stretching your model's cross section out into a solid. But what if instead of pulling the cross section out, we spun it around an axis? Read on to learn about <a href="revolve.html"><code>revolve</code></a>.</p>
+</body>
+</html>

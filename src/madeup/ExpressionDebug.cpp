@@ -50,7 +50,7 @@ Co<Expression> ExpressionDebug::evaluate(Environment &env) const {
 
   ExpressionBoolean *boolean_value = dynamic_cast<ExpressionBoolean *>(value.GetPointer());
   if (boolean_value) {
-    std::cerr << message->getSource() << ": " << boolean_value->toBoolean() << std::endl;
+    std::cerr << message->getSource() << ": " << (boolean_value->toBoolean() ? "true" : "false") << std::endl;
     return value;
   }
   

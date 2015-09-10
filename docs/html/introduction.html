@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Madeup Documentation</title>
+  <link rel="stylesheet" type="text/css" href="css/coderay.css">
+</head>
+<body>
+<h1 id="madeup">Madeup</h1>
+<p>Madeup is a programming language for generating 3D models&mdash;it is a language for makings things <em>up</em>. Its speakers use commands like <code>move</code> and <code>yaw</code> to walk paths through space. These paths trace the cross sections or skeletons of solid models. They then use commands like <code>extrude</code> or <code>revolve</code> to generate a solid model around the paths. The models can then be exported and then printed or imported in another 3D application.</p>
+
+<p>Like any language, Madeup has a grammar and meaning that must be learned in order to express models. This documentation describes the language so that you can start making things up. We begin with examples. You may wish to jump straight to the <a href="reference.html">language reference</a>.</p>
+
+<h2 id="hello-dowel">Hello, Dowel</h2>
+<p>Let's build something. How about an S-shaped curve? The central mechanic of Madeup is walking paths, so we'll walk a path resembling the letter S. This will give us a feel for how to use Madeup's movement and turning commands. I encourage you to create the model yourself using <a href="http://madeup.xyz">the Madeup web client</a>.</p>
+
+<p>We begin with simplest program possible:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre></pre></div>
+</div>
+  </div>
+
+</div>
+
+<p>Sweet, huh? This code does absolutely nothing, but it's a perfectly valid Madeup program. As we add lines of code to our program, we'll keep the old ones but highlight the new ones.</p>
+
+<p>We'll start on the bottom left of the S and work our way up. Let's say the bottom left appears at the origin. We jump there directly with the <code>moveto</code> command:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><b style="background-color: #dcdcdc">moveto <span style="color:#606">x</span>:<span style="color:#00D">0</span> <span style="color:#606">y</span>:<span style="color:#00D">0</span> <span style="color:#606">z</span>:<span style="color:#00D">0</span></b>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/arrow_up.png"><img src="images/arrow_up.png" alt="Arrow Up" class="smallimg" /></a>
+
+</div>
+
+<p>An arrow shows us where we are, and that we're looking up the y-axis. I'd rather be looking right. We can <code>yaw</code> to turn that direction:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>moveto <span style="color:#606">x</span>:<span style="color:#00D">0</span> <span style="color:#606">y</span>:<span style="color:#00D">0</span> <span style="color:#606">z</span>:<span style="color:#00D">0</span>
+
+<b style="background-color: #dcdcdc">yaw <span style="color:#606">degrees</span>:<span style="color:#00D">90</span></b>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/arrow_right.png"><img src="images/arrow_right.png" alt="Arrow Right" class="smallimg" /></a>
+
+</div>
+
+<p>The blank line is not significant. I added it just to make our later code easier to read. Let's travel 5 units to make the base of the S:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>moveto <span style="color:#606">x</span>:<span style="color:#00D">0</span> <span style="color:#606">y</span>:<span style="color:#00D">0</span> <span style="color:#606">z</span>:<span style="color:#00D">0</span>
+
+<b style="background-color: #dcdcdc">yaw <span style="color:#606">degrees</span>:<span style="color:#00D">90</span></b>
+<b style="background-color: #dcdcdc">move <span style="color:#606">length</span>:<span style="color:#00D">5</span></b>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/s_bottom.png"><img src="images/s_bottom.png" alt="S Bottom" class="bigimg" /></a>
+
+</div>
+
+<p>Note that <code>move</code> doesn't ask for a lot of information, only how much to travel. However, behind the scenes, it considers what direction we are currently facing and carries us off in that direction. We could have used <code>moveto x:5 y:0 z:0</code> to accomplish the same thing. The advantage of using <code>move</code> is that if we later decide to put our S someplace else, we only need to change the starting location in the one <code>moveto</code> command on the first line.</p>
+
+<p>We're ready to go up. However, we're not facing up anymore. Let's turn left this time and move the same length as before:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>moveto <span style="color:#606">x</span>:<span style="color:#00D">0</span> <span style="color:#606">y</span>:<span style="color:#00D">0</span> <span style="color:#606">z</span>:<span style="color:#00D">0</span>
+
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span>
+<b style="background-color: #dcdcdc">yaw <span style="color:#606">degrees</span>:<span style="color:#00D">-90</span></b>
+<b style="background-color: #dcdcdc">move <span style="color:#606">length</span>:<span style="color:#00D">5</span></b>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/s_bottom_right.png"><img src="images/s_bottom_right.png" alt="S Bottom Right" class="bigimg" /></a>
+
+</div>
+
+<p>Let's do the same thing to make the middle horizontal line:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>moveto <span style="color:#606">x</span>:<span style="color:#00D">0</span> <span style="color:#606">y</span>:<span style="color:#00D">0</span> <span style="color:#606">z</span>:<span style="color:#00D">0</span>
+
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span>
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">-90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span>
+<b style="background-color: #dcdcdc">yaw <span style="color:#606">degrees</span>:<span style="color:#00D">-90</span></b>
+<b style="background-color: #dcdcdc">move <span style="color:#606">length</span>:<span style="color:#00D">5</span></b>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/s_halfway.png"><img src="images/s_halfway.png" alt="S Halfway" class="bigimg" /></a>
+
+</div>
+
+<p>The code is getting a little harder to follow now. Let's add some comments to explain to the human readers of our code where we are. Comments have no effect on the output of the program.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>moveto <span style="color:#606">x</span>:<span style="color:#00D">0</span> <span style="color:#606">y</span>:<span style="color:#00D">0</span> <span style="color:#606">z</span>:<span style="color:#00D">0</span>
+
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> <b style="background-color: #dcdcdc">-- bottom horizontal</b>
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">-90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> <b style="background-color: #dcdcdc">-- right vertical</b>
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">-90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> <b style="background-color: #dcdcdc">-- middle horizontal</b>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<p>Next, let's go up again, turning right this time:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>moveto <span style="color:#606">x</span>:<span style="color:#00D">0</span> <span style="color:#606">y</span>:<span style="color:#00D">0</span> <span style="color:#606">z</span>:<span style="color:#00D">0</span>
+
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- bottom horizontal
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">-90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- right vertical
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">-90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- middle horizontal
+<b style="background-color: #dcdcdc">yaw <span style="color:#606">degrees</span>:<span style="color:#00D">90</span></b>
+<b style="background-color: #dcdcdc">move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- left vertical</b>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/s_top_left.png"><img src="images/s_top_left.png" alt="S Top Left" class="bigimg" /></a>
+
+</div>
+
+<p>We're almost there. One more turn and move:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>moveto <span style="color:#606">x</span>:<span style="color:#00D">0</span> <span style="color:#606">y</span>:<span style="color:#00D">0</span> <span style="color:#606">z</span>:<span style="color:#00D">0</span>
+
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- bottom horizontal
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">-90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- right vertical
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">-90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- middle horizontal
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- left vertical
+<b style="background-color: #dcdcdc">yaw <span style="color:#606">degrees</span>:<span style="color:#00D">90</span></b>
+<b style="background-color: #dcdcdc">move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- top horizontal</b>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/s_top.png"><img src="images/s_top.png" alt="S Top" class="bigimg" /></a>
+
+</div>
+
+<p>The path is complete. Our next step is to turn it into a solid. To do this, we pick one of Madeup's several solidifiers. Let's use <code>dowel</code>, which interprets our path as a skeleton around which it generates a solid dowel structure. We add the line and then hit the <code>Solidify</code> button.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>moveto <span style="color:#606">x</span>:<span style="color:#00D">0</span> <span style="color:#606">y</span>:<span style="color:#00D">0</span> <span style="color:#606">z</span>:<span style="color:#00D">0</span>
+
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- bottom horizontal
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">-90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- right vertical
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">-90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- middle horizontal
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- left vertical
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- top horizontal
+
+<b style="background-color: #dcdcdc">dowel</b>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/s_square.png"><img src="images/s_square.png" alt="Square S" class="bigimg" /></a>
+
+</div>
+
+<p>Let's smooth out those bends a bit so that we turn no more than 1 degree at a time:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>moveto <span style="color:#606">x</span>:<span style="color:#00D">0</span> <span style="color:#606">y</span>:<span style="color:#00D">0</span> <span style="color:#606">z</span>:<span style="color:#00D">0</span>
+
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- bottom horizontal
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">-90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- right vertical
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">-90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- middle horizontal
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- left vertical
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- top horizontal
+
+<b style="background-color: #dcdcdc">dowel <span style="color:#606">maxBend</span>:<span style="color:#00D">1</span></b>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/s_maxbend.png"><img src="images/s_maxbend.png" alt="Maxbend S" class="bigimg" /></a>
+
+</div>
+
+<p>Finally, let's go from a square dowel to a round dowel by tweaking the special <code>nsides</code> variable:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>moveto <span style="color:#606">x</span>:<span style="color:#00D">0</span> <span style="color:#606">y</span>:<span style="color:#00D">0</span> <span style="color:#606">z</span>:<span style="color:#00D">0</span>
+
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- bottom horizontal
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">-90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- right vertical
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">-90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- middle horizontal
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- left vertical
+yaw <span style="color:#606">degrees</span>:<span style="color:#00D">90</span>
+move <span style="color:#606">length</span>:<span style="color:#00D">5</span> -- top horizontal
+
+<b style="background-color: #dcdcdc">nsides = <span style="color:#00D">30</span></b>
+dowel <span style="color:#606">maxBend</span>:<span style="color:#00D">1</span>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/s_smooth.png"><img src="images/s_smooth.png" alt="Smooth S" class="bigimg" /></a>
+
+</div>
+
+<p>In the examples above, we named our parameters. That's not strictly necessary, but it may help others understand your code. Omitting the names yields the same model:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>moveto <span style="color:#00D">0</span>, <span style="color:#00D">0</span>, <span style="color:#00D">0</span>
+
+yaw <span style="color:#00D">90</span>
+move <span style="color:#00D">5</span> -- bottom horizontal
+yaw <span style="color:#00D">-90</span>
+move <span style="color:#00D">5</span> -- right vertical
+yaw <span style="color:#00D">-90</span>
+move <span style="color:#00D">5</span> -- middle horizontal
+yaw <span style="color:#00D">90</span>
+move <span style="color:#00D">5</span> -- left vertical
+yaw <span style="color:#00D">90</span>
+move <span style="color:#00D">5</span> -- top horizontal
+
+nsides = <span style="color:#00D">30</span>
+dowel <span style="color:#00D">1</span>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/s_smooth.png"><img src="images/s_smooth.png" alt="Smooth S" class="bigimg" /></a>
+
+</div>
+
+<h2 id="next">Next</h2>
+<p>You've seen the <code>dowel</code> solidifier. Let's now check out <a href="extrude.html"><code>extrude</code></a>.</p>
+</body>
+</html>

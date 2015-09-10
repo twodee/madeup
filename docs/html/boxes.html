@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Madeup Documentation</title>
+  <link rel="stylesheet" type="text/css" href="css/coderay.css">
+</head>
+<body>
+<h1 id="boxes">Boxes</h1>
+<p>The <code>boxes</code> solidifier is almost identical to <code>dots</code>&mdash;it very simply places a cube at each vertex on the path you walk. You can set each box's size independently.</p>
+
+<p>With <code>dots</code>, we set each sphere's size using <code>.radius</code>. This same variable is used to set a box's size, with each side measuring 2 * <code>.radius</code>.</p>
+
+<p>Let's make a voxelated sphere by walking along its surface and placing vertices. Traversing the surface of a sphere in a serial fashion is an interesting and difficult problem. We're going to make our lives easier and first consider all locations in a cubic region circumscribing the sphere having radius <code>reach</code>:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>reach = <span style="color:#00D">4</span>
+
+<span style="color:#080;font-weight:bold">for</span> z <span style="color:#080;font-weight:bold">in</span> -reach..reach
+  <span style="color:#080;font-weight:bold">for</span> y <span style="color:#080;font-weight:bold">in</span> -reach..reach
+    <span style="color:#080;font-weight:bold">for</span> x <span style="color:#080;font-weight:bold">in</span> -reach..reach
+      moveto x, y, z
+    <span style="color:#080;font-weight:bold">end</span>
+  <span style="color:#080;font-weight:bold">end</span>
+<span style="color:#080;font-weight:bold">end</span>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/boxes_cube_path.png"><img src="images/boxes_cube_path.png" alt="Boxes Cube Path" class="bigimg" /></a>
+
+</div>
+
+<p>It's not lost on me how ugly that is.</p>
+
+<p>Now, let's see how far each location is from the sphere, and only if the distance is pretty close to the sphere's radius will we move to that location:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>reach = <span style="color:#00D">4</span>
+<b style="background-color: #dcdcdc">threshold = <span style="color:#60E">0.6</span></b>
+
+<span style="color:#080;font-weight:bold">for</span> z <span style="color:#080;font-weight:bold">in</span> -reach..reach
+  <span style="color:#080;font-weight:bold">for</span> y <span style="color:#080;font-weight:bold">in</span> -reach..reach
+    <span style="color:#080;font-weight:bold">for</span> x <span style="color:#080;font-weight:bold">in</span> -reach..reach
+      <b style="background-color: #dcdcdc">distance = (x * x + y * y + z * z) ^ <span style="color:#60E">0.5</span></b>
+      <b style="background-color: #dcdcdc"><span style="color:#080;font-weight:bold">if</span> |distance - reach| &lt;= threshold</b>
+        <b style="background-color: #dcdcdc">moveto x, y, z</b>
+      <b style="background-color: #dcdcdc"><span style="color:#080;font-weight:bold">end</span></b>
+    <span style="color:#080;font-weight:bold">end</span>
+  <span style="color:#080;font-weight:bold">end</span>
+<span style="color:#080;font-weight:bold">end</span>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/boxes_sphere_path.png"><img src="images/boxes_sphere_path.png" alt="Boxes Sphere Path" class="bigimg" /></a>
+
+</div>
+
+<p>That's looking better. If you look closely, you'll see no locations inside the sphere. We've also eliminated many outside the sphere. We've culled out everything but the spherical shell. Now, let's put boxes at each of those locations. To make 1x1x1 cubes, we set <code>.radius</code> to 0.5 before our loops start:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre>reach = <span style="color:#00D">4</span>
+threshold = <span style="color:#60E">0.6</span>
+<b style="background-color: #dcdcdc">.radius = <span style="color:#60E">0.5</span></b>
+
+<span style="color:#080;font-weight:bold">for</span> z <span style="color:#080;font-weight:bold">in</span> -reach..reach
+  <span style="color:#080;font-weight:bold">for</span> y <span style="color:#080;font-weight:bold">in</span> -reach..reach
+    <span style="color:#080;font-weight:bold">for</span> x <span style="color:#080;font-weight:bold">in</span> -reach..reach
+      distance = (x * x + y * y + z * z) ^ <span style="color:#60E">0.5</span>
+      <span style="color:#080;font-weight:bold">if</span> |distance - reach| &lt;= threshold
+        moveto x, y, z
+      <span style="color:#080;font-weight:bold">end</span>
+    <span style="color:#080;font-weight:bold">end</span>
+  <span style="color:#080;font-weight:bold">end</span>
+<span style="color:#080;font-weight:bold">end</span>
+
+<b style="background-color: #dcdcdc">boxes</b>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/boxes_sphere.png"><img src="images/boxes_sphere.png" alt="Boxes Sphere" class="bigimg" /></a>
+
+</div>
+
+<h2 id="next">Next</h2>
+<p>The <code>boxes</code> solidifier excels at building voxelated creations algorithmically. Like <code>dots</code>, it may result in overlapping geometry that will need to be cleaned up before printing. But it's simple. On the other end of the complexity spectrum, we've got the <a href="surface.html"><code>surface</code></a> solidifier, which is the least automatic of them all.</p>
+</body>
+</html>

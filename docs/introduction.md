@@ -1,7 +1,7 @@
 #Madeup
 Madeup is a programming language for generating 3D models---it is a language for makings things *up*. Its speakers use commands like `move` and `yaw` to walk paths through space. These paths trace the cross sections or skeletons of solid models. They then use commands like `extrude` or `revolve` to generate a solid model around the paths. The models can then be exported and then printed or imported in another 3D application.
 
-Like any language, Madeup has a grammar and meaning that must be learned in order to express models. This documentation describes the language so that you can start making things up.
+Like any language, Madeup has a grammar and meaning that must be learned in order to express models. This documentation describes the language so that you can start making things up. We begin with examples. You may wish to jump straight to the [language reference](reference.html).
 
 ##Hello, Dowel
 Let's build something. How about an S-shaped curve? The central mechanic of Madeup is walking paths, so we'll walk a path resembling the letter S. This will give us a feel for how to use Madeup's movement and turning commands. I encourage you to create the model yourself using [the Madeup web client](http://madeup.xyz).

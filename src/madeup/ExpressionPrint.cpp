@@ -49,7 +49,7 @@ Co<Expression> ExpressionPrint::evaluate(Environment &env) const {
 
   ExpressionBoolean *boolean_value = dynamic_cast<ExpressionBoolean *>(value.GetPointer());
   if (boolean_value) {
-    std::cout << boolean_value->toBoolean() << std::endl;
+    std::cout << (boolean_value->toBoolean() ? "true" : "false") << std::endl;
     return value;
   }
 

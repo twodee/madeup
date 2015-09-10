@@ -16,8 +16,14 @@ debug true or false == true
 debug false or false == false
 debug false or true == true
 debug true or true == true
-debug not true == false
-debug not false == true
+debug (not true) == false
+debug (not false) == true
+debug (not true == false) == true
+debug (not false == true) == true
+debug (not not true) == true
+debug (not not false) == false
 debug (sign 5) == 1
 debug (sign -100) == -1
 debug (sign 0) == 0
+debug (not 5 < 3) == true
+debug (not 5 > 3) == false

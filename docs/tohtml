@@ -22,6 +22,7 @@ md.gsub!(/\*\*(.*?)\*\*/, '<b style="background-color: #dcdcdc">\1</b>')
 
 # Kramdown inserts literal emdashes, which show up funny in my browser. Let's use the HTML entity instead.
 md.gsub!(/\u2014/, '&mdash;')
+md.gsub!(/\u2026/, '&hellip;')
 
 puts IO.read('header.html')
 puts md
