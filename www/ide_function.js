@@ -566,7 +566,7 @@ $(document).ready(function() {
   });
 
   $('#docs').click(function() {
-    window.open('http://madeup.xyz/docs/introduction.html', '_blank');
+    window.open('docs/introduction.html', '_blank');
   });
 
   $('#solidify').click(function() {

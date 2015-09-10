@@ -35,3 +35,7 @@ add_custom_target(wwwdeps
 add_custom_target(docs
   COMMAND make
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs)
+
+add_custom_target(wwwdocs
+  COMMAND make WWW_ROOT=${WWW_ROOT} wwwdocs
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs)

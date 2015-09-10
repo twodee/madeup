@@ -6,5 +6,10 @@ all: $(HTMLS)
 html/%.html: %.md header.html footer.html Makefile tohtml
 	./tohtml $*.md > $@
 
+wwwdocs:
+	sudo mkdir -p $(WWW_ROOT)/docs
+	sudo cp -r html/* $(WWW_ROOT)/docs
+	sudo chmod -R a+rX $(WWW_ROOT)/docs
+
 clean:
 	rm -f html/*.html
