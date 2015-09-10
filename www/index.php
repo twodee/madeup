@@ -125,6 +125,7 @@
       <input id="smaller" type="button" value="-abc"/>
       <input id="bigger" type="button" value="+abc"/>
       <input id="toggleEditorPopup" class="togglePopup" type="button" value="Editor"/>
+      <input id="docs" type="button" value="Docs"/>
     </div>
 
     <div style="display: inline-block; position: absolute; left: 0px; right: 0px; text-align: center; pointer-events: none;" class="fileLink">

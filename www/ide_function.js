@@ -565,6 +565,10 @@ $(document).ready(function() {
     textEditor.focus();
   });
 
+  $('#docs').click(function() {
+    window.open('http://madeup.xyz/docs/introduction.html', '_blank');
+  });
+
   $('#solidify').click(function() {
     hideMenus();
     log('Running...'); 
