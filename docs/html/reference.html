@@ -14,11 +14,11 @@
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>-- <span style="color:#036;font-weight:bold">This</span> program generates a rocket ship.
--- <span style="color:#036;font-weight:bold">It</span> will fly.
--- <span style="color:#036;font-weight:bold">Someday</span>.
+  <div class="code"><pre><span style="color:#777">-- This program generates a rocket ship.</span>
+<span style="color:#777">-- It will fly.</span>
+<span style="color:#777">-- Someday.</span>
 
-print <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">&lt;=&gt;</span><span style="color:#710">&quot;</span></span> -- <span style="color:#036;font-weight:bold">See</span> it fly!
+<span style="color:#369;font-weight:bold">print</span> <span style="background-color:hsla(0,100%,50%,0.05)">&quot;&lt;=&gt;&quot;</span> <span style="color:#777">-- See it fly!</span>
 </pre></div>
 </div>
   </div>
@@ -40,12 +40,12 @@ print <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#7
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre><span style="color:#60E">6.7</span> -- real
-<span style="color:#00D">2</span> -- integer
-<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">i: </span><span style="color:#710">&quot;</span></span> -- string
-<span style="color:#069">true</span> -- boolean
-<span style="color:#069">false</span> -- boolean
-nothing -- the <span style="color:#080;font-weight:bold">not</span>-a-thing
+  <div class="code"><pre><span style="color:#60E">6.7</span> <span style="color:#777">-- real</span>
+<span style="color:#00D">2</span> <span style="color:#777">-- integer</span>
+<span style="background-color:hsla(0,100%,50%,0.05)">&quot;i: &quot;</span> <span style="color:#777">-- string</span>
+<span style="color:#088">true</span> <span style="color:#777">-- boolean</span>
+<span style="color:#088">false</span> <span style="color:#777">-- boolean</span>
+<span style="color:#088">nothing</span> <span style="color:#777">-- the not-a-thing</span>
 </pre></div>
 </div>
   </div>
@@ -58,7 +58,7 @@ nothing -- the <span style="color:#080;font-weight:bold">not</span>-a-thing
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>print (<span style="color:#00D">5</span> + <span style="color:#00D">3</span>) * <span style="color:#00D">8</span>
+  <div class="code"><pre><span style="color:#369;font-weight:bold">print</span> (<span style="color:#00D">5</span> + <span style="color:#00D">3</span>) * <span style="color:#00D">8</span>
 </pre></div>
 </div>
   </div>
@@ -70,9 +70,9 @@ nothing -- the <span style="color:#080;font-weight:bold">not</span>-a-thing
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>print <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">triangle</span><span style="color:#710">&quot;</span></span>
-print abs <span style="color:#00D">-5</span>
-a = cos pi
+  <div class="code"><pre><span style="color:#369;font-weight:bold">print</span> <span style="background-color:hsla(0,100%,50%,0.05)">&quot;triangle&quot;</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#369;font-weight:bold">abs</span> -<span style="color:#00D">5</span>
+<span style="color:#606">a</span> = <span style="color:#369;font-weight:bold">cos</span> <span style="color:#069">pi</span>
 </pre></div>
 </div>
   </div>
@@ -84,7 +84,7 @@ a = cos pi
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>x = cos (-theta)
+  <div class="code"><pre><span style="color:#606">x</span> = <span style="color:#369;font-weight:bold">cos</span> (-<span style="color:#606">theta</span>)
 </pre></div>
 </div>
   </div>
@@ -96,7 +96,7 @@ a = cos pi
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>x = cos -theta
+  <div class="code"><pre><span style="color:#606">x</span> = <span style="color:#369;font-weight:bold">cos</span> -<span style="color:#606">theta</span>
 </pre></div>
 </div>
   </div>
@@ -111,8 +111,8 @@ a = cos pi
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>x = <span style="color:#60E">-3.14</span>
-print |x + <span style="color:#00D">1</span>| -- prints <span style="color:#60E">2.14</span>
+  <div class="code"><pre><span style="color:#606">x</span> = -<span style="color:#60E">3.14</span>
+<span style="color:#369;font-weight:bold">print</span> |<span style="color:#606">x</span> + <span style="color:#00D">1</span>| <span style="color:#777">-- prints 2.14</span>
 </pre></div>
 </div>
   </div>
@@ -124,8 +124,8 @@ print |x + <span style="color:#00D">1</span>| -- prints <span style="color:#60E"
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>x = <span style="color:#60E">-3.14</span>
-print |x + |<span style="color:#00D">-1</span>|| -- illegal
+  <div class="code"><pre><span style="color:#606">x</span> = -<span style="color:#60E">3.14</span>
+<span style="color:#369;font-weight:bold">print</span> |<span style="color:#606">x</span> + |-<span style="color:#00D">1</span>|| <span style="color:#777">-- illegal</span>
 </pre></div>
 </div>
   </div>
@@ -138,10 +138,10 @@ print |x + |<span style="color:#00D">-1</span>|| -- illegal
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>counts = <span style="color:#00D">10</span> of <span style="color:#00D">0</span>
-counts[<span style="color:#00D">0</span>] = <span style="color:#00D">17</span>
-counts[<span style="color:#00D">9</span>] = <span style="color:#00D">32</span>
-counts[<span style="color:#00D">10</span>] = <span style="color:#00D">5</span> -- illegal, out-of-bounds index
+  <div class="code"><pre><span style="color:#606">counts</span> = <span style="color:#00D">10</span> <span style="color:#080;font-weight:bold">of</span> <span style="color:#00D">0</span>
+<span style="color:#606">counts</span>[<span style="color:#00D">0</span>] = <span style="color:#00D">17</span>
+<span style="color:#606">counts</span>[<span style="color:#00D">9</span>] = <span style="color:#00D">32</span>
+<span style="color:#606">counts</span>[<span style="color:#00D">10</span>] = <span style="color:#00D">5</span> <span style="color:#777">-- illegal, out-of-bounds index</span>
 </pre></div>
 </div>
   </div>
@@ -156,9 +156,9 @@ counts[<span style="color:#00D">10</span>] = <span style="color:#00D">5</span> -
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>print <span style="color:#00D">5</span> ^ <span style="color:#00D">3</span> -- prints <span style="color:#00D">125</span>
-print <span style="color:#00D">49</span> ^ <span style="color:#60E">0.5</span> -- prints <span style="color:#00D">7</span>
-print <span style="color:#00D">2</span> ^ <span style="color:#00D">3</span> ^ <span style="color:#00D">2</span> -- same as (<span style="color:#00D">2</span> ^ <span style="color:#00D">3</span>) ^ <span style="color:#00D">2</span> = <span style="color:#00D">8</span> ^ <span style="color:#00D">2</span> = <span style="color:#00D">64</span>
+  <div class="code"><pre><span style="color:#369;font-weight:bold">print</span> <span style="color:#00D">5</span> ^ <span style="color:#00D">3</span> <span style="color:#777">-- prints 125</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#00D">49</span> ^ <span style="color:#60E">0.5</span> <span style="color:#777">-- prints 7</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#00D">2</span> ^ <span style="color:#00D">3</span> ^ <span style="color:#00D">2</span> <span style="color:#777">-- same as (2 ^ 3) ^ 2 = 8 ^ 2 = 64</span>
 </pre></div>
 </div>
   </div>
@@ -173,12 +173,12 @@ print <span style="color:#00D">2</span> ^ <span style="color:#00D">3</span> ^ <s
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>print <span style="color:#60E">100.7</span> * <span style="color:#00D">2</span> -- <span style="color:#60E">201.4</span>
-print <span style="color:#00D">7</span> / <span style="color:#00D">3</span> -- <span style="color:#00D">2</span>
-print <span style="color:#00D">7</span> / <span style="color:#60E">3.0</span> -- <span style="color:#60E">2.3333</span>...
-print <span style="color:#00D">7</span> /<span style="background-color:hsla(300,100%,50%,0.06)"><span style="color:#404">/</span><span style="color:#808"> 3 -- 2.3333...
-print 7 % 3 -- 1
-</span></span></pre></div>
+  <div class="code"><pre><span style="color:#369;font-weight:bold">print</span> <span style="color:#60E">100.7</span> * <span style="color:#00D">2</span> <span style="color:#777">-- 201.4</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#00D">7</span> / <span style="color:#00D">3</span> <span style="color:#777">-- 2</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#00D">7</span> / <span style="color:#60E">3.0</span> <span style="color:#777">-- 2.3333...</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#00D">7</span> // <span style="color:#00D">3</span> <span style="color:#777">-- 2.3333...</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#00D">7</span> % <span style="color:#00D">3</span> <span style="color:#777">-- 1</span>
+</pre></div>
 </div>
   </div>
 
@@ -190,10 +190,10 @@ print 7 % 3 -- 1
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>print <span style="color:#00D">100</span> + <span style="color:#00D">-100</span> -- <span style="color:#00D">0</span>
-print <span style="color:#60E">0.7</span> + <span style="color:#00D">2</span> -- <span style="color:#60E">2.7</span>
-x = <span style="color:#60E">0.3</span>
-print <span style="color:#00D">6</span> - x -- <span style="color:#60E">5.7</span>
+  <div class="code"><pre><span style="color:#369;font-weight:bold">print</span> <span style="color:#00D">100</span> + -<span style="color:#00D">100</span> <span style="color:#777">-- 0</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#60E">0.7</span> + <span style="color:#00D">2</span> <span style="color:#777">-- 2.7</span>
+<span style="color:#606">x</span> = <span style="color:#60E">0.3</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#00D">6</span> - <span style="color:#606">x</span> <span style="color:#777">-- 5.7</span>
 </pre></div>
 </div>
   </div>
@@ -206,10 +206,10 @@ print <span style="color:#00D">6</span> - x -- <span style="color:#60E">5.7</spa
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>print <span style="color:#00D">5</span> &lt; <span style="color:#00D">3</span> -- <span style="color:#069">false</span>
-print <span style="color:#00D">6</span> &lt;= <span style="color:#00D">6</span> -- <span style="color:#069">true</span>
-print <span style="color:#00D">7</span> &gt;= <span style="color:#00D">3</span> -- <span style="color:#069">true</span>
-print <span style="color:#00D">2</span> &gt; <span style="color:#00D">-2</span> -- <span style="color:#069">true</span>
+  <div class="code"><pre><span style="color:#369;font-weight:bold">print</span> <span style="color:#00D">5</span> &lt; <span style="color:#00D">3</span> <span style="color:#777">-- false</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#00D">6</span> &lt;= <span style="color:#00D">6</span> <span style="color:#777">-- true</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#00D">7</span> &gt;= <span style="color:#00D">3</span> <span style="color:#777">-- true</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#00D">2</span> &gt; -<span style="color:#00D">2</span> <span style="color:#777">-- true</span>
 </pre></div>
 </div>
   </div>
@@ -222,11 +222,11 @@ print <span style="color:#00D">2</span> &gt; <span style="color:#00D">-2</span> 
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>print <span style="color:#00D">5</span> == <span style="color:#00D">0</span> -- <span style="color:#069">false</span>
-print <span style="color:#069">true</span> == <span style="color:#080;font-weight:bold">not</span> <span style="color:#069">false</span> -- <span style="color:#069">true</span>
-print <span style="color:#00D">3</span> / <span style="color:#00D">2</span> == <span style="color:#00D">3</span> /<span style="background-color:hsla(300,100%,50%,0.06)"><span style="color:#404">/</span><span style="color:#808"> 2 -- false
-print 5.7 != 5.69 -- true
-</span></span></pre></div>
+  <div class="code"><pre><span style="color:#369;font-weight:bold">print</span> <span style="color:#00D">5</span> == <span style="color:#00D">0</span> <span style="color:#777">-- false</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#088">true</span> == <span style="color:#080;font-weight:bold">not</span> <span style="color:#088">false</span> <span style="color:#777">-- true</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#00D">3</span> / <span style="color:#00D">2</span> == <span style="color:#00D">3</span> // <span style="color:#00D">2</span> <span style="color:#777">-- false</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#60E">5.7</span> != <span style="color:#60E">5.69</span> <span style="color:#777">-- true</span>
+</pre></div>
 </div>
   </div>
 
@@ -238,11 +238,11 @@ print 5.7 != 5.69 -- true
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>a = b = <span style="color:#00D">3</span>
-print a -- <span style="color:#00D">3</span>
-print b -- <span style="color:#00D">3</span>
-sum = a + b -- sum holds <span style="color:#00D">6</span>
-diff = a - b -- diff holds <span style="color:#00D">0</span>
+  <div class="code"><pre><span style="color:#606">a</span> = <span style="color:#606">b</span> = <span style="color:#00D">3</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#606">a</span> <span style="color:#777">-- 3</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#606">b</span> <span style="color:#777">-- 3</span>
+<span style="color:#606">sum</span> = <span style="color:#606">a</span> + <span style="color:#606">b</span> <span style="color:#777">-- sum holds 6</span>
+<span style="color:#606">diff</span> = <span style="color:#606">a</span> - <span style="color:#606">b</span> <span style="color:#777">-- diff holds 0</span>
 </pre></div>
 </div>
   </div>
@@ -255,11 +255,11 @@ diff = a - b -- diff holds <span style="color:#00D">0</span>
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>print <span style="color:#080;font-weight:bold">not</span> <span style="color:#069">true</span> -- prints <span style="color:#069">false</span>
-x = <span style="color:#00D">15</span>
-<span style="color:#080;font-weight:bold">if</span> <span style="color:#080;font-weight:bold">not</span> x &lt; <span style="color:#00D">15</span>
-  print <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">yes!</span><span style="color:#710">&quot;</span></span>
-<span style="color:#080;font-weight:bold">end</span> -- prints yes!
+  <div class="code"><pre><span style="color:#369;font-weight:bold">print</span> <span style="color:#080;font-weight:bold">not</span> <span style="color:#088">true</span> <span style="color:#777">-- prints false</span>
+<span style="color:#606">x</span> = <span style="color:#00D">15</span>
+<span style="color:#080;font-weight:bold">if</span> <span style="color:#080;font-weight:bold">not</span> <span style="color:#606">x</span> &lt; <span style="color:#00D">15</span>
+  <span style="color:#369;font-weight:bold">print</span> <span style="background-color:hsla(0,100%,50%,0.05)">&quot;yes!&quot;</span>
+<span style="color:#080;font-weight:bold">end</span> <span style="color:#777">-- prints yes!</span>
 </pre></div>
 </div>
   </div>
@@ -272,8 +272,8 @@ x = <span style="color:#00D">15</span>
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre><span style="color:#080;font-weight:bold">if</span> x &gt; <span style="color:#00D">0</span> <span style="color:#080;font-weight:bold">and</span> y &gt; <span style="color:#00D">0</span>
-  print <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">in quadrant 1</span><span style="color:#710">&quot;</span></span>
+  <div class="code"><pre><span style="color:#080;font-weight:bold">if</span> <span style="color:#606">x</span> &gt; <span style="color:#00D">0</span> <span style="color:#080;font-weight:bold">and</span> <span style="color:#606">y</span> &gt; <span style="color:#00D">0</span>
+  <span style="color:#369;font-weight:bold">print</span> <span style="background-color:hsla(0,100%,50%,0.05)">&quot;in quadrant 1&quot;</span>
 <span style="color:#080;font-weight:bold">end</span>
 </pre></div>
 </div>
@@ -287,8 +287,8 @@ x = <span style="color:#00D">15</span>
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre><span style="color:#080;font-weight:bold">if</span> i &lt; <span style="color:#00D">0</span> <span style="color:#080;font-weight:bold">or</span> i &gt;= values.length
-  print <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">bad index</span><span style="color:#710">&quot;</span></span>
+  <div class="code"><pre><span style="color:#080;font-weight:bold">if</span> <span style="color:#606">i</span> &lt; <span style="color:#00D">0</span> <span style="color:#080;font-weight:bold">or</span> <span style="color:#606">i</span> &gt;= <span style="color:#606">length</span> <span style="color:#606">values</span>
+  <span style="color:#369;font-weight:bold">print</span> <span style="background-color:hsla(0,100%,50%,0.05)">&quot;bad index&quot;</span>
 <span style="color:#080;font-weight:bold">end</span>
 </pre></div>
 </div>
@@ -322,9 +322,9 @@ x = <span style="color:#00D">15</span>
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>a = <span style="color:#00D">1</span>
-ndogs = random <span style="color:#00D">0</span>, <span style="color:#00D">10</span>
-tau = <span style="color:#00D">2</span> * pi
+  <div class="code"><pre><span style="color:#606">a</span> = <span style="color:#00D">1</span>
+<span style="color:#606">ndogs</span> = <span style="color:#369;font-weight:bold">random</span> <span style="color:#00D">0</span>, <span style="color:#00D">10</span>
+<span style="color:#606">tau</span> = <span style="color:#00D">2</span> * <span style="color:#069">pi</span>
 </pre></div>
 </div>
   </div>
@@ -336,10 +336,10 @@ tau = <span style="color:#00D">2</span> * pi
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>radius = <span style="color:#00D">10</span>
+  <div class="code"><pre><span style="color:#606">radius</span> = <span style="color:#00D">10</span>
 
-to polarizeX x = radius * cos x
-to polarizeY y = radius * sin y
+<span style="color:#080;font-weight:bold">to</span> <span style="color:#606">polarizeX</span> <span style="color:#606">x</span> = <span style="color:#606">radius</span> * <span style="color:#369;font-weight:bold">cos</span> <span style="color:#606">x</span>
+<span style="color:#080;font-weight:bold">to</span> <span style="color:#606">polarizeY</span> <span style="color:#606">y</span> = <span style="color:#606">radius</span> * <span style="color:#369;font-weight:bold">sin</span> <span style="color:#606">y</span>
 </pre></div>
 </div>
   </div>
@@ -351,15 +351,15 @@ to polarizeY y = radius * sin y
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>n = <span style="color:#00D">3</span>
+  <div class="code"><pre><span style="color:#606">n</span> = <span style="color:#00D">3</span>
 
-to increment
-  n = n + <span style="color:#00D">1</span>
+<span style="color:#080;font-weight:bold">to</span> <span style="color:#606">increment</span>
+  <span style="color:#606">n</span> = <span style="color:#606">n</span> + <span style="color:#00D">1</span>
 <span style="color:#080;font-weight:bold">end</span>
 
-increment
-increment
-print n -- prints <span style="color:#00D">5</span>
+<span style="color:#606">increment</span>
+<span style="color:#606">increment</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#606">n</span> <span style="color:#777">-- prints 5</span>
 </pre></div>
 </div>
   </div>
@@ -375,8 +375,8 @@ print n -- prints <span style="color:#00D">5</span>
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>repeat <span style="color:#00D">10</span>
-  print <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">:)</span><span style="color:#710">&quot;</span></span>
+  <div class="code"><pre><span style="color:#080;font-weight:bold">repeat</span> <span style="color:#00D">10</span>
+  <span style="color:#369;font-weight:bold">print</span> <span style="background-color:hsla(0,100%,50%,0.05)">&quot;:)&quot;</span>
 <span style="color:#080;font-weight:bold">end</span>
 </pre></div>
 </div>
@@ -389,10 +389,10 @@ print n -- prints <span style="color:#00D">5</span>
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>sum = <span style="color:#00D">0</span>
-n = random <span style="color:#00D">0</span>, <span style="color:#00D">100</span>
-repeat n
-  sum = sum + n
+  <div class="code"><pre><span style="color:#606">sum</span> = <span style="color:#00D">0</span>
+<span style="color:#606">n</span> = <span style="color:#369;font-weight:bold">random</span> <span style="color:#00D">0</span>, <span style="color:#00D">100</span>
+<span style="color:#080;font-weight:bold">repeat</span> <span style="color:#606">n</span>
+  <span style="color:#606">sum</span> = <span style="color:#606">sum</span> + <span style="color:#606">n</span>
 <span style="color:#080;font-weight:bold">end</span>
 </pre></div>
 </div>
@@ -406,11 +406,11 @@ repeat n
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>-- prints xoxox
-repeatwich <span style="color:#00D">3</span>
-  print <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">x</span><span style="color:#710">&quot;</span></span>
-around
-  print <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">o</span><span style="color:#710">&quot;</span></span>
+  <div class="code"><pre><span style="color:#777">-- prints xoxox</span>
+<span style="color:#080;font-weight:bold">repeatwich</span> <span style="color:#00D">3</span>
+  <span style="color:#369;font-weight:bold">print</span> <span style="background-color:hsla(0,100%,50%,0.05)">&quot;x&quot;</span>
+<span style="color:#080;font-weight:bold">around</span>
+  <span style="color:#369;font-weight:bold">print</span> <span style="background-color:hsla(0,100%,50%,0.05)">&quot;o&quot;</span>
 <span style="color:#080;font-weight:bold">end</span>
 </pre></div>
 </div>
@@ -426,9 +426,9 @@ around
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>-- prints <span style="color:#00D">0</span>, <span style="color:#00D">1</span>, <span style="color:#00D">2</span>
-<span style="color:#080;font-weight:bold">for</span> i to <span style="color:#00D">3</span>
-  print i
+  <div class="code"><pre><span style="color:#777">-- prints 0, 1, 2</span>
+<span style="color:#080;font-weight:bold">for</span> <span style="color:#606">i</span> <span style="color:#080;font-weight:bold">to</span> <span style="color:#00D">3</span>
+  <span style="color:#369;font-weight:bold">print</span> <span style="color:#606">i</span>
 <span style="color:#080;font-weight:bold">end</span>
 </pre></div>
 </div>
@@ -444,9 +444,9 @@ around
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>-- prints <span style="color:#00D">0</span>, <span style="color:#00D">1</span>, <span style="color:#00D">2</span>, <span style="color:#00D">3</span>
-<span style="color:#080;font-weight:bold">for</span> i through <span style="color:#00D">3</span>
-  print i
+  <div class="code"><pre><span style="color:#777">-- prints 0, 1, 2, 3</span>
+<span style="color:#080;font-weight:bold">for</span> <span style="color:#606">i</span> <span style="color:#080;font-weight:bold">through</span> <span style="color:#00D">3</span>
+  <span style="color:#369;font-weight:bold">print</span> <span style="color:#606">i</span>
 <span style="color:#080;font-weight:bold">end</span>
 </pre></div>
 </div>
@@ -460,9 +460,9 @@ around
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>-- prints <span style="color:#00D">100</span>, <span style="color:#00D">101</span>, <span style="color:#00D">102</span>, <span style="color:#00D">103</span>
-<span style="color:#080;font-weight:bold">for</span> i <span style="color:#080;font-weight:bold">in</span> <span style="color:#00D">100</span>..<span style="color:#00D">103</span>
-  print i
+  <div class="code"><pre><span style="color:#777">-- prints 100, 101, 102, 103</span>
+<span style="color:#080;font-weight:bold">for</span> <span style="color:#606">i</span> <span style="color:#080;font-weight:bold">in</span> <span style="color:#00D">100</span>..<span style="color:#00D">103</span>
+  <span style="color:#369;font-weight:bold">print</span> <span style="color:#606">i</span>
 <span style="color:#080;font-weight:bold">end</span>
 </pre></div>
 </div>
@@ -476,11 +476,11 @@ around
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>-- <span style="color:#036;font-weight:bold">Stop</span> once we go past <span style="color:#00D">100</span>.
-x = <span style="color:#00D">0</span>
-<span style="color:#080;font-weight:bold">while</span> x &lt; <span style="color:#00D">100</span>
-  x = x + random <span style="color:#00D">0</span>, <span style="color:#00D">10</span>
-  moveto x, <span style="color:#00D">0</span>, <span style="color:#00D">0</span>
+  <div class="code"><pre><span style="color:#777">-- Stop once we go past 100.</span>
+<span style="color:#606">x</span> = <span style="color:#00D">0</span>
+<span style="color:#080;font-weight:bold">while</span> <span style="color:#606">x</span> &lt; <span style="color:#00D">100</span>
+  <span style="color:#606">x</span> = <span style="color:#606">x</span> + <span style="color:#369;font-weight:bold">random</span> <span style="color:#00D">0</span>, <span style="color:#00D">10</span>
+  <span style="color:#369;font-weight:bold">moveto</span> <span style="color:#606">x</span>, <span style="color:#00D">0</span>, <span style="color:#00D">0</span>
 <span style="color:#080;font-weight:bold">end</span>
 </pre></div>
 </div>
@@ -497,12 +497,12 @@ x = <span style="color:#00D">0</span>
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>-- <span style="color:#036;font-weight:bold">Zigzag</span>.
-for i <span style="color:#080;font-weight:bold">in</span> <span style="color:#00D">10</span>
-  <span style="color:#080;font-weight:bold">if</span> i % <span style="color:#00D">2</span> == <span style="color:#00D">0</span>
-    moveto <span style="color:#00D">1</span>, <span style="color:#00D">0</span>, <span style="color:#00D">0</span>
+  <div class="code"><pre><span style="color:#777">-- Zigzag.</span>
+<span style="color:#080;font-weight:bold">for</span> <span style="color:#606">i</span> <span style="color:#080;font-weight:bold">in</span> <span style="color:#00D">10</span>
+  <span style="color:#080;font-weight:bold">if</span> <span style="color:#606">i</span> % <span style="color:#00D">2</span> == <span style="color:#00D">0</span>
+    <span style="color:#369;font-weight:bold">moveto</span> <span style="color:#00D">1</span>, <span style="color:#00D">0</span>, <span style="color:#00D">0</span>
   <span style="color:#080;font-weight:bold">else</span>
-    moveto <span style="color:#00D">-1</span>, <span style="color:#00D">0</span>, <span style="color:#00D">0</span>
+    <span style="color:#369;font-weight:bold">moveto</span> -<span style="color:#00D">1</span>, <span style="color:#00D">0</span>, <span style="color:#00D">0</span>
   <span style="color:#080;font-weight:bold">end</span>
 <span style="color:#080;font-weight:bold">end</span>
 </pre></div>
@@ -517,7 +517,7 @@ for i <span style="color:#080;font-weight:bold">in</span> <span style="color:#00
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>to abs x = <span style="color:#080;font-weight:bold">if</span> x &gt; <span style="color:#00D">0</span> <span style="color:#080;font-weight:bold">then</span> x <span style="color:#080;font-weight:bold">else</span> -x
+  <div class="code"><pre><span style="color:#080;font-weight:bold">to</span> <span style="color:#369;font-weight:bold">abs</span> <span style="color:#606">x</span> = <span style="color:#080;font-weight:bold">if</span> <span style="color:#606">x</span> &gt; <span style="color:#00D">0</span> <span style="color:#080;font-weight:bold">then</span> <span style="color:#606">x</span> <span style="color:#080;font-weight:bold">else</span> -<span style="color:#606">x</span>
 </pre></div>
 </div>
   </div>
@@ -533,7 +533,7 @@ for i <span style="color:#080;font-weight:bold">in</span> <span style="color:#00
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>print <span style="color:#00D">9</span> * <span style="color:#00D">7</span> -- prints <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">63</span><span style="color:#710">&quot;</span></span>
+  <div class="code"><pre><span style="color:#369;font-weight:bold">print</span> <span style="color:#00D">9</span> * <span style="color:#00D">7</span> <span style="color:#777">-- prints &quot;63&quot;</span>
 </pre></div>
 </div>
   </div>
@@ -546,7 +546,7 @@ for i <span style="color:#080;font-weight:bold">in</span> <span style="color:#00
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>debug <span style="color:#00D">9</span> * <span style="color:#00D">7</span> -- prints <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">9 * 7: 63</span><span style="color:#710">&quot;</span></span>
+  <div class="code"><pre><span style="color:#369;font-weight:bold">debug</span> <span style="color:#00D">9</span> * <span style="color:#00D">7</span> <span style="color:#777">-- prints &quot;9 * 7: 63&quot;</span>
 </pre></div>
 </div>
   </div>
@@ -625,8 +625,8 @@ for i <span style="color:#080;font-weight:bold">in</span> <span style="color:#00
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>to sum3 a b c
-  a + b + c
+  <div class="code"><pre><span style="color:#080;font-weight:bold">to</span> <span style="color:#606">sum3</span> <span style="color:#606">a</span> <span style="color:#606">b</span> <span style="color:#606">c</span>
+  <span style="color:#606">a</span> + <span style="color:#606">b</span> + <span style="color:#606">c</span>
 <span style="color:#080;font-weight:bold">end</span>
 </pre></div>
 </div>
@@ -639,7 +639,7 @@ for i <span style="color:#080;font-weight:bold">in</span> <span style="color:#00
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>to sum3 a b c = a + b + c
+  <div class="code"><pre><span style="color:#080;font-weight:bold">to</span> <span style="color:#606">sum3</span> <span style="color:#606">a</span> <span style="color:#606">b</span> <span style="color:#606">c</span> = <span style="color:#606">a</span> + <span style="color:#606">b</span> + <span style="color:#606">c</span>
 </pre></div>
 </div>
   </div>
@@ -651,12 +651,12 @@ for i <span style="color:#080;font-weight:bold">in</span> <span style="color:#00
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>to average a b c
-  sum = a + b + c
-  sum <span style="background-color:hsla(300,100%,50%,0.06)"><span style="color:#404">/</span><span style="color:#404">/</span></span> <span style="color:#00D">3</span>
+  <div class="code"><pre><span style="color:#080;font-weight:bold">to</span> <span style="color:#606">average</span> <span style="color:#606">a</span> <span style="color:#606">b</span> <span style="color:#606">c</span>
+  <span style="color:#606">sum</span> = <span style="color:#606">a</span> + <span style="color:#606">b</span> + <span style="color:#606">c</span>
+  <span style="color:#606">sum</span> // <span style="color:#00D">3</span>
 <span style="color:#080;font-weight:bold">end</span>
-print average <span style="color:#00D">10</span>, <span style="color:#00D">20</span>, <span style="color:#00D">30</span> -- prints <span style="color:#00D">20</span>
-print sum -- illegal, sum unknown
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#606">average</span> <span style="color:#00D">10</span>, <span style="color:#00D">20</span>, <span style="color:#00D">30</span> <span style="color:#777">-- prints 20</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#606">sum</span> <span style="color:#777">-- illegal, sum unknown</span>
 </pre></div>
 </div>
   </div>

@@ -160,4 +160,7 @@ surface width, height
 
 ![Surface Cone](images/surface_cone.png){:.midimg}
 
+##Next
 The `surface` solidifier is best suited for building models described by 2D parametric equations. These include planes, cones, spheres, terrain, waves, Klein bottles, and an infinite number of others.
+
+You've learned about each of the solidifiers currently available in Madeup. Perhaps you'd like to read in more detail about the [Madeup language](reference.html)?

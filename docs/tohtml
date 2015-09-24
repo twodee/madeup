@@ -8,7 +8,7 @@ md = IO.read(ARGV[0])
 md.gsub!(/(^(?>{:\.mup}\n~~~+\n(.*\n)*?~~~+\n)(\n!.*\n)?)/, "<div markdown=\"1\" class=\"imgcode\">\n\n\\1\n</div>\n")
 
 # Run Kramdown.
-IO.popen('kramdown --enable-coderay --coderay-line-numbers nil --coderay-default-lang=ruby --smart-quotes "apos,apos,quot,quot"', 'r+') do |pipe|
+IO.popen('kramdown --enable-coderay --coderay-line-numbers nil --coderay-default-lang=madeup --smart-quotes "apos,apos,quot,quot"', 'r+') do |pipe|
   pipe.puts md
   pipe.close_write
   md = pipe.read

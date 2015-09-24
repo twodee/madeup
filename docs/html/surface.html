@@ -11,9 +11,9 @@
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre><span style="color:#080;font-weight:bold">for</span> row to <span style="color:#00D">5</span>
-  <span style="color:#080;font-weight:bold">for</span> column to <span style="color:#00D">6</span>
-    moveto column, row, <span style="color:#00D">0</span>
+  <div class="code"><pre><span style="color:#080;font-weight:bold">for</span> <span style="color:#606">row</span> <span style="color:#080;font-weight:bold">to</span> <span style="color:#00D">5</span>
+  <span style="color:#080;font-weight:bold">for</span> <span style="color:#606">column</span> <span style="color:#080;font-weight:bold">to</span> <span style="color:#00D">6</span>
+    <span style="color:#369;font-weight:bold">moveto</span> <span style="color:#606">column</span>, <span style="color:#606">row</span>, <span style="color:#00D">0</span>
   <span style="color:#080;font-weight:bold">end</span>
 <span style="color:#080;font-weight:bold">end</span>
 </pre></div>
@@ -29,16 +29,16 @@
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre><b style="background-color: #dcdcdc">width = <span style="color:#00D">6</span></b>
-<b style="background-color: #dcdcdc">height = <span style="color:#00D">5</span></b>
+  <div class="code"><pre><b style="background-color: #dcdcdc"><span style="color:#606">width</span> = <span style="color:#00D">6</span></b>
+<b style="background-color: #dcdcdc"><span style="color:#606">height</span> = <span style="color:#00D">5</span></b>
 
-<span style="color:#080;font-weight:bold">for</span> row to <b style="background-color: #dcdcdc">height</b>
-  <span style="color:#080;font-weight:bold">for</span> column to <b style="background-color: #dcdcdc">width</b>
-    moveto column, row, <span style="color:#00D">0</span>
+<span style="color:#080;font-weight:bold">for</span> <span style="color:#606">row</span> <span style="color:#080;font-weight:bold">to</span> <b style="background-color: #dcdcdc"><span style="color:#606">height</span></b>
+  <span style="color:#080;font-weight:bold">for</span> <span style="color:#606">column</span> <span style="color:#080;font-weight:bold">to</span> <b style="background-color: #dcdcdc"><span style="color:#606">width</span></b>
+    <span style="color:#369;font-weight:bold">moveto</span> <span style="color:#606">column</span>, <span style="color:#606">row</span>, <span style="color:#00D">0</span>
   <span style="color:#080;font-weight:bold">end</span>
 <span style="color:#080;font-weight:bold">end</span>
 
-<b style="background-color: #dcdcdc">surface width, height</b>
+<b style="background-color: #dcdcdc"><span style="color:#606">surface</span> <span style="color:#606">width</span>, <span style="color:#606">height</span></b>
 </pre></div>
 </div>
   </div>
@@ -52,16 +52,16 @@
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>width = <span style="color:#00D">6</span>
-height = <span style="color:#00D">5</span>
+  <div class="code"><pre><span style="color:#606">width</span> = <span style="color:#00D">6</span>
+<span style="color:#606">height</span> = <span style="color:#00D">5</span>
 
-<span style="color:#080;font-weight:bold">for</span> row to height
-  <span style="color:#080;font-weight:bold">for</span> column to width
-    moveto column, row, <span style="color:#00D">0</span>
+<span style="color:#080;font-weight:bold">for</span> <span style="color:#606">row</span> <span style="color:#080;font-weight:bold">to</span> <span style="color:#606">height</span>
+  <span style="color:#080;font-weight:bold">for</span> <span style="color:#606">column</span> <span style="color:#080;font-weight:bold">to</span> <span style="color:#606">width</span>
+    <span style="color:#369;font-weight:bold">moveto</span> <span style="color:#606">column</span>, <span style="color:#606">row</span>, <span style="color:#00D">0</span>
   <span style="color:#080;font-weight:bold">end</span>
 <span style="color:#080;font-weight:bold">end</span>
 
-surface width, height
+<span style="color:#606">surface</span> <span style="color:#606">width</span>, <span style="color:#606">height</span>
 </pre></div>
 </div>
   </div>
@@ -76,20 +76,20 @@ surface width, height
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>width = <span style="color:#00D">6</span>
-height = <span style="color:#00D">5</span>
+  <div class="code"><pre><span style="color:#606">width</span> = <span style="color:#00D">6</span>
+<span style="color:#606">height</span> = <span style="color:#00D">5</span>
 
-<span style="color:#080;font-weight:bold">for</span> row to height
-  <span style="color:#080;font-weight:bold">for</span> column to width
-    <b style="background-color: #dcdcdc">proportion = column / (width - <span style="color:#60E">1.0</span>)</b>
-    <b style="background-color: #dcdcdc">degrees = <span style="color:#00D">360</span> * proportion</b>
-    <b style="background-color: #dcdcdc">x = cos degrees</b>
-    <b style="background-color: #dcdcdc">z = sin degrees</b>
-    <b style="background-color: #dcdcdc">moveto x, row, z</b>
+<span style="color:#080;font-weight:bold">for</span> <span style="color:#606">row</span> <span style="color:#080;font-weight:bold">to</span> <span style="color:#606">height</span>
+  <span style="color:#080;font-weight:bold">for</span> <span style="color:#606">column</span> <span style="color:#080;font-weight:bold">to</span> <span style="color:#606">width</span>
+    <b style="background-color: #dcdcdc"><span style="color:#606">proportion</span> = <span style="color:#606">column</span> / (<span style="color:#606">width</span> - <span style="color:#60E">1.0</span>)</b>
+    <b style="background-color: #dcdcdc"><span style="color:#606">degrees</span> = <span style="color:#00D">360</span> * <span style="color:#606">proportion</span></b>
+    <b style="background-color: #dcdcdc"><span style="color:#606">x</span> = <span style="color:#369;font-weight:bold">cos</span> <span style="color:#606">degrees</span></b>
+    <b style="background-color: #dcdcdc"><span style="color:#606">z</span> = <span style="color:#369;font-weight:bold">sin</span> <span style="color:#606">degrees</span></b>
+    <b style="background-color: #dcdcdc"><span style="color:#369;font-weight:bold">moveto</span> <span style="color:#606">x</span>, <span style="color:#606">row</span>, <span style="color:#606">z</span></b>
   <span style="color:#080;font-weight:bold">end</span>
 <span style="color:#080;font-weight:bold">end</span>
 
-surface width, height
+<span style="color:#606">surface</span> <span style="color:#606">width</span>, <span style="color:#606">height</span>
 </pre></div>
 </div>
   </div>
@@ -103,20 +103,20 @@ surface width, height
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>width = <span style="color:#00D">6</span>
-height = <span style="color:#00D">5</span>
+  <div class="code"><pre><span style="color:#606">width</span> = <span style="color:#00D">6</span>
+<span style="color:#606">height</span> = <span style="color:#00D">5</span>
 
-<span style="color:#080;font-weight:bold">for</span> row to height
-  <span style="color:#080;font-weight:bold">for</span> column to width
-    proportion = column / (width - <span style="color:#60E">1.0</span>)
-    degrees = <span style="color:#00D">360</span> * proportion
-    x = cos degrees
-    z = sin degrees
-    moveto x, row, z
+<span style="color:#080;font-weight:bold">for</span> <span style="color:#606">row</span> <span style="color:#080;font-weight:bold">to</span> <span style="color:#606">height</span>
+  <span style="color:#080;font-weight:bold">for</span> <span style="color:#606">column</span> <span style="color:#080;font-weight:bold">to</span> <span style="color:#606">width</span>
+    <span style="color:#606">proportion</span> = <span style="color:#606">column</span> / (<span style="color:#606">width</span> - <span style="color:#60E">1.0</span>)
+    <span style="color:#606">degrees</span> = <span style="color:#00D">360</span> * <span style="color:#606">proportion</span>
+    <span style="color:#606">x</span> = <span style="color:#369;font-weight:bold">cos</span> <span style="color:#606">degrees</span>
+    <span style="color:#606">z</span> = <span style="color:#369;font-weight:bold">sin</span> <span style="color:#606">degrees</span>
+    <span style="color:#369;font-weight:bold">moveto</span> <span style="color:#606">x</span>, <span style="color:#606">row</span>, <span style="color:#606">z</span>
   <span style="color:#080;font-weight:bold">end</span>
 <span style="color:#080;font-weight:bold">end</span>
 
-surface width, height
+<span style="color:#606">surface</span> <span style="color:#606">width</span>, <span style="color:#606">height</span>
 </pre></div>
 </div>
   </div>
@@ -130,20 +130,20 @@ surface width, height
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>width = <span style="color:#00D">6</span>
-height = <span style="color:#00D">5</span>
+  <div class="code"><pre><span style="color:#606">width</span> = <span style="color:#00D">6</span>
+<span style="color:#606">height</span> = <span style="color:#00D">5</span>
 
-<span style="color:#080;font-weight:bold">for</span> row to height
-  <span style="color:#080;font-weight:bold">for</span> column to width
-    proportion = column / (width - <span style="color:#60E">1.0</span>)
-    degrees = <b style="background-color: #dcdcdc">-</b><span style="color:#00D">360</span> * proportion
-    x = cos degrees
-    z = sin degrees
-    moveto x, row, z
+<span style="color:#080;font-weight:bold">for</span> <span style="color:#606">row</span> <span style="color:#080;font-weight:bold">to</span> <span style="color:#606">height</span>
+  <span style="color:#080;font-weight:bold">for</span> <span style="color:#606">column</span> <span style="color:#080;font-weight:bold">to</span> <span style="color:#606">width</span>
+    <span style="color:#606">proportion</span> = <span style="color:#606">column</span> / (<span style="color:#606">width</span> - <span style="color:#60E">1.0</span>)
+    <span style="color:#606">degrees</span> = <b style="background-color: #dcdcdc">-</b><span style="color:#00D">360</span> * <span style="color:#606">proportion</span>
+    <span style="color:#606">x</span> = <span style="color:#369;font-weight:bold">cos</span> <span style="color:#606">degrees</span>
+    <span style="color:#606">z</span> = <span style="color:#369;font-weight:bold">sin</span> <span style="color:#606">degrees</span>
+    <span style="color:#369;font-weight:bold">moveto</span> <span style="color:#606">x</span>, <span style="color:#606">row</span>, <span style="color:#606">z</span>
   <span style="color:#080;font-weight:bold">end</span>
 <span style="color:#080;font-weight:bold">end</span>
 
-surface width, height
+<span style="color:#606">surface</span> <span style="color:#606">width</span>, <span style="color:#606">height</span>
 </pre></div>
 </div>
   </div>
@@ -157,20 +157,20 @@ surface width, height
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>width = <b style="background-color: #dcdcdc"><span style="color:#00D">100</span></b>
-height = <span style="color:#00D">5</span>
+  <div class="code"><pre><span style="color:#606">width</span> = <b style="background-color: #dcdcdc"><span style="color:#00D">100</span></b>
+<span style="color:#606">height</span> = <span style="color:#00D">5</span>
 
-<span style="color:#080;font-weight:bold">for</span> row to height
-  <span style="color:#080;font-weight:bold">for</span> column to width
-    proportion = column / (width - <span style="color:#60E">1.0</span>)
-    degrees = <span style="color:#00D">-360</span> * proportion
-    x = cos degrees
-    z = sin degrees
-    moveto x, row, z
+<span style="color:#080;font-weight:bold">for</span> <span style="color:#606">row</span> <span style="color:#080;font-weight:bold">to</span> <span style="color:#606">height</span>
+  <span style="color:#080;font-weight:bold">for</span> <span style="color:#606">column</span> <span style="color:#080;font-weight:bold">to</span> <span style="color:#606">width</span>
+    <span style="color:#606">proportion</span> = <span style="color:#606">column</span> / (<span style="color:#606">width</span> - <span style="color:#60E">1.0</span>)
+    <span style="color:#606">degrees</span> = -<span style="color:#00D">360</span> * <span style="color:#606">proportion</span>
+    <span style="color:#606">x</span> = <span style="color:#369;font-weight:bold">cos</span> <span style="color:#606">degrees</span>
+    <span style="color:#606">z</span> = <span style="color:#369;font-weight:bold">sin</span> <span style="color:#606">degrees</span>
+    <span style="color:#369;font-weight:bold">moveto</span> <span style="color:#606">x</span>, <span style="color:#606">row</span>, <span style="color:#606">z</span>
   <span style="color:#080;font-weight:bold">end</span>
 <span style="color:#080;font-weight:bold">end</span>
 
-surface width, height
+<span style="color:#606">surface</span> <span style="color:#606">width</span>, <span style="color:#606">height</span>
 </pre></div>
 </div>
   </div>
@@ -184,21 +184,21 @@ surface width, height
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre>width = <span style="color:#00D">100</span>
-height = <span style="color:#00D">5</span>
+  <div class="code"><pre><span style="color:#606">width</span> = <span style="color:#00D">100</span>
+<span style="color:#606">height</span> = <span style="color:#00D">5</span>
 
-<span style="color:#080;font-weight:bold">for</span> row to height
-  <span style="color:#080;font-weight:bold">for</span> column to width
-    proportion = column / (width - <span style="color:#60E">1.0</span>)
-    degrees = <span style="color:#00D">-360</span> * proportion
-    <b style="background-color: #dcdcdc">radius = row / (height - <span style="color:#60E">1.0</span>)</b>
-    x = <b style="background-color: #dcdcdc">radius * cos degrees</b>
-    z = <b style="background-color: #dcdcdc">radius * sin degrees</b>
-    moveto x, row, z
+<span style="color:#080;font-weight:bold">for</span> <span style="color:#606">row</span> <span style="color:#080;font-weight:bold">to</span> <span style="color:#606">height</span>
+  <span style="color:#080;font-weight:bold">for</span> <span style="color:#606">column</span> <span style="color:#080;font-weight:bold">to</span> <span style="color:#606">width</span>
+    <span style="color:#606">proportion</span> = <span style="color:#606">column</span> / (<span style="color:#606">width</span> - <span style="color:#60E">1.0</span>)
+    <span style="color:#606">degrees</span> = -<span style="color:#00D">360</span> * <span style="color:#606">proportion</span>
+    <b style="background-color: #dcdcdc"><span style="color:#606">radius</span> = <span style="color:#606">row</span> / (<span style="color:#606">height</span> - <span style="color:#60E">1.0</span>)</b>
+    <span style="color:#606">x</span> = <b style="background-color: #dcdcdc"><span style="color:#606">radius</span> * <span style="color:#369;font-weight:bold">cos</span> <span style="color:#606">degrees</span></b>
+    <span style="color:#606">z</span> = <b style="background-color: #dcdcdc"><span style="color:#606">radius</span> * <span style="color:#369;font-weight:bold">sin</span> <span style="color:#606">degrees</span></b>
+    <span style="color:#369;font-weight:bold">moveto</span> <span style="color:#606">x</span>, <span style="color:#606">row</span>, <span style="color:#606">z</span>
   <span style="color:#080;font-weight:bold">end</span>
 <span style="color:#080;font-weight:bold">end</span>
 
-surface width, height
+<span style="color:#606">surface</span> <span style="color:#606">width</span>, <span style="color:#606">height</span>
 </pre></div>
 </div>
   </div>
@@ -207,6 +207,9 @@ surface width, height
 
 </div>
 
+<h2 id="next">Next</h2>
 <p>The <code>surface</code> solidifier is best suited for building models described by 2D parametric equations. These include planes, cones, spheres, terrain, waves, Klein bottles, and an infinite number of others.</p>
+
+<p>You've learned about each of the solidifiers currently available in Madeup. Perhaps you'd like to read in more detail about the <a href="reference.html">Madeup language</a>?</p>
 </body>
 </html>

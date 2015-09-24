@@ -194,7 +194,7 @@ Query whether at least one of two booleans is true with the `or` operator.
 
 {:.mup}
 ~~~
-if i < 0 or i >= values.length
+if i < 0 or i >= length values
   print "bad index"
 end
 ~~~
