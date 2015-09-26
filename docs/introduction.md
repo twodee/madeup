@@ -40,7 +40,7 @@ The blank line is not significant. I added it just to make our later code easier
 ~~~
 moveto x:0 y:0 z:0
 
-**yaw degrees:90**
+yaw degrees:90
 **move length:5**
 ~~~
 

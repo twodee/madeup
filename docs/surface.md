@@ -93,7 +93,7 @@ surface width, height
 
 ![Surface Cylinder Inverted](images/surface_cylinder_inverted.png){:.midimg}
 
-Unlike the other solidifiers, `surface` doesn't know what is inside and what is outside your model. It will orient the faces in a default way that may not be correct. Usually we can fix this just by walk the grid in the opposite direction. In our case, we can just negate the degrees:
+Unlike the other solidifiers, `surface` doesn't know what is inside and what is outside your model. It will orient the faces in a default way that may not be correct. Usually we can fix this just by walking the grid in the opposite direction. In our case, we can just negate the degrees:
 
 {:.mup}
 ~~~

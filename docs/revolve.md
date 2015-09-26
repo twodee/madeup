@@ -1,7 +1,7 @@
 #Revolve
-Like `extrude`, the `revolve` solidifier interprets the walked path as the cross section. Instead of elongating it, however, it spins it around some axis. We get to choose the axis, the number of degrees we spin, and how many facets appear in the revolved model.
+Like `extrude`, the `revolve` solidifier interprets the walked path as the cross section of a solid model. Instead of elongating it, however, it spins it around some axis. We get to choose the axis, the number of degrees we spin, and how many facets appear in the revolved model.
 
-For our example, let's create an axle with fixed wheels. We star by tracing out the cross section of the first wheel, the axle, and then second wheel. Let's use some variables to make the code easier to read:
+For our example, let's create an axle with fixed wheels. We start by tracing out the cross section of the first wheel, the axle, and then the second wheel. Let's use some variables to make the code easier to read:
 
 {:.mup}
 ~~~
