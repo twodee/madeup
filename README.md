@@ -2,7 +2,7 @@ Madeup is a programming language for making things up -- literally. Programmers 
 
 Programs may be composed with either text or blocks. The language facilitates an imperative and functional style of programming using standard expressions, conditionals, loops, functions, arrays, and turtle geometry commands.
 
-The easiest way to write Madeup programs is through its [web client](http://madeup.xyz). The [documentation](http://madeup.xyz/docs/introduction.html) contains many examples and a language reference.
+The easiest way to write Madeup programs is through its [web client](http://madeup.xyz). The client has only been tested under Chrome, Firefox, and Safari. The [documentation](http://madeup.xyz/docs/introduction.html) contains many examples and a language reference.
 
 Madeup is still in alpha stage, so you will likely discover bugs, slowness, and missing features. We invite bug reports, contributions, and patience.
 
