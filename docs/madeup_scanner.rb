@@ -31,7 +31,7 @@ module Scanners
     CONSTANTS = %w( true false nothing )
     KEYWORDS = %w( repeat for while in to through of by repeatwich if then else end not and or around )
     PREDEFINED_CONSTANTS = %w( pi e )
-    PREDEFINED_FUNCTIONS = %w( move moveto yaw pitch roll .radius .innerRadius .outerRadius random sin cos tan asin acos atan atan2 log print debug abs nsides translate rotate scale reframe push pop identity reverse center size min max )
+    PREDEFINED_FUNCTIONS = %w( move moveto yaw pitch roll .radius .innerRadius .outerRadius random sin cos tan asin acos atan atan2 log print debug abs nsides translate rotate scale reframe push pop identity reverse center size min max tube dowel dots boxes revolve extrude surface )
     IDENT_KIND = WordList.new(:key).add(CONSTANTS, :value)
                                    .add(KEYWORDS, :keyword)
                                    .add(PREDEFINED_CONSTANTS, :predefined_constant)
