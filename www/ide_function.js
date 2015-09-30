@@ -153,7 +153,7 @@ $(document).ready(function() {
 
     if (Cookies.get('consoleHeight')) {
       $('#console').height(Cookies.get('consoleHeight'));
-      $('#console').height(200);
+      // $('#console').height(200);
       resize();
     }
 
@@ -779,7 +779,7 @@ function run(mode) {
       {
         source: getSource(),
         extension: 'json',
-        geometry_mode: 'SURFACE',
+        geometry_mode: mode,
         shading_mode: isFlatShaded ? 'FLAT' : 'SMOOTH'
       }
     ),
