@@ -198,8 +198,9 @@
   <!-- Setup ______________________________________________________________ -->
   <form id="downloader" action="interpret.php" method="post" style="display: none">
     <input id="extension" type="text" value="obj" name="extension"/>
-    <input id="mode" type="text" value="SURFACE" name="mode"/>
-    <input id="shadingMode" type="text" value="SMOOTH" name="shadingMode"/>
+    <input id="tag" type="text" value="model" name="tag"/>
+    <input id="geometry_mode" type="text" value="SURFACE" name="geometry_mode"/>
+    <input id="shading_mode" type="text" value="SMOOTH" name="shading_mode"/>
     <textarea id="source" name="source"></textarea>
   </form>
 

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
-#include <future>
+/* #include <future> */
+#include <sstream>
 
 #include "madeup/ExpressionBlock.h"
 #include "madeup/ExpressionClosure.h"
@@ -81,7 +82,9 @@ int main(int argc, char **argv) {
         } else if (mode_label == "SMOOTH") {
           is_flat = false;
         } else {
-          usage("unknown geometry mode");
+          std::stringstream ss;
+          ss << "unknown shading mode \"" << mode_label << "\"";
+          usage(ss.str());
         }
         ++optind;
       } else {
@@ -99,7 +102,9 @@ int main(int argc, char **argv) {
         } else if (mode_label == "NONE") {
           geometry_mode = GeometryMode::NONE;
         } else {
-          usage("unknown geometry mode");
+          std::stringstream ss;
+          ss << "unknown geometry mode \"" << mode_label << "\"";
+          usage(ss.str());
         }
         ++optind;
       } else {

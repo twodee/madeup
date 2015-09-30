@@ -153,6 +153,7 @@ $(document).ready(function() {
 
     if (Cookies.get('consoleHeight')) {
       $('#console').height(Cookies.get('consoleHeight'));
+      $('#console').height(200);
       resize();
     }
 
@@ -560,6 +561,7 @@ $(document).ready(function() {
 
   $('#download').click(function() {
     hideMenus();
+    $('#tag').val(mupName);
     $('#source').val(getSource());
     $('#downloader').submit();
     textEditor.focus();
@@ -777,14 +779,14 @@ function run(mode) {
       {
         source: getSource(),
         extension: 'json',
-        mode: mode,
-        shadingMode: isFlatShaded ? 'FLAT' : 'SMOOTH'
+        geometry_mode: 'SURFACE',
+        shading_mode: isFlatShaded ? 'FLAT' : 'SMOOTH'
       }
     ),
     contentType: 'application/json; charset=utf-8',
     dataType: 'json',
     success: function(data) {
-      var sansDebug = data['output'].replace(/^Debug:.*$\n/gm, '');
+      var sansDebug = data['stdout'].replace(/^Debug:.*$\n/gm, '');
       if (sansDebug.length > 0) {
         console.log(sansDebug);
       }
@@ -875,7 +877,7 @@ function run(mode) {
         updateCulling();
         render();
       } else if (data['exit_status'] == 22) {
-        log(data['output'] + '\nYour model was taking a long time to build. It felt like it was never going to finish! So, I stopped trying. Sorry.');
+        log(data['stdout'] + '\nYour model was taking a long time to build. It felt like it was never going to finish! So, I stopped trying. Sorry.');
       } else {
         log(sansDebug);
       }
