@@ -60,7 +60,7 @@ if (!(strcmp($in['extension'], 'json') == 0 || strcmp($in['extension'], 'obj') =
   exec($command, $lines, $out['exit_status']);
   $out['stdout'] = implode("\n", $lines);
 
-  if ($in['extension'] === 'obj') {
+  if ($in['extension'] === 'obj' && $out['exit_status'] == 0) {
     // We generate a file named after the model. But let's play it
     // safe and remove all the alphanumeric junk they try to feed
     // us.

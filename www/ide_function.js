@@ -33,6 +33,16 @@ function populateFileMenu() {
   $('#mups').html(list);
 }
 
+function enableDownload(enable) {
+  if (enable) {
+    $('#download').prop('disabled', false);
+    $('#download').css('color', '#FFFFFF');
+  } else {
+    $('#download').prop('disabled', true);
+    $('#download').css('color', '#666666');
+  }
+}
+
 function generateDownloadable(filename, text) {
   var blob = new Blob([text], {type: "application/json"});
   saveAs(blob, filename);
@@ -559,6 +569,7 @@ $(document).ready(function() {
     toggleMenu('#displayPopup');
   });
 
+  enableDownload(false);
   $('#download').click(function() {
     hideMenus();
     $('#tag').val(mupName);
@@ -668,6 +679,7 @@ $(document).ready(function() {
 });
 
 var onEditorChange = function(delta) {
+  enableDownload(false);
   if (preview) {
     clearTimeout(preview); 
   }
@@ -807,6 +819,7 @@ function run(mode) {
           model.geometry.computeFaceNormals();
           model.geometry.computeVertexNormals();
           allGeometry = model.geometry;
+          enableDownload(true);
         } else {
           var paths = JSON.parse(data['model']);
           allGeometry = new THREE.Geometry();
