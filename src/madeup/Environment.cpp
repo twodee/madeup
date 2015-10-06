@@ -470,9 +470,9 @@ void Environment::move(float distance) {
   QVector3<float> offset(QVector4<float>(turtle.camera.GetTo() * distance, 0.0f));
 
   // Do we apply the transform to the offset between our old position and 
-  // our new? No, no for the time being.
-  /* turtle.position += xforms.top() * offset; */
-  turtle.position += offset;
+  // our new? No, not for the time being.
+  turtle.position += xforms.top() * offset;
+  /* turtle.position += offset; */
 
   // DON'T DO THIS. Move is a relative command. We want to transform the offset.
   /* turtle.position = xforms.top() * turtle.position; */

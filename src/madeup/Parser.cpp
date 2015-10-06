@@ -87,6 +87,7 @@ bool Parser::isInExpressionFirst(int k) const {
          isUp(Token::TO, k) ||
          isUp(Token::NOTHING, k) ||
          isUp(Token::MINUS, k) ||
+         isUp(Token::LEFT_CURLY_BRACE, k) ||
          isUp(Token::ID, k);
 }
 
@@ -182,6 +183,7 @@ void Parser::statement() {
 
 /* ------------------------------------------------------------------------- */
 
+// Precedence level 0: or.
 void Parser::expressionLevel0() {
   expressionLevel1();
   while (isUp(Token::OR)) {
@@ -195,6 +197,7 @@ void Parser::expressionLevel0() {
 
 /* ------------------------------------------------------------------------- */
 
+// Precedence level 1: and.
 void Parser::expressionLevel1() {
   expressionLevel2();
   while (isUp(Token::AND)) {
@@ -208,6 +211,7 @@ void Parser::expressionLevel1() {
 
 /* ------------------------------------------------------------------------- */
 
+// Precedence level 2: not.
 void Parser::expressionLevel2() {
   if (isUp(Token::NOT)) {
     ++i;
@@ -221,6 +225,7 @@ void Parser::expressionLevel2() {
 
 /* ------------------------------------------------------------------------- */
 
+// Precedence level 3: == !=.
 void Parser::expressionLevel3() {
   expressionLevel4();
   while (isUp(Token::EQUAL_TO) || isUp(Token::NOT_EQUAL_TO)) {
@@ -239,6 +244,7 @@ void Parser::expressionLevel3() {
 
 /* ------------------------------------------------------------------------- */
 
+// Precedence level 4: < <= > >=.
 void Parser::expressionLevel4() {
   expressionLevel5();
   while (isUp(Token::LESS_THAN) || isUp(Token::LESS_THAN_OR_EQUAL_TO) || isUp(Token::GREATER_THAN) || isUp(Token::GREATER_THAN_OR_EQUAL_TO)) {
@@ -261,6 +267,7 @@ void Parser::expressionLevel4() {
 
 /* ------------------------------------------------------------------------- */
 
+// Precedence level 5: + -.
 void Parser::expressionLevel5() {
   expressionLevel6();
   while (isUp(Token::PLUS) || isUp(Token::MINUS)) {
@@ -279,6 +286,7 @@ void Parser::expressionLevel5() {
 
 /* ------------------------------------------------------------------------- */
 
+// Precedence level 6: * / // %.
 void Parser::expressionLevel6() {
   expressionLevel7();
   while (isUp(Token::TIMES) || isUp(Token::DIVIDE) || isUp(Token::REAL_DIVIDE) || isUp(Token::REMAINDER)) {
@@ -301,6 +309,7 @@ void Parser::expressionLevel6() {
 
 /* ------------------------------------------------------------------------- */
 
+// Precedence level 7: ^.
 void Parser::expressionLevel7() {
   expressionLevel8();
   while (isUp(Token::CIRCUMFLEX)) {
@@ -314,6 +323,7 @@ void Parser::expressionLevel7() {
 
 /* ------------------------------------------------------------------------- */
 
+// Precedence level 8: expr BY expr OF.
 void Parser::expressionLevel8() {
   expressionLevel9();
   if (!is_in_loop_range && (isUp(Token::BY) || isUp(Token::OF))) {
@@ -349,6 +359,7 @@ void Parser::expressionLevel8() {
 
 /* ------------------------------------------------------------------------- */
 
+// Precedence level 9: unary -.
 void Parser::expressionLevel9() {
   if (isUp(Token::MINUS)) {
     ++i;
@@ -362,6 +373,7 @@ void Parser::expressionLevel9() {
 
 /* ------------------------------------------------------------------------- */
 
+// Precedence level 10: subscript [].
 void Parser::expressionLevel10() {
   atom();
   Co<Expression> array;
@@ -844,6 +856,29 @@ void Parser::atom() {
     } else {
       std::stringstream ss;
       ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected a name.";
+      throw MessagedException(ss.str());
+    }
+
+  } else if (isUp(Token::LEFT_CURLY_BRACE)) {
+    std::vector<Co<Expression> > items;
+    Token left_bracket_token = tokens[i];
+
+    if (!isUp(Token::RIGHT_CURLY_BRACE)) {
+      do {
+        ++i; // consume [ or ,
+        expressionLevel0();
+        items.push_back(popExpression());
+      } while (isUp(Token::COMMA));
+    }
+
+    if (isUp(Token::RIGHT_CURLY_BRACE)) {
+      ExpressionArrayLiteral *array_literal = new ExpressionArrayLiteral(items);
+      SourceLocation location(left_bracket_token.getLocation(), tokens[i].getLocation());
+      pushExpression(array_literal, left_bracket_token.getLocation(), tokens[i].getLocation());
+      ++i;
+    } else {
+      std::stringstream ss;
+      ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected }.";
       throw MessagedException(ss.str());
     }
 

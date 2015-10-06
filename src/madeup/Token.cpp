@@ -66,6 +66,10 @@ const std::string Token::getTypeString() const {
       return "LEFT_BRACKET";
     case RIGHT_BRACKET:
       return "RIGHT_BRACKET";
+    case LEFT_CURLY_BRACE:
+      return "LEFT_CURLY_BRACE";
+    case RIGHT_CURLY_BRACE:
+      return "RIGHT_CURLY_BRACE";
     case PLUS:
       return "PLUS";
     case MINUS:

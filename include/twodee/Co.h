@@ -22,6 +22,7 @@ template<typename T> class Co {
     bool IsNull() const;
 
     T *GetPointer();
+    const T *GetPointer() const;
 
     Co<T> &operator=(const Co<T>& other);
 
@@ -143,6 +144,13 @@ Co<T> &Co<T>::operator=(const Co<T>& other) {
 
 template<typename T>
 T *Co<T>::GetPointer() {
+  return p;
+}
+
+/* ------------------------------------------------------------------------- */
+
+template<typename T>
+const T *Co<T>::GetPointer() const {
   return p;
 }
 

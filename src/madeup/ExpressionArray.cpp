@@ -79,8 +79,42 @@ void ExpressionArrayReference::write(ostream &out) const {
 
 /* ------------------------------------------------------------------------- */
 
-Co<ExpressionArray> ExpressionArrayReference::GetArray() {
+Co<ExpressionArray> ExpressionArrayReference::getArray() {
   return array_expression;
+}
+
+/* ------------------------------------------------------------------------- */
+
+Co<const ExpressionArray> ExpressionArrayReference::getArray() const {
+  return array_expression;
+}
+
+/* ------------------------------------------------------------------------- */
+
+ExpressionArrayLiteral::ExpressionArrayLiteral(const std::vector<Co<Expression> >& items) :
+  items(items) {
+}
+
+/* ------------------------------------------------------------------------- */
+
+Co<Expression> ExpressionArrayLiteral::evaluate(Environment &env) const {
+  Co<ExpressionArray> array = Co<Expression>(new ExpressionArray(items.size(), Co<Expression>(ExpressionUnit::getSingleton())));
+  for (int i = 0; i < items.size(); ++i) {
+    array->setElement(i, items[i]->evaluate(env));
+  }
+
+  return Co<Expression>(new ExpressionArrayReference(array));
+}
+
+/* ------------------------------------------------------------------------- */
+
+void ExpressionArrayLiteral::write(ostream &out) const {
+  out << "(ARRAYLITERAL";
+  for (int i = 0; i < items.size(); ++i) {
+    out << " ";
+    items[i]->write(out);
+  }
+  out << ")";
 }
 
 /* ------------------------------------------------------------------------- */
@@ -130,23 +164,23 @@ ExpressionArraySize::ExpressionArraySize() :
 Co<Expression> ExpressionArraySize::evaluate(Environment &env) const {
   Co<ExpressionClosure> array_closure = env["array"];
   if (array_closure.IsNull()) {
-    throw MessagedException(getSourceLocation().toAnchor() + ": I expect function length to be given a value named array. No value named array is defined.");
+    throw MessagedException(getSourceLocation().toAnchor() + ": I expect function size to be given a value named array. No value named array is defined.");
   }
 
   Co<Expression> array_value = array_closure->evaluate(env);
   ExpressionArrayReference *array = dynamic_cast<ExpressionArrayReference *>(array_value.GetPointer());
 
   if (!array) {
-    throw MessagedException(array_expression->getSourceLocation().toAnchor() + ": I expect function length to be applied to an array. " + array_expression->getSource() + " is not an array.");
+    throw MessagedException(array_expression->getSourceLocation().toAnchor() + ": I expect function size to be applied to an array. " + array_expression->getSource() + " is not an array.");
   }
 
-  return Co<Expression>(new ExpressionInteger(array->GetArray()->getSize()));
+  return Co<Expression>(new ExpressionInteger(array->getArray()->getSize()));
 }
 
 /* ------------------------------------------------------------------------- */
 
 void ExpressionArraySize::write(ostream &out) const {
-  out << "(length array)";
+  out << "(size array)";
 }
 
 /* ------------------------------------------------------------------------- */
@@ -179,15 +213,15 @@ Co<ExpressionInteger> ExpressionArraySubscript::evaluateIndex(Environment &env, 
   }
 
   if (index->toInteger() < 0) {
-    index->setInteger(index->toInteger() + array->GetArray()->getSize());
+    index->setInteger(index->toInteger() + array->getArray()->getSize());
   }
 
-  if (index->toInteger() < 0 || index->toInteger() >= array->GetArray()->getSize()) {
+  if (index->toInteger() < 0 || index->toInteger() >= array->getArray()->getSize()) {
     std::stringstream ss;
     ss << index_expression->getSourceLocation().toAnchor();
     ss << ": Operator [] expects a valid index. The array has ";
-    ss << array->GetArray()->getSize();
-    ss << " elements, indexed 0 through " << (array->GetArray()->getSize() - 1) << ". " << index_expression->getSource() << " is not a valid index.";
+    ss << array->getArray()->getSize();
+    ss << " elements, indexed 0 through " << (array->getArray()->getSize() - 1) << ". " << index_expression->getSource() << " is not a valid index.";
     throw MessagedException(ss.str());
   }
 
@@ -199,7 +233,7 @@ Co<ExpressionInteger> ExpressionArraySubscript::evaluateIndex(Environment &env, 
 Co<Expression> ExpressionArraySubscript::evaluate(Environment &env) const {
   Co<ExpressionArrayReference> array = evaluateArrayReference(env);
   Co<ExpressionInteger> index = evaluateIndex(env, array);
-  return (*array->GetArray())[index->toInteger()];
+  return (*array->getArray())[index->toInteger()];
 }
 
 /* ------------------------------------------------------------------------- */

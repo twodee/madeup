@@ -21,7 +21,7 @@ Co<Expression> ExpressionDefineArrayElement::evaluate(Environment &env) const {
   Co<ExpressionArrayReference> array = subscript->evaluateArrayReference(env); 
   Co<ExpressionInteger> index = subscript->evaluateIndex(env, array); 
 
-  array->GetArray()->setElement(index->toInteger(), rhs_value);
+  array->getArray()->setElement(index->toInteger(), rhs_value);
   
   return rhs_value;
 }

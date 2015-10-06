@@ -31,7 +31,8 @@ class ExpressionArrayReference : public Expression {
 
     Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
-    Co<ExpressionArray> GetArray();
+    Co<ExpressionArray> getArray();
+    Co<const ExpressionArray> getArray() const;
 
   private:
     Co<ExpressionArray> array_expression;
@@ -49,6 +50,19 @@ class ExpressionArrayConstructor : public Expression {
   private:
     Co<Expression> fill_expression;
     Co<Expression> length_expression;
+};
+
+/* ------------------------------------------------------------------------- */
+
+class ExpressionArrayLiteral : public Expression {
+  public:
+    ExpressionArrayLiteral(const std::vector<Co<Expression> >& items);
+
+    Co<Expression> evaluate(Environment &env) const;
+    void write(ostream &out) const;
+
+  private:
+    std::vector<Co<Expression> > items;
 };
 
 /* ------------------------------------------------------------------------- */
