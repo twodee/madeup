@@ -108,10 +108,10 @@ Token Lexer::getToken() {
     return makeToken(Token::LEFT_BRACKET);
   } else if (c == ']') {
     return makeToken(Token::RIGHT_BRACKET);
-  } else if (c == '{') {
-    return makeToken(Token::LEFT_CURLY_BRACE);
-  } else if (c == '}') {
-    return makeToken(Token::RIGHT_CURLY_BRACE);
+  /* } else if (c == '{') { */
+    /* return makeToken(Token::LEFT_CURLY_BRACE); */
+  /* } else if (c == '}') { */
+    /* return makeToken(Token::RIGHT_CURLY_BRACE); */
   } else if (c == ':') {
     return makeToken(Token::COLON);
   } else if (c == '\n') {

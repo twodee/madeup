@@ -14,6 +14,9 @@ class ExpressionCall : public Expression {
     void addParameter(Co<Expression> parameter);
     Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
+    const std::string &getName() const;
+    int getArity() const;
+    const Co<Expression> &operator[](int i) const;
 
   private:
     std::string name;

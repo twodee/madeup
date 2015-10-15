@@ -6,9 +6,9 @@ namespace madeup {
 
 /* ------------------------------------------------------------------------- */
 
-ExpressionDefineArrayElement::ExpressionDefineArrayElement(Co<Expression> array, Co<Expression> index, Co<Expression> rhs) :
+ExpressionDefineArrayElement::ExpressionDefineArrayElement(Co<ExpressionCall> subscript, Co<Expression> rhs) :
   Expression(),
-  subscript(Co<ExpressionArraySubscript>(new ExpressionArraySubscript(array, index))),
+  subscript(subscript),
   rhs(rhs) {
 }
 
@@ -18,12 +18,29 @@ Co<Expression> ExpressionDefineArrayElement::evaluate(Environment &env) const {
   Co<Expression> rhs_value = rhs->evaluate(env);
   rhs_value->setSource(rhs->getSource(), rhs->getSourceLocation());
 
-  Co<ExpressionArrayReference> array = subscript->evaluateArrayReference(env); 
-  Co<ExpressionInteger> index = subscript->evaluateIndex(env, array); 
+  /* Co<ExpressionInteger> index = subscript->evaluateIndex(env, array);  */
 
-  array->getArray()->setElement(index->toInteger(), rhs_value);
+  Co<ExpressionClosure> closure = env[subscript->getName()];
+  Co<Expression> result = closure->evaluate(env);
+  ExpressionArrayReference *array = dynamic_cast<ExpressionArrayReference *>(result.GetPointer());
+  if (array) {
+    // assert only 1 param 
+    if (subscript->getArity() != 1) {
+      throw MessagedException(getSourceLocation().toAnchor() + ": " + "Bad subscript.");
+    }
+
+    // evaluate param
+    Co<Expression> index_value = (*subscript)[0]->evaluate(env);
+    ExpressionInteger *index = dynamic_cast<ExpressionInteger *>(index_value.GetPointer());
+    if (!index) {
+      throw MessagedException(getSourceLocation().toAnchor() + ": " + "Non-integer subscript.");
+    }
+    array->getArray()->setElement(index->toInteger(), rhs_value);
   
-  return rhs_value;
+    return rhs_value;
+  } else {
+    throw MessagedException(getSourceLocation().toAnchor() + ": " + "Bad array");
+  }
 }
 
 /* ------------------------------------------------------------------------- */

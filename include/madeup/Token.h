@@ -17,8 +17,8 @@ class Token {
       ID,
       LEFT_BRACKET,
       RIGHT_BRACKET,
-      LEFT_CURLY_BRACE,
-      RIGHT_CURLY_BRACE,
+      /* LEFT_CURLY_BRACE, */
+      /* RIGHT_CURLY_BRACE, */
       PLUS,
       MINUS,
       TIMES,

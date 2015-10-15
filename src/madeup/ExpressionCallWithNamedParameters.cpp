@@ -30,6 +30,13 @@ Co<Expression> ExpressionCallWithNamedParameters::evaluate(Environment &env) con
     throw MessagedException(getSourceLocation().toAnchor() + ": No function named " + name + " is defined.");
   }
 
+  /* std::cout << "" << std::endl; */
+  /* std::cout << "with names" << std::endl; */
+  /* std::cout << "getSource(): " << getSource() << std::endl; */
+  /* std::cout << "closure: " << closure << std::endl; */
+  /* std::cout << "closure->GetDefine(): " << closure->getDefine() << std::endl; */
+  /* std::cout << "closure->GetDefine()->name: " << closure->getDefine()->getName() << std::endl; */
+
   Co<ExpressionDefine> define = closure->getDefine();
   Co<Environment> closure_env(new Environment(*closure->getEnvironment()));
 

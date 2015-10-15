@@ -3,6 +3,7 @@
 
 #include "madeup/Expression.h"
 #include "madeup/ExpressionArray.h"
+#include "madeup/ExpressionCall.h"
 
 namespace madeup {
 
@@ -10,13 +11,13 @@ namespace madeup {
 
 class ExpressionDefineArrayElement : public Expression {
   public:
-    ExpressionDefineArrayElement(Co<Expression> array, Co<Expression> index, Co<Expression> rhs);
+    ExpressionDefineArrayElement(Co<ExpressionCall> subscript, Co<Expression> rhs);
     Co<Expression> evaluate(Environment &env) const;
     Co<Expression> getRightHandSide() const;
     void write(ostream &out) const;
 
   private:
-    Co<ExpressionArraySubscript> subscript;
+    Co<ExpressionCall> subscript;
     Co<Expression> rhs;
 };
 
