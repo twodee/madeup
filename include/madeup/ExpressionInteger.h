@@ -16,6 +16,7 @@ class ExpressionInteger : public ExpressionNumber {
     void setInteger(int i);
     float toReal() const;
     void write(ostream &out) const;
+    std::string toString() const;
 
   private:
     int value;

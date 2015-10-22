@@ -1,10 +1,13 @@
 #include <sstream>
 
 #include "madeup/ExpressionAdd.h"
+#include "madeup/ExpressionArray.h"
+#include "madeup/ExpressionBoolean.h"
+#include "madeup/ExpressionInteger.h"
+#include "madeup/ExpressionPrimitive.h"
 #include "madeup/ExpressionString.h"
 #include "madeup/ExpressionReal.h"
-#include "madeup/ExpressionInteger.h"
-#include "madeup/ExpressionBoolean.h"
+#include "madeup/ExpressionUnit.h"
 #include "twodee/MessagedException.h"
 
 using std::ostringstream;
@@ -23,69 +26,92 @@ ExpressionAdd::ExpressionAdd(Co<Expression> left, Co<Expression> right) :
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionAdd::evaluate(Environment &env) const {
-  Co<Expression> lvalue = left->evaluate(env);
-  Co<Expression> rvalue = right->evaluate(env);
+  return evaluate_helper(left, right, getSource(), getSourceLocation(), env);
+}
 
-  ExpressionString *lstring = dynamic_cast<ExpressionString *>(lvalue.GetPointer());
-  ExpressionString *rstring = dynamic_cast<ExpressionString *>(rvalue.GetPointer());
-  ExpressionNumber *lnumber = dynamic_cast<ExpressionNumber *>(lvalue.GetPointer());
-  ExpressionNumber *rnumber = dynamic_cast<ExpressionNumber *>(rvalue.GetPointer());
-  ExpressionInteger *linteger = dynamic_cast<ExpressionInteger *>(lvalue.GetPointer());
-  ExpressionInteger *rinteger = dynamic_cast<ExpressionInteger *>(rvalue.GetPointer());
-  ExpressionBoolean *lboolean = dynamic_cast<ExpressionBoolean *>(lvalue.GetPointer());
-  ExpressionBoolean *rboolean = dynamic_cast<ExpressionBoolean *>(rvalue.GetPointer());
-  
-  Co<Expression> value;
+/* ------------------------------------------------------------------------- */
 
-  if (lstring && rstring) {
-    value = Co<Expression>(new ExpressionString(lstring->getString() + rstring->getString()));
-  }
+Co<Expression> ExpressionAdd::evaluate_helper(Co<Expression> l,
+                                              Co<Expression> r,
+                                              const std::string &source,
+                                              const SourceLocation &location,
+                                              Environment &env) {
+  Co<Expression> l_value = l->evaluate(env);
+  Co<Expression> r_value = r->evaluate(env);
 
-  // Left is a string. Convert the other.
-  else if (lstring) {
-    ostringstream ss;
-    ss << lstring->getString();
-    if (rinteger) {
-      ss << rinteger->toInteger();
-    } else if (rnumber) {
-      ss << rnumber->toReal();
-    } else if (rboolean) {
-      ss << (rboolean->toBoolean() ? "true" : "false");
+  // Left is a string.
+  ExpressionString *l_string = dynamic_cast<ExpressionString *>(l_value.GetPointer());
+  if (l_string) {
+    ExpressionPrimitive *r_primitive = dynamic_cast<ExpressionPrimitive *>(r_value.GetPointer());
+    if (r_primitive) {
+      return Co<Expression>(new ExpressionString(l_string->getString() + r_primitive->toString()));
     } else {
-      throw MessagedException(right->getSourceLocation().toAnchor() + ": Operator + doesn't know how to join a string to " + right->getSource());
+      throw MessagedException(r->getSourceLocation().toAnchor() + ": Operator + doesn't know how to join a string to " + r->getSource());
     }
-    return Co<Expression>(new ExpressionString(ss.str()));
   }
 
-  // Right is a string. Convert the other.
-  else if (rstring) {
-    ostringstream ss;
-    if (linteger) {
-      ss << linteger->toInteger();
-    } else if (lnumber) {
-      ss << lnumber->toReal();
-    } else if (lboolean) {
-      ss << lboolean->toBoolean();
+  // Right is a string.
+  ExpressionString *r_string = dynamic_cast<ExpressionString *>(r_value.GetPointer());
+  if (r_string) {
+    ExpressionPrimitive *l_primitive = dynamic_cast<ExpressionPrimitive *>(l_value.GetPointer());
+    if (l_primitive) {
+      return Co<Expression>(new ExpressionString(l_primitive->toString() + r_string->getString()));
     } else {
-      throw MessagedException(right->getSourceLocation().toAnchor() + ": Operator + doesn't know how to join a string to " + right->getSource() + ".");
+      throw MessagedException(l->getSourceLocation().toAnchor() + ": Operator + doesn't know how to append a string to " + l->getSource());
     }
-    ss << rstring->getString();
-    value = Co<Expression>(new ExpressionString(ss.str()));
   }
 
-  else if (linteger && rinteger) {
-    value = Co<Expression>(new ExpressionInteger(linteger->toInteger() + rinteger->toInteger()));
+  // Integers
+  ExpressionInteger *l_integer = dynamic_cast<ExpressionInteger *>(l_value.GetPointer());
+  ExpressionInteger *r_integer = dynamic_cast<ExpressionInteger *>(r_value.GetPointer());
+  if (l_integer && r_integer) {
+    return Co<Expression>(new ExpressionInteger(l_integer->toInteger() + r_integer->toInteger()));
   }
 
-  else if (lnumber && rnumber) {
-    value = Co<Expression>(new ExpressionReal(lnumber->toReal() + rnumber->toReal()));
+  // Any mix of numbers
+  ExpressionNumber *l_number = dynamic_cast<ExpressionNumber *>(l_value.GetPointer());
+  ExpressionNumber *r_number = dynamic_cast<ExpressionNumber *>(r_value.GetPointer());
+  if (l_number && r_number) {
+    return Co<Expression>(new ExpressionReal(l_number->toReal() + r_number->toReal()));
   }
 
-  else {
-    throw MessagedException(getSourceLocation().toAnchor() + ": Operator + doesn't know how to join " + left->getSource() + " and " + right->getSource() + ".");
+  // Arrays
+  ExpressionArrayReference *l_array = dynamic_cast<ExpressionArrayReference *>(l_value.GetPointer());
+  ExpressionArrayReference *r_array = dynamic_cast<ExpressionArrayReference *>(r_value.GetPointer());
+  if (l_array && r_array) {
+    int nitems = l_array->getArray()->getSize();
+    if (nitems == r_array->getArray()->getSize()) {
+      Co<ExpressionArray> array(new ExpressionArray(nitems, ExpressionUnit::getSingleton()));
+      for (int i = 0; i < nitems; ++i) {
+        array->setElement(i, evaluate_helper((*l_array->getArray())[i], (*r_array->getArray())[i], source, location, env));
+      }
+      return Co<Expression>(new ExpressionArrayReference(array));
+    } else {
+      throw MessagedException(location.toAnchor() + ": Operator + doesn't know how to add arrays of different sizes.");
+    }
+  } 
+
+  // Left only is an array
+  if (l_array) {
+    int nitems = l_array->getArray()->getSize();
+    Co<ExpressionArray> array(new ExpressionArray(nitems, ExpressionUnit::getSingleton()));
+    for (int i = 0; i < nitems; ++i) {
+      array->setElement(i, evaluate_helper((*l_array->getArray())[i], r_value, source, location, env));
+    }
+    return Co<Expression>(new ExpressionArrayReference(array));
   }
 
-  return value;
+  // Right only is an array
+  if (r_array) {
+    int nitems = r_array->getArray()->getSize();
+    Co<ExpressionArray> array(new ExpressionArray(nitems, ExpressionUnit::getSingleton()));
+    for (int i = 0; i < nitems; ++i) {
+      array->setElement(i, evaluate_helper(l_value, (*r_array->getArray())[i], source, location, env));
+    }
+    return Co<Expression>(new ExpressionArrayReference(array));
+  }
+
+  throw MessagedException(location.toAnchor() + ": Operator + doesn't know how to join " + l->getSource() + " and " + r->getSource() + ".");
 }
 
 /* ------------------------------------------------------------------------- */

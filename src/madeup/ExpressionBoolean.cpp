@@ -5,7 +5,7 @@ namespace madeup {
 /* ------------------------------------------------------------------------- */
 
 ExpressionBoolean::ExpressionBoolean(bool value) :
-  Expression(),
+  ExpressionPrimitive(),
   value(value) {
 }
 
@@ -25,6 +25,12 @@ bool ExpressionBoolean::toBoolean() const {
 
 void ExpressionBoolean::write(ostream &out) const {
   out << "(BOOLEAN " << (value ? "true" : "false") << ")";
+}
+
+/* ------------------------------------------------------------------------- */
+
+std::string ExpressionBoolean::toString() const {
+  return value ? "true" : "false"; 
 }
 
 /* ------------------------------------------------------------------------- */

@@ -49,7 +49,7 @@ Co<Expression> ExpressionCall::evaluate(Environment &env) const {
   // If the expression takes no parameters, it might be an array and we'll need
   // to look for a subscript. Even if its not, we can skip over a bunch of
   // logic for handling parameters.
-  if (define->getArity() == 0) {
+  if (false && define->getArity() == 0) {
     Co<Expression> result = closure->evaluate(env);
     ExpressionArrayReference *array = dynamic_cast<ExpressionArrayReference *>(result.GetPointer());
     if (array) {

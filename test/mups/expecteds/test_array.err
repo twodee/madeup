@@ -1,0 +1,23 @@
+sum == {101, 302, 490}: true
+diff == {-99, -298, -510}: true
+product == {100, 600, -5000}: true
+p == {7, 14, -70}: true
+p == {7, 14, -70}: true
+q == {100, 150, -50}: true
+q == {5, 4, 2, 1}: true
+ns == {10, 0, 9, 3}: true
+tfs == {false, true, true, false, true}: true
+(-ns) == {5, 0, 10, -8, -3}: true
+(t1 and t2) == {true, false, false, false}: true
+(t1 or t2) == {true, true, true, false}: true
+(a < 100) == {true, true, false, false, false}: true
+all (|q - {0.5, 1.0, 1.5}| < 0.001): true
+r == {0, 1, 2, 0, 1, 2, 0, 1}: true
+r == {1, 0, 3, 9, 6}: true
+p == {1, 64, 9}: true
+all (|l - {3, 6, 4}| < 0.001): true
+all {true, true, true}: true
+all {true}: true
+all {false}: true
+all {false, true, true}: true
+all {false, false}: true

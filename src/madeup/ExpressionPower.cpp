@@ -1,5 +1,6 @@
 #include <sstream>
 
+#include "madeup/ExpressionArray.h"
 #include "madeup/ExpressionInteger.h"
 #include "madeup/ExpressionPower.h"
 #include "madeup/ExpressionReal.h"
@@ -20,34 +21,72 @@ ExpressionPower::ExpressionPower(Co<Expression> left, Co<Expression> right) :
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionPower::evaluate(Environment &env) const {
-  Co<Expression> lvalue = left->evaluate(env);
-  Co<Expression> rvalue = right->evaluate(env);
-
-  ExpressionNumber *lnumber = dynamic_cast<ExpressionNumber *>(lvalue.GetPointer());
-  ExpressionNumber *rnumber = dynamic_cast<ExpressionNumber *>(rvalue.GetPointer());
-
-  if (!lnumber) {
-    throw MessagedException(left->getSourceLocation().toAnchor() + ": Operator ^ expects a numeric base. " + left->getSource() + " is not a number.");
-  }
-
-  if (!rnumber) {
-    throw MessagedException(right->getSourceLocation().toAnchor() + ": Operator ^ expects a numeric exponent. " + right->getSource() + " is not a number.");
-  }
-
-  ExpressionInteger *linteger = dynamic_cast<ExpressionInteger *>(lvalue.GetPointer());
-  ExpressionInteger *rinteger = dynamic_cast<ExpressionInteger *>(rvalue.GetPointer());
-  
-  Co<Expression> r;
-  if (linteger && rinteger) {
-    r = Co<Expression>(new ExpressionInteger((int) pow(linteger->toInteger(), rinteger->toInteger())));
-  } else {
-    r = Co<Expression>(new ExpressionReal(pow(lnumber->toReal(), rnumber->toReal())));
-  }
-
-  return r;
+  return evaluate_helper(left, right, getSource(), getSourceLocation(), env);
 }
 
 /* ------------------------------------------------------------------------- */
+
+Co<Expression> ExpressionPower::evaluate_helper(Co<Expression> l,
+                                                Co<Expression> r,
+                                                const std::string &source,
+                                                const SourceLocation &location,
+                                                Environment &env) {
+  Co<Expression> l_value = l->evaluate(env);
+  Co<Expression> r_value = r->evaluate(env);
+
+  // Integers
+  ExpressionInteger *l_integer = dynamic_cast<ExpressionInteger *>(l_value.GetPointer());
+  ExpressionInteger *r_integer = dynamic_cast<ExpressionInteger *>(r_value.GetPointer());
+  if (l_integer && r_integer) {
+    return Co<Expression>(new ExpressionInteger((int) pow(l_integer->toInteger(), r_integer->toInteger())));
+  }
+
+  // Any mix of numbers
+  ExpressionNumber *l_number = dynamic_cast<ExpressionNumber *>(l_value.GetPointer());
+  ExpressionNumber *r_number = dynamic_cast<ExpressionNumber *>(r_value.GetPointer());
+  if (l_number && r_number) {
+    return Co<Expression>(new ExpressionReal(pow(l_number->toReal(), r_number->toReal())));
+  }
+
+  // Both are arrays
+  ExpressionArrayReference *l_array = dynamic_cast<ExpressionArrayReference *>(l_value.GetPointer());
+  ExpressionArrayReference *r_array = dynamic_cast<ExpressionArrayReference *>(r_value.GetPointer());
+  if (l_array && r_array) {
+    int nitems = l_array->getArray()->getSize();
+    if (nitems == r_array->getArray()->getSize()) {
+      Co<ExpressionArray> array(new ExpressionArray(nitems, ExpressionUnit::getSingleton()));
+      for (int i = 0; i < nitems; ++i) {
+        array->setElement(i, evaluate_helper((*l_array->getArray())[i], (*r_array->getArray())[i], source, location, env));
+      }
+      return Co<Expression>(new ExpressionArrayReference(array));
+    } else {
+      throw MessagedException(location.toAnchor() + ": Operator * doesn't know how to multiply arrays of different sizes.");
+    }
+  } 
+
+  // Left only is an array
+  if (l_array) {
+    int nitems = l_array->getArray()->getSize();
+    Co<ExpressionArray> array(new ExpressionArray(nitems, ExpressionUnit::getSingleton()));
+    for (int i = 0; i < nitems; ++i) {
+      array->setElement(i, evaluate_helper((*l_array->getArray())[i], r_value, source, location, env));
+    }
+    return Co<Expression>(new ExpressionArrayReference(array));
+  }
+
+  // Right only is an array
+  if (r_array) {
+    int nitems = r_array->getArray()->getSize();
+    Co<ExpressionArray> array(new ExpressionArray(nitems, ExpressionUnit::getSingleton()));
+    for (int i = 0; i < nitems; ++i) {
+      array->setElement(i, evaluate_helper(l_value, (*r_array->getArray())[i], source, location, env));
+    }
+    return Co<Expression>(new ExpressionArrayReference(array));
+  }
+
+  throw MessagedException(location.toAnchor() + ": Operator ^ doesn't know how to raise " + l->getSource() + " to " + r->getSource() + ".");
+}
+
 
 void ExpressionPower::write(ostream &out) const {
   out << "(^ ";

@@ -2,5 +2,5 @@ n = 10
 nums = n of 3
 print size nums
 for i to size nums
-  print nums(i)
+  print nums[i]
 end

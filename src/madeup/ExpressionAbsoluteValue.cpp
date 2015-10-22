@@ -1,6 +1,7 @@
 #include <sstream>
 
 #include "madeup/ExpressionAbsoluteValue.h"
+#include "madeup/ExpressionArray.h"
 #include "madeup/ExpressionInteger.h"
 #include "madeup/ExpressionReal.h"
 #include "twodee/MessagedException.h"
@@ -20,24 +21,41 @@ ExpressionAbsoluteValue::ExpressionAbsoluteValue(Co<Expression> expr) :
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionAbsoluteValue::evaluate(Environment &env) const {
-  Co<Expression> value = expr->evaluate(env);
+  return evaluate_helper(expr, getSource(), getSourceLocation(), env);
+}
 
-  ExpressionNumber *number = dynamic_cast<ExpressionNumber *>(value.GetPointer());
+/* ------------------------------------------------------------------------- */
 
-  if (!number) {
-    throw MessagedException(expr->getSourceLocation().toAnchor() + ": I can only compute the absolute value of a number. " + expr->getSource() + " is not a number.");
-  }
+Co<Expression> ExpressionAbsoluteValue::evaluate_helper(Co<Expression> e,
+                                                        const std::string &source,
+                                                        const SourceLocation &location,
+                                                        Environment &env) {
+  Co<Expression> value = e->evaluate(env);
 
+  // Integer
   ExpressionInteger *integer = dynamic_cast<ExpressionInteger *>(value.GetPointer());
-  
-  Co<Expression> r;
   if (integer) {
-    r = Co<Expression>(new ExpressionInteger(abs(integer->toInteger())));
-  } else {
-    r = Co<Expression>(new ExpressionReal(fabs(number->toReal())));
+    return Co<Expression>(new ExpressionInteger(abs(integer->toInteger())));
   }
 
-  return r;
+  // Any number
+  ExpressionNumber *number = dynamic_cast<ExpressionNumber *>(value.GetPointer());
+  if (number) {
+    return Co<Expression>(new ExpressionReal(fabs(number->toReal())));
+  }
+
+  // Array
+  ExpressionArrayReference *e_array = dynamic_cast<ExpressionArrayReference *>(value.GetPointer());
+  if (e_array) {
+    int nitems = e_array->getArray()->getSize();
+    Co<ExpressionArray> array(new ExpressionArray(nitems));
+    for (int i = 0; i < nitems; ++i) {
+      array->setElement(i, evaluate_helper((*e_array->getArray())[i], source, location, env));
+    }
+    return Co<Expression>(new ExpressionArrayReference(array));
+  }
+
+  throw MessagedException(e->getSourceLocation().toAnchor() + ": I don't know how to compute the absolute value of " + e->getSource() + ".");
 }
 
 /* ------------------------------------------------------------------------- */

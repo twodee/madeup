@@ -1,8 +1,10 @@
 #include <sstream>
 
+#include "madeup/ExpressionArray.h"
 #include "madeup/ExpressionInteger.h"
 #include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionSubtract.h"
+#include "madeup/ExpressionUnit.h"
 #include "twodee/MessagedException.h"
 
 using namespace td;
@@ -20,25 +22,70 @@ ExpressionSubtract::ExpressionSubtract(Co<Expression> left, Co<Expression> right
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionSubtract::evaluate(Environment &env) const {
-  Co<Expression> lvalue = left->evaluate(env);
-  Co<Expression> rvalue = right->evaluate(env);
+  return subtract(left, right, getSource(), getSourceLocation(), env);
+}
 
-  ExpressionNumber *lnumber = dynamic_cast<ExpressionNumber *>(lvalue.GetPointer());
-  ExpressionNumber *rnumber = dynamic_cast<ExpressionNumber *>(rvalue.GetPointer());
-  ExpressionInteger *linteger = dynamic_cast<ExpressionInteger *>(lvalue.GetPointer());
-  ExpressionInteger *rinteger = dynamic_cast<ExpressionInteger *>(rvalue.GetPointer());
-  
-  // Both are decimals.
-  Co<Expression> r;
-  if (linteger && rinteger) {
-    r = Co<Expression>(new ExpressionInteger(linteger->toInteger() - rinteger->toInteger()));
-  } else if (lnumber && rnumber) {
-    r = Co<Expression>(new ExpressionReal(lnumber->toReal() - rnumber->toReal()));
-  } else {
-    throw MessagedException(getSourceLocation().toAnchor() + ": Operator - doesn't know how to subtract " + right->getSource() + " from " + left->getSource() + ".");
+/* ------------------------------------------------------------------------- */
+
+Co<Expression> ExpressionSubtract::subtract(Co<Expression> l,
+                                            Co<Expression> r,
+                                            const std::string &source,
+                                            const SourceLocation &location,
+                                            Environment &env) {
+  Co<Expression> l_value = l->evaluate(env);
+  Co<Expression> r_value = r->evaluate(env);
+
+  // Integers
+  ExpressionInteger *l_integer = dynamic_cast<ExpressionInteger *>(l_value.GetPointer());
+  ExpressionInteger *r_integer = dynamic_cast<ExpressionInteger *>(r_value.GetPointer());
+  if (l_integer && r_integer) {
+    return Co<Expression>(new ExpressionInteger(l_integer->toInteger() - r_integer->toInteger()));
   }
 
-  return r;
+  // Any mix of numbers
+  ExpressionNumber *l_number = dynamic_cast<ExpressionNumber *>(l_value.GetPointer());
+  ExpressionNumber *r_number = dynamic_cast<ExpressionNumber *>(r_value.GetPointer());
+  if (l_number && r_number) {
+    return Co<Expression>(new ExpressionReal(l_number->toReal() - r_number->toReal()));
+  }
+
+  // Arrays
+  ExpressionArrayReference *l_array = dynamic_cast<ExpressionArrayReference *>(l_value.GetPointer());
+  ExpressionArrayReference *r_array = dynamic_cast<ExpressionArrayReference *>(r_value.GetPointer());
+  if (l_array && r_array) {
+    int nitems = l_array->getArray()->getSize();
+    if (nitems == r_array->getArray()->getSize()) {
+      Co<ExpressionArray> array(new ExpressionArray(nitems, ExpressionUnit::getSingleton()));
+      for (int i = 0; i < nitems; ++i) {
+        array->setElement(i, subtract((*l_array->getArray())[i], (*r_array->getArray())[i], source, location, env));
+      }
+      return Co<Expression>(new ExpressionArrayReference(array));
+    } else {
+      throw MessagedException(location.toAnchor() + ": Operator - doesn't know how to subtract arrays of different sizes.");
+    }
+  } 
+
+  // Left only is an array
+  if (l_array) {
+    int nitems = l_array->getArray()->getSize();
+    Co<ExpressionArray> array(new ExpressionArray(nitems, ExpressionUnit::getSingleton()));
+    for (int i = 0; i < nitems; ++i) {
+      array->setElement(i, subtract((*l_array->getArray())[i], r_value, source, location, env));
+    }
+    return Co<Expression>(new ExpressionArrayReference(array));
+  }
+
+  // Right only is an array
+  if (r_array) {
+    int nitems = r_array->getArray()->getSize();
+    Co<ExpressionArray> array(new ExpressionArray(nitems, ExpressionUnit::getSingleton()));
+    for (int i = 0; i < nitems; ++i) {
+      array->setElement(i, subtract(l_value, (*r_array->getArray())[i], source, location, env));
+    }
+    return Co<Expression>(new ExpressionArrayReference(array));
+  }
+
+  throw MessagedException(location.toAnchor() + ": Operator - doesn't know how to join " + l->getSource() + " and " + r->getSource() + ".");
 }
 
 /* ------------------------------------------------------------------------- */

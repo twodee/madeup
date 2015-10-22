@@ -15,6 +15,11 @@ class ExpressionLog : public Expression {
     void write(ostream &out) const;
 
   private:
+    static Co<Expression> evaluate_helper(Co<Expression> base,
+                                          Co<Expression> x,
+                                          const std::string &source,
+                                          const SourceLocation &location,
+                                          Environment &env);
 };
 
 /* ------------------------------------------------------------------------- */

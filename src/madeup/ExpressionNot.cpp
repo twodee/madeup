@@ -1,5 +1,6 @@
 #include <sstream>
 
+#include "madeup/ExpressionArray.h"
 #include "madeup/ExpressionBoolean.h"
 #include "madeup/ExpressionNot.h"
 #include "twodee/MessagedException.h"
@@ -18,15 +19,35 @@ ExpressionNot::ExpressionNot(Co<Expression> left) :
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionNot::evaluate(Environment &env) const {
-  Co<Expression> lvalue = left->evaluate(env);
+  return evaluate_helper(left, getSource(), getSourceLocation(), env);
+}
 
-  ExpressionBoolean *lboolean = dynamic_cast<ExpressionBoolean *>(lvalue.GetPointer());
-  
-  if (lboolean) {
-    return Co<Expression>(new ExpressionBoolean(!lboolean->toBoolean()));
-  } else {
-    throw MessagedException(left->getSourceLocation().toAnchor() + ": Operator not expects a boolean operand. " + left->getSource() + " is not boolean.");
+/* ------------------------------------------------------------------------- */
+
+Co<Expression> ExpressionNot::evaluate_helper(Co<Expression> e,
+                                              const std::string &source,
+                                              const SourceLocation &location,
+                                              Environment &env) {
+  Co<Expression> value = e->evaluate(env);
+
+  // Boolean
+  ExpressionBoolean *e_boolean = dynamic_cast<ExpressionBoolean *>(value.GetPointer());
+  if (e_boolean) {
+    return Co<Expression>(new ExpressionBoolean(!e_boolean->toBoolean()));
   }
+
+  // Array
+  ExpressionArrayReference *e_array = dynamic_cast<ExpressionArrayReference *>(value.GetPointer());
+  if (e_array) {
+    int nitems = e_array->getArray()->getSize();
+    Co<ExpressionArray> array(new ExpressionArray(nitems));
+    for (int i = 0; i < nitems; ++i) {
+      array->setElement(i, evaluate_helper((*e_array->getArray())[i], source, location, env));
+    }
+    return Co<Expression>(new ExpressionArrayReference(array));
+  }
+
+  throw MessagedException(e->getSourceLocation().toAnchor() + ": I don't know how to apply operator not to " + e->getSource() + ".");
 }
 
 /* ------------------------------------------------------------------------- */

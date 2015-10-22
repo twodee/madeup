@@ -7,7 +7,7 @@ namespace madeup {
 /* ------------------------------------------------------------------------- */
 
 ExpressionString::ExpressionString(const std::string &value) :
-  Expression(),
+  ExpressionPrimitive(),
   value(value) {
 }
 
@@ -27,6 +27,12 @@ string ExpressionString::getString() const {
 
 void ExpressionString::write(ostream &out) const {
   out << "(STRING " << value << ")";
+}
+
+/* ------------------------------------------------------------------------- */
+
+std::string ExpressionString::toString() const {
+  return value;
 }
 
 /* ------------------------------------------------------------------------- */

@@ -56,7 +56,7 @@ bool ExpressionPrint::print(const Co<Expression>& value) {
   const ExpressionArrayReference *array_reference = dynamic_cast<const ExpressionArrayReference *>(value.GetPointer());
   if (array_reference) {
     Co<ExpressionArray> array_value = array_reference->getArray();
-    std::cout << "[";
+    std::cout << "{";
     if (array_value->getSize() > 0) {
       print((*array_value)[0]);
       for (int i = 1; i < array_value->getSize(); ++i) {
@@ -64,7 +64,7 @@ bool ExpressionPrint::print(const Co<Expression>& value) {
         print((*array_value)[i]);
       }
     }
-    std::cout << "]";
+    std::cout << "}";
     return true;
   }
 

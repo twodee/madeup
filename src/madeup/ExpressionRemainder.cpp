@@ -1,3 +1,4 @@
+#include "madeup/ExpressionArray.h"
 #include "madeup/ExpressionRemainder.h"
 #include "madeup/ExpressionInteger.h"
 #include "twodee/MessagedException.h"
@@ -17,21 +18,67 @@ ExpressionRemainder::ExpressionRemainder(Co<Expression> left, Co<Expression> rig
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionRemainder::evaluate(Environment &env) const {
-  Co<Expression> lvalue = left->evaluate(env);
-  Co<Expression> rvalue = right->evaluate(env);
+  return evaluate_helper(left, right, getSource(), getSourceLocation(), env);
+}
 
-  ExpressionInteger *linteger = dynamic_cast<ExpressionInteger *>(lvalue.GetPointer());
-  ExpressionInteger *rinteger = dynamic_cast<ExpressionInteger *>(rvalue.GetPointer());
-  
-  if (linteger && rinteger) {
-    if (rinteger->toInteger() != 0) {
-      return Co<Expression>(new ExpressionInteger(linteger->toInteger() % rinteger->toInteger()));
+/* ------------------------------------------------------------------------- */
+
+Co<Expression> ExpressionRemainder::evaluate_helper(Co<Expression> l,
+                                                    Co<Expression> r,
+                                                    const std::string &source,
+                                                    const SourceLocation &location,
+                                                    Environment &env) {
+  Co<Expression> l_value = l->evaluate(env);
+  Co<Expression> r_value = r->evaluate(env);
+
+  // Integers
+  ExpressionInteger *l_integer = dynamic_cast<ExpressionInteger *>(l_value.GetPointer());
+  ExpressionInteger *r_integer = dynamic_cast<ExpressionInteger *>(r_value.GetPointer());
+  if (l_integer && r_integer) {
+    if (r_integer->toInteger() != 0) {
+      return Co<Expression>(new ExpressionInteger(l_integer->toInteger() % r_integer->toInteger()));
     } else {
-      throw MessagedException(right->getSourceLocation().toAnchor() + ": I don't know how to get the remainder of something divided by 0.");
+      throw MessagedException(r->getSourceLocation().toAnchor() + ": I don't know how to get the remainder when dividing by 0.");
     }
   }
-  
-  throw MessagedException(getSourceLocation().toAnchor() + ": Operator % doesn't know how to get the remainder of " + left->getSource() + " divided by " + right->getSource() + ".");
+ 
+  // Both are arrays
+  ExpressionArrayReference *l_array = dynamic_cast<ExpressionArrayReference *>(l_value.GetPointer());
+  ExpressionArrayReference *r_array = dynamic_cast<ExpressionArrayReference *>(r_value.GetPointer());
+  if (l_array && r_array) {
+    int nitems = l_array->getArray()->getSize();
+    if (nitems == r_array->getArray()->getSize()) {
+      Co<ExpressionArray> array(new ExpressionArray(nitems));
+      for (int i = 0; i < nitems; ++i) {
+        array->setElement(i, evaluate_helper((*l_array->getArray())[i], (*r_array->getArray())[i], source, location, env));
+      }
+      return Co<Expression>(new ExpressionArrayReference(array));
+    } else {
+      throw MessagedException(location.toAnchor() + ": Operator % doesn't know how to get remainders across arrays of different sizes.");
+    }
+  } 
+
+  // Left only is an array
+  if (l_array) {
+    int nitems = l_array->getArray()->getSize();
+    Co<ExpressionArray> array(new ExpressionArray(nitems));
+    for (int i = 0; i < nitems; ++i) {
+      array->setElement(i, evaluate_helper((*l_array->getArray())[i], r_value, source, location, env));
+    }
+    return Co<Expression>(new ExpressionArrayReference(array));
+  }
+
+  // Right only is an array
+  if (r_array) {
+    int nitems = r_array->getArray()->getSize();
+    Co<ExpressionArray> array(new ExpressionArray(nitems));
+    for (int i = 0; i < nitems; ++i) {
+      array->setElement(i, evaluate_helper(l_value, (*r_array->getArray())[i], source, location, env));
+    }
+    return Co<Expression>(new ExpressionArrayReference(array));
+  }
+
+  throw MessagedException(location.toAnchor() + ": Operator % doesn't know how to get the remainder of " + l->getSource() + " divided by " + r->getSource() + ".");
 }
 
 /* ------------------------------------------------------------------------- */

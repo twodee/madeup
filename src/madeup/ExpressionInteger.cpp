@@ -41,4 +41,12 @@ void ExpressionInteger::write(ostream &out) const {
 
 /* ------------------------------------------------------------------------- */
 
+std::string ExpressionInteger::toString() const {
+  stringstream ss;
+  ss << value;
+  return ss.str();
+}
+
+/* ------------------------------------------------------------------------- */
+
 }

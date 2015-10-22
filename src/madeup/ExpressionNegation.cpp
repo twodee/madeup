@@ -1,5 +1,6 @@
 #include <sstream>
 
+#include "madeup/ExpressionArray.h"
 #include "madeup/ExpressionInteger.h"
 #include "madeup/ExpressionNegation.h"
 #include "madeup/ExpressionReal.h"
@@ -19,19 +20,41 @@ ExpressionNegation::ExpressionNegation(Co<Expression> left) :
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionNegation::evaluate(Environment &env) const {
-  Co<Expression> lvalue = left->evaluate(env);
+  return evaluate_helper(left, getSource(), getSourceLocation(), env);
+}
 
-  ExpressionInteger *lint = dynamic_cast<ExpressionInteger *>(lvalue.GetPointer());
-  if (lint) {
-    return Co<Expression>(new ExpressionInteger(-lint->toInteger()));
-  }
-  
-  ExpressionReal *ldecimal = dynamic_cast<ExpressionReal *>(lvalue.GetPointer());
-  if (ldecimal) {
-    return Co<Expression>(new ExpressionReal(-ldecimal->toReal()));
+/* ------------------------------------------------------------------------- */
+
+Co<Expression> ExpressionNegation::evaluate_helper(Co<Expression> e,
+                                                   const std::string &source,
+                                                   const SourceLocation &location,
+                                                   Environment &env) {
+  Co<Expression> value = e->evaluate(env);
+
+  // Integer
+  ExpressionInteger *integer = dynamic_cast<ExpressionInteger *>(value.GetPointer());
+  if (integer) {
+    return Co<Expression>(new ExpressionInteger(-integer->toInteger()));
   }
 
-  throw MessagedException(left->getSourceLocation().toAnchor() + ": Operator not expects a numeric operand. " + left->getSource() + " is not numeric.");
+  // Any number
+  ExpressionNumber *number = dynamic_cast<ExpressionNumber *>(value.GetPointer());
+  if (number) {
+    return Co<Expression>(new ExpressionReal(-number->toReal()));
+  }
+
+  // Array
+  ExpressionArrayReference *e_array = dynamic_cast<ExpressionArrayReference *>(value.GetPointer());
+  if (e_array) {
+    int nitems = e_array->getArray()->getSize();
+    Co<ExpressionArray> array(new ExpressionArray(nitems));
+    for (int i = 0; i < nitems; ++i) {
+      array->setElement(i, evaluate_helper((*e_array->getArray())[i], source, location, env));
+    }
+    return Co<Expression>(new ExpressionArrayReference(array));
+  }
+
+  throw MessagedException(e->getSourceLocation().toAnchor() + ": I don't know how to negate " + e->getSource() + ".");
 }
 
 /* ------------------------------------------------------------------------- */

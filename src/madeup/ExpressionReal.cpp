@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include "madeup/ExpressionReal.h"
 
 namespace madeup {
@@ -31,6 +33,14 @@ int ExpressionReal::toInteger() const {
 
 void ExpressionReal::write(ostream &out) const {
   out << "(REAL " << value << ")";
+}
+
+/* ------------------------------------------------------------------------- */
+
+std::string ExpressionReal::toString() const {
+  std::stringstream ss;
+  ss << value;
+  return ss.str(); 
 }
 
 /* ------------------------------------------------------------------------- */

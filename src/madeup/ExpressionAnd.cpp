@@ -1,3 +1,4 @@
+#include "madeup/ExpressionArray.h"
 #include "madeup/ExpressionAnd.h"
 #include "madeup/ExpressionBoolean.h"
 #include "twodee/MessagedException.h"
@@ -17,22 +18,63 @@ ExpressionAnd::ExpressionAnd(Co<Expression> left, Co<Expression> right) :
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionAnd::evaluate(Environment &env) const {
-  Co<Expression> lvalue = left->evaluate(env);
-  Co<Expression> rvalue = right->evaluate(env);
+  return evaluate_helper(left, right, getSource(), getSourceLocation(), env);
+}
 
-  ExpressionBoolean *lboolean = dynamic_cast<ExpressionBoolean *>(lvalue.GetPointer());
-  ExpressionBoolean *rboolean = dynamic_cast<ExpressionBoolean *>(rvalue.GetPointer());
-  
-  Co<Expression> value;
-  if (lboolean && rboolean) {
-    value = Co<Expression>(new ExpressionBoolean(lboolean->toBoolean() && rboolean->toBoolean()));
-  } else if (!lboolean) {
-    throw MessagedException(left->getSourceLocation().toAnchor() + ": Operator and expects boolean operands. " + left->getSource() + " is not boolean.");
-  } else if (!rboolean) {
-    throw MessagedException(right->getSourceLocation().toAnchor() + ": Operator or expects boolean operands. " + right->getSource() + " is not boolean.");
+/* ------------------------------------------------------------------------- */
+
+Co<Expression> ExpressionAnd::evaluate_helper(Co<Expression> l,
+                                              Co<Expression> r,
+                                              const std::string &source,
+                                              const SourceLocation &location,
+                                              Environment &env) {
+  Co<Expression> l_value = l->evaluate(env);
+  Co<Expression> r_value = r->evaluate(env);
+
+  // Booleans
+  ExpressionBoolean *l_boolean = dynamic_cast<ExpressionBoolean *>(l_value.GetPointer());
+  ExpressionBoolean *r_boolean = dynamic_cast<ExpressionBoolean *>(r_value.GetPointer());
+  if (l_boolean && r_boolean) {
+    return Co<Expression>(new ExpressionBoolean(l_boolean->toBoolean() && r_boolean->toBoolean()));
   }
 
-  return value;
+  // Both are arrays
+  ExpressionArrayReference *l_array = dynamic_cast<ExpressionArrayReference *>(l_value.GetPointer());
+  ExpressionArrayReference *r_array = dynamic_cast<ExpressionArrayReference *>(r_value.GetPointer());
+  if (l_array && r_array) {
+    int nitems = l_array->getArray()->getSize();
+    if (nitems == r_array->getArray()->getSize()) {
+      Co<ExpressionArray> array(new ExpressionArray(nitems));
+      for (int i = 0; i < nitems; ++i) {
+        array->setElement(i, evaluate_helper((*l_array->getArray())[i], (*r_array->getArray())[i], source, location, env));
+      }
+      return Co<Expression>(new ExpressionArrayReference(array));
+    } else {
+      throw MessagedException(location.toAnchor() + ": Operator and doesn't know how to join arrays of different sizes.");
+    }
+  } 
+
+  // Left only is an array
+  if (l_array && r_boolean) {
+    int nitems = l_array->getArray()->getSize();
+    Co<ExpressionArray> array(new ExpressionArray(nitems));
+    for (int i = 0; i < nitems; ++i) {
+      array->setElement(i, evaluate_helper((*l_array->getArray())[i], r_value, source, location, env));
+    }
+    return Co<Expression>(new ExpressionArrayReference(array));
+  }
+
+  // Right only is an array
+  if (l_boolean && r_array) {
+    int nitems = r_array->getArray()->getSize();
+    Co<ExpressionArray> array(new ExpressionArray(nitems));
+    for (int i = 0; i < nitems; ++i) {
+      array->setElement(i, evaluate_helper(l_value, (*r_array->getArray())[i], source, location, env));
+    }
+    return Co<Expression>(new ExpressionArrayReference(array));
+  }
+
+  throw MessagedException(location.toAnchor() + ": Operator and doesn't know how to join " + l->getSource() + " and " + r->getSource() + ".");
 }
 
 /* ------------------------------------------------------------------------- */

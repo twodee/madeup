@@ -1,0 +1,81 @@
+a = {1, 2, -10}
+b = {100, 300, 500}
+
+sum = a + b
+debug sum == {101, 302, 490}
+
+diff = a - b
+debug diff == {-99, -298, -510}
+
+product = a * b
+debug product == {100, 600, -5000}
+
+p = a * 7
+debug p == {7, 14, -70}
+
+p = 7 * a
+debug p == {7, 14, -70}
+
+q = b / a
+debug q == {100, 150, -50}
+
+q = {100, 80, 40, 20} / 20
+debug q == {5, 4, 2, 1}
+
+ns = |{-10, 0, 9, -3}|
+debug ns == {10, 0, 9, 3}
+
+tfs = not {true, false, false, true, false}
+debug tfs == {false, true, true, false, true}
+
+ns = {-5, 0, -10, 8, 3}
+debug (-ns) == {5, 0, 10, -8, -3}
+
+t1 = {true, true, false, false}
+t2 = {true, false, true, false}
+debug (t1 and t2) == {true, false, false, false}
+debug (t1 or t2) == {true, true, true, false}
+
+a = {90, -10, 100, 110, 1000}
+debug (a < 100) == {true, true, false, false, false}
+
+a = {1, 2, 3}
+q = a // 2
+debug all (|q - {0.5, 1.0, 1.5}| < 0.001)
+
+a = {0, 1, 2, 3, 4, 5, 6, 7}
+r = a % 3
+debug r == {0, 1, 2, 0, 1, 2, 0, 1}
+
+a = {10, 20, 24, 19, 15}
+b = {3, 2, 7, 10, 9}
+r = a % b
+debug r == {1, 0, 3, 9, 6}
+
+a = {1, 2, 3}
+b = {8, 6, 2}
+p = a ^ b
+debug p == {1, 64, 9}
+
+x = {1000, 64, 81}
+base = {10, 2, 3}
+l = log base, x
+debug all (|l - {3, 6, 4}| < 0.001)
+
+debug all {true, true, true}
+debug all {true}
+debug not all {false}
+debug not all {false, true, true}
+debug not all {false, false}
+debug any {true}
+debug any {true, true, true, true}
+debug any {false, false, false, true}
+debug any {false, false, true, false}
+debug not any {false, false, false, false, false}
+
+debug {10, 17, -45} < {10, 16, -44} == {false, false, true}
+debug {10, 17, -45} <= {10, 16, -44} == {true, false, true}
+debug {3, 3} == {3, 3}
+debug {3, 4} != {4, 3}
+debug {10, 17, -45} > {10, 16, -44} == {false, true, false}
+debug {10, 17, -45} >= {10, 16, -44} == {true, true, false}

@@ -4,18 +4,20 @@
 #include <string>
 
 #include "madeup/Expression.h"
+#include "madeup/ExpressionPrimitive.h"
 
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */
 
-class ExpressionString : public Expression {
+class ExpressionString : public ExpressionPrimitive {
   public:
     ExpressionString(const std::string &value);
 
     Co<Expression> evaluate(Environment &env) const;
-    string getString() const;
+    std::string getString() const;
     void write(ostream &out) const;
+    std::string toString() const;
 
   private:
     std::string value;

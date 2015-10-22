@@ -362,11 +362,11 @@ Blockly.Blocks['madeup_generate_tube'] = {
   }
 };
 
-Blockly.Blocks['madeup_generate_dot'] = {
+Blockly.Blocks['madeup_generate_spheres'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
     this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendDummyInput().appendField("dot");
+    this.appendDummyInput().appendField("spheres");
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
@@ -384,11 +384,11 @@ Blockly.Blocks['madeup_generate_forget'] = {
   }
 };
 
-Blockly.Blocks['madeup_generate_box'] = {
+Blockly.Blocks['madeup_generate_boxes'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
     this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendDummyInput().appendField("box");
+    this.appendDummyInput().appendField("boxes");
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
@@ -824,12 +824,12 @@ Blockly.Blocks['madeup_loop_for_in_by'] = {
         .appendField("for")
         .appendField(new Blockly.FieldVariable("i"), "ITERATOR")
         .appendField("in");
-    this.appendValueInput("NEXT")
-        .setCheck("Integer")
-        .appendField(",");
     this.appendValueInput("STOP")
         .setCheck("Integer")
         .appendField("..");
+    this.appendValueInput("BY")
+        .setCheck("Integer")
+        .appendField("by");
     this.appendStatementInput("BODY");
     this.setInputsInline(true);
     this.setPreviousStatement(true);

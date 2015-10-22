@@ -3,6 +3,7 @@
 
 #include "madeup/Expression.h"
 #include "madeup/ExpressionInteger.h"
+#include "madeup/ExpressionUnit.h"
 
 namespace madeup {
 
@@ -10,7 +11,7 @@ namespace madeup {
 
 class ExpressionArray : public Expression {
   public:
-    ExpressionArray(int nelements, Co<Expression> fill);
+    ExpressionArray(int nelements, Co<Expression> fill = ExpressionUnit::getSingleton());
 
     Co<Expression> evaluate(Environment &env) const;
     int getSize();

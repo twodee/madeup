@@ -19,7 +19,7 @@ body {
   width: 300px;
 }
 
-.popups {
+.popup {
   padding: 5px;
   background-color: #333333;
   border: 0px;
@@ -32,7 +32,7 @@ body {
   position: absolute;
 }
 
-.popups input[type="text"] {
+.popup input[type="text"] {
   margin: 2px;
 }
 

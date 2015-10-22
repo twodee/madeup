@@ -3,6 +3,8 @@
 
 #include "madeup/Environment.h"
 #include "madeup/ExpressionAbsoluteValue.h"
+#include "madeup/ExpressionAll.h"
+#include "madeup/ExpressionAny.h"
 #include "madeup/ExpressionArray.h"
 #include "madeup/ExpressionAxis.h"
 #include "madeup/ExpressionBoolean.h"
@@ -17,6 +19,7 @@
 #include "madeup/ExpressionEcho.h"
 #include "madeup/ExpressionExtrude.h"
 #include "madeup/ExpressionForget.h"
+#include "madeup/ExpressionHome.h"
 #include "madeup/ExpressionIdentity.h"
 #include "madeup/ExpressionInteger.h"
 #include "madeup/ExpressionInverseSine.h"
@@ -212,6 +215,7 @@ void Environment::prime() {
   define_rotate->addFormal("degrees");
 
   Co<ExpressionDefine> define_identity(new ExpressionDefine("identity", Co<Expression>(new ExpressionIdentity())));
+  Co<ExpressionDefine> define_home(new ExpressionDefine("home", Co<Expression>(new ExpressionHome())));
   Co<ExpressionDefine> define_reverse(new ExpressionDefine("reverse", Co<Expression>(new ExpressionReverse())));
 
   Co<ExpressionDefine> define_center(new ExpressionDefine("center", Co<Expression>(new ExpressionCenter())));
@@ -247,6 +251,12 @@ void Environment::prime() {
   Co<ExpressionDefine> define_sign(new ExpressionDefine("sign", Co<Expression>(new ExpressionSign())));
   define_sign->addFormal("n");
 
+  Co<ExpressionDefine> define_all(new ExpressionDefine("all", Co<Expression>(new ExpressionAll())));
+  define_all->addFormal("array");
+
+  Co<ExpressionDefine> define_any(new ExpressionDefine("any", Co<Expression>(new ExpressionAny())));
+  define_any->addFormal("array");
+
   Co<ExpressionDefine> define_dowel(new ExpressionDefine("dowel", Co<Expression>(new ExpressionDowel())));
   define_dowel->addFormal("twist");
   define_dowel->addFormal("maxBend");
@@ -258,9 +268,9 @@ void Environment::prime() {
   Co<ExpressionDefine> define_polygon(new ExpressionDefine("polygon", Co<Expression>(new ExpressionPolygon())));
   define_polygon->addFormal("flip");
 
-  Co<ExpressionDefine> define_dot(new ExpressionDefine("dot", Co<Expression>(new ExpressionDot())));
+  Co<ExpressionDefine> define_spheres(new ExpressionDefine("spheres", Co<Expression>(new ExpressionDot())));
 
-  Co<ExpressionDefine> define_box(new ExpressionDefine("box", Co<Expression>(new ExpressionBox())));
+  Co<ExpressionDefine> define_boxes(new ExpressionDefine("boxes", Co<Expression>(new ExpressionBox())));
 
   Co<ExpressionDefine> define_revolve(new ExpressionDefine("revolve", Co<Expression>(new ExpressionRevolve())));
   define_revolve->addFormal("x");
@@ -297,6 +307,7 @@ void Environment::prime() {
   add("translate", Co<ExpressionClosure>(new ExpressionClosure(define_translate, globals)));
   add("rotate", Co<ExpressionClosure>(new ExpressionClosure(define_rotate, globals)));
   add("identity", Co<ExpressionClosure>(new ExpressionClosure(define_identity, globals)));
+  add("home", Co<ExpressionClosure>(new ExpressionClosure(define_home, globals)));
   add("reverse", Co<ExpressionClosure>(new ExpressionClosure(define_reverse, globals)));
   add("center", Co<ExpressionClosure>(new ExpressionClosure(define_center, globals)));
   add("echo", Co<ExpressionClosure>(new ExpressionClosure(define_echo, globals)));
@@ -305,17 +316,17 @@ void Environment::prime() {
   add("surface", Co<ExpressionClosure>(new ExpressionClosure(define_surface, globals)));
   add("random", Co<ExpressionClosure>(new ExpressionClosure(define_random, globals)));
   add("sign", Co<ExpressionClosure>(new ExpressionClosure(define_sign, globals)));
+  add("all", Co<ExpressionClosure>(new ExpressionClosure(define_all, globals)));
+  add("any", Co<ExpressionClosure>(new ExpressionClosure(define_any, globals)));
   add("max", Co<ExpressionClosure>(new ExpressionClosure(define_max, globals)));
   add("min", Co<ExpressionClosure>(new ExpressionClosure(define_min, globals)));
   add("dowel", Co<ExpressionClosure>(new ExpressionClosure(define_dowel, globals)));
-  add("stick", Co<ExpressionClosure>(new ExpressionClosure(define_dowel, globals)));
   add("tube", Co<ExpressionClosure>(new ExpressionClosure(define_tube, globals)));
   add("polygon", Co<ExpressionClosure>(new ExpressionClosure(define_polygon, globals)));
-  add("dot", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
-  add("ball", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
-  add("dots", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
-  add("box", Co<ExpressionClosure>(new ExpressionClosure(define_box, globals)));
-  add("boxes", Co<ExpressionClosure>(new ExpressionClosure(define_box, globals)));
+  add("sphere", Co<ExpressionClosure>(new ExpressionClosure(define_spheres, globals)));
+  add("spheres", Co<ExpressionClosure>(new ExpressionClosure(define_spheres, globals)));
+  add("box", Co<ExpressionClosure>(new ExpressionClosure(define_boxes, globals)));
+  add("boxes", Co<ExpressionClosure>(new ExpressionClosure(define_boxes, globals)));
   add("revolve", Co<ExpressionClosure>(new ExpressionClosure(define_revolve, globals)));
   add("extrude", Co<ExpressionClosure>(new ExpressionClosure(define_extrude, globals)));
   add("forget", Co<ExpressionClosure>(new ExpressionClosure(define_forget, globals)));
@@ -332,13 +343,11 @@ void Environment::prime() {
   globals->add("dowel", (*this)["dowel"]);
   globals->add("tube", (*this)["tube"]);
   globals->add("polygon", (*this)["polygon"]);
-  globals->add("ball", (*this)["ball"]);
-  globals->add("box", (*this)["box"]);
   globals->add("revolve", (*this)["revolve"]);
+  globals->add("box", (*this)["box"]);
   globals->add("boxes", (*this)["boxes"]);
-  globals->add("dot", (*this)["dot"]);
-  globals->add("dots", (*this)["dots"]);
-  globals->add("stick", (*this)["stick"]);
+  globals->add("sphere", (*this)["sphere"]);
+  globals->add("spheres", (*this)["spheres"]);
   globals->add("print", (*this)["print"]);
   globals->add("debug", (*this)["debug"]);
   globals->add("atan2", (*this)["atan2"]);
@@ -351,6 +360,7 @@ void Environment::prime() {
   globals->add("translate", (*this)["translate"]);
   globals->add("rotate", (*this)["rotate"]);
   globals->add("identity", (*this)["identity"]);
+  globals->add("home", (*this)["home"]);
   globals->add("reverse", (*this)["reverse"]);
   globals->add("center", (*this)["center"]);
   globals->add("echo", (*this)["echo"]);
@@ -360,6 +370,8 @@ void Environment::prime() {
   globals->add("max", (*this)["max"]);
   globals->add("min", (*this)["min"]);
   globals->add("sign", (*this)["sign"]);
+  globals->add("all", (*this)["all"]);
+  globals->add("any", (*this)["any"]);
   globals->add("asin", (*this)["asin"]);
   globals->add("tan", (*this)["tan"]);
   globals->add("log", (*this)["log"]);
@@ -521,6 +533,16 @@ void Environment::rotate(float x, float y, float z, float degrees) {
 void Environment::identity() {
   xforms.pop();
   xforms.push(QMatrix4<float>(1.0f));
+}
+
+/* ------------------------------------------------------------------------- */
+
+void Environment::home() {
+  if (run.size() == 0) {
+    throw new MessagedException("No home to return to.");
+  }
+
+  run.push_back(*run.begin());
 }
 
 /* ------------------------------------------------------------------------- */

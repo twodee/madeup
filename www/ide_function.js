@@ -21,6 +21,566 @@ THREE.Object3D.prototype.clear = function() {
   }
 }
 
+function getBlocklyProcedureFormals(name) {
+  // allProcedures gives back [procedures with return, procedures without
+  // return]. We only have the latter.
+  var procs = Blockly.Procedures.allProcedures(blocklyWorkspace)[1];
+
+  // Find the procedure in the list with the given name.
+  for (var i = 0; i < procs.length; ++i) {
+    console.log("procedure " + i + ": " + procs[i][0]);
+    if (procs[i][0] == name) {
+      return procs[i][1];
+    }
+  }
+
+  throw 'No procedure named ' + name;
+}
+
+function Peeker(src) {
+  this.i = 0;
+  this.src = src;
+  this.peek = function() {
+    return this.src.charAt(this.i);
+  };
+  this.get = function() {
+    var c = this.peek();
+    ++this.i;
+    return c;
+  };
+  this.getToken = function() {
+    var token = '';
+    while (this.peek() != ' ' && this.peek() != ')') {
+      token += this.get();
+    }
+    return token;
+  }
+  this.getInteger = function() {
+    var isNegative = false;
+    var num = '';
+
+    if (this.peek() == '-') {
+      isNegative = true;
+      this.get(); 
+    }
+
+    while (/^\d+$/.test(this.peek())) {
+      num = num + this.get();
+    }
+
+    num = parseInt(num);
+    return isNegative ? -num : num;
+  };
+  this.getReal = function() {
+    var isNegative = false;
+    var num = '';
+
+    if (this.peek() == '-') {
+      isNegative = true;
+      this.get(); 
+    }
+
+    while (/^\d+$/.test(this.peek())) {
+      num = num + this.get();
+    }
+
+    if (this.peek() == '.') {
+      num = num + this.get();
+    }
+
+    while (/^\d+$/.test(this.peek())) {
+      num = num + this.get();
+    }
+
+    num = parseFloat(num);
+    return isNegative ? -num : num;
+  };
+}
+
+function parse(peeker) {
+  var block = null;
+
+  // assert '('
+  if (peeker.peek() != '(') {
+    throw 'expecting (';
+  } else {
+    peeker.get();
+  }
+
+  // figure out contents
+  var token = peeker.getToken();
+
+  if (token == 'block') {
+    if (peeker.peek() == ' ') {
+      peeker.get(); // eat space
+      block = parse(peeker);
+      var prevStatement = block;
+      while (peeker.peek() == ' ') {
+        peeker.get(); // eat space
+        var statement = parse(peeker);
+
+        // If statement can have predecessor and predecessor can have a successor...
+        if (statement.previousConnection && prevStatement.nextConnection) {
+          prevStatement.nextConnection.connect(statement.previousConnection);
+        }
+
+        // If this statement can have a successor, set it up for connection to next.
+        if (statement.nextConnection) {
+          prevStatement = statement;
+        }
+      }
+    }
+  }
+
+  else if (token == 'call' || token == 'call-with-names') {
+    peeker.get(); // eat space
+    id = peeker.getToken();
+    if (id == 'print') {
+      peeker.get(); // eat space
+      var msg = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_io_print');
+      block.getInput('MESSAGE').connection.connect(msg.outputConnection);
+    } else if (id == 'debug') {
+      peeker.get(); // eat space
+      var msg = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_io_debug');
+      block.getInput('MESSAGE').connection.connect(msg.outputConnection);
+    } else if (id == 'sign') {
+      peeker.get(); // eat space
+      var x = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_math_sign');
+      block.getInput('X').connection.connect(x.outputConnection);
+    } else if (id == 'moveto') {
+      peeker.get(); // eat space
+      var x = parse(peeker);
+      peeker.get(); // eat space
+      var y = parse(peeker);
+      peeker.get(); // eat space
+      var z = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_movement_moveto');
+      block.getInput('X').connection.connect(x.outputConnection);
+      block.getInput('Y').connection.connect(y.outputConnection);
+      block.getInput('Z').connection.connect(z.outputConnection);
+    } else if (id == 'move') {
+      peeker.get(); // eat space
+      var x = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_movement_move');
+      block.getInput('DISTANCE').connection.connect(x.outputConnection);
+    } else if (id == 'yaw' || id == 'roll' || id == 'pitch') {
+      peeker.get(); // eat space
+      var degrees = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_movement_turn');
+      block.setFieldValue(id, 'TYPE');
+      block.getInput('DEGREES').connection.connect(degrees.outputConnection);
+    } else if (id == 'translate' || id == 'scale') {
+      peeker.get(); // eat space
+      var x = parse(peeker);
+      peeker.get(); // eat space
+      var y = parse(peeker);
+      peeker.get(); // eat space
+      var z = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_movement_' + id);
+      block.getInput('X').connection.connect(x.outputConnection);
+      block.getInput('Y').connection.connect(y.outputConnection);
+      block.getInput('Z').connection.connect(z.outputConnection);
+    } else if (id == 'spheres' || id == 'forget' || id == 'boxes') {
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_generate_' + id);
+    } else if (id == 'revolve') {
+      peeker.get(); // eat space
+      var x = parse(peeker);
+      peeker.get(); // eat space
+      var y = parse(peeker);
+      peeker.get(); // eat space
+      var z = parse(peeker);
+      peeker.get(); // eat space
+      var degrees = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_generate_revolve');
+      block.getInput('X').connection.connect(x.outputConnection);
+      block.getInput('Y').connection.connect(y.outputConnection);
+      block.getInput('Z').connection.connect(z.outputConnection);
+      block.getInput('DEGREES').connection.connect(degrees.outputConnection);
+    } else if (id == 'extrude') {
+      peeker.get(); // eat space
+      var x = parse(peeker);
+      peeker.get(); // eat space
+      var y = parse(peeker);
+      peeker.get(); // eat space
+      var z = parse(peeker);
+      peeker.get(); // eat space
+      var length = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_generate_extrude');
+      block.getInput('X').connection.connect(x.outputConnection);
+      block.getInput('Y').connection.connect(y.outputConnection);
+      block.getInput('Z').connection.connect(z.outputConnection);
+      block.getInput('LENGTH').connection.connect(length.outputConnection);
+    } else if (id == 'surface') {
+      peeker.get(); // eat space
+      var columns = parse(peeker);
+      peeker.get(); // eat space
+      var rows = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_generate_surface');
+      block.getInput('COLUMNS').connection.connect(columns.outputConnection);
+      block.getInput('ROWS').connection.connect(rows.outputConnection);
+    } else if (id == 'dowel' || id == 'tube') {
+      var maxBend;
+      if (peeker.peek() == ' ') {
+        peeker.get(); // eat space
+        maxBend = parse(peeker);
+      } else {
+        maxBend = Blockly.Block.obtain(blocklyWorkspace, 'madeup_math_integer');
+        maxBend.setFieldValue(360, 'INTEGER');
+        maxBend.initSvg();
+        maxBend.render();
+      }
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_generate_' + id);
+      block.getInput('MAXBEND').connection.connect(maxBend.outputConnection);
+    } else if (id == 'rotate') {
+      peeker.get(); // eat space
+      var x = parse(peeker);
+      peeker.get(); // eat space
+      var y = parse(peeker);
+      peeker.get(); // eat space
+      var z = parse(peeker);
+      peeker.get(); // eat space
+      var degrees = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_movement_' + id);
+      block.getInput('X').connection.connect(x.outputConnection);
+      block.getInput('Y').connection.connect(y.outputConnection);
+      block.getInput('Z').connection.connect(z.outputConnection);
+      block.getInput('DEGREES').connection.connect(degrees.outputConnection);
+    } else if (id == 'sin' || id == 'cos' || id == 'tan') {
+      peeker.get(); // eat space
+      var degrees = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_math_sincostan');
+      block.setFieldValue(id, 'F');
+      block.getInput('DEGREES').connection.connect(degrees.outputConnection);
+    } else if (id == 'asin' || id == 'acos' || id == 'atan') {
+      peeker.get(); // eat space
+      var ratio = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_math_inverse_sincostan');
+      block.setFieldValue(id, 'F');
+      block.getInput('RATIO').connection.connect(ratio.outputConnection);
+    } else if (id == 'center' || id == 'identity' || id == 'reframe' || id == 'push' || id == 'pop' || id == 'reverse') {
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_movement_' + id);
+    } else if (id == 'where') {
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_io_where');
+    } else if (id == 'log') {
+      peeker.get(); // eat space
+      var base = parse(peeker);
+      peeker.get(); // eat space
+      var x = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_math_log');
+      block.getInput('BASE').connection.connect(base.outputConnection);
+      block.getInput('X').connection.connect(x.outputConnection);
+    } else if (id == 'min' || id == 'max') {
+      peeker.get(); // eat space
+      var a = parse(peeker);
+      peeker.get(); // eat space
+      var b = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_math_minmax');
+      block.setFieldValue(id, 'F');
+      block.getInput('A').connection.connect(a.outputConnection);
+      block.getInput('B').connection.connect(b.outputConnection);
+    } else {
+      // is it a variable or a function?
+      if (!Blockly.Procedures.isLegalName(id, blocklyWorkspace)) {
+        block = Blockly.Block.obtain(blocklyWorkspace, 'procedures_callnoreturn');
+        block.setFieldValue(id, 'NAME');
+        var formals = getBlocklyProcedureFormals(id);
+        console.log(formals);
+        block.setProcedureParameters(formals, formals);
+        console.log("length: " + block.inputList.length);
+        for (var i = 0, input; input = block.inputList[i]; i++) { 
+          console.log(input);
+        }
+        var i = 0;
+        while (peeker.peek() == ' ') {
+          peeker.get(); // eat space
+          var actualBlock = parse(peeker);
+          block.getInput('ARG' + i).connection.connect(actualBlock.outputConnection);
+          ++i;
+        }
+      } else {
+        block = Blockly.Block.obtain(blocklyWorkspace, 'variables_get');
+        block.setFieldValue(id, 'VAR');
+      }
+    }
+  }
+
+  else if (token == 'repeat') {
+    peeker.get(); // eat space
+    var count = parse(peeker);
+    peeker.get(); // eat space
+    var body = parse(peeker);
+
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_loop_repeat');
+    block.getInput('COUNT').connection.connect(count.outputConnection);
+    block.getInput('BLOCK').connection.connect(body.previousConnection);
+  }
+
+  else if (token == 'repeatwich') {
+    peeker.get(); // eat space
+    var count = parse(peeker);
+    peeker.get(); // eat space
+    var surrounder = parse(peeker);
+    peeker.get(); // eat space
+    var surroundee = parse(peeker);
+
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_loop_repeatwich');
+    block.getInput('COUNT').connection.connect(count.outputConnection);
+    block.getInput('SURROUNDER').connection.connect(surrounder.previousConnection);
+    block.getInput('SURROUNDEE').connection.connect(surroundee.previousConnection);
+  }
+
+  else if (token == 'while') {
+    peeker.get(); // eat space
+    var condition = parse(peeker);
+    peeker.get(); // eat space
+    var body = parse(peeker);
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_loop_while');
+    block.getInput('CONDITION').connection.connect(condition.outputConnection);
+    block.getInput('BODY').connection.connect(body.previousConnection);
+  }
+
+  else if (token == 'if') {
+    peeker.get(); // eat space
+    var condition = parse(peeker);
+    peeker.get(); // eat space
+    var thenBlock = parse(peeker);
+    peeker.get(); // eat space
+    var elseBlock = parse(peeker);
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_logic_if_else_statement');
+    block.getInput('CONDITION').connection.connect(condition.outputConnection);
+    block.getInput('THEN').connection.connect(thenBlock.previousConnection);
+    block.getInput('ELSE').connection.connect(elseBlock.previousConnection);
+  }
+
+  else if (token == 'for-through') {
+    peeker.get(); // eat space
+    var id = peeker.getToken();
+    peeker.get(); // eat space
+    var stop = parse(peeker);
+    peeker.get(); // eat space
+    var body = parse(peeker);
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_loop_for_through');
+    block.setFieldValue(id, 'ITERATOR');
+    block.getInput('STOP').connection.connect(stop.outputConnection);
+    block.getInput('BODY').connection.connect(body.previousConnection);
+  }
+
+  else if (token == 'for-through-by') {
+    peeker.get(); // eat space
+    var id = peeker.getToken();
+    peeker.get(); // eat space
+    var stop = parse(peeker);
+    peeker.get(); // eat space
+    var by = parse(peeker);
+    peeker.get(); // eat space
+    var body = parse(peeker);
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_loop_for_through_by');
+    block.setFieldValue(id, 'ITERATOR');
+    block.getInput('STOP').connection.connect(stop.outputConnection);
+    block.getInput('BY').connection.connect(by.outputConnection);
+    block.getInput('BODY').connection.connect(body.previousConnection);
+  }
+
+  else if (token == 'for-to') {
+    peeker.get(); // eat space
+    var id = peeker.getToken();
+    peeker.get(); // eat space
+    var stop = parse(peeker);
+    peeker.get(); // eat space
+    var body = parse(peeker);
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_loop_for_to');
+    block.setFieldValue(id, 'ITERATOR');
+    block.getInput('STOP').connection.connect(stop.outputConnection);
+    block.getInput('BODY').connection.connect(body.previousConnection);
+  }
+
+  else if (token == 'for-to-by') {
+    peeker.get(); // eat space
+    var id = peeker.getToken();
+    peeker.get(); // eat space
+    var stop = parse(peeker);
+    peeker.get(); // eat space
+    var by = parse(peeker);
+    peeker.get(); // eat space
+    var body = parse(peeker);
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_loop_for_to_by');
+    block.setFieldValue(id, 'ITERATOR');
+    block.getInput('STOP').connection.connect(stop.outputConnection);
+    block.getInput('BY').connection.connect(by.outputConnection);
+    block.getInput('BODY').connection.connect(body.previousConnection);
+  }
+
+  else if (token == 'for-in') {
+    peeker.get(); // eat space
+    var id = peeker.getToken();
+    peeker.get(); // eat space
+    var start = parse(peeker);
+    peeker.get(); // eat space
+    var stop = parse(peeker);
+    peeker.get(); // eat space
+    var body = parse(peeker);
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_loop_for_in');
+    block.setFieldValue(id, 'ITERATOR');
+    block.getInput('START').connection.connect(start.outputConnection);
+    block.getInput('STOP').connection.connect(stop.outputConnection);
+    block.getInput('BODY').connection.connect(body.previousConnection);
+  }
+
+  else if (token == 'for-in-by') {
+    peeker.get(); // eat space
+    var id = peeker.getToken();
+    peeker.get(); // eat space
+    var start = parse(peeker);
+    peeker.get(); // eat space
+    var stop = parse(peeker);
+    peeker.get(); // eat space
+    var by = parse(peeker);
+    peeker.get(); // eat space
+    var body = parse(peeker);
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_loop_for_in_by');
+    block.setFieldValue(id, 'ITERATOR');
+    block.getInput('START').connection.connect(start.outputConnection);
+    block.getInput('STOP').connection.connect(stop.outputConnection);
+    block.getInput('BY').connection.connect(by.outputConnection);
+    block.getInput('BODY').connection.connect(body.previousConnection);
+  }
+
+  else if (token == '+' || token == '-' || token == '*' || token == '/' || token == '//' || token == '^' || token == '%') {
+    peeker.get(); // eat space
+    var a = parse(peeker);
+    peeker.get(); // eat space
+    var b = parse(peeker);
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_math_binary_arithmetic_operator');
+    block.setFieldValue(token, 'OPERATOR');
+    block.getInput('A').connection.connect(a.outputConnection);
+    block.getInput('B').connection.connect(b.outputConnection);
+  }
+
+  else if (token == 'negate') {
+    peeker.get(); // eat space
+    var a = parse(peeker);
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_math_unary_operator');
+    block.getInput('A').connection.connect(a.outputConnection);
+  }
+
+  else if (token == 'define') {
+    peeker.get(); // eat space
+    var id = peeker.getToken();
+    block = Blockly.Block.obtain(blocklyWorkspace, 'procedures_defnoreturn');
+    block.setFieldValue(id, 'NAME');
+    peeker.get(); // eat space
+    var formals = [];
+    while (peeker.peek() != '(') {
+      var formal = peeker.getToken();
+      formals.push(formal);
+      peeker.get(); // eat space
+    }
+    block.arguments_ = formals;
+    block.updateParams_();
+    var body = parse(peeker);
+    block.getInput('STACK').connection.connect(body.previousConnection);
+  }
+
+  else if (token == 'define-variable') {
+    peeker.get(); // eat space
+    var id = peeker.getToken();
+    peeker.get(); // eat space
+    var rhs = parse(peeker);
+    block = Blockly.Block.obtain(blocklyWorkspace, 'variables_set');
+    block.setFieldValue(id, 'VAR');
+    block.getInput('VALUE').connection.connect(rhs.outputConnection);
+  }
+
+  else if (token == '>' || token == '>=' || token == '<' || token == '<=' || token == '==' || token == '!=') {
+    peeker.get(); // eat space
+    var a = parse(peeker);
+    peeker.get(); // eat space
+    var b = parse(peeker);
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_math_relational_operator');
+    block.setFieldValue(token, 'OPERATOR');
+    block.getInput('A').connection.connect(a.outputConnection);
+    block.getInput('B').connection.connect(b.outputConnection);
+  }
+
+  else if (token == 'or' || token == 'and') {
+    peeker.get(); // eat space
+    var a = parse(peeker);
+    peeker.get(); // eat space
+    var b = parse(peeker);
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_logic_junction');
+    block.setFieldValue(token, 'F');
+    block.getInput('A').connection.connect(a.outputConnection);
+    block.getInput('B').connection.connect(b.outputConnection);
+  }
+
+  else if (token == 'not') {
+    peeker.get(); // eat space
+    var a = parse(peeker);
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_logic_not');
+    block.getInput('A').connection.connect(a.outputConnection);
+  }
+
+  else if (token == 'abs') {
+    peeker.get(); // eat space
+    var x = parse(peeker);
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_math_abs');
+    block.getInput('X').connection.connect(x.outputConnection);
+  }
+
+  else if (token == 'unit') {
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_nothing');
+  }
+
+  else if (token == 'INTEGER') {
+    peeker.get(); // eat space
+    var i = peeker.getInteger();
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_math_integer');
+    block.setFieldValue('' + i, 'INTEGER');
+  }
+
+  else if (token == 'BOOLEAN') {
+    peeker.get(); // eat space
+    var literal = peeker.getToken();
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_logic_boolean');
+    block.setFieldValue(literal, 'BOOLEAN');
+  }
+
+  else if (token == 'REAL') {
+    peeker.get(); // eat space
+    var i = peeker.getReal();
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_math_real');
+    block.setFieldValue('' + i, 'REAL');
+  }
+
+  else if (token == 'STRING') {
+    peeker.get(); // eat space
+    var s = '';
+    while (peeker.peek() != ')') {
+      s += peeker.get();
+    }
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_string');
+    block.setFieldValue(s, 'STRING');
+  }
+
+  // assert ')'
+  if (peeker.peek() != ')') {
+    throw 'expecting )';
+  } else {
+    peeker.get();
+  }
+  
+  // Block might be null if empty body loop or conditional body.
+  if (block) {
+    block.initSvg();
+    block.render();
+  }
+
+  return block;
+}
+
 function populateFileMenu() {
   var list = '';
   var mups = Object.keys(window.localStorage).sort();
@@ -74,12 +634,13 @@ var showHeadings = true;
 var showCounterclockwise = true;
 var showClockwise = false;
 var modelColor = 'FF0000';
-var workspace = null;
+var blocklyWorkspace = null;
 var fontSize = 14;
 var gridSpacing = 1.0;
 var gridExtent = 10.0;
 var isFlatShaded = true;
 var isEditorText = true;
+var tree = null;
 
 var isEditorTextChanged = false;
 var isShowWireframeChanged = false;
@@ -125,8 +686,8 @@ function saveInCookies() {
   Cookies.set('leftWidth', $('#left').width());
   Cookies.set('consoleHeight', $('#console').height());
 
-  if (workspace) {
-    var xml = Blockly.Xml.workspaceToDom(workspace);
+  if (blocklyWorkspace) {
+    var xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
     var xmlText = Blockly.Xml.domToText(xml);
     Cookies.set('lastBlocks', xmlText);
   }
@@ -323,7 +884,6 @@ $(document).ready(function() {
   });
 
   $('#smaller').click(function() {
-    hideMenus();
     isFontSizeChanged = true;
     fontSize -= 2;
     $('#menu input').each(function (i) {
@@ -335,7 +895,6 @@ $(document).ready(function() {
   });
 
   $('#bigger').click(function() {
-    hideMenus();
     isFontSizeChanged = true;
     fontSize += 2;
     $('#menu input').each(function (i) {
@@ -347,7 +906,6 @@ $(document).ready(function() {
   });
 
   $('#fit').click(function() {
-    hideMenus();
     fit();
     textEditor.focus();
   });
@@ -535,7 +1093,6 @@ $(document).ready(function() {
   function toggleMenu(id) {
     var buttonID = '#toggle' + id.charAt(1).toUpperCase() + id.substring(2);
 
-    hideMenus(id);
     $(id).css('top', $(buttonID).offset().top + $(buttonID).innerHeight(true)) - 8; 
     $(id).css('left', $(buttonID).offset().left); 
 
@@ -557,6 +1114,12 @@ $(document).ready(function() {
     populateFileMenu();
   });
 
+  $('#translate').click(function() {
+    setEditor(false);
+    blocklyWorkspace.clear();
+    translate();
+  });
+
   $('#toggleEditorPopup').click(function() {
     toggleMenu('#editorPopup');
   });
@@ -571,7 +1134,6 @@ $(document).ready(function() {
 
   enableDownload(false);
   $('#download').click(function() {
-    hideMenus();
     $('#tag').val(mupName);
     $('#source').val(getSource());
     $('#downloader').submit();
@@ -583,7 +1145,6 @@ $(document).ready(function() {
   });
 
   $('#solidify').click(function() {
-    hideMenus();
     log('Running...'); 
     saveInCookies();
     run(GeometryMode.SURFACE);
@@ -591,7 +1152,6 @@ $(document).ready(function() {
   });
 
   $('#fileSaveAs').click(function() {
-    hideMenus();
     var name = prompt('Save under what name?');
     if (name != null) {
       mupName = name;
@@ -600,8 +1160,17 @@ $(document).ready(function() {
     }
   });
 
+  $('#fileSave').click(function() {
+
+    if (!mupName) {
+      mupName = prompt('Save under what name?');
+    }
+
+    save();
+    updateTitle();
+  });
+
   $('#exportArchive').click(function() {
-    hideMenus();
 
     var archive = new Object;
     for (var mup in window.localStorage) {
@@ -637,16 +1206,15 @@ $(document).ready(function() {
   });
 
   $('#fileClose').click(function() {
-    hideMenus();
+    // TODO prompt for save
     save();
     load('untitled');
   });
 
   $('#fileDelete').click(function() {
-    hideMenus();
-    save();
     var ok = confirm('Delete ' + mupName + '?');
     if (ok) {
+      if (blocklyWorkspace) blocklyWorkspace.clear();
       window.localStorage.removeItem(mupName);
       mupName = null;
       load('untitled');
@@ -672,6 +1240,29 @@ $(document).ready(function() {
     } 
   });
 
+  $(document).on('click', function(event) {
+    // If a non-menu was clicked on, so let's close all the menus.
+    if ($(event.target).closest('.togglePopup').length == 0 &&
+        $(event.target).closest('.popup').length == 0) {
+      hideMenus();
+    }
+    
+    // Otherwise, if got a click on a menu toggle button, let's hide any other
+    // menus. 
+    else if ($(event.target).hasClass('togglePopup')) {
+      // The menu button has ID toggleNamePopup. Strip off the toggle and lowercase
+      // the name to get the menu's ID.
+      var id = event.target.id.substring(6);
+      var id = '#' + id.charAt(0).toLowerCase() + id.substring(1);
+      hideMenus(id);
+    }
+ 
+    // Otherwise, if got a click on a menu itself, let's hide any other menus. 
+    else if ($(event.target).hasClass('popup')) {
+      hideMenus(event.target.id);
+    }
+  });
+
   if (hasWebGL()) {
     init();
     animate();
@@ -694,6 +1285,12 @@ function schedulePreview() {
 }
 
 function setEditor(isText) {
+  if (isText) {
+    $("#isEditorText").prop('checked', true);
+  } else {
+    $("#isEditorBlocks").prop('checked', true);
+  }
+
   if (isEditorText == isText) return;
   isEditorText = isText;
   isEditorTextChanged = true;
@@ -702,21 +1299,18 @@ function setEditor(isText) {
     $('#blocksEditor').hide();
     $('#textEditor').show();
   } else {
+    var src = getSource();
+
     $('#textEditor').hide();
     $('#blocksEditor').show();
 
-    if (!workspace) {
-      workspace = Blockly.inject('blocksCanvas', {toolbox: document.getElementById('toolbox')});
-      workspace.addChangeListener(function() {
-        var code = Blockly.Madeup.workspaceToCode(workspace);
+    if (!blocklyWorkspace) {
+      blocklyWorkspace = Blockly.inject('blocksCanvas', {toolbox: document.getElementById('toolbox')});
+      blocklyWorkspace.addChangeListener(function() {
+        var code = Blockly.Madeup.workspaceToCode(blocklyWorkspace);
         textEditor.setValue(code);
         log(code);
       });
-      // if (Cookies.get('lastBlocks')) {
-        // var xml = Blockly.Xml.textToDom(Cookies.get('lastBlocks'));
-        // Blockly.Xml.domToWorkspace(workspace, xml);
-      // }
-    } else {
     }
   }
 
@@ -727,7 +1321,7 @@ function setEditor(isText) {
 function load(mup) {
   console.log('new mup: ' + mup);
 
-  hideMenus();
+  // TODO prompt for save
   save();
   mupName = mup;
 
@@ -743,9 +1337,9 @@ function load(mup) {
     if (isEditorText) {
       textEditor.session.setValue(file.source, -1);
     } else {
-      workspace.clear();
+      blocklyWorkspace.clear();
       var xml = Blockly.Xml.textToDom(file.source);
-      Blockly.Xml.domToWorkspace(workspace, xml);
+      Blockly.Xml.domToWorkspace(blocklyWorkspace, xml);
     }
   }
 
@@ -763,8 +1357,9 @@ function save() {
       source = getSource();
       mode = 'text';
     } else {
-      var xml = Blockly.Xml.workspaceToDom(workspace);
+      var xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
       source = Blockly.Xml.domToText(xml);
+      console.log(source);
       mode = 'blocks';
     }
 
@@ -780,6 +1375,33 @@ function save() {
 
 function getSource() {
   return textEditor.getValue();
+}
+
+function translate() {
+  $.ajax({
+    type: 'POST',
+    url: 'translate.php',
+    data: JSON.stringify(
+      {
+        source: getSource()
+      }
+    ),
+    contentType: 'application/json; charset=utf-8',
+    dataType: 'json',
+    success: function(data) {
+      console.log("exit status: " + data['exit_status']);
+      if (data['exit_status'] == 0) {
+        tree = data['tree'];
+        console.log(data['tree']);
+        var block = parse(new Peeker(tree));
+        block.initSvg();
+        block.render();
+      }
+    },
+    failure: function(errorMessage) {
+      console.log('Failure. :(');
+    }
+  });
 }
 
 var allGeometry = undefined;
@@ -804,6 +1426,9 @@ function run(mode) {
       }
 
       if (data['exit_status'] == 0) {
+        tree = data['tree'];
+        console.log(data['tree']);
+
         for (var i = 0; i < meshes.length; ++i) {
           modelScene.remove(meshes[i]);
         }
@@ -1017,11 +1642,6 @@ function init() {
   renderer.setClearColor(0xFFFFFF, 1);
   document.getElementById("glcanvas").appendChild(renderer.domElement);
 
-  // Hide menus when clicking off-menu. This is not UFW. I need to explicitly
-  // omit the parameters.
-  document.getElementById('left').addEventListener('mousedown', function() {hideMenus();});
-  renderer.domElement.addEventListener('mousedown', function() {hideMenus();});
-
   // controls = new THREE.OrbitControls(camera, renderer.domElement);  
   controls = new THREE.TrackballControls(camera, renderer.domElement);
   controls.addEventListener('change', render);
@@ -1077,10 +1697,10 @@ function render() {
 
 function hideMenus(exceptID) {
   if (exceptID === undefined) {
-    $('.popups').hide();
+    $('.popup').hide();
     $('.togglePopup').css('background-color', '#000000');
   } else {
-    $('.popups').not(exceptID).hide();
+    $('.popup').not(exceptID).hide();
     $('.togglePopup').not('#toggle' + exceptID.charAt(1).toUpperCase() + exceptID.substring(2)).css('background-color', '#000000');
   }
 

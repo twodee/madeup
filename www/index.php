@@ -80,8 +80,8 @@
       <block type="madeup_movement_reverse"></block>
     </category>
     <category name="Generate">
-      <block type="madeup_generate_dot"></block>
-      <block type="madeup_generate_box"></block>
+      <block type="madeup_generate_spheres"></block>
+      <block type="madeup_generate_boxes"></block>
       <block type="madeup_generate_dowel"></block>
       <block type="madeup_generate_tube"></block>
       <block type="madeup_generate_extrude"></block>
@@ -139,7 +139,8 @@
       <input id="download" type="button" value="Download"/>
     </div>
 
-    <div id="filePopup" class="popups">
+    <div id="filePopup" class="popup">
+      <a href="#" id="fileSave" class="fileLink">Save</a><br/>
       <a href="#" id="fileSaveAs" class="fileLink">Save As</a><br/>
       <a href="#" id="fileClose" class="fileLink">Close</a><br/>
       <p></p> 
@@ -155,13 +156,14 @@
       <span id="mups"></span>
     </div>
 
-    <div id="editorPopup" class="popups">
+    <div id="editorPopup" class="popup">
       <input type="radio" name="editorMode" id="isEditorText" value="Text" checked="checked"/>Text or 
       <input type="radio" name="editorMode" id="isEditorBlocks" value="Blocks"/>Blocks<br/>
       <input type="checkbox" id="autopreview" checked="checked"/>Preview <input type="text" id="nSecondsTillPreview" size="5"/> seconds after last edit<br/>
+      <a href="#" id="translate" class="fileLink">Translate</a><br/>
     </div>
 
-    <div id="gridPopup" class="popups">
+    <div id="gridPopup" class="popup">
       <input type="checkbox" id="axisX"/>X axis<br/>
       <input type="checkbox" id="axisY"/>Y axis<br/>
       <input type="checkbox" id="axisZ"/>Z axis<br/>
@@ -172,7 +174,7 @@
       Grid Spacing: <input type="text" id="gridSpacing" size="5"/><br/>
     </div>
 
-    <div id="displayPopup" class="popups">
+    <div id="displayPopup" class="popup">
       <input type="checkbox" id="showWireframe"/>Show wireframe<br/>
       <input type="checkbox" id="showHeadings"/>Show heading<br/>
       <input type="checkbox" id="showCounterclockwise"/>Show counterclockwise faces<br/>

@@ -80,15 +80,68 @@ Co<Expression> ExpressionFor::evaluate(Environment &env) const {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionFor::write(ostream &out) const {
-  out << "(for " << id << " ";
-  start->write(out);
-  out << " ";
-  end->write(out);
-  out << " ";
-  delta->write(out);
-  out << " ";
-  body->write(out);
-  out << ")";
+  const ExpressionInteger *start_integer = dynamic_cast<const ExpressionInteger *>(start.GetPointer());
+  const ExpressionInteger *delta_integer = dynamic_cast<const ExpressionInteger *>(delta.GetPointer());
+  // to or through
+  if (start_integer && start_integer->toInteger() == 0) {
+    // through
+    if (is_inclusive) {
+      if (delta_integer && delta_integer->toInteger() == 1) {
+        out << "(for-through " << id << " ";
+        end->write(out);
+        out << " ";
+        body->write(out);
+        out << ")";
+      } else {
+        out << "(for-through-by " << id << " ";
+        end->write(out);
+        out << " ";
+        delta->write(out);
+        out << " ";
+        body->write(out);
+        out << ")";
+      }
+    }
+
+    // to
+    else {
+      if (delta_integer && delta_integer->toInteger() == 1) {
+        out << "(for-to " << id << " ";
+        end->write(out);
+        out << " ";
+        body->write(out);
+        out << ")";
+      } else {
+        out << "(for-to-by " << id << " ";
+        end->write(out);
+        out << " ";
+        delta->write(out);
+        out << " ";
+        body->write(out);
+        out << ")";
+      }
+    }
+  } else {
+    if (delta_integer && delta_integer->toInteger() == 1) {
+      out << "(for-in " << id << " ";
+      start->write(out);
+      out << " ";
+      end->write(out);
+      out << " ";
+      body->write(out);
+      out << ")";
+    } else {
+      out << "(for-in-by " << id << " ";
+      start->write(out);
+      out << " ";
+      end->write(out);
+      out << " ";
+      delta->write(out);
+      out << " ";
+      body->write(out);
+      out << ")";
+    }
+  }
 }
 
 /* ------------------------------------------------------------------------- */

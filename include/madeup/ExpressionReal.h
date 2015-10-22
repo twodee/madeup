@@ -15,6 +15,7 @@ class ExpressionReal : public ExpressionNumber {
     float toReal() const;
     int toInteger() const;
     void write(ostream &out) const;
+    std::string toString() const;
 
   private:
     float value;

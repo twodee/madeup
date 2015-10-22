@@ -1,5 +1,6 @@
 #include <sstream>
 
+#include "madeup/ExpressionArray.h"
 #include "madeup/ExpressionBoolean.h"
 #include "madeup/ExpressionEqual.h"
 #include "madeup/ExpressionInteger.h"
@@ -22,32 +23,67 @@ ExpressionEqual::ExpressionEqual(Co<Expression> left, Co<Expression> right) :
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionEqual::evaluate(Environment &env) const {
-  Co<Expression> lvalue = left->evaluate(env);
-  Co<Expression> rvalue = right->evaluate(env);
+  return evaluate_helper(left, right, getSource(), getSourceLocation(), env);
+}
 
-  ExpressionString *lstring = dynamic_cast<ExpressionString *>(lvalue.GetPointer());
-  ExpressionString *rstring = dynamic_cast<ExpressionString *>(rvalue.GetPointer());
-  ExpressionReal *ldecimal = dynamic_cast<ExpressionReal *>(lvalue.GetPointer());
-  ExpressionReal *rdecimal = dynamic_cast<ExpressionReal *>(rvalue.GetPointer());
-  ExpressionInteger *linteger = dynamic_cast<ExpressionInteger *>(lvalue.GetPointer());
-  ExpressionInteger *rinteger = dynamic_cast<ExpressionInteger *>(rvalue.GetPointer());
-  ExpressionBoolean *lboolean = dynamic_cast<ExpressionBoolean *>(lvalue.GetPointer());
-  ExpressionBoolean *rboolean = dynamic_cast<ExpressionBoolean *>(rvalue.GetPointer());
-  
-  Co<Expression> value;
-  if (lstring && rstring) {
-    value = Co<Expression>(new ExpressionBoolean(lstring->getString() == rstring->getString()));
-  } else if (ldecimal && rdecimal) {
-    value = Co<Expression>(new ExpressionBoolean(ldecimal->toReal() == rdecimal->toReal()));
-  } else if (linteger && rinteger) {
-    value = Co<Expression>(new ExpressionBoolean(linteger->toInteger() == rinteger->toInteger()));
-  } else if (lboolean && rboolean) {
-    value = Co<Expression>(new ExpressionBoolean(lboolean->toBoolean() == rboolean->toBoolean()));
-  } else {
-    value = new ExpressionBoolean(false);
+/* ------------------------------------------------------------------------- */
+
+Co<Expression> ExpressionEqual::evaluate_helper(Co<Expression> l,
+                                                Co<Expression> r,
+                                                const std::string &source,
+                                                const SourceLocation &location,
+                                                Environment &env) {
+  Co<Expression> l_value = l->evaluate(env);
+  Co<Expression> r_value = r->evaluate(env);
+
+  // Integers
+  ExpressionInteger *l_integer = dynamic_cast<ExpressionInteger *>(l_value.GetPointer());
+  ExpressionInteger *r_integer = dynamic_cast<ExpressionInteger *>(r_value.GetPointer());
+  if (l_integer && r_integer) {
+    return Co<Expression>(new ExpressionBoolean(l_integer->toInteger() == r_integer->toInteger()));
   }
 
-  return value;
+  // Reals
+  ExpressionInteger *l_real = dynamic_cast<ExpressionInteger *>(l_value.GetPointer());
+  ExpressionInteger *r_real = dynamic_cast<ExpressionInteger *>(r_value.GetPointer());
+  if (l_real && r_real) {
+    return Co<Expression>(new ExpressionBoolean(l_real->toReal() == r_real->toReal()));
+  }
+
+  // Booleans
+  ExpressionBoolean *l_boolean = dynamic_cast<ExpressionBoolean *>(l_value.GetPointer());
+  ExpressionBoolean *r_boolean = dynamic_cast<ExpressionBoolean *>(r_value.GetPointer());
+  if (l_boolean && r_boolean) {
+    return Co<Expression>(new ExpressionBoolean(l_boolean->toBoolean() == r_boolean->toBoolean()));
+  }
+  
+  // Strings
+  ExpressionString *l_string = dynamic_cast<ExpressionString *>(l_value.GetPointer());
+  ExpressionString *r_string = dynamic_cast<ExpressionString *>(r_value.GetPointer());
+  if (l_string && r_string) {
+    return Co<Expression>(new ExpressionBoolean(l_string->getString() == r_string->getString()));
+  }
+
+  // Both are arrays
+  ExpressionArrayReference *l_array = dynamic_cast<ExpressionArrayReference *>(l_value.GetPointer());
+  ExpressionArrayReference *r_array = dynamic_cast<ExpressionArrayReference *>(r_value.GetPointer());
+  if (l_array && r_array) {
+    int nitems = l_array->getArray()->getSize();
+    if (nitems == r_array->getArray()->getSize()) {
+      for (int i = 0; i < nitems; ++i) {
+        Co<Expression> is_same = evaluate_helper((*l_array->getArray())[i],
+                                               (*r_array->getArray())[i],
+                                               source, location, env);
+        ExpressionBoolean *b = dynamic_cast<ExpressionBoolean *>(is_same.GetPointer());
+        if (!b->toBoolean()) {
+          return is_same;
+        }
+      }
+      return Co<Expression>(new ExpressionBoolean(true));
+    }
+  } 
+
+  return Co<Expression>(new ExpressionBoolean(false));
 }
 
 /* ------------------------------------------------------------------------- */

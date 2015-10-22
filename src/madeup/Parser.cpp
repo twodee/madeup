@@ -87,7 +87,7 @@ bool Parser::isInExpressionFirst(int k) const {
          isUp(Token::TO, k) ||
          isUp(Token::NOTHING, k) ||
          isUp(Token::MINUS, k) ||
-         /* isUp(Token::LEFT_CURLY_BRACE, k) || */
+         isUp(Token::LEFT_CURLY_BRACE, k) ||
          isUp(Token::ID, k);
 }
 
@@ -376,46 +376,46 @@ void Parser::expressionLevel9() {
 // Precedence level 10: subscript [].
 void Parser::expressionLevel10() {
   atom();
-  /* Co<Expression> array; */
+  Co<Expression> array;
 
-  /* if (isUp(Token::LEFT_BRACKET)) { */
-    /* array = popExpression(); */
-  /* } */
+  if (isUp(Token::LEFT_BRACKET)) {
+    array = popExpression();
+  }
 
-  /* while (isUp(Token::LEFT_BRACKET)) { */
-    /* ++i; */
-    /* expressionLevel0(); */
-    /* Co<Expression> subscript = popExpression(); */
-    /* if (isUp(Token::RIGHT_BRACKET)) { */
-      /* ++i; */
-      /* if (isUp(Token::ASSIGN)) { */
-        /* ++i; */
-        /* Co<Expression> rhs; */
-        /* if (isUp(Token::NEWLINE)) { */
-          /* ++i; */
-          /* block(); */
-          /* rhs = popBlock(); */
-          /* if (isUp(Token::END)) { */
-            /* ++i; */
-          /* } else { */
-            /* std::stringstream ss; */
-            /* ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'end'."; */
-            /* throw MessagedException(ss.str()); */
-          /* } */
-        /* } else { */
-          /* expressionLevel0(); */
-          /* rhs = popExpression(); */
-        /* } */
-        /* pushExpression(new ExpressionDefineArrayElement(array, subscript, rhs), array->getSourceLocation(), rhs->getSourceLocation()); */
-      /* } else { */
-        /* pushExpression(new ExpressionArraySubscript(array, subscript), array->getSourceLocation(), subscript->getSourceLocation()); */
-      /* } */
-    /* } else { */
-      /* std::stringstream ss; */
-      /* ss << subscript->getSourceLocation().toAnchor() << ": I didn't find a ']' where I expected it."; */
-      /* throw MessagedException(ss.str()); */
-    /* } */
-  /* } */
+  while (isUp(Token::LEFT_BRACKET)) {
+    ++i;
+    expressionLevel0();
+    Co<Expression> subscript = popExpression();
+    if (isUp(Token::RIGHT_BRACKET)) {
+      ++i;
+      if (isUp(Token::ASSIGN)) {
+        ++i;
+        Co<Expression> rhs;
+        if (isUp(Token::NEWLINE)) {
+          ++i;
+          block();
+          rhs = popBlock();
+          if (isUp(Token::END)) {
+            ++i;
+          } else {
+            std::stringstream ss;
+            ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'end'.";
+            throw MessagedException(ss.str());
+          }
+        } else {
+          expressionLevel0();
+          rhs = popExpression();
+        }
+        pushExpression(new ExpressionDefineArrayElement(array, subscript, rhs), array->getSourceLocation(), rhs->getSourceLocation());
+      } else {
+        pushExpression(new ExpressionArraySubscript(array, subscript), array->getSourceLocation(), subscript->getSourceLocation());
+      }
+    } else {
+      std::stringstream ss;
+      ss << subscript->getSourceLocation().toAnchor() << ": I didn't find a ']' where I expected it.";
+      throw MessagedException(ss.str());
+    }
+  }
 }
 
 /* ------------------------------------------------------------------------- */
@@ -754,29 +754,29 @@ void Parser::atom() {
       /* std::cout << "just saw call" << std::endl; */
       /* std::cout << isUp(Token::ASSIGN) << std::endl; */
 
-      if (isUp(Token::ASSIGN)) {
-        ++i;
-        Co<Expression> rhs;
-        if (isUp(Token::NEWLINE)) {
-          ++i;
-          block();
-          rhs = popBlock();
-          if (isUp(Token::END)) {
-            ++i;
-          } else {
-            std::stringstream ss;
-            ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'end'.";
-            throw MessagedException(ss.str());
-          }
-        } else {
-          expressionLevel0();
-          rhs = popExpression();
-        }
-        pushExpression(new ExpressionDefineArrayElement(call, rhs), call->getSourceLocation(), rhs->getSourceLocation());
-      } else {
+      /* if (isUp(Token::ASSIGN)) { */
+        /* ++i; */
+        /* Co<Expression> rhs; */
+        /* if (isUp(Token::NEWLINE)) { */
+          /* ++i; */
+          /* block(); */
+          /* rhs = popBlock(); */
+          /* if (isUp(Token::END)) { */
+            /* ++i; */
+          /* } else { */
+            /* std::stringstream ss; */
+            /* ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'end'."; */
+            /* throw MessagedException(ss.str()); */
+          /* } */
+        /* } else { */
+          /* expressionLevel0(); */
+          /* rhs = popExpression(); */
+        /* } */
+        /* pushExpression(new ExpressionDefineArrayElement(call, rhs), call->getSourceLocation(), rhs->getSourceLocation()); */
+      /* } else { */
         /* pushExpression(new ExpressionArraySubscript(array, subscript), array->getSourceLocation(), subscript->getSourceLocation()); */
         expressions.push(call);
-      }
+      /* } */
     }
   } else if (isUp(Token::FOR)) {
     Token for_token = tokens[i];
@@ -886,26 +886,26 @@ void Parser::atom() {
       throw MessagedException(ss.str());
     }
 
-  } else if (isUp(Token::LEFT_BRACKET)) {
+  } else if (isUp(Token::LEFT_CURLY_BRACE)) {
     std::vector<Co<Expression> > items;
     Token left_bracket_token = tokens[i];
 
-    if (!isUp(Token::RIGHT_BRACKET)) {
+    if (!isUp(Token::RIGHT_CURLY_BRACE)) {
       do {
-        ++i; // consume [ or ,
+        ++i; // consume { or ,
         expressionLevel0();
         items.push_back(popExpression());
       } while (isUp(Token::COMMA));
     }
 
-    if (isUp(Token::RIGHT_BRACKET)) {
+    if (isUp(Token::RIGHT_CURLY_BRACE)) {
       ExpressionArrayLiteral *array_literal = new ExpressionArrayLiteral(items);
       SourceLocation location(left_bracket_token.getLocation(), tokens[i].getLocation());
       pushExpression(array_literal, left_bracket_token.getLocation(), tokens[i].getLocation());
       ++i;
     } else {
       std::stringstream ss;
-      ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected ].";
+      ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected }.";
       throw MessagedException(ss.str());
     }
 

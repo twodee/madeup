@@ -4,6 +4,8 @@ add_library(madeup
   Expression.cpp
   ExpressionAbsoluteValue.cpp
   ExpressionAdd.cpp
+  ExpressionAll.cpp
+  ExpressionAny.cpp
   ExpressionAnd.cpp
   ExpressionArray.cpp
   ExpressionAxis.cpp
@@ -30,6 +32,7 @@ add_library(madeup
   ExpressionForget.cpp
   ExpressionGreater.cpp
   ExpressionGreaterOrEqual.cpp
+  ExpressionHome.cpp
   ExpressionIdentity.cpp
   ExpressionIf.cpp
   ExpressionInteger.cpp

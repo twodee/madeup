@@ -2,12 +2,13 @@
 #define EXPRESSIONNUMBER_H
 
 #include "madeup/Expression.h"
+#include "madeup/ExpressionPrimitive.h"
 
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */
 
-class ExpressionNumber : public Expression {
+class ExpressionNumber : public ExpressionPrimitive {
   public:
     ExpressionNumber();
 
