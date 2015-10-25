@@ -13,26 +13,29 @@ oop.inherits(Mode, TextMode);
 (function() {
     this.lineCommentStart = "--";
     
-//    // special logic for indent/outdent. 
-//    // By default ace keeps indentation of previous line
-//    this.getNextLineIndent = function(state, line, tab) {
-//        var indent = this.$getIndent(line);
-//        return indent;
-//    };
+this.getNextLineIndent = function(state, line, tab) {
+  var match = line.match(/^\s*/);
+  var currentIndent = match[0];
+  if (/^\s*(if|else|to|for|repeat|while|around)\b/.test(line)) {
+    return currentIndent + '  ';
+  } else {
+    return currentIndent;
+  }
+};
 
 // Do I need to fix the indent?
 this.checkOutdent = function(state, line, input) {
-  return /^\s*end\s*$/.test(line) || /^\s*end\s*$/.test(line + input);;
+  console.log(state);
+  console.log('line: ' + line + ' | input: ' + input);
+  return /^\s*(en|els|aroun)\s*$/.test(line);
 };
 
 // Fix the indent.
 this.autoOutdent = function(state, doc, row) {
   var line = doc.getLine(row);
-  var match = line.match(/^  /);
+  var match = line.match(/^\s*(end|else|around)\b/);
   if (match) {
     doc.replace(new Range(row, 0, row, 2), '');
-  } else {
-    return 0;
   }
 };
 
