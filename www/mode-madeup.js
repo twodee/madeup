@@ -11,33 +11,33 @@ var Mode = function() {
 oop.inherits(Mode, TextMode);
 
 (function() {
-    this.lineCommentStart = "--";
+  this.lineCommentStart = "--";
     
-this.getNextLineIndent = function(state, line, tab) {
-  var match = line.match(/^\s*/);
-  var currentIndent = match[0];
-  if (/^\s*(if|else|to|for|repeat|while|around)\b/.test(line)) {
-    return currentIndent + '  ';
-  } else {
-    return currentIndent;
-  }
-};
+  this.getNextLineIndent = function(state, line, tab) {
+    var match = line.match(/^\s*/);
+    var currentIndent = match[0];
+    if (/^\s*(if|else|to|for|repeat|while|around)\b/.test(line)) {
+      return currentIndent + '  ';
+    } else {
+      return currentIndent;
+    }
+  };
 
-// Do I need to fix the indent?
-this.checkOutdent = function(state, line, input) {
-  console.log(state);
-  console.log('line: ' + line + ' | input: ' + input);
-  return /^\s*(en|els|aroun)\s*$/.test(line);
-};
+  // Do I need to fix the indent?
+  this.checkOutdent = function(state, line, input) {
+    console.log(state);
+    console.log('line: ' + line + ' | input: ' + input);
+    return /^\s*(en|els|aroun)\s*$/.test(line);
+  };
 
-// Fix the indent.
-this.autoOutdent = function(state, doc, row) {
-  var line = doc.getLine(row);
-  var match = line.match(/^\s*(end|else|around)\b/);
-  if (match) {
-    doc.replace(new Range(row, 0, row, 2), '');
-  }
-};
+  // Fix the indent.
+  this.autoOutdent = function(state, doc, row) {
+    var line = doc.getLine(row);
+    var match = line.match(/^\s*(end|else|around)\b/);
+    if (match) {
+      doc.replace(new Range(row, 0, row, 2), '');
+    }
+  };
 
 //    // create worker for live syntax checking
 //    this.createWorker = function(session) {
