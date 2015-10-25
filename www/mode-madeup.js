@@ -19,15 +19,23 @@ oop.inherits(Mode, TextMode);
 //        var indent = this.$getIndent(line);
 //        return indent;
 //    };
-//
-//    this.checkOutdent = function(state, line, input) {
-//        return this.$outdent.checkOutdent(line, input);
-//    };
-//
-//    this.autoOutdent = function(state, doc, row) {
-//        this.$outdent.autoOutdent(doc, row);
-//    };
-//    
+
+// Do I need to fix the indent?
+this.checkOutdent = function(state, line, input) {
+  return /^\s*end\s*$/.test(line) || /^\s*end\s*$/.test(line + input);;
+};
+
+// Fix the indent.
+this.autoOutdent = function(state, doc, row) {
+  var line = doc.getLine(row);
+  var match = line.match(/^  /);
+  if (match) {
+    doc.replace(new Range(row, 0, row, 2), '');
+  } else {
+    return 0;
+  }
+};
+
 //    // create worker for live syntax checking
 //    this.createWorker = function(session) {
 //        var worker = new WorkerClient(["ace"], "ace/mode/madeup_worker", "MadeupWorker");
