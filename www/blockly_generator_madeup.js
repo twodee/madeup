@@ -391,7 +391,6 @@ Blockly.Madeup['madeup_math_binary_arithmetic_operator'] = function(block) {
   } else {
     precedence = Blockly.Madeup.ORDER_EXPONENTIATION;
   } 
-  console.log(dropdown_operator + ': ' + precedence);
 
   var value_a = Blockly.Madeup.valueToCode(block, 'A', precedence);
   var value_b = Blockly.Madeup.valueToCode(block, 'B', precedence);

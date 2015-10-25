@@ -7,6 +7,21 @@ function hasWebGL() {
   } 
 }
 
+window.onbeforeunload = function() {
+  if (mupName && isSourceDirty) {
+    return 'You have unsaved changes.';
+  }
+};
+
+var lastBlocks = null;
+function onBlocksChanged() {
+  var xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
+  var currentBlocks = Blockly.Xml.domToText(xml);
+  isSourceDirty = lastBlocks != currentBlocks;
+  updateTitle();
+  run(getSource(), GeometryMode.PATH);
+}
+
 var GeometryMode = Object.freeze({
   PATH: 'PATH',
   SURFACE: 'SURFACE'
@@ -287,12 +302,7 @@ function parse(peeker) {
         block = Blockly.Block.obtain(blocklyWorkspace, 'procedures_callnoreturn');
         block.setFieldValue(id, 'NAME');
         var formals = getBlocklyProcedureFormals(id);
-        console.log(formals);
         block.setProcedureParameters(formals, formals);
-        console.log("length: " + block.inputList.length);
-        for (var i = 0, input; input = block.inputList[i]; i++) { 
-          console.log(input);
-        }
         var i = 0;
         while (peeker.peek() == ' ') {
           peeker.get(); // eat space
@@ -641,6 +651,7 @@ var gridExtent = 10.0;
 var isFlatShaded = true;
 var isEditorText = true;
 var tree = null;
+var isSourceDirty = false;
 
 var isEditorTextChanged = false;
 var isShowWireframeChanged = false;
@@ -657,7 +668,7 @@ var isShowClockwiseChanged = false;
 var isFlatShadedChanged = false;
 
 function updateTitle() {
-  $('#toggleFilePopup').attr('value', mupName);
+  $('#toggleFilePopup').attr('value', mupName + (isSourceDirty ? '*' : ''));
 }
 
 function saveInCookies() {
@@ -824,7 +835,7 @@ $(document).ready(function() {
           modelColor = hex;
           isModelColorChanged = true;
           $('#modelColor').css('background-color', '#' + modelColor);
-          run(GeometryMode.SURFACE);
+          run(getSource(), GeometryMode.SURFACE);
         }
       });
 
@@ -874,7 +885,9 @@ $(document).ready(function() {
     // Only save cookies if they were successfully loaded.
     $(window).unload(function() {
       saveInCookies();
-      save();
+      if (mupName && isSourceDirty && confirm('Save changes to ' + mupName + '?')) {
+        save();
+      }
     });
   });
 
@@ -911,6 +924,7 @@ $(document).ready(function() {
   });
 
   $('input[type=radio][name=editorMode]').change(function() {
+    hideMenus(); // setEditor may pop open a dialog, which doesn't look good with a menu still open
     var editorMode = $(this).val();
     setEditor(editorMode != "Blocks");
   });
@@ -919,7 +933,7 @@ $(document).ready(function() {
     isShowHeadingsChanged = true;
     showHeadings = this.checked;
     textEditor.focus();
-    run(GeometryMode.PATH);
+    run(getSource(), GeometryMode.PATH);
   });
 
   $('#isFlatShaded').click(function() {
@@ -1087,7 +1101,7 @@ $(document).ready(function() {
   $('#showWireframe').click(function() {
     isShowWireframeChanged = true;
     showWireframe = this.checked;
-    run(GeometryMode.SURFACE);
+    run(getSource(), GeometryMode.SURFACE);
   });
 
   function toggleMenu(id) {
@@ -1112,12 +1126,6 @@ $(document).ready(function() {
   $('#toggleFilePopup').click(function() {
     toggleMenu('#filePopup');
     populateFileMenu();
-  });
-
-  $('#translate').click(function() {
-    setEditor(false);
-    blocklyWorkspace.clear();
-    translate();
   });
 
   $('#toggleEditorPopup').click(function() {
@@ -1147,7 +1155,7 @@ $(document).ready(function() {
   $('#solidify').click(function() {
     log('Running...'); 
     saveInCookies();
-    run(GeometryMode.SURFACE);
+    run(getSource(), GeometryMode.SURFACE);
     textEditor.focus();
   });
 
@@ -1161,7 +1169,6 @@ $(document).ready(function() {
   });
 
   $('#fileSave').click(function() {
-
     if (!mupName) {
       mupName = prompt('Save under what name?');
     }
@@ -1206,8 +1213,9 @@ $(document).ready(function() {
   });
 
   $('#fileClose').click(function() {
-    // TODO prompt for save
-    save();
+    if (mupName && isSourceDirty && confirm('Save changes to ' + mupName + '?')) {
+      save();
+    }
     load('untitled');
   });
 
@@ -1243,7 +1251,6 @@ $(document).ready(function() {
   $(document).on('click', function(event) {
     // Don't do any hiding when color picker clicked on.
     if ($(event.target).closest('.colorpicker').length != 0) {
-      console.log('a click!');
       event.preventDefault();
       return;
       // return false;
@@ -1280,12 +1287,14 @@ $(document).ready(function() {
 });
 
 var onEditorChange = function(delta) {
+  isSourceDirty = true;
+  updateTitle();
   enableDownload(false);
   if (preview) {
     clearTimeout(preview); 
   }
   preview = setTimeout(function() {
-    run(GeometryMode.PATH);
+    run(getSource(), GeometryMode.PATH);
   }, nSecondsTillPreview * 1000);
 }
 
@@ -1295,46 +1304,70 @@ function schedulePreview() {
 }
 
 function setEditor(isText) {
-  if (isText) {
+  // Bail if we're already in the requested mode.
+  if (isEditorText == isText) return;
+
+  if (blocklyWorkspace) {
+    blocklyWorkspace.removeChangeListener(onBlocksChanged);
+  }
+
+  isEditorText = isText;
+  isEditorTextChanged = true;
+
+  // Update radio buttons to reflect current editor.
+  if (isEditorText) {
     $("#isEditorText").prop('checked', true);
   } else {
     $("#isEditorBlocks").prop('checked', true);
   }
 
-  if (isEditorText == isText) return;
-  isEditorText = isText;
-  isEditorTextChanged = true;
-
+  // We're heading to text.
   if (isEditorText) {
+    // Any blocks to convert to text?
+    if (blocklyWorkspace.getTopBlocks().length > 0 && confirm('Convert your blocks to text?')) {
+      var source = Blockly.Madeup.workspaceToCode(blocklyWorkspace);
+      textEditor.setValue(source);
+    }
+
     $('#blocksEditor').hide();
     $('#textEditor').show();
-  } else {
-    var src = getSource();
+  }
+  
+  // We're heading to blocks.
+  else {
+    if (!blocklyWorkspace) {
+      blocklyWorkspace = Blockly.inject('blocksCanvas', {toolbox: document.getElementById('toolbox')});
+    }
+
+    // Any text to convert to blocks?
+    var source = textEditor.getValue();
+    if (source.length > 0 && confirm('Convert your text to blocks?')) {
+      blocklyWorkspace.clear();
+      convertTextToBlocks(source);
+    }
 
     $('#textEditor').hide();
     $('#blocksEditor').show();
-
-    if (!blocklyWorkspace) {
-      blocklyWorkspace = Blockly.inject('blocksCanvas', {toolbox: document.getElementById('toolbox')});
-      blocklyWorkspace.addChangeListener(function() {
-        var code = Blockly.Madeup.workspaceToCode(blocklyWorkspace);
-        textEditor.setValue(code);
-        log(code);
-        console.log(code);
-      });
-    }
   }
 
   resize();
   Blockly.fireUiEvent(window, 'resize');
+
+  if (!isEditorText && blocklyWorkspace) {
+    blocklyWorkspace.addChangeListener(onBlocksChanged);
+  }
 }
 
 function load(mup) {
-  console.log('new mup: ' + mup);
-
   hideMenus();
-  // TODO prompt for save
-  save();
+  if (mupName && isSourceDirty && confirm('Save changes to ' + mupName + '?')) {
+    save();
+  }
+
+  // Clear the editors so they don't try to get converted.
+  textEditor.setValue();
+  if (blocklyWorkspace) blocklyWorkspace.clear();
+
   mupName = mup;
 
   for (var i = 0; i < meshes.length; ++i) {
@@ -1352,16 +1385,18 @@ function load(mup) {
       blocklyWorkspace.clear();
       var xml = Blockly.Xml.textToDom(file.source);
       Blockly.Xml.domToWorkspace(blocklyWorkspace, xml);
+      xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
+      lastBlocks = Blockly.Xml.domToText(xml);
     }
   }
 
   // TODO toggle modes
+  isSourceDirty = false;
   updateTitle();
 }
 
 function save() {
   if (mupName != null) {
-    console.log('saving ' + mupName);
 
     var mode = null;
     var source = null;
@@ -1371,7 +1406,6 @@ function save() {
     } else {
       var xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
       source = Blockly.Xml.domToText(xml);
-      console.log(source);
       mode = 'blocks';
     }
 
@@ -1382,26 +1416,27 @@ function save() {
     };
 
     window.localStorage.setItem(mupName, JSON.stringify(file));
+    isSourceDirty = false;
+    updateTitle();
   }
 }
 
 function getSource() {
-  return textEditor.getValue();
+  if (isEditorText) {
+    return textEditor.getValue();
+  } else {
+    return Blockly.Madeup.workspaceToCode(blocklyWorkspace);
+  }
 }
 
-function translate() {
+function convertTextToBlocks(source) {
   $.ajax({
     type: 'POST',
     url: 'translate.php',
-    data: JSON.stringify(
-      {
-        source: getSource()
-      }
-    ),
+    data: JSON.stringify({ source: source }),
     contentType: 'application/json; charset=utf-8',
     dataType: 'json',
     success: function(data) {
-      console.log("exit status: " + data['exit_status']);
       if (data['exit_status'] == 0) {
         tree = data['tree'];
         console.log(data['tree']);
@@ -1417,13 +1452,13 @@ function translate() {
 }
 
 var allGeometry = undefined;
-function run(mode) {
+function run(source, mode) {
   $.ajax({
     type: 'POST',
     url: 'interpret.php',
     data: JSON.stringify(
       {
-        source: getSource(),
+        source: source,
         extension: 'json',
         geometry_mode: mode,
         shading_mode: isFlatShaded ? 'FLAT' : 'SMOOTH'
@@ -1639,7 +1674,6 @@ function updateCulling() {
   }
   renderer.setFaceCulling(mode, THREE.FrontFaceDirectionCCW);
   render();
-  //run(GeometryMode.SURFACE);
 }
 
 function init() {

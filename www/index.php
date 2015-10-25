@@ -160,7 +160,6 @@
       <input type="radio" name="editorMode" id="isEditorText" value="Text" checked="checked"/>Text or 
       <input type="radio" name="editorMode" id="isEditorBlocks" value="Blocks"/>Blocks<br/>
       <input type="checkbox" id="autopreview" checked="checked"/>Preview <input type="text" id="nSecondsTillPreview" size="5"/> seconds after last edit<br/>
-      <a href="#" id="translate" class="fileLink">Translate</a><br/>
     </div>
 
     <div id="gridPopup" class="popup">
