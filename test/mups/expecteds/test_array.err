@@ -21,3 +21,14 @@ all {true}: true
 all {false}: true
 all {false, true, true}: true
 all {false, false}: true
+any {true}: true
+any {true, true, true, true}: true
+any {false, false, false, true}: true
+any {false, false, true, false}: true
+any {false, false, false, false, false}: true
+{10, 17, -45} < {10, 16, -44} == {false, false, true}: true
+{10, 17, -45} <= {10, 16, -44} == {true, false, true}: true
+{3, 3} == {3, 3}: true
+{3, 4} != {4, 3}: true
+{10, 17, -45} > {10, 16, -44} == {false, true, false}: true
+{10, 17, -45} >= {10, 16, -44} == {true, true, false}: true

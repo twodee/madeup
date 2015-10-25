@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Madeup Documentation</title>
+  <link rel="stylesheet" type="text/css" href="css/coderay.css">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+</head>
+<body>
+<h1 id="spheres">Spheres</h1>
+<p>The <code>spheres</code> solidifier very simply places a faceted sphere at each vertex on the path you walk. You can set each sphere's radius independently.</p>
+
+<p>Instead of making the canonical snowman model, let's generate a collection of spheres in random locations with radii in [1, 2]. We specify the radius by assigning a value to the builtin <code>.radius</code> variable right before the <code>moveto</code>. The leading <code>.</code> is significant. It implies that <code>.radius</code> is an attribute of a vertex.</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span style="color:#606">seed</span> = <span style="color:#00D">30</span>
+
+<span style="color:#080;font-weight:bold">repeat</span> <span style="color:#00D">150</span>
+  <span style="color:#606">x</span> = <span style="color:#369;font-weight:bold">random</span> -<span style="color:#00D">10</span>, <span style="color:#00D">10</span>
+  <span style="color:#606">y</span> = <span style="color:#369;font-weight:bold">random</span> -<span style="color:#00D">10</span>, <span style="color:#00D">10</span>
+  <span style="color:#606">z</span> = <span style="color:#369;font-weight:bold">random</span> -<span style="color:#00D">10</span>, <span style="color:#00D">10</span>
+  <span style="color:#369;font-weight:bold">.radius</span> = <span style="color:#60E">0.1</span> * <span style="color:#369;font-weight:bold">random</span> <span style="color:#00D">10</span>, <span style="color:#00D">20</span>
+  <span style="color:#369;font-weight:bold">moveto</span> <span style="color:#606">x</span>, <span style="color:#606">y</span>, <span style="color:#606">z</span>
+<span style="color:#080;font-weight:bold">end</span>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/dots_path.png"><img src="images/dots_path.png" alt="Dots Path" class="bigimg" /></a>
+
+</div>
+
+<p>Note that the path is quite messy. The <code>spheres</code> solidifier focuses only the vertices, completely disregarding the connections between them.</p>
+
+<p>Let's add in the solidifier call:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span style="color:#606">seed</span> = <span style="color:#00D">30</span>
+
+<span style="color:#080;font-weight:bold">repeat</span> <span style="color:#00D">150</span>
+  <span style="color:#606">x</span> = <span style="color:#369;font-weight:bold">random</span> -<span style="color:#00D">10</span>, <span style="color:#00D">10</span>
+  <span style="color:#606">y</span> = <span style="color:#369;font-weight:bold">random</span> -<span style="color:#00D">10</span>, <span style="color:#00D">10</span>
+  <span style="color:#606">z</span> = <span style="color:#369;font-weight:bold">random</span> -<span style="color:#00D">10</span>, <span style="color:#00D">10</span>
+  <span style="color:#369;font-weight:bold">.radius</span> = <span style="color:#60E">0.1</span> * <span style="color:#369;font-weight:bold">random</span> <span style="color:#00D">10</span>, <span style="color:#00D">20</span>
+  <span style="color:#369;font-weight:bold">moveto</span> <span style="color:#606">x</span>, <span style="color:#606">y</span>, <span style="color:#606">z</span>
+<span style="color:#080;font-weight:bold">end</span>
+
+<b style="background-color: #dcdcdc"><span style="color:#606">spheres</span></b>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/dots_octahedrons.png"><img src="images/dots_octahedrons.png" alt="Dots Octahedrons" class="bigimg" /></a>
+
+</div>
+
+<p>Those aren't spheres. They're octahedrons. As with <code>revolve</code>, the smoothness of our model is determined by another builtin variable: <code>nsides</code>. Let's increase the value from the default value of 4:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span style="color:#606">seed</span> = <span style="color:#00D">30</span>
+
+<span style="color:#080;font-weight:bold">repeat</span> <span style="color:#00D">150</span>
+  <span style="color:#606">x</span> = <span style="color:#369;font-weight:bold">random</span> -<span style="color:#00D">10</span>, <span style="color:#00D">10</span>
+  <span style="color:#606">y</span> = <span style="color:#369;font-weight:bold">random</span> -<span style="color:#00D">10</span>, <span style="color:#00D">10</span>
+  <span style="color:#606">z</span> = <span style="color:#369;font-weight:bold">random</span> -<span style="color:#00D">10</span>, <span style="color:#00D">10</span>
+  <span style="color:#369;font-weight:bold">.radius</span> = <span style="color:#60E">0.1</span> * <span style="color:#369;font-weight:bold">random</span> <span style="color:#00D">10</span>, <span style="color:#00D">20</span>
+  <span style="color:#369;font-weight:bold">moveto</span> <span style="color:#606">x</span>, <span style="color:#606">y</span>, <span style="color:#606">z</span>
+<span style="color:#080;font-weight:bold">end</span>
+
+<b style="background-color: #dcdcdc"><span style="color:#369;font-weight:bold">nsides</span> = <span style="color:#00D">25</span></b>
+<span style="color:#606">spheres</span>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/dots_rounded.png"><img src="images/dots_rounded.png" alt="Dots Rounded" class="bigimg" /></a>
+
+</div>
+
+<p>Note that variable <code>nsides</code> is a model attribute and not a vertex attribute. It only needs to be set before the call to <code>spheres</code>.</p>
+
+<h2 id="worm">Worm</h2>
+<p>Let's consider one more example to illustrate an issue that you will occasionally encounter when building models. We draw a little sinusoidal worm with the following program:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span style="color:#369;font-weight:bold">nsides</span> = <span style="color:#00D">50</span>
+<span style="color:#369;font-weight:bold">.radius</span> = <span style="color:#00D">20</span>
+<span style="color:#606">amplitude</span> = <span style="color:#00D">70</span>
+
+<span style="color:#080;font-weight:bold">for</span> <span style="color:#606">y</span> <span style="color:#080;font-weight:bold">in</span> <span style="color:#00D">0</span>,<span style="color:#00D">20</span>..<span style="color:#00D">360</span>
+  <span style="color:#606">x</span> = <span style="color:#606">amplitude</span> * <span style="color:#369;font-weight:bold">sin</span> <span style="color:#606">y</span>
+  <span style="color:#369;font-weight:bold">moveto</span> <span style="color:#606">x</span>, <span style="color:#606">y</span>, <span style="color:#00D">0</span>
+<span style="color:#080;font-weight:bold">end</span>
+
+<span style="color:#606">spheres</span>
+</pre></div>
+</div>
+  </div>
+
+  <a href="images/dots_worm.png"><img src="images/dots_worm.png" alt="Dots Worm" class="midimg" /></a>
+
+</div>
+
+<p>Our first example yielded a bunch of loose spheres, which is hardly a printable model. Now we have a model with overlapping spheres. Technically, this is a solid and should be printable, but the intersecting geometry will cause trouble for many printers. We'll first want to run our model through a repair tool like Netfabb. Someday Madeup may repair models automatically. Someday.</p>
+
+<h2 id="next">Next</h2>
+<p>The <code>spheres</code> solidifier is useful for chemists and people wanting to add eyes to their models. Rounded models present challenges to many printers. The companion <a href="boxes.html"><code>boxes</code></a> solidifier, on the other hand, is happy to make very ordinary and printable models.</p>
+</body>
+</html>

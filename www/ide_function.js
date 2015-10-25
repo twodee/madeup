@@ -183,7 +183,7 @@ function parse(peeker) {
       block.getInput('X').connection.connect(x.outputConnection);
       block.getInput('Y').connection.connect(y.outputConnection);
       block.getInput('Z').connection.connect(z.outputConnection);
-    } else if (id == 'spheres' || id == 'forget' || id == 'boxes') {
+    } else if (id == 'spheres' || id == 'forget' || id == 'boxes' || id == 'polygon') {
       block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_generate_' + id);
     } else if (id == 'revolve') {
       peeker.get(); // eat space
@@ -1241,6 +1241,14 @@ $(document).ready(function() {
   });
 
   $(document).on('click', function(event) {
+    // Don't do any hiding when color picker clicked on.
+    if ($(event.target).closest('.colorpicker').length != 0) {
+      console.log('a click!');
+      event.preventDefault();
+      return;
+      // return false;
+    }
+
     // If a non-menu was clicked on, so let's close all the menus.
     if ($(event.target).closest('.togglePopup').length == 0 &&
         $(event.target).closest('.popup').length == 0) {
@@ -1261,6 +1269,8 @@ $(document).ready(function() {
     else if ($(event.target).hasClass('popup')) {
       hideMenus(event.target.id);
     }
+
+    return true;
   });
 
   if (hasWebGL()) {
@@ -1310,6 +1320,7 @@ function setEditor(isText) {
         var code = Blockly.Madeup.workspaceToCode(blocklyWorkspace);
         textEditor.setValue(code);
         log(code);
+        console.log(code);
       });
     }
   }
@@ -1321,6 +1332,7 @@ function setEditor(isText) {
 function load(mup) {
   console.log('new mup: ' + mup);
 
+  hideMenus();
   // TODO prompt for save
   save();
   mupName = mup;
@@ -1566,6 +1578,8 @@ function resize() {
   var height = window.innerHeight;
   if (renderer) renderer.setSize(width, height);
   camera.aspect = width / height;
+  // camera.top = camera.left / camera.aspect;
+  // camera.bottom = -camera.top;
   camera.updateProjectionMatrix();
   $("#textEditor").height($(document).height() - $('#menu').height() - $('#console').height());
   $("#blocksEditor").height($(document).height() - $('#menu').height() - $('#console').height());
@@ -1630,6 +1644,7 @@ function updateCulling() {
 
 function init() {
   camera = new THREE.PerspectiveCamera(45.0, 1.0, 0.1, 10000.0);
+  // camera = new THREE.OrthographicCamera(-50, 50, 50, -50, -100, 100);
   camera.position.z = 30;
 
   var glcanvas = $("#glcanvas");

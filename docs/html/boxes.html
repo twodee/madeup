@@ -3,12 +3,14 @@
 <head>
   <title>Madeup Documentation</title>
   <link rel="stylesheet" type="text/css" href="css/coderay.css">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 </head>
 <body>
 <h1 id="boxes">Boxes</h1>
-<p>The <code>boxes</code> solidifier is almost identical to <code>dots</code>&mdash;it very simply places a cube at each vertex on the path you walk. You can set each box's size independently.</p>
+<p>The <code>boxes</code> solidifier is almost identical to <code>spheres</code>&mdash;it very simply places a cube at each vertex on the path you walk. You can set each box's size independently.</p>
 
-<p>With <code>dots</code>, we set each sphere's size using <code>.radius</code>. This same variable is used to set a box's size, with each side measuring 2 * <code>.radius</code>.</p>
+<p>With <code>spheres</code>, we set each sphere's size using <code>.radius</code>. This same variable is used to set a box's size, with each side measuring 2 * <code>.radius</code>.</p>
 
 <p>Let's make a voxelated sphere by walking along its surface and placing vertices. Traversing the surface of a sphere in a serial fashion is an interesting and difficult problem. We're going to make our lives easier and first consider all locations in a cubic region circumscribing the sphere having radius <code>reach</code>:</p>
 
@@ -80,7 +82,7 @@
   <span style="color:#080;font-weight:bold">end</span>
 <span style="color:#080;font-weight:bold">end</span>
 
-<b style="background-color: #dcdcdc"><span style="color:#606">boxes</span></b>
+<b style="background-color: #dcdcdc"><span style="color:#369;font-weight:bold">boxes</span></b>
 </pre></div>
 </div>
   </div>
@@ -90,6 +92,6 @@
 </div>
 
 <h2 id="next">Next</h2>
-<p>The <code>boxes</code> solidifier excels at building voxelated creations algorithmically. Like <code>dots</code>, it may result in overlapping geometry that will need to be cleaned up before printing. But it's simple. On the other end of the complexity spectrum, we've got the <a href="surface.html"><code>surface</code></a> solidifier, which is the least automatic of them all.</p>
+<p>The <code>boxes</code> solidifier excels at building voxelated creations algorithmically. Like <code>spheres</code>, it may result in overlapping geometry that will need to be cleaned up before printing. But it's simple. On the other end of the complexity spectrum, we've got the <a href="surface.html"><code>surface</code></a> solidifier, which is the least automatic of them all.</p>
 </body>
 </html>

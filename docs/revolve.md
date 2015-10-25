@@ -156,4 +156,4 @@ revolve 0, 1, 0, 360
 ![Axle Hollow](images/axle_hollow.png){:.bigimg}
 
 ##Next
-The `revolve` solidifier excels at generating radially symmetric models. Speaking of radially symmetric, let's next check out drawing with spheres using the [`dots`](dots.html) solidifier.
+The `revolve` solidifier excels at generating radially symmetric models. Speaking of radially symmetric, let's next check out drawing with spheres using the [`spheres`](spheres.html) solidifier.

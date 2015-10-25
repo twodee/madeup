@@ -43,14 +43,6 @@ Blockly.Madeup = new Blockly.Generator('Madeup');
  * @private
  */
 Blockly.Madeup.addReservedWords('');
-    // import keyword
-    // print ','.join(keyword.kwlist)
-    // http://docs.python.org/reference/lexical_analysis.html#keywords
-    //'and,as,assert,break,class,continue,def,del,elif,else,except,exec,finally,for,from,global,if,import,in,is,lambda,not,or,pass,print,raise,return,try,while,with,yield,' +
-    //http://docs.python.org/library/constants.html
-    //'True,False,None,NotImplemented,Ellipsis,__debug__,quit,exit,copyright,license,credits,' +
-    // http://docs.python.org/library/functions.html
-    //'abs,divmod,input,open,staticmethod,all,enumerate,int,ord,str,any,eval,isinstance,pow,sum,basestring,execfile,issubclass,print,super,bin,file,iter,property,tuple,bool,filter,len,range,type,bytearray,float,list,raw_input,unichr,callable,format,locals,reduce,unicode,chr,frozenset,long,reload,vars,classmethod,getattr,map,repr,xrange,cmp,globals,max,reversed,zip,compile,hasattr,memoryview,round,__import__,complex,hash,min,set,apply,delattr,help,next,setattr,buffer,dict,hex,object,slice,coerce,dir,id,oct,sorted,intern');
 
 /**
  * Order of operation ENUMs.
@@ -94,8 +86,7 @@ Blockly.Madeup.init = function(workspace) {
   Blockly.Madeup.functionNames_ = Object.create(null);
 
   if (!Blockly.Madeup.variableDB_) {
-    Blockly.Madeup.variableDB_ =
-        new Blockly.Names(Blockly.Madeup.RESERVED_WORDS_);
+    Blockly.Madeup.variableDB_ = new Blockly.Names(Blockly.Madeup.RESERVED_WORDS_);
   } else {
     Blockly.Madeup.variableDB_.reset();
   }
@@ -355,6 +346,11 @@ Blockly.Madeup['madeup_generate_forget'] = function(block) {
   return code;
 };
 
+Blockly.Madeup['madeup_generate_polygon'] = function(block) {
+  var code = 'polygon\n';
+  return code;
+};
+
 Blockly.Madeup['madeup_generate_boxes'] = function(block) {
   var code = 'boxes\n';
   return code;
@@ -576,10 +572,8 @@ Blockly.Madeup['procedures_defnoreturn'] = function(block) {
     args[x] = Blockly.Madeup.variableDB_.getName(block.arguments_[x], Blockly.Variables.NAME_TYPE);
   }
 
-  var code = 'to ' + funcName + ' ' + args.join(' ') + '\n' + branch + 'end';
-  code = Blockly.Madeup.scrub_(block, code);
-  Blockly.Madeup.definitions_[funcName] = code;
-  return null;
+  var code = 'to ' + funcName + ' ' + args.join(' ') + '\n' + branch + 'end\n';
+  return code;
 };
 
 Blockly.Madeup['procedures_callnoreturn'] = function(block) {

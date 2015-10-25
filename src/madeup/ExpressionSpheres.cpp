@@ -1,4 +1,4 @@
-#include "madeup/ExpressionDot.h"
+#include "madeup/ExpressionSpheres.h"
 #include "madeup/ExpressionMesh.h"
 #include "madeup/ExpressionUnit.h"
 
@@ -6,21 +6,21 @@ namespace madeup {
 
 /* ------------------------------------------------------------------------- */
 
-ExpressionDot::ExpressionDot() :
+ExpressionSpheres::ExpressionSpheres() :
   Expression() {
 }
 
 /* ------------------------------------------------------------------------- */
 
-Co<Expression> ExpressionDot::evaluate(Environment &env) const {
-  Co<Trimesh> trimesh = env.dot();
+Co<Expression> ExpressionSpheres::evaluate(Environment &env) const {
+  Co<Trimesh> trimesh = env.spheres();
   return Co<Expression>(new ExpressionMesh(trimesh));
 }
 
 /* ------------------------------------------------------------------------- */
 
-void ExpressionDot::write(ostream &out) const {
-  out << "(dot)";
+void ExpressionSpheres::write(ostream &out) const {
+  out << "(spheres)";
 }
 
 /* ------------------------------------------------------------------------- */

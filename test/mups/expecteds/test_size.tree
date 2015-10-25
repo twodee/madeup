@@ -1,1 +1,1 @@
-(block (define-variable n (INTEGER 10)) (define-variable nums (MAKEARRAY (call-with-names n) (INTEGER 3))) (call print (call size (call-with-names nums))) (for i (INTEGER 0) (call size (call-with-names nums)) (INTEGER 1) (block (call print (SUBSCRIPT (call-with-names nums) (call-with-names i))))))
+(block (define-variable n (INTEGER 10)) (define-variable nums (MAKEARRAY (call-with-names n) (INTEGER 3))) (call print (call size (call-with-names nums))) (for-to i (call size (call-with-names nums)) (block (call print (SUBSCRIPT (call-with-names nums) (call-with-names i))))))

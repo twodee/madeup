@@ -12,7 +12,7 @@ add_library(madeup
   ExpressionBlobs.cpp
   ExpressionBlock.cpp
   ExpressionBoolean.cpp
-  ExpressionBox.cpp
+  ExpressionBoxes.cpp
   ExpressionCall.cpp
   ExpressionCallWithNamedParameters.cpp
   ExpressionCenter.cpp
@@ -23,7 +23,7 @@ add_library(madeup
   ExpressionDefineArrayElement.cpp
   ExpressionDefineVariable.cpp
   ExpressionDivide.cpp
-  ExpressionDot.cpp
+  ExpressionSpheres.cpp
   ExpressionDowel.cpp
   ExpressionEcho.cpp
   ExpressionEqual.cpp

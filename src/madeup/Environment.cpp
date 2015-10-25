@@ -9,12 +9,12 @@
 #include "madeup/ExpressionAxis.h"
 #include "madeup/ExpressionBoolean.h"
 #include "madeup/ExpressionBlobs.h"
-#include "madeup/ExpressionBox.h"
+#include "madeup/ExpressionBoxes.h"
 #include "madeup/ExpressionCenter.h"
 #include "madeup/ExpressionClosure.h"
 #include "madeup/ExpressionCosine.h"
 #include "madeup/ExpressionDebug.h"
-#include "madeup/ExpressionDot.h"
+#include "madeup/ExpressionSpheres.h"
 #include "madeup/ExpressionDowel.h"
 #include "madeup/ExpressionEcho.h"
 #include "madeup/ExpressionExtrude.h"
@@ -268,9 +268,9 @@ void Environment::prime() {
   Co<ExpressionDefine> define_polygon(new ExpressionDefine("polygon", Co<Expression>(new ExpressionPolygon())));
   define_polygon->addFormal("flip");
 
-  Co<ExpressionDefine> define_spheres(new ExpressionDefine("spheres", Co<Expression>(new ExpressionDot())));
+  Co<ExpressionDefine> define_spheres(new ExpressionDefine("spheres", Co<Expression>(new ExpressionSpheres())));
 
-  Co<ExpressionDefine> define_boxes(new ExpressionDefine("boxes", Co<Expression>(new ExpressionBox())));
+  Co<ExpressionDefine> define_boxes(new ExpressionDefine("boxes", Co<Expression>(new ExpressionBoxes())));
 
   Co<ExpressionDefine> define_revolve(new ExpressionDefine("revolve", Co<Expression>(new ExpressionRevolve())));
   define_revolve->addFormal("x");
@@ -986,7 +986,7 @@ Co<Trimesh> Environment::extrude(const QVector3<float> &axis, float length) {
 
 /* ------------------------------------------------------------------------- */
 
-Co<Trimesh> Environment::dot() {
+Co<Trimesh> Environment::spheres() {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
 
   if (geometry_mode == GeometryMode::SURFACE) {
@@ -1010,7 +1010,7 @@ Co<Trimesh> Environment::dot() {
 
 /* ------------------------------------------------------------------------- */
 
-Co<Trimesh> Environment::box() {
+Co<Trimesh> Environment::boxes() {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
 
   if (geometry_mode == GeometryMode::SURFACE) {

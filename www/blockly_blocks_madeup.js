@@ -384,6 +384,17 @@ Blockly.Blocks['madeup_generate_forget'] = {
   }
 };
 
+Blockly.Blocks['madeup_generate_polygon'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
+    this.appendDummyInput().appendField('polygon');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('');
+  }
+};
+
 Blockly.Blocks['madeup_generate_boxes'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');

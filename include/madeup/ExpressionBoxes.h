@@ -1,5 +1,5 @@
-#ifndef ELEMENTDOT_H
-#define ELEMENTDOT_H
+#ifndef ELEMENTBOXES_H
+#define ELEMENTBOXES_H
 
 #include "madeup/Expression.h"
 
@@ -7,9 +7,9 @@ namespace madeup {
 
 /* ------------------------------------------------------------------------- */
 
-class ExpressionDot : public Expression {
+class ExpressionBoxes : public Expression {
   public:
-    ExpressionDot();
+    ExpressionBoxes();
 
     Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;

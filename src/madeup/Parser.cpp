@@ -7,7 +7,6 @@
 #include "madeup/ExpressionArray.h"
 #include "madeup/ExpressionBlock.h"
 #include "madeup/ExpressionBoolean.h"
-#include "madeup/ExpressionBox.h"
 #include "madeup/ExpressionCall.h"
 #include "madeup/ExpressionCallWithNamedParameters.h"
 #include "madeup/ExpressionClosure.h"

@@ -75,8 +75,8 @@ class Environment {
     Co<Trimesh> polygon(bool is_flipped);
     Co<Trimesh> revolve();
     Co<Trimesh> extrude(const QVector3<float> &axis, float length);
-    Co<Trimesh> dot();
-    Co<Trimesh> box();
+    Co<Trimesh> spheres();
+    Co<Trimesh> boxes();
     Co<Trimesh> blobs(float grain, float iso);
     Co<Trimesh> surface(int width, int height);
     void forget();
