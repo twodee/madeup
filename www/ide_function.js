@@ -181,6 +181,14 @@ function parse(peeker) {
       var x = parse(peeker);
       block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_movement_move');
       block.getInput('DISTANCE').connection.connect(x.outputConnection);
+    } else if (id == 'random') {
+      peeker.get(); // eat space
+      var min = parse(peeker);
+      peeker.get(); // eat space
+      var max = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_math_random');
+      block.getInput('MIN').connection.connect(min.outputConnection);
+      block.getInput('MAX').connection.connect(max.outputConnection);
     } else if (id == 'yaw' || id == 'roll' || id == 'pitch') {
       peeker.get(); // eat space
       var degrees = parse(peeker);

@@ -27,13 +27,13 @@ oop.inherits(Mode, TextMode);
   this.checkOutdent = function(state, line, input) {
     console.log(state);
     console.log('line: ' + line + ' | input: ' + input);
-    return /^\s*(en|els|aroun)\s*$/.test(line);
+    return /^\s{2,}(en|els|aroun)\s*$/.test(line);
   };
 
   // Fix the indent.
   this.autoOutdent = function(state, doc, row) {
     var line = doc.getLine(row);
-    var match = line.match(/^\s*(end|else|around)\b/);
+    var match = line.match(/^\s{2,}(end|else|around)\b/);
     if (match) {
       doc.replace(new Range(row, 0, row, 2), '');
     }
