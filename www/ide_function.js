@@ -1178,6 +1178,7 @@ $(document).ready(function() {
   });
 
   $('#fileSaveAs').click(function() {
+    hideMenus();
     var name = prompt('Save under what name?');
     if (name != null) {
       mupName = name;
@@ -1187,15 +1188,20 @@ $(document).ready(function() {
   });
 
   $('#fileSave').click(function() {
+    hideMenus();
+
     if (!mupName) {
       mupName = prompt('Save under what name?');
     }
 
-    save();
-    updateTitle();
+    if (mupName) {
+      save();
+      updateTitle();
+    }
   });
 
   $('#exportArchive').click(function() {
+    hideMenus();
 
     var archive = new Object;
     for (var mup in window.localStorage) {
@@ -1231,6 +1237,7 @@ $(document).ready(function() {
   });
 
   $('#fileClose').click(function() {
+    hideMenus();
     if (mupName && isSourceDirty && confirm('Save changes to ' + mupName + '?')) {
       save();
     }
@@ -1415,7 +1422,6 @@ function load(mup) {
 
 function save() {
   if (mupName != null) {
-
     var mode = null;
     var source = null;
     if (isEditorText) {
