@@ -171,7 +171,7 @@ Blockly.Madeup.scrub_ = function(block, code) {
 Blockly.Madeup['madeup_io_print'] = function(block) {
   var value_message = Blockly.Madeup.valueToCode(block, 'MESSAGE', Blockly.Madeup.ORDER_NONE);
   var code = 'print ' + value_message + '\n';
-  return code;
+  return [code, Blockly.Madeup.ORDER_ATOMIC];
 };
 
 Blockly.Madeup['madeup_io_debug'] = function(block) {
@@ -582,7 +582,7 @@ Blockly.Madeup['procedures_callnoreturn'] = function(block) {
     args[x] = Blockly.Madeup.valueToCode(block, 'ARG' + x, Blockly.Madeup.ORDER_ATOMIC) || '';
   }
   var code = funcName + ' ' + args.join(', ') + '\n';
-  return code;
+  return [code, Blockly.Madeup.ORDER_ATOMIC];
 };
 
 Blockly.Madeup['procedures_callreturn'] = function(block) {

@@ -134,15 +134,18 @@ function parse(peeker) {
         peeker.get(); // eat space
         var statement = parse(peeker);
 
-        // If statement can have predecessor and predecessor can have a successor...
-        if (statement.previousConnection && prevStatement.nextConnection) {
-          prevStatement.nextConnection.connect(statement.previousConnection);
+        // If statement is more of an expression than a statement, we need to wrap
+        // it up in an eval block.
+        if (statement.outputConnection) {
+          var evalBlock = Blockly.Block.obtain(blocklyWorkspace, 'madeup_eval');
+          evalBlock.getInput('EXPR').connection.connect(statement.outputConnection);
+          statement = evalBlock;
+          statement.initSvg();
+          statement.render();
         }
 
-        // If this statement can have a successor, set it up for connection to next.
-        if (statement.nextConnection) {
-          prevStatement = statement;
-        }
+        prevStatement.nextConnection.connect(statement.previousConnection);
+        prevStatement = statement;
       }
     }
   }
@@ -507,6 +510,13 @@ function parse(peeker) {
     var id = peeker.getToken();
     peeker.get(); // eat space
     var rhs = parse(peeker);
+    
+    if (!rhs.outputConnection) {
+      rhs.setNextStatement(false);
+      rhs.setPreviousStatement(false);
+      rhs.setOutput(true);
+    }
+
     block = Blockly.Block.obtain(blocklyWorkspace, 'variables_set');
     block.setFieldValue(id, 'VAR');
     block.getInput('VALUE').connection.connect(rhs.outputConnection);
