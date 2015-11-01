@@ -16,7 +16,7 @@ class ExpressionCall : public Expression {
     void write(ostream &out) const;
     const std::string &getName() const;
     int getArity() const;
-    const Co<Expression> &operator[](int i) const;
+    const Co<Expression> &operator[](unsigned int i) const;
 
   private:
     std::string name;

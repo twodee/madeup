@@ -134,7 +134,7 @@ int ExpressionCall::getArity() const {
 
 /* ------------------------------------------------------------------------- */
 
-const Co<Expression> &ExpressionCall::operator[](int i) const {
+const Co<Expression> &ExpressionCall::operator[](unsigned int i) const {
   assert(0 <= i && i < parameters.size());
   return parameters[i]; 
 }
