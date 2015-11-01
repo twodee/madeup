@@ -99,7 +99,7 @@ ExpressionArrayLiteral::ExpressionArrayLiteral(const std::vector<Co<Expression> 
 
 Co<Expression> ExpressionArrayLiteral::evaluate(Environment &env) const {
   Co<ExpressionArray> array = Co<Expression>(new ExpressionArray(items.size(), Co<Expression>(ExpressionUnit::getSingleton())));
-  for (int i = 0; i < items.size(); ++i) {
+  for (unsigned int i = 0; i < items.size(); ++i) {
     array->setElement(i, items[i]->evaluate(env));
   }
 
@@ -110,7 +110,7 @@ Co<Expression> ExpressionArrayLiteral::evaluate(Environment &env) const {
 
 void ExpressionArrayLiteral::write(ostream &out) const {
   out << "(ARRAYLITERAL";
-  for (int i = 0; i < items.size(); ++i) {
+  for (unsigned int i = 0; i < items.size(); ++i) {
     out << " ";
     items[i]->write(out);
   }
