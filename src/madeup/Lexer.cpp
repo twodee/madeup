@@ -188,13 +188,9 @@ Token Lexer::getTokenAfterDot() {
 Token Lexer::getTokenAfterMinus() {
   int c = in.get();
   if (c == '-') {
-    do {
-      ++location.end_column;
-      ++location.end_index;
-      c = in.get();
-    } while (c != EOF && c != '\n');
-    in.putback(c);
-    return getToken();
+    ++location.end_column;
+    ++location.end_index;
+    return getTokenAfterMinusMinus();
   } else if (isdigit(c)) {
     ++location.end_column;
     ++location.end_index;
@@ -204,6 +200,47 @@ Token Lexer::getTokenAfterMinus() {
     in.putback(c);
     return makeToken(Token::MINUS);
   }
+}
+
+/* ------------------------------------------------------------------------- */
+
+Token Lexer::getTokenAfterMinusMinus() {
+  int c = in.get();
+
+  // We saw ---, so we need to read until the next ---.
+  if (c == '-') {
+    int ndashes = 0;
+    do {
+      ++location.end_column;
+      ++location.end_index;
+      c = in.get();
+      if (c == '-') {
+        ++ndashes;
+      } else {
+        ndashes = 0;
+      }
+    } while (c != EOF && ndashes < 3);
+
+    if (c == EOF) {
+      // unmatched ---
+      std::stringstream ss;
+      ss << location.toAnchor() << ": I was reading a multiline comment, but I couldn't find its ending ---.";
+      throw MessagedException(ss.str());
+    }
+  }
+
+  // We only saw --, so this must be a one-line comment. Read to the end of
+  // the line.
+  else {
+    do {
+      ++location.end_column;
+      ++location.end_index;
+      c = in.get();
+    } while (c != EOF && c != '\n');
+    in.putback(c);
+  }
+
+  return getToken();
 }
 
 /* ------------------------------------------------------------------------- */

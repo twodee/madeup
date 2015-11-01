@@ -22,6 +22,7 @@ class Lexer {
     Token getTokenAfterSlash();
     Token getTokenAfterDot();
     Token getTokenAfterMinus();
+    Token getTokenAfterMinusMinus();
     Token getTokenAfterQuote();
     Token getTokenAfterLetter();
     Token getTokenAfterDigit();

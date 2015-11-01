@@ -64,6 +64,11 @@ var MadeupHighlightRules = function() {
     "start" : [
       {
         token: "comment",
+        regex: "---",
+        next: "multiline_comment_allowed"
+      },
+      {
+        token: "comment",
         regex: "--",
         next: "comment_allowed"
       },
@@ -97,6 +102,16 @@ var MadeupHighlightRules = function() {
       {
         token: "comment",
         regex: "$|^",
+        next: "start"
+      },
+      {
+        defaultToken: "comment"
+      }
+    ],
+    "multiline_comment_allowed" : [
+      {
+        token: "comment",
+        regex: "---",
         next: "start"
       },
       {
