@@ -25,8 +25,6 @@ oop.inherits(Mode, TextMode);
 
   // Do I need to fix the indent?
   this.checkOutdent = function(state, line, input) {
-    console.log(state);
-    console.log('line: ' + line + ' | input: ' + input);
     return /^\s{2,}(en|els|aroun)\s*$/.test(line);
   };
 
@@ -90,6 +88,11 @@ var MadeupHighlightRules = function() {
       {
         token: "variable",
         regex: /(\.[a-zA-Z]|[a-zA-Z])(\w|\.\w)*/,
+        next: "start"
+      },
+      {
+        token: "string",
+        regex: /"[^"]*"/,
         next: "start"
       },
       {

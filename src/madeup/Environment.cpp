@@ -46,6 +46,7 @@
 #include "madeup/ExpressionScale.h"
 #include "madeup/ExpressionSign.h"
 #include "madeup/ExpressionSine.h"
+#include "madeup/ExpressionSize.h"
 #include "madeup/ExpressionSurface.h"
 #include "madeup/ExpressionTangent.h"
 #include "madeup/ExpressionTranslate.h"
@@ -144,8 +145,8 @@ void Environment::prime() {
   Co<ExpressionDefine> define_cosine(new ExpressionDefine("cos", Co<Expression>(new ExpressionCosine())));
   define_cosine->addFormal("degrees");
 
-  Co<ExpressionDefine> define_size(new ExpressionDefine("size", Co<Expression>(new ExpressionArraySize())));
-  define_size->addFormal("array");
+  Co<ExpressionDefine> define_size(new ExpressionDefine("size", Co<Expression>(new ExpressionSize())));
+  define_size->addFormal("list");
 
   Co<ExpressionDefine> define_log(new ExpressionDefine("log", Co<Expression>(new ExpressionLog())));
   define_log->addFormal("base");

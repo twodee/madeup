@@ -1,22 +1,24 @@
-#ifndef ELEMENTDEFINEARRAYELEMENT_H
-#define ELEMENTDEFINEARRAYELEMENT_H
+#ifndef ELEMENTDEFINEELEMENT_H
+#define ELEMENTDEFINEELEMENT_H
 
 #include "madeup/Expression.h"
-#include "madeup/ExpressionArray.h"
+#include "madeup/ExpressionSubscript.h"
 
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */
 
-class ExpressionDefineArrayElement : public Expression {
+class ExpressionDefineElement : public Expression {
   public:
-    ExpressionDefineArrayElement(Co<Expression> array, Co<Expression> index, Co<Expression> rhs);
+    ExpressionDefineElement(Co<Expression> base,
+                            Co<Expression> index,
+                            Co<Expression> rhs);
     Co<Expression> evaluate(Environment &env) const;
     Co<Expression> getRightHandSide() const;
     void write(ostream &out) const;
 
   private:
-    Co<ExpressionArraySubscript> subscript;
+    Co<ExpressionSubscript> subscript;
     Co<Expression> rhs;
 };
 

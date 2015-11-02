@@ -20,7 +20,7 @@ add_library(madeup
   ExpressionCosine.cpp
   ExpressionDebug.cpp
   ExpressionDefine.cpp
-  ExpressionDefineArrayElement.cpp
+  ExpressionDefineElement.cpp
   ExpressionDefineVariable.cpp
   ExpressionDivide.cpp
   ExpressionSpheres.cpp
@@ -73,7 +73,9 @@ add_library(madeup
   ExpressionScale.cpp
   ExpressionSign.cpp
   ExpressionSine.cpp
+  ExpressionSize.cpp
   ExpressionString.cpp
+  ExpressionSubscript.cpp
   ExpressionSubtract.cpp
   ExpressionSurface.cpp
   ExpressionTangent.cpp

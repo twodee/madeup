@@ -11,7 +11,7 @@
 #include "madeup/ExpressionCallWithNamedParameters.h"
 #include "madeup/ExpressionClosure.h"
 #include "madeup/ExpressionDefine.h"
-#include "madeup/ExpressionDefineArrayElement.h"
+#include "madeup/ExpressionDefineElement.h"
 #include "madeup/ExpressionDefineVariable.h"
 #include "madeup/ExpressionDivide.h"
 #include "madeup/ExpressionEqual.h"
@@ -375,10 +375,10 @@ void Parser::expressionLevel9() {
 // Precedence level 10: subscript [].
 void Parser::expressionLevel10() {
   atom();
-  Co<Expression> array;
+  Co<Expression> base;
 
   if (isUp(Token::LEFT_BRACKET)) {
-    array = popExpression();
+    base = popExpression();
   }
 
   while (isUp(Token::LEFT_BRACKET)) {
@@ -405,13 +405,13 @@ void Parser::expressionLevel10() {
           expressionLevel0();
           rhs = popExpression();
         }
-        pushExpression(new ExpressionDefineArrayElement(array, subscript, rhs), array->getSourceLocation(), rhs->getSourceLocation());
+        pushExpression(new ExpressionDefineElement(base, subscript, rhs), base->getSourceLocation(), rhs->getSourceLocation());
       } else {
-        pushExpression(new ExpressionArraySubscript(array, subscript), array->getSourceLocation(), subscript->getSourceLocation());
+        pushExpression(new ExpressionSubscript(base, subscript), base->getSourceLocation(), subscript->getSourceLocation());
       }
     } else {
       std::stringstream ss;
-      ss << subscript->getSourceLocation().toAnchor() << ": I didn't find a ']' where I expected it.";
+      ss << subscript->getSourceLocation().toAnchor() << ": I didn't find a ']' where I expected one.";
       throw MessagedException(ss.str());
     }
   }
@@ -771,7 +771,7 @@ void Parser::atom() {
           /* expressionLevel0(); */
           /* rhs = popExpression(); */
         /* } */
-        /* pushExpression(new ExpressionDefineArrayElement(call, rhs), call->getSourceLocation(), rhs->getSourceLocation()); */
+        /* pushExpression(new ExpressionDefineElement(call, rhs), call->getSourceLocation(), rhs->getSourceLocation()); */
       /* } else { */
         /* pushExpression(new ExpressionArraySubscript(array, subscript), array->getSourceLocation(), subscript->getSourceLocation()); */
         expressions.push(call);

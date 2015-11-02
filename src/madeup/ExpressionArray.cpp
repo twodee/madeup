@@ -27,7 +27,7 @@ Co<Expression> ExpressionArray::evaluate(Environment &env) const {
 
 /* ------------------------------------------------------------------------- */
 
-int ExpressionArray::getSize() {
+int ExpressionArray::getSize() const {
   return nelements;
 }
 
@@ -150,99 +150,6 @@ void ExpressionArrayConstructor::write(ostream &out) const {
   length_expression->write(out);
   out << " ";
   fill_expression->write(out);
-  out << ")";
-}
-
-/* ------------------------------------------------------------------------- */
-
-ExpressionArraySize::ExpressionArraySize() :
-  Expression() {
-}
-
-/* ------------------------------------------------------------------------- */
-
-Co<Expression> ExpressionArraySize::evaluate(Environment &env) const {
-  Co<ExpressionClosure> array_closure = env["array"];
-  if (array_closure.IsNull()) {
-    throw MessagedException(getSourceLocation().toAnchor() + ": I expect function size to be given a value named array. No value named array is defined.");
-  }
-
-  Co<Expression> array_value = array_closure->evaluate(env);
-  ExpressionArrayReference *array = dynamic_cast<ExpressionArrayReference *>(array_value.GetPointer());
-
-  if (!array) {
-    throw MessagedException(array_expression->getSourceLocation().toAnchor() + ": I expect function size to be applied to an array. " + array_expression->getSource() + " is not an array.");
-  }
-
-  return Co<Expression>(new ExpressionInteger(array->getArray()->getSize()));
-}
-
-/* ------------------------------------------------------------------------- */
-
-void ExpressionArraySize::write(ostream &out) const {
-  out << "(size array)";
-}
-
-/* ------------------------------------------------------------------------- */
-
-ExpressionArraySubscript::ExpressionArraySubscript(Co<Expression> array_expression, Co<Expression> index_expression) :
-  Expression(),
-  array_expression(array_expression),
-  index_expression(index_expression) {
-}
-
-/* ------------------------------------------------------------------------- */
-
-Co<ExpressionArrayReference> ExpressionArraySubscript::evaluateArrayReference(Environment &env) const {
-  Co<Expression> array_value = array_expression->evaluate(env);
-  ExpressionArrayReference *array = dynamic_cast<ExpressionArrayReference *>(array_value.GetPointer());
-  if (!array) {
-    throw MessagedException(array_expression->getSourceLocation().toAnchor() + ": Operator [] expects to be applied to an array. " + array_expression->getSource() + " is not an array.");
-  }
-
-  return Co<ExpressionArrayReference>(array_value);
-}
-
-/* ------------------------------------------------------------------------- */
-
-Co<ExpressionInteger> ExpressionArraySubscript::evaluateIndex(Environment &env, Co<ExpressionArrayReference> array) const {
-  Co<Expression> index_value = index_expression->evaluate(env);
-  ExpressionInteger *index = dynamic_cast<ExpressionInteger *>(index_value.GetPointer());
-  if (!index) {
-    throw MessagedException(index_expression->getSourceLocation().toAnchor() + ": Operator [] expects index to be an integer. " + index_expression->getSource() + " is not an integer.");
-  }
-
-  if (index->toInteger() < 0) {
-    index->setInteger(index->toInteger() + array->getArray()->getSize());
-  }
-
-  if (index->toInteger() < 0 || index->toInteger() >= array->getArray()->getSize()) {
-    std::stringstream ss;
-    ss << index_expression->getSourceLocation().toAnchor();
-    ss << ": Operator [] expects a valid index. The array has ";
-    ss << array->getArray()->getSize();
-    ss << " elements, indexed 0 through " << (array->getArray()->getSize() - 1) << ". " << index_expression->getSource() << " is not a valid index.";
-    throw MessagedException(ss.str());
-  }
-
-  return Co<ExpressionInteger>(index_value);
-}
-
-/* ------------------------------------------------------------------------- */
-
-Co<Expression> ExpressionArraySubscript::evaluate(Environment &env) const {
-  Co<ExpressionArrayReference> array = evaluateArrayReference(env);
-  Co<ExpressionInteger> index = evaluateIndex(env, array);
-  return (*array->getArray())[index->toInteger()];
-}
-
-/* ------------------------------------------------------------------------- */
-
-void ExpressionArraySubscript::write(ostream &out) const {
-  out << "(SUBSCRIPT ";
-  array_expression->write(out);
-  out << " ";
-  index_expression->write(out);
   out << ")";
 }
 
