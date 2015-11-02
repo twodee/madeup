@@ -184,7 +184,7 @@ int main(int argc, char **argv) {
           }
 
           if (trimesh->GetVertexCount() == 0) {
-            std::cerr << "Uh oh. I didn't see a solidifier (like dots, dowel, extrude, etc.) in your code. I can't make a model without a solidifier." << std::endl;
+            std::cerr << "Uh oh. You didn't visit any locations. I can't make any models until you move around some." << std::endl;
           }
         }
 
