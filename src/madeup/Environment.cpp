@@ -383,6 +383,7 @@ void Environment::prime() {
   globals->add("forget", (*this)["forget"]);
 
   xforms.push(QMatrix4<float>(1.0f));
+  paths.push_back(vector<Turtle>());
 }
 
 /* ------------------------------------------------------------------------- */
