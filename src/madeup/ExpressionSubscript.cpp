@@ -47,7 +47,7 @@ Co<ExpressionInteger> ExpressionSubscript::evaluateIndex(Environment &env,
     index_value->setInteger(index_value->toInteger() + s.length());
   }
 
-  if (index_value->toInteger() < 0 || index_value->toInteger() >= s.length()) {
+  if (index_value->toInteger() < 0 || index_value->toInteger() >= (int) s.length()) {
     std::stringstream ss;
     ss << index_expression->getSourceLocation().toAnchor();
     ss << ": I expect operator [] to be given a valid index. The string has ";
