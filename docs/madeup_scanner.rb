@@ -68,6 +68,9 @@ module Scanners
           when :initial
             if match = scan(/ \s+ /x)
               encoder.text_token match, :space
+            elsif match = scan(/---/)
+              encoder.text_token match, :comment
+              state = :multiline_comment
             elsif match = scan(/--.*$/)
               encoder.text_token match, :comment
             elsif match = scan(/".*?"/)
@@ -85,7 +88,14 @@ module Scanners
             else
               encoder.text_token getch, :error
             end
-          end
+          when :multiline_comment
+            if match = scan(/---/)
+              encoder.text_token match, :comment
+              state = :initial
+            else
+              encoder.text_token getch, :comment
+            end
+        end
       end
 
       encoder

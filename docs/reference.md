@@ -2,7 +2,7 @@
 Every fun thing that has ever happened started with some rules (gravitational law, oldest player rolls first, etc.), and Madeup is no exception. Let's describe the grammar of the Madeup language.
 
 ##Comments
-Code is mixture of executable instructions and notes for the humans working with the code. The notes are called comments and they start with `--`:
+Code is mixture of executable instructions and notes for the humans working with the code. The notes are called comments. Single-line comments start with `--` and appear on their own lines or at the end of lines containing instructions.
 
 {:.mup}
 ~~~
@@ -13,7 +13,18 @@ Code is mixture of executable instructions and notes for the humans working with
 print "<=>" -- See it fly!
 ~~~
 
-Comments can appear on their own lines or at the end of lines containing instructions.
+Use `---` to get a multiline comment, which spans until the next occurrence of `---`. You might use it to write paragraphs of documentation or to prevent chunks of code from being run as you experiment:
+
+{:.mup}
+~~~
+--- Let's disable this code for the time beiing.
+print pi
+nsides = 100
+where
+---
+
+print 10
+~~~
 
 ##Expressions
 Madeup programs are built out of expressions, utterances that yield some value. Every construct of Madeup is an expression, but not all provide meaningful values. Like `yaw`. The `yaw` command yields a special value named `nothing`, which is good for nothing.

@@ -11,7 +11,7 @@
 <p>Every fun thing that has ever happened started with some rules (gravitational law, oldest player rolls first, etc.), and Madeup is no exception. Let's describe the grammar of the Madeup language.</p>
 
 <h2 id="comments">Comments</h2>
-<p>Code is mixture of executable instructions and notes for the humans working with the code. The notes are called comments and they start with <code>--</code>:</p>
+<p>Code is mixture of executable instructions and notes for the humans working with the code. The notes are called comments. Single-line comments start with <code>--</code> and appear on their own lines or at the end of lines containing instructions.</p>
 
 <div class="imgcode">
 
@@ -27,7 +27,23 @@
 
 </div>
 
-<p>Comments can appear on their own lines or at the end of lines containing instructions.</p>
+<p>Use <code>---</code> to get a multiline comment, which spans until the next occurrence of <code>---</code>. You might use it to write paragraphs of documentation or to prevent chunks of code from being run as you experiment:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span style="color:#777">---</span><span style="color:#777"> </span><span style="color:#777">L</span><span style="color:#777">e</span><span style="color:#777">t</span><span style="color:#777">'</span><span style="color:#777">s</span><span style="color:#777"> </span><span style="color:#777">d</span><span style="color:#777">i</span><span style="color:#777">s</span><span style="color:#777">a</span><span style="color:#777">b</span><span style="color:#777">l</span><span style="color:#777">e</span><span style="color:#777"> </span><span style="color:#777">t</span><span style="color:#777">h</span><span style="color:#777">i</span><span style="color:#777">s</span><span style="color:#777"> </span><span style="color:#777">c</span><span style="color:#777">o</span><span style="color:#777">d</span><span style="color:#777">e</span><span style="color:#777"> </span><span style="color:#777">f</span><span style="color:#777">o</span><span style="color:#777">r</span><span style="color:#777"> </span><span style="color:#777">t</span><span style="color:#777">h</span><span style="color:#777">e</span><span style="color:#777"> </span><span style="color:#777">t</span><span style="color:#777">i</span><span style="color:#777">m</span><span style="color:#777">e</span><span style="color:#777"> </span><span style="color:#777">b</span><span style="color:#777">e</span><span style="color:#777">i</span><span style="color:#777">i</span><span style="color:#777">n</span><span style="color:#777">g</span><span style="color:#777">.</span><span style="color:#777">
+</span><span style="color:#777">p</span><span style="color:#777">r</span><span style="color:#777">i</span><span style="color:#777">n</span><span style="color:#777">t</span><span style="color:#777"> </span><span style="color:#777">p</span><span style="color:#777">i</span><span style="color:#777">
+</span><span style="color:#777">n</span><span style="color:#777">s</span><span style="color:#777">i</span><span style="color:#777">d</span><span style="color:#777">e</span><span style="color:#777">s</span><span style="color:#777"> </span><span style="color:#777">=</span><span style="color:#777"> </span><span style="color:#777">1</span><span style="color:#777">0</span><span style="color:#777">0</span><span style="color:#777">
+</span><span style="color:#777">w</span><span style="color:#777">h</span><span style="color:#777">e</span><span style="color:#777">r</span><span style="color:#777">e</span><span style="color:#777">
+</span><span style="color:#777">---</span>
+
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#00D">10</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
 
 <h2 id="expressions">Expressions</h2>
 <p>Madeup programs are built out of expressions, utterances that yield some value. Every construct of Madeup is an expression, but not all provide meaningful values. Like <code>yaw</code>. The <code>yaw</code> command yields a special value named <code>nothing</code>, which is good for nothing.</p>
