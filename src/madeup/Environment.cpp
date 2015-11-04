@@ -28,6 +28,7 @@
 #include "madeup/ExpressionInverseCosine.h"
 #include "madeup/ExpressionInverseTangent.h"
 #include "madeup/ExpressionLog.h"
+#include "madeup/ExpressionMagnitude.h"
 #include "madeup/ExpressionMax.h"
 #include "madeup/ExpressionMesh.h"
 #include "madeup/ExpressionMin.h"
@@ -157,6 +158,9 @@ void Environment::prime() {
 
   Co<ExpressionDefine> define_normalize(new ExpressionDefine("normalize", Co<Expression>(new ExpressionNormalize())));
   define_normalize->addFormal("list");
+
+  Co<ExpressionDefine> define_magnitude(new ExpressionDefine("magnitude", Co<Expression>(new ExpressionMagnitude())));
+  define_magnitude->addFormal("list");
 
   Co<ExpressionDefine> define_cross(new ExpressionDefine("cross", Co<Expression>(new ExpressionCross())));
   define_cross->addFormal("a");
@@ -306,6 +310,7 @@ void Environment::prime() {
   add("size", Co<ExpressionClosure>(new ExpressionClosure(define_size, globals)));
   add("dot", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
   add("normalize", Co<ExpressionClosure>(new ExpressionClosure(define_normalize, globals)));
+  add("magnitude", Co<ExpressionClosure>(new ExpressionClosure(define_magnitude, globals)));
   add("cross", Co<ExpressionClosure>(new ExpressionClosure(define_cross, globals)));
   add("log", Co<ExpressionClosure>(new ExpressionClosure(define_log, globals)));
   add("tan", Co<ExpressionClosure>(new ExpressionClosure(define_tangent, globals)));
@@ -395,6 +400,8 @@ void Environment::prime() {
   globals->add("log", (*this)["log"]);
   globals->add("cos", (*this)["cos"]);
   globals->add("size", (*this)["size"]);
+  globals->add("normalize", (*this)["normalize"]);
+  globals->add("magnitude", (*this)["magnitude"]);
   globals->add("dot", (*this)["dot"]);
   globals->add("cross", (*this)["cross"]);
   globals->add("sin", (*this)["sin"]);

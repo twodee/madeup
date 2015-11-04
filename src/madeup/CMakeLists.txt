@@ -44,6 +44,7 @@ add_library(madeup
   ExpressionLesser.cpp
   ExpressionLesserOrEqual.cpp
   ExpressionLog.cpp
+  ExpressionMagnitude.cpp
   ExpressionMax.cpp
   ExpressionMesh.cpp 
   ExpressionMin.cpp
