@@ -29,7 +29,7 @@ Co<Expression> ExpressionCosine::evaluate(Environment &env) const {
     return Co<Expression>(new ExpressionReal(cosf(value * td::PI / 180.0f)));
   }
 
-  throw MessagedException(degrees_closure->getSourceLocation().toAnchor() + ": Function cos expects a number. " + degrees_closure->getSource() + " is not a number.");
+  throw MessagedException(getSourceLocation().toAnchor() + ": Function cos expects a number. " + degrees_closure->getSource() + " is not a number.");
 }
 
 /* ------------------------------------------------------------------------- */

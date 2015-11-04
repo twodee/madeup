@@ -13,7 +13,9 @@
 #include "madeup/ExpressionCenter.h"
 #include "madeup/ExpressionClosure.h"
 #include "madeup/ExpressionCosine.h"
+#include "madeup/ExpressionCross.h"
 #include "madeup/ExpressionDebug.h"
+#include "madeup/ExpressionDot.h"
 #include "madeup/ExpressionSpheres.h"
 #include "madeup/ExpressionDowel.h"
 #include "madeup/ExpressionEcho.h"
@@ -31,6 +33,7 @@
 #include "madeup/ExpressionMin.h"
 #include "madeup/ExpressionMove.h"
 #include "madeup/ExpressionMoveTo.h"
+#include "madeup/ExpressionNormalize.h"
 #include "madeup/ExpressionPitch.h"
 #include "madeup/ExpressionPolygon.h"
 #include "madeup/ExpressionPop.h"
@@ -147,6 +150,17 @@ void Environment::prime() {
 
   Co<ExpressionDefine> define_size(new ExpressionDefine("size", Co<Expression>(new ExpressionSize())));
   define_size->addFormal("list");
+
+  Co<ExpressionDefine> define_dot(new ExpressionDefine("dot", Co<Expression>(new ExpressionDot())));
+  define_dot->addFormal("a");
+  define_dot->addFormal("b");
+
+  Co<ExpressionDefine> define_normalize(new ExpressionDefine("normalize", Co<Expression>(new ExpressionNormalize())));
+  define_normalize->addFormal("list");
+
+  Co<ExpressionDefine> define_cross(new ExpressionDefine("cross", Co<Expression>(new ExpressionCross())));
+  define_cross->addFormal("a");
+  define_cross->addFormal("b");
 
   Co<ExpressionDefine> define_log(new ExpressionDefine("log", Co<Expression>(new ExpressionLog())));
   define_log->addFormal("base");
@@ -290,6 +304,9 @@ void Environment::prime() {
   add("sin", Co<ExpressionClosure>(new ExpressionClosure(define_sine, globals)));
   add("cos", Co<ExpressionClosure>(new ExpressionClosure(define_cosine, globals)));
   add("size", Co<ExpressionClosure>(new ExpressionClosure(define_size, globals)));
+  add("dot", Co<ExpressionClosure>(new ExpressionClosure(define_dot, globals)));
+  add("normalize", Co<ExpressionClosure>(new ExpressionClosure(define_normalize, globals)));
+  add("cross", Co<ExpressionClosure>(new ExpressionClosure(define_cross, globals)));
   add("log", Co<ExpressionClosure>(new ExpressionClosure(define_log, globals)));
   add("tan", Co<ExpressionClosure>(new ExpressionClosure(define_tangent, globals)));
   add("asin", Co<ExpressionClosure>(new ExpressionClosure(define_inverse_sine, globals)));
@@ -378,6 +395,8 @@ void Environment::prime() {
   globals->add("log", (*this)["log"]);
   globals->add("cos", (*this)["cos"]);
   globals->add("size", (*this)["size"]);
+  globals->add("dot", (*this)["dot"]);
+  globals->add("cross", (*this)["cross"]);
   globals->add("sin", (*this)["sin"]);
   globals->add("extrude", (*this)["extrude"]);
   globals->add("forget", (*this)["forget"]);

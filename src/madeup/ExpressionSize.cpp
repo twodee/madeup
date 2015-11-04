@@ -16,7 +16,7 @@ ExpressionSize::ExpressionSize() :
 Co<Expression> ExpressionSize::evaluate(Environment &env) const {
   Co<ExpressionClosure> list_closure = env["list"];
   if (list_closure.IsNull()) {
-    throw MessagedException(getSourceLocation().toAnchor() + ": I expect function size to be given a value named array. No value named array is defined.");
+    throw MessagedException(getSourceLocation().toAnchor() + ": I expect function size to be given a value named list. No value named list is defined.");
   }
 
   Co<Expression> list_value = list_closure->evaluate(env);

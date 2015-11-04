@@ -18,11 +18,13 @@ add_library(madeup
   ExpressionCenter.cpp
   ExpressionClosure.cpp
   ExpressionCosine.cpp
+  ExpressionCross.cpp
   ExpressionDebug.cpp
   ExpressionDefine.cpp
   ExpressionDefineElement.cpp
   ExpressionDefineVariable.cpp
   ExpressionDivide.cpp
+  ExpressionDot.cpp
   ExpressionSpheres.cpp
   ExpressionDowel.cpp
   ExpressionEcho.cpp
@@ -49,6 +51,7 @@ add_library(madeup
   ExpressionMoveTo.cpp
   ExpressionMultiply.cpp
   ExpressionNegation.cpp
+  ExpressionNormalize.cpp
   ExpressionNot.cpp
   ExpressionNotEqual.cpp
   ExpressionNumber.cpp
