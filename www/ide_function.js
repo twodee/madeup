@@ -1683,6 +1683,7 @@ function highlight(startIndex, stopIndex) {
   var stop = indexToRowColumn(stopIndex);
 
   textEditor.getSelection().setSelectionRange(new Range(start.row, start.column, stop.row, stop.column + 1));
+  textEditor.centerSelection();
 }
 
 function updateCulling() {
