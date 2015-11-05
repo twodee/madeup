@@ -33,17 +33,6 @@ Co<Expression> ExpressionCall::evaluate(Environment &env) const {
     throw MessagedException(getSourceLocation().toAnchor() + ": I couldn't find a function or variable named " + name + ".");
   }
 
-  /* std::cout << "" << std::endl; */
-  /* std::cout << "without names" << std::endl; */
-  /* std::cout << "getSource(): " << getSource() << std::endl; */
-  /* std::cout << "closure: " << closure << std::endl; */
-  /* std::cout << "closure->GetDefine(): " << closure->getDefine() << std::endl; */
-  /* std::cout << "closure->GetDefine()->name: " << closure->getDefine()->getName() << std::endl; */
-  /* ExpressionArray *array2 = dynamic_cast<ExpressionArray *>(closure.GetPointer()); */
-  /* std::cout << "array2: " << array2 << std::endl; */
-
-  // I can't evaluate closure yet, because it may need params, right?
-
   Co<ExpressionDefine> define = closure->getDefine();
 
   // If the expression takes no parameters, it might be an array and we'll need

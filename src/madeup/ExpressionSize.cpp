@@ -16,7 +16,7 @@ ExpressionSize::ExpressionSize() :
 Co<Expression> ExpressionSize::evaluate(Environment &env) const {
   Co<ExpressionClosure> list_closure = env["list"];
   if (list_closure.IsNull()) {
-    throw MessagedException(getSourceLocation().toAnchor() + ": I expect function size to be given a value named list. No value named list is defined.");
+    throw UnlocatedException("I expect function size to be given a value named list. No value named list is defined.");
   }
 
   Co<Expression> list_value = list_closure->evaluate(env);
@@ -31,7 +31,7 @@ Co<Expression> ExpressionSize::evaluate(Environment &env) const {
     return Co<Expression>(new ExpressionInteger(string_value->getString().length()));
   }
 
-  throw MessagedException(getSourceLocation().toAnchor() + ": I expect function size to be applied to an array or a string. " + list_closure->getSource() + " is not an array.");
+  throw UnlocatedException("I expect function size to be applied to an array or a string. " + list_closure->getSource() + " is not an array.");
 }
 
 /* ------------------------------------------------------------------------- */

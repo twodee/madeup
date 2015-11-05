@@ -17,13 +17,13 @@ ExpressionNormalize::ExpressionNormalize() :
 Co<Expression> ExpressionNormalize::evaluate(Environment &env) const {
   Co<ExpressionClosure> list_closure = env["list"];
   if (list_closure.IsNull()) {
-    throw MessagedException(getSourceLocation().toAnchor() + ": I expect function normalize to be given a value named list. No value named list is defined.");
+    throw UnlocatedException("I expect function normalize to be given a value named list. No value named list is defined.");
   }
 
   Co<Expression> list_value = list_closure->evaluate(env);
   ExpressionArrayReference *list_array_value = dynamic_cast<ExpressionArrayReference *>(list_value.GetPointer());
   if (!list_array_value) {
-    throw MessagedException(getSourceLocation().toAnchor() + ": I expect function normalize's parameter list to be an array. " + list_closure->getSource() + " is not an array.");
+    throw UnlocatedException("I expect function normalize's parameter list to be an array. " + list_closure->getSource() + " is not an array.");
   }
 
   float dot = 0.0;
@@ -32,9 +32,8 @@ Co<Expression> ExpressionNormalize::evaluate(Environment &env) const {
     ExpressionNumber *number = dynamic_cast<ExpressionNumber *>(element.GetPointer());
     if (!number) {
       std::stringstream ss;
-      ss << getSourceLocation().toAnchor();
-      ss << ": I expect function normalize's parameter list to be composed of numbers. But element " << i << " is not a number.";
-      throw MessagedException(ss.str());
+      ss << "I expect function normalize's parameter list to be composed of numbers. But element " << i << " is not a number.";
+      throw UnlocatedException(ss.str());
     }
 
     dot += number->toReal() * number->toReal();
