@@ -329,30 +329,33 @@ void Parser::expressionLevel8() {
     std::stack<Co<Expression> > dimensions;
     dimensions.push(popExpression());
 
+    // Read the higher-dimensional BY expressions...
     while (isUp(Token::BY)) {
       ++i;
       expressionLevel9();
       dimensions.push(popExpression());
     }
 
+    // Read the filler value.
+    Co<Expression> fill;
     if (isUp(Token::OF)) {
       ++i;
       expressionLevel9();
-      Co<Expression> fill = popExpression();
-      do {
-        Co<Expression> dimension = dimensions.top();
-        dimensions.pop();
-        Co<Expression> tmp = Co<Expression>(new ExpressionArrayConstructor(fill, dimension));
-        SourceLocation location(dimension->getSourceLocation(), fill->getSourceLocation());
-        tmp->setSource(getSubsource(location), location);
-        fill = tmp;
-      } while (dimensions.size() > 0);
-      expressions.push(fill);
+      fill = popExpression();
     } else {
-      std::stringstream ss;
-      ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'of'.";
-      throw MessagedException(ss.str());
+      fill = ExpressionUnit::getSingleton();
     }
+
+    do {
+      Co<Expression> dimension = dimensions.top();
+      dimensions.pop();
+      Co<Expression> tmp = Co<Expression>(new ExpressionArrayConstructor(fill, dimension));
+      SourceLocation location(dimension->getSourceLocation(), fill->getSourceLocation());
+      tmp->setSource(getSubsource(location), location);
+      fill = tmp;
+    } while (dimensions.size() > 0);
+
+    expressions.push(fill);
   }
 }
 
