@@ -79,6 +79,7 @@ add_library(madeup
   ExpressionSine.cpp
   ExpressionSize.cpp
   ExpressionString.cpp
+  ExpressionSubrange.cpp
   ExpressionSubscript.cpp
   ExpressionSubtract.cpp
   ExpressionSurface.cpp

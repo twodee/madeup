@@ -35,6 +35,8 @@
 #include "madeup/ExpressionRepeat.h"
 #include "madeup/ExpressionRepeatwich.h"
 #include "madeup/ExpressionString.h"
+#include "madeup/ExpressionSubscript.h"
+#include "madeup/ExpressionSubrange.h"
 #include "madeup/ExpressionSubtract.h"
 #include "madeup/ExpressionUnit.h"
 #include "madeup/ExpressionWhile.h"
@@ -388,6 +390,10 @@ void Parser::expressionLevel10() {
 
     expressionLevel0();
     Co<Expression> subscript = popExpression();
+
+    // if ]
+    // else if ..
+    
     if (isUp(Token::RIGHT_BRACKET)) {
       ++i;
       if (isUp(Token::ASSIGN)) {
@@ -412,7 +418,25 @@ void Parser::expressionLevel10() {
       } else {
         pushExpression(new ExpressionSubscript(base, subscript), base->getSourceLocation(), subscript->getSourceLocation());
       }
-    } else {
+    }
+
+    else if (isUp(Token::RANGE)) {
+      ++i;
+
+      expressionLevel0();
+      Co<Expression> subscript2 = popExpression();
+
+      if (isUp(Token::RIGHT_BRACKET)) {
+        ++i;
+        pushExpression(new ExpressionSubrange(base, subscript, subscript2), base->getSourceLocation(), subscript2->getSourceLocation());
+      } else {
+        std::stringstream ss;
+        ss << subscript->getSourceLocation().toAnchor() << ": I didn't find a ']' where I expected one.";
+        throw MessagedException(ss.str());
+      }
+    }
+    
+    else {
       std::stringstream ss;
       ss << subscript->getSourceLocation().toAnchor() << ": I didn't find a ']' where I expected one.";
       throw MessagedException(ss.str());
