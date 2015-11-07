@@ -377,15 +377,15 @@ void Parser::expressionLevel9() {
 
 // Precedence level 10: subscript [].
 void Parser::expressionLevel10() {
+  // Grab the simplest expression first.
   atom();
-  Co<Expression> base;
 
-  if (isUp(Token::LEFT_BRACKET)) {
-    base = popExpression();
-  }
-
+  // If we see a [, then that simplest expression is the base of a
+  // subscript operation.
   while (isUp(Token::LEFT_BRACKET)) {
     ++i;
+    Co<Expression> base = popExpression();
+
     expressionLevel0();
     Co<Expression> subscript = popExpression();
     if (isUp(Token::RIGHT_BRACKET)) {
