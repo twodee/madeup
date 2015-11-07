@@ -1,8 +1,9 @@
 #include "madeup/ExpressionCallWithNamedParameters.h"
 #include "madeup/ExpressionClosure.h"
 
-using std::string;
 using std::pair;
+using std::set;
+using std::string;
 
 namespace madeup {
 
@@ -40,13 +41,26 @@ Co<Expression> ExpressionCallWithNamedParameters::evaluate(Environment &env) con
   Co<ExpressionDefine> define = closure->getDefine();
   Co<Environment> closure_env(new Environment(*closure->getEnvironment()));
 
+  // Before trying to execute this business, let's make certain the user didn't
+  // pass any named parameters that don't apply. Having extras isn't going to
+  // stop us from executing the function, but it probably means the caller has
+  // some different intent.
+  set<string> formal_names = define->getFormalNames();
+  for (bindings_t::const_iterator i = bindings.begin();
+       i != bindings.end();
+       ++i) {
+    if (formal_names.find(i->first) == formal_names.end()) {
+      throw MessagedException(getSourceLocation().toAnchor() + ": I saw that you passed a parameter named " + i->first + " to function " + define->getName() + ", but " + define->getName() + " doesn't accept a parameter named " + i->first + ".");
+    }
+  }
+
+  // Having cleared the appropriateness of the bindings, let's start evaluating.
   for (unsigned int i = 0; i < define->getArity(); ++i) {
-    // lookup getFormal in bindings list
-    // failing, in env
     const FormalParameter &formal = define->getFormal(i);
     bool is_lazy = formal.getEvaluationMode() == FormalParameter::LAZY;
 
-    // Look up parameter name in enumerated bindings first. If we find an explicit parameter with that name, use its value.
+    // Look up parameter name in enumerated bindings first. If we find an
+    // explicit parameter with that name, use its value.
     bindings_t::const_iterator match = bindings.find(formal.getName());
     Co<ExpressionDefine> parameter_define;
     Co<ExpressionDefine> parameter_closure;
@@ -56,7 +70,8 @@ Co<Expression> ExpressionCallWithNamedParameters::evaluate(Environment &env) con
       parameter_closure->setSource(match->second->getSource(), match->second->getSourceLocation());
     }
 
-    // If no such parameter was enumerated, checking for a binding with that name in the surrounding environment at the time of the call.
+    // If no such parameter was enumerated, checking for a binding with that
+    // name in the surrounding environment at the time of the call.
     else if (env.isBound(formal.getName())) {
       Co<Expression> closure = env[formal.getName()];
       parameter_define = Co<ExpressionDefine>(new ExpressionDefine(formal.getName(), is_lazy ? closure : closure->evaluate(env)));

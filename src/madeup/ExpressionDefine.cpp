@@ -2,6 +2,7 @@
 #include "madeup/ExpressionDefine.h"
 #include "madeup/ExpressionUnit.h"
 
+using std::set;
 using std::string;
 using std::vector;
 
@@ -131,6 +132,20 @@ void ExpressionDefine::predeclare(Environment &env) const {
     Co<ExpressionClosure> closure(new ExpressionClosure(define));
     env.add(name, closure);
   }
+}
+
+/* ------------------------------------------------------------------------- */
+
+set<string> ExpressionDefine::getFormalNames() const {
+  set<string> identifiers;
+
+  for (vector<FormalParameter>::const_iterator i = formals.begin();
+       i != formals.end();
+       ++i) {
+    identifiers.insert(i->getName());
+  }
+
+  return identifiers;
 }
 
 /* ------------------------------------------------------------------------- */

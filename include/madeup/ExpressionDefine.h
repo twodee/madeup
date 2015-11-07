@@ -1,6 +1,8 @@
 #ifndef ELEMENTDEFINE_H
 #define ELEMENTDEFINE_H
 
+#include <set>
+
 #include "madeup/Expression.h"
 
 namespace madeup {
@@ -47,6 +49,7 @@ class ExpressionDefine : public Expression {
     bool isDynamicallyScoped() const;
     const std::string &getName() const { return name; }
     void predeclare(Environment &env) const;
+    std::set<std::string> getFormalNames() const;
 
   private:
     std::string name;
