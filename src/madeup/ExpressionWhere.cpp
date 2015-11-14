@@ -1,6 +1,7 @@
 #include <iostream>
 
-#include "madeup/ExpressionUnit.h"
+#include "madeup/ExpressionArray.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionWhere.h"
 
 using namespace td;
@@ -16,8 +17,12 @@ ExpressionWhere::ExpressionWhere() :
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionWhere::evaluate(Environment &env) const {
-  std::cerr << env.getTurtle().position << std::endl;
-  return Co<Expression>(ExpressionUnit::getSingleton());
+  QVector3<float> position = env.getTurtle().position;
+  Co<ExpressionArray> new_array(new ExpressionArray(3));
+  for (int i = 0; i < 3; ++i) {
+    new_array->setElement(i, Co<Expression>(new ExpressionReal(position[i])));
+  }
+  return Co<Expression>(new ExpressionArrayReference(new_array));
 }
 
 /* ------------------------------------------------------------------------- */
