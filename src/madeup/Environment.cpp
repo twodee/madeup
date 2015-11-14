@@ -11,6 +11,7 @@
 #include "madeup/ExpressionBlobs.h"
 #include "madeup/ExpressionBoxes.h"
 #include "madeup/ExpressionCenter.h"
+#include "madeup/ExpressionCoalesce.h"
 #include "madeup/ExpressionClosure.h"
 #include "madeup/ExpressionCosine.h"
 #include "madeup/ExpressionCross.h"
@@ -242,6 +243,9 @@ void Environment::prime() {
   Co<ExpressionDefine> define_echo(new ExpressionDefine("echo", Co<Expression>(new ExpressionEcho())));
   define_echo->addFormal("mesh");
 
+  Co<ExpressionDefine> define_coalesce(new ExpressionDefine("coalesce", Co<Expression>(new ExpressionCoalesce())));
+  define_coalesce->addFormal("threshold");
+
   Co<ExpressionDefine> define_axis(new ExpressionDefine("axis", Co<Expression>(new ExpressionAxis())));
   define_axis->addFormal("x");
   define_axis->addFormal("y");
@@ -334,6 +338,7 @@ void Environment::prime() {
   add("reverse", Co<ExpressionClosure>(new ExpressionClosure(define_reverse, globals)));
   add("center", Co<ExpressionClosure>(new ExpressionClosure(define_center, globals)));
   add("echo", Co<ExpressionClosure>(new ExpressionClosure(define_echo, globals)));
+  add("coalesce", Co<ExpressionClosure>(new ExpressionClosure(define_coalesce, globals)));
   add("axis", Co<ExpressionClosure>(new ExpressionClosure(define_axis, globals)));
   add("blobs", Co<ExpressionClosure>(new ExpressionClosure(define_blobs, globals)));
   add("surface", Co<ExpressionClosure>(new ExpressionClosure(define_surface, globals)));
@@ -387,6 +392,7 @@ void Environment::prime() {
   globals->add("reverse", (*this)["reverse"]);
   globals->add("center", (*this)["center"]);
   globals->add("echo", (*this)["echo"]);
+  globals->add("coalesce", (*this)["coalesce"]);
   globals->add("axis", (*this)["axis"]);
   globals->add("surface", (*this)["surface"]);
   globals->add("random", (*this)["random"]);
@@ -570,7 +576,23 @@ void Environment::home() {
     throw new MessagedException("No home to return to.");
   }
 
-  run.push_back(*run.begin());
+  turtle.position = (*run.begin()).position;
+  recordVertex();
+  recordPreview();
+}
+
+/* ------------------------------------------------------------------------- */
+
+int Environment::coalesce(float threshold) {
+  int ndoubles = 0;
+  for (int i = 0; i < run.size() - 1; ++i) {
+    float distance = run[i].position.GetDistanceTo(run[i + 1].position); 
+    if (distance <= threshold) {
+      run.erase(run.begin() + i + 1);
+      ++ndoubles;
+    }
+  }
+  return ndoubles;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -757,6 +779,9 @@ Co<Trimesh> Environment::dowel(float twist, float max_bend) {
 
         Co<Expression> nsides_value = (*this)["nsides"]->evaluate(*this);
         int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->toInteger();
+        if (nsides < 3) {
+          throw UnlocatedException("I expect nsides to be at least 3 for the dowel solidifier.");
+        }
 
         trimesh = Co<Trimesh>(line->Dowel(nsides, radius, true, twist, max_bend));
         *trimesh *= xforms.top();
@@ -815,6 +840,9 @@ Co<Trimesh> Environment::tube(float twist, float max_bend) {
 
         Co<Expression> nsides_value = (*this)["nsides"]->evaluate(*this);
         int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->toInteger();
+        if (nsides < 3) {
+          throw UnlocatedException("I expect nsides to be at least 3 for the tube solidifier.");
+        }
 
         trimesh = Co<Trimesh>(line->Dowel(nsides, radius, false, twist, max_bend));
         *trimesh *= xforms.top();
@@ -951,6 +979,9 @@ Co<Trimesh> Environment::revolve() {
 
         Co<Expression> nsides_value = (*this)["nsides"]->evaluate(*this);
         int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->toInteger();
+        if (nsides < 2) {
+          throw UnlocatedException("I expect nsides to be at least 2 for the revolve solidifier.");
+        }
 
         Co<Expression> x_value = (*this)["x"]->evaluate(*this);
         float x = dynamic_cast<ExpressionNumber *>(x_value.GetPointer())->toReal();
@@ -1020,6 +1051,9 @@ Co<Trimesh> Environment::spheres() {
   if (geometry_mode == GeometryMode::SURFACE) {
     Co<Expression> nsides_value = (*this)["nsides"]->evaluate(*this);
     int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->toInteger();
+    if (nsides < 4) {
+      throw UnlocatedException("I expect nsides to be at least 4 for the spheres solidifier.");
+    }
 
     for (unsigned int i = 0; i < run.size(); ++i) {
       trimesh = Co<Trimesh>(Trimesh::GetSphere(nsides, nsides / 2, run[i].outer_radius));

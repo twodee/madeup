@@ -64,6 +64,7 @@ class Environment {
     void rotate(float x, float y, float z, float degrees);
     void center();
     void identity();
+    int coalesce(float threshold);
     void home();
     void reverse();
     void echo(Co<Trimesh> mesh);

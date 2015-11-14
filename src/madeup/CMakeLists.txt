@@ -17,6 +17,7 @@ add_library(madeup
   ExpressionCallWithNamedParameters.cpp
   ExpressionCenter.cpp
   ExpressionClosure.cpp
+  ExpressionCoalesce.cpp
   ExpressionCosine.cpp
   ExpressionCross.cpp
   ExpressionDebug.cpp
