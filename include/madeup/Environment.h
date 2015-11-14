@@ -25,6 +25,7 @@ using namespace td;
 
 struct Node {
   QVector3<float> position;
+  QVector3<float> rgb;
   float outer_radius;
   float inner_radius;
   float energy;

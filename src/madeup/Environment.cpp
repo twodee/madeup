@@ -126,6 +126,13 @@ void Environment::prime() {
   add("z", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("z", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
   add("flip", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("flip", Co<Expression>(new ExpressionBoolean(false)))), Environment())));
 
+  ExpressionArray *rgb = new ExpressionArray(3);
+  rgb->setElement(0, Co<Expression>(new ExpressionReal(1.0f)));
+  rgb->setElement(1, Co<Expression>(new ExpressionReal(0.0f)));
+  rgb->setElement(2, Co<Expression>(new ExpressionReal(0.0f)));
+  add(".rgb", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine(".rgb", Co<Expression>(new ExpressionArrayReference(Co<ExpressionArray>(rgb))))), Environment())));
+
+  globals->add(".rgb", (*this)[".rgb"]);
   globals->add(".outerRadius", (*this)[".outerRadius"]);
   globals->add(".innerRadius", (*this)[".innerRadius"]);
   globals->add("nsides", (*this)["nsides"]);
@@ -424,6 +431,7 @@ void Environment::add(const string &id, Co<ExpressionClosure> closure) {
   // If a binding already exists for this closure, let's replace the innards of
   // the old one.  Other environments may have an alias to this closure, so we
   // don't want to insert a brand new closure instance.
+
   map<string, Co<ExpressionClosure> >::iterator match = id_to_expression.find(id);
   if (match != id_to_expression.end()) {
     match->second->setDefine(closure->getDefine());
@@ -432,6 +440,16 @@ void Environment::add(const string &id, Co<ExpressionClosure> closure) {
   } else {
     id_to_expression[id] = closure;
   }
+
+#if 0
+  std::cout << "adding " << id << std::endl;
+  for (map<string, Co<ExpressionClosure> >::const_iterator i = id_to_expression.begin();
+       i != id_to_expression.end();
+       ++i) {
+    std::cout << i->first << " -> " << i->second << std::endl;
+  }
+  std::cout << "" << std::endl;
+#endif
 }
 
 /* ------------------------------------------------------------------------- */
@@ -495,7 +513,21 @@ void Environment::recordVertex() {
     halflife = 0.0f;
   }
 
-  Node cursor = {turtle.position, outer_radius, inner_radius, energy, halflife};
+  v = (*this)[".rgb"]->evaluate(*this);
+  ExpressionArrayReference *rgb_value = dynamic_cast<ExpressionArrayReference *>(v.GetPointer());
+  QVector3<float> rgb;
+  if (rgb_value) {
+    Co<ExpressionArray> array = rgb_value->getArray();
+    for (int i = 0; i < 3; ++i) {
+      Co<Expression> element_value = (*array)[i];
+      ExpressionNumber *element_number = dynamic_cast<ExpressionNumber *>(element_value.GetPointer());
+      rgb[i] = element_number->toReal();
+    }
+  } else {
+    rgb = QVector3<float>(1.0f, 0.0f, 0.0f);
+  }
+
+  Node cursor = {turtle.position, rgb, outer_radius, inner_radius, energy, halflife};
   run.push_back(cursor);
 }
 
