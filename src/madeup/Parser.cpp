@@ -548,7 +548,7 @@ void Parser::atom() {
         }
       } else {
         std::stringstream ss;
-        ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'surrounds'.";
+        ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'around'.";
         throw MessagedException(ss.str());
       }
     } else {
