@@ -7,10 +7,14 @@ function hasWebGL() {
   } 
 }
 
+// Warn on leaving the page if there are unsaved changes. Downloading triggers
+// this, even though we're not leaving the page, so we add a special flag to
+// filter out these events.
 window.onbeforeunload = function() {
-  if (mupName && isSourceDirty) {
+  if (!isDownloading && mupName && isSourceDirty) {
     return 'You have unsaved changes.';
   }
+  isDownloading = false;
 };
 
 var lastBlocks = null;
@@ -648,6 +652,7 @@ function yyyymmdd() {
   return year + '_' + month + '_' + day;
 }
 
+var isDownloading = false;
 var swatch = null;
 var initialized = false;
 var mupName = null;
@@ -1162,6 +1167,7 @@ $(document).ready(function() {
   $('#download').click(function() {
     $('#tag').val(mupName);
     $('#source').val(getSource());
+    isDownloading = true;
     $('#downloader').submit();
     textEditor.focus();
   });
