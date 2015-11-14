@@ -585,10 +585,11 @@ void Environment::home() {
 
 int Environment::coalesce(float threshold) {
   int ndoubles = 0;
-  for (int i = 0; i < run.size() - 1; ++i) {
-    float distance = run[i].position.GetDistanceTo(run[i + 1].position); 
+  for (int i = run.size() - 1; i > 0; --i) {
+    float distance = run[i].position.GetDistanceTo(run[i - 1].position); 
     if (distance <= threshold) {
-      run.erase(run.begin() + i + 1);
+      run.erase(run.begin() + i);
+      paths[paths.size() - 1].erase(paths[paths.size() - 1].begin() + i);
       ++ndoubles;
     }
   }
