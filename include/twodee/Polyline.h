@@ -865,7 +865,7 @@ Trimesh *Polyline<T>::Triangulate() const {
       QVector2<T> to = remaining[k].vertex2 - remaining[j].vertex2;
 
       float signed_area = to[0] * fro[1] - to[1] * fro[0];
-      if (signed_area < 1.0e-3f) {
+      if (signed_area < 1.0e-6f) {
         if (i == remaining.size() - 1) {
           throw MessagedException("no good angle");
         } else {
