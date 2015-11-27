@@ -90,7 +90,9 @@ Trimesh *Polyline<T>::Revolve(const QVector3<T>& axis, int nstops, float degrees
     is_full = true;
   }
 
-  NField<float, 2> img(QVector2<int>(this->GetElementCount(), nstops), 3);
+  int nmetas = this->GetChannelCount() - 3;
+
+  NField<float, 2> img(QVector2<int>(this->GetElementCount(), nstops), this->GetChannelCount());
   QMatrix4<float> rot;
   if (is_full) {
     rot = QMatrix4<float>::GetRotate(degrees / nstops, axis);
@@ -114,14 +116,10 @@ Trimesh *Polyline<T>::Revolve(const QVector3<T>& axis, int nstops, float degrees
   }
 
   // Fill the first row with the polyline coordinates.
-  QVector3<T> position((T) 0);
+  /* QVector3<T> position((T) 0); */
   QVector2<int> i(0, 0);
   for (i[0] = 0; i[0] < this->GetElementCount(); ++i[0]) {
-    const T *element = (*this)(i[0]);
-    for (int d = 0; d < this->GetChannelCount(); ++d) {
-      position[d] = element[d];
-    }
-    memcpy(img(i), &position[0], sizeof(T) * 3);
+    memcpy(img(i), (*this)(i[0]), sizeof(T) * this->GetChannelCount());
   }
 
   QVector3<T> c;
@@ -134,13 +132,16 @@ Trimesh *Polyline<T>::Revolve(const QVector3<T>& axis, int nstops, float degrees
       c[0] = img(i)[0];
       c[1] = img(i)[1];
       c[2] = img(i)[2];
-
       ct = rot * c;
+
+      T *vertex_meta = img(i) + 3;
 
       i[1] = ri;
       img(i)[0] = ct[0];
       img(i)[1] = ct[1];
       img(i)[2] = ct[2];
+
+      memcpy(img(i) + 3, vertex_meta, sizeof(T) * nmetas);
     }
   }
 
@@ -163,18 +164,19 @@ Trimesh *Polyline<T>::Revolve(const QVector3<T>& axis, int nstops, float degrees
     // The first cap is easy. Just take our framing polyline and
     // triangulate it.
     Trimesh *cap_a_mesh = this->Triangulate(); 
+
+    if (nmetas > 0) {
+      T *vertex_meta = cap_a_mesh->AllocateVertexMetas(nmetas);
+      for (int i = 0; i < this->GetElementCount(); ++i) {
+        memcpy(vertex_meta, (*this)(i) + 3, sizeof(T) * nmetas);
+        vertex_meta += nmetas;
+      }
+    }
+
     if ((is_ccw && normal_dot_direction > 0) ||
         (!is_ccw && normal_dot_direction < 0)) {
       cap_a_mesh->ReverseWinding();
     }
-
-    // The second cap spans the final rotated framing polyline. We've already
-    // calculated that rotated frame. It's in the last row of our field.
-    /* Polyline<T> cap_b_frame(this->GetElementCount(), this->GetChannelCount(), IsOpen()); */
-    /* for (int i = 0; i < this->GetElementCount(); ++i) { */
-      /* QVector2<T> c(i, nstops - 1); */
-      /* memcpy(cap_b_frame(i), img(c), 3 * sizeof(float)); */
-    /* } */
 
     QMatrix4<float> xform = QMatrix4<float>::GetRotate(degrees, axis);
     Trimesh cap_b_mesh(*cap_a_mesh);
@@ -185,7 +187,6 @@ Trimesh *Polyline<T>::Revolve(const QVector3<T>& axis, int nstops, float degrees
     *base += cap_b_mesh;
 
     delete cap_a_mesh;
-    /* delete cap_b_mesh; */
   }
 
   return base;
@@ -247,6 +248,20 @@ QVector3<T> Polyline<T>::GetConstrainedPerpendicular(const QVector3<T> &axis) {
 
   return to_ring;
 }
+
+/* ------------------------------------------------------------------------- */
+
+template<typename T>
+struct VertexMeta {
+  QVector3<T> position;
+  const T *meta;
+
+  VertexMeta(const QVector3<T> &position,
+              const T *meta) :
+    position(position),
+    meta(meta) {
+  }
+};
 
 /* ------------------------------------------------------------------------- */
 
@@ -369,8 +384,8 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
     }
   }
  
-  vector<QVector3<T> > cap_neighbors[2];
-  vector<QVector3<T> > vertices;
+  vector<VertexMeta<T> > cap_neighbors[2];
+  vector<VertexMeta<T> > vertices;
   Plane<T, 3> first_plane(nodes[0], normals[0]);
 
   // Now generate geometry for the rest of the vertices.
@@ -388,6 +403,9 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
     if (is_adaptive_radius) {
       radius = (*this)(vi)[3];
     }
+
+    const T *meta = &(*this)(vi)[3];
+    std::cout << "meta[#](# in 0,4): " << meta[0] << ", " << meta[1] << ", " << meta[2] << ", " << meta[3] << std::endl;
 
     // See if we need to round this bend. We round if two things are true: 1)
     // the bend exceeds the maximum allowed, and 2) we're not an endpoint node
@@ -424,7 +442,7 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
       if (vi > 0) {
         int i_previous_ring = vertices.size() - nstops;
         for (int si = 0; si < nstops; ++si) {
-          QVector3<T> previous_ring_neighbor(vertices[i_previous_ring + si]);
+          QVector3<T> previous_ring_neighbor(vertices[i_previous_ring + si].position);
           Line<T, 3> line(previous_ring_neighbor, afts[vi] * (T) -1);
 
           QVector3<T> intersection_point;
@@ -434,7 +452,7 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
             diff.Normalize();
             intersection_point = pivot_on_aft + diff * radius;
           }
-          vertices.push_back(intersection_point);
+          vertices.push_back(VertexMeta<T>(intersection_point, meta));
         }
       }
 
@@ -450,7 +468,7 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
         to_ring = QMatrix4<float>::GetRotate(twist, afts[0]) * to_ring;
         for (int si = 0; si < nstops; ++si) {
           QVector3<T> ring_neighbor = QMatrix4<float>::GetRotate(si * -360.0f / nstops, afts[0]) * to_ring + pivot_on_aft;
-          vertices.push_back(ring_neighbor);
+          vertices.push_back(VertexMeta<T>(ring_neighbor, meta));
         }
       }
 
@@ -468,9 +486,9 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
       for (int i = 1; i < nslices; ++i) {
         int i_previous_ring = vertices.size() - nstops;
         for (int si = 0; si < nstops; ++si) {
-          QVector3<T> previous_ring_neighbor(vertices[i_previous_ring + si]);
+          QVector3<T> previous_ring_neighbor(vertices[i_previous_ring + si].position);
           QVector3<T> ring_neighbor = rotator * previous_ring_neighbor;
-          vertices.push_back(ring_neighbor);
+          vertices.push_back(VertexMeta<T>(ring_neighbor, meta));
         }
       }
     }
@@ -494,12 +512,12 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
 
         QVector3<T> intersection_point;
         first_plane.Intersect(line, intersection_point);
-        vertices.push_back(intersection_point);
+        vertices.push_back(VertexMeta<T>(intersection_point, meta));
 
         // If this line is disconnected, let's record this vertex as also being
         // part of the cap.
         if (is_open) {
-          cap_neighbors[0].push_back(intersection_point);
+          cap_neighbors[0].push_back(VertexMeta<T>(intersection_point, meta));
         }
       }
     }
@@ -507,16 +525,16 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
     else if (nodes[vi].GetDistanceTo(nodes[vi - 1]) < EPSILON) {
       int i_previous_ring = vertices.size() - nstops;
       for (int si = 0; si < nstops; ++si) {
-        QVector3<T> previous_ring_neighbor(vertices[i_previous_ring + si]);
+        QVector3<T> previous_ring_neighbor(vertices[i_previous_ring + si].position);
         QVector3<T> diff = previous_ring_neighbor - nodes[vi];
         diff.Normalize();
         QVector3<T> scaled = nodes[vi] + diff * radius;
-        vertices.push_back(scaled);
+        vertices.push_back(VertexMeta<T>(scaled, meta));
  
         // If this is the last node on an open line, let's capture these
         // vertices for the cap as well.
         if (vi == this->GetElementCount() - 1 && is_open) {
-          cap_neighbors[1].push_back(scaled);
+          cap_neighbors[1].push_back(VertexMeta<T>(scaled, meta));
         }
       }
     }
@@ -531,7 +549,7 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
 
       int i_previous_ring = vertices.size() - nstops;
       for (int si = 0; si < nstops; ++si) {
-        QVector3<T> previous_ring_neighbor(vertices[i_previous_ring + si]);
+        QVector3<T> previous_ring_neighbor(vertices[i_previous_ring + si].position);
         Line<T, 3> line(previous_ring_neighbor, afts[vi] * (T) -1);
 
         QVector3<T> intersection_point;
@@ -545,12 +563,12 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
         line = Line<T, 3>(intersection_point, afts[vi] * (T) -1);
         plane.Intersect(line, intersection_point);
 
-        vertices.push_back(intersection_point);
+        vertices.push_back(VertexMeta<T>(intersection_point, meta));
 
         // If this is the last node on an open line, let's capture these
         // vertices for the cap as well.
         if (vi == this->GetElementCount() - 1 && is_open) {
-          cap_neighbors[1].push_back(intersection_point);
+          cap_neighbors[1].push_back(VertexMeta<T>(intersection_point, meta));
         }
       }
     }
@@ -566,7 +584,7 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
     Plane<T, 3> aft_plane(nodes[0], afts[0]);
     int i_previous_ring = vertices.size() - nstops;
     for (int si = 0; si < nstops; ++si) {
-      QVector3<T> previous_ring_neighbor(vertices[i_previous_ring + si]);
+      QVector3<T> previous_ring_neighbor(vertices[i_previous_ring + si].position);
       Line<T, 3> line(previous_ring_neighbor, fores[nvertices - 1] * (T) -1);
 
       QVector3<T> intersection_point;
@@ -581,7 +599,7 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
         intersection_point = first_plane.GetPoint() + diff * (*this)(0)[3];
       }
 
-      vertices.push_back(intersection_point);
+      vertices.push_back(VertexMeta<T>(intersection_point, &(*this)(0)[3]));
     }
   }
 
@@ -591,14 +609,18 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
   delete[] afts;
   delete[] fores;
 
+  int nmetas = this->GetChannelCount() - 3;
+
   // We lay out the vertices in an nstops x ~nvertices grid. At each cell is a
   // vertex's 3D position.
-  NField<float, 2> img(QVector2<int>(nstops, vertices.size() / nstops), 3);
+  NField<float, 2> img(QVector2<int>(nstops, vertices.size() / nstops), this->GetChannelCount());
   NFieldIterator<2> c(img.GetDimensions());
   int i = 0;
   while (c.HasNext()) {
     c.Next();
-    memcpy(img(c), &vertices[i][0], sizeof(T) * 3);
+    std::cout << "vertices[i].meta[#](# in 0,4): " << vertices[i].meta[0] << ", " << vertices[i].meta[1] << ", " << vertices[i].meta[2] << ", " << vertices[i].meta[3] << std::endl;
+    memcpy(img(c), &vertices[i].position[0], sizeof(T) * 3);
+    memcpy(&img(c)[3], vertices[i].meta, sizeof(T) * nmetas);
     ++i;
   }
 
@@ -606,6 +628,7 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
   // wrap (following the solid gerth of tube), but not the rows. We wrapped
   // those manually as needed.
   Trimesh *mesh = Trimesh::GetParametric(img, true, false);
+  mesh->MigrateVertexMetasToColors(1, 2, 3);
 
   // If this mesh is open, we need to generate caps as well.
   if (is_open && is_capped) {
@@ -614,11 +637,19 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
       Trimesh *cap = new Trimesh(cap_neighbors[ci].size() + 1, nstops);
 
       float *position = cap->GetPositions();
+      float *meta = cap->AllocateVertexMetas(nmetas);
+
+      // Center vertex
       memcpy(position, (*this)(vi), sizeof(T) * 3);
+      memcpy(meta, &(*this)(vi)[3], sizeof(T) * nmetas);
       position += 3;
+      meta += nmetas;
+
       for (unsigned int i = 0; i < cap_neighbors[ci].size(); ++i) {
-        memcpy(position, &cap_neighbors[ci][i][0], sizeof(T) * 3);
+        memcpy(position, &cap_neighbors[ci][i].position[0], sizeof(T) * 3);
+        memcpy(meta, cap_neighbors[ci][i].meta, sizeof(T) * nmetas);
         position += 3;
+        meta += nmetas;
       }
 
       int *face = cap->GetFaces();
@@ -638,6 +669,8 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
       delete cap;
     }
   }
+
+  mesh->WriteJSON("boo.json");
 
   return mesh;
 }
@@ -768,7 +801,7 @@ template<class T>
 QVector3<T> Polyline<T>::GetNormal() const {
   int nvertices = this->GetElementCount();
   int ndims = this->GetChannelCount();
-  assert(ndims == 3);
+  assert(ndims >= 3);
 
   QVector3<T> normal((T) 0); 
   for (int i = 0; i < nvertices; ++i) {
@@ -787,7 +820,7 @@ template<class T>
 Polyline<T> *Polyline<T>::Flatten() const {
   int nvertices = this->GetElementCount();
   int ndims = this->GetChannelCount();
-  assert(ndims == 3);
+  assert(ndims >= 3);
 
   // We project the triangle down to two dimensions. A simple way to do this is
   // to get the polygon's normal and drop the dimension of the component with
@@ -920,18 +953,29 @@ Trimesh *Polyline<T>::Extrude(const QVector3<T> &axis, T distance, const QMatrix
   bool is_ccw = flattened->IsCounterclockwise();
   delete flattened;
 
-  vector<QVector3<float> > positions; 
+  vector<VertexMeta<T> > vertices; 
   vector<QVector3<int> > faces; 
+
+  int nmetas = this->GetChannelCount() - 3;
 
   // End A
   Trimesh *cap_a = this->Triangulate(); 
+  float *vertex_meta = NULL;
+  if (nmetas > 0) {
+    vertex_meta = cap_a->AllocateVertexMetas(nmetas);
+  }
+
   for (int i = 0; i < nvertices; ++i) {
-    positions.push_back(QVector3<T>((*this)(i)));
+    vertices.push_back(VertexMeta<T>(QVector3<T>((*this)(i)), &(*this)(i)[3]));
+    if (vertex_meta) {
+      memcpy(vertex_meta, &(*this)(i)[3], sizeof(float) * nmetas);
+      vertex_meta += nmetas;
+    }
   }
 
   // End B
   for (int i = 0; i < nvertices; ++i) {
-    positions.push_back(xform * (positions[i] + delta));
+    vertices.push_back(VertexMeta<T>(xform * (vertices[i].position + delta), vertices[i].meta));
   }
 
   for (int i = 0; i < nvertices; ++i) {
@@ -939,7 +983,19 @@ Trimesh *Polyline<T>::Extrude(const QVector3<T> &axis, T distance, const QMatrix
     faces.push_back(QVector3<int>(i, i + nvertices, (i + nvertices - 1) % nvertices + nvertices));
   }
 
+  vector<QVector3<T> > positions;
+  for (int i = 0; i < vertices.size(); ++i) {
+    positions.push_back(vertices[i].position);
+  }
   Trimesh *extruded = new Trimesh(positions, faces);
+
+  if (nmetas > 0) {
+    float *vertex_meta = extruded->AllocateVertexMetas(nmetas);
+    for (int i = 0; i < vertices.size(); ++i) {
+      memcpy(vertex_meta, vertices[i].meta, sizeof(float) * nmetas);
+      vertex_meta += nmetas;
+    }
+  }
 
   if (!is_ccw && normal_dot_direction < 0) {
     extruded->ReverseWinding();

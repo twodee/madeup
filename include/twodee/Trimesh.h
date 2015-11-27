@@ -103,6 +103,11 @@ class Trimesh {
      @return Positions buffer
      */
     const float *GetColors() const;
+    float *AllocateVertexColors(int nchannels = 3);
+
+    const float *GetVertexMetas() const;
+    float *AllocateVertexMetas(int nmetas);
+    void MigrateVertexMetasToColors(int r, int g, int b);
 
     /**
      Gets the per-vertex ambient occlusion buffer.
@@ -328,6 +333,10 @@ class Trimesh {
 
     /** Per-vertex colors */
     float *colors;
+    int ncolor_channels;
+
+    float *vertex_metas;
+    int nvertex_metas;
 
     /** Per-vertex 1-D texture coordinates */
     float *tex1D_coords;

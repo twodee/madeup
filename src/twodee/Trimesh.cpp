@@ -62,6 +62,7 @@ Trimesh::Trimesh(int nvertices, int nfaces) :
   faces(new int[nfaces * 3]),
   normals(NULL),
   colors(NULL),
+  vertex_metas(NULL),
   tex1D_coords(NULL),
   tex2D_coords(NULL),
   tex3D_coords(NULL),
@@ -77,6 +78,7 @@ Trimesh::Trimesh(const std::vector<td::QVector3<float> >& positions, const std::
   faces(new int[nfaces * 3]),
   normals(NULL),
   colors(NULL),
+  vertex_metas(NULL),
   tex1D_coords(NULL),
   tex2D_coords(NULL),
   tex3D_coords(NULL),
@@ -106,6 +108,7 @@ Trimesh::Trimesh(int ntriangles, const float *positions) :
   faces(new int[ntriangles * 3]),
   normals(NULL),
   colors(NULL),
+  vertex_metas(NULL),
   tex1D_coords(NULL),
   tex2D_coords(NULL),
   tex3D_coords(NULL),
@@ -130,6 +133,7 @@ Trimesh::~Trimesh() {
   delete[] faces;
   delete[] normals;  
   delete[] colors;  
+  delete[] vertex_metas;  
   delete[] tex1D_coords;
   delete[] tex2D_coords;
   delete[] tex3D_coords;
@@ -998,8 +1002,11 @@ void Trimesh::ReadPly(const std::string& path) {
 void Trimesh::NullBuffers() {
   nvertices = 0;
   nfaces = 0;
+  ncolor_channels = 0;
+  nvertex_metas = 0;
   positions = normals = colors = tex1D_coords = tex2D_coords = tex3D_coords = occlusion = NULL;
   faces = NULL;
+  vertex_metas = NULL;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -1090,6 +1097,8 @@ void Trimesh::WriteObj(const std::string& path) {
 /* ------------------------------------------------------------------------- */
 
 void Trimesh::WriteJSON(const std::string& path) {
+  bool has_vertex_colors = colors != NULL;
+
   // open file
   std::ofstream f(path.c_str());
   f << std::fixed;
@@ -1098,11 +1107,12 @@ void Trimesh::WriteJSON(const std::string& path) {
 
   // write metadata
   f << "  \"metadata\": {" << std::endl; 
+  f << "    \"formatVersion\": 3, " << std::endl;
   f << "    \"generatedBy\": \"libtwodee\", " << std::endl;
   f << "    \"vertices\": " << GetVertexCount() << "," << std::endl;
   f << "    \"faces\": " << GetFaceCount() << "," << std::endl;
   f << "    \"normals\": " << 0 << "," << std::endl;
-  f << "    \"colors\": " << 0 << "," << std::endl;
+  f << "    \"colors\": " << (has_vertex_colors ? GetVertexCount() : 0) << "," << std::endl;
   f << "    \"uvs\": " << 0 << "," << std::endl;
   f << "    \"materials\": " << 0 << "," << std::endl;
   f << "    \"morphTargets\": 0" << std::endl;
@@ -1120,15 +1130,48 @@ void Trimesh::WriteJSON(const std::string& path) {
     }
   }
   f << "]," << std::endl;
+ 
+  // write colors
+  if (has_vertex_colors) {
+    f << "  \"colors\": [";
+    if (GetVertexCount() > 0) {
+
+      float *color = colors;
+
+      int r = (int) (color[0] * 255);
+      int g = (int) (color[1] * 255);
+      int b = (int) (color[2] * 255);
+      int rgb = (r << 16) | (g << 8) | (b << 0);
+      f << rgb;
+
+      color += 3;
+      for (int i = 1; i < nvertices; ++i, color += 3) {
+        r = (int) (color[0] * 255);
+        g = (int) (color[1] * 255);
+        b = (int) (color[2] * 255);
+        rgb = (r << 16) | (g << 8) | (b << 0);
+        f << "," << rgb;
+      }
+    }
+    f << "]," << std::endl;
+  }
+
+  int face_type = has_vertex_colors ? 128 : 0;
 
   // write face indices
   f << "  \"faces\": [";
   if (GetFaceCount() > 0) {
     int *face = faces;
-    f << 0 << "," << face[0] << "," << face[1] << "," << face[2];
+    f << face_type << "," << face[0] << "," << face[1] << "," << face[2];
+    if (has_vertex_colors) {
+      f << "," << face[0] << "," << face[1] << "," << face[2];
+    }
     face += 3;
     for (int i = 1; i < GetFaceCount(); ++i, face += 3) {
-      f << ", 0," << face[0] << "," << face[1] << "," << face[2];
+      f << ", " << face_type << "," << face[0] << "," << face[1] << "," << face[2];
+      if (has_vertex_colors) {
+        f << "," << face[0] << "," << face[1] << "," << face[2];
+      }
     }
   }
   f << "]" << std::endl;
@@ -1217,7 +1260,7 @@ Trimesh *Trimesh::GetQuadrilateral(int nrows, int ncols) {
 /* ------------------------------------------------------------------------- */
 
 Trimesh *Trimesh::GetParametric(const NField<float, 2>& quadric_map, bool wrap_x, bool wrap_y, bool generate_texcoords) {
-  assert(quadric_map.GetChannelCount() == 3);
+  assert(quadric_map.GetChannelCount() >= 3);
 
   const QVector2<int>& dims = quadric_map.GetDimensions();
   int nrow_quads;
@@ -1238,10 +1281,24 @@ Trimesh *Trimesh::GetParametric(const NField<float, 2>& quadric_map, bool wrap_x
   int nfaces = 2 * nrow_quads * ncol_quads;
 
   Trimesh *mesh = new Trimesh(nvertices, nfaces);
+  int nmetas = quadric_map.GetChannelCount() - 3;
 
   // Store vertex positions; each coordinate is in one element of the
   // three channel image.
-  memcpy(mesh->positions, quadric_map.GetData(), sizeof(float) * nvertices * 3);
+
+  if (nmetas == 0) {
+    memcpy(mesh->positions, quadric_map.GetData(), sizeof(float) * 3 * nvertices);
+  } else {
+    float *position = mesh->GetPositions();
+    float *vertex_meta = mesh->AllocateVertexMetas(nmetas);
+    for (int i = 0; i < nvertices; ++i) {
+      memcpy(position, quadric_map(i), sizeof(float) * 3);
+      memcpy(vertex_meta, &quadric_map(i)[3], sizeof(float) * nmetas);
+      std::cout << "vertex_meta[#](# in 0,4): " << vertex_meta[0] << ", " << vertex_meta[1] << ", " << vertex_meta[2] << ", " << vertex_meta[3] << std::endl;
+      position += 3;
+      vertex_meta += nmetas;
+    }
+  }
 
   // The face connectivity is trivial to compute.  Just hook up adjacent
   // nodes of the image grid.  We're decomposing into triangles, so two
@@ -1665,7 +1722,17 @@ void Trimesh::DisconnectFaces() {
   float *new_positions = new float[3 * new_nvertices];
   float *new_normals = new float[3 * new_nvertices];
 
-  delete[] colors;
+  bool has_vertex_colors = colors != NULL;
+  float *new_colors = NULL;
+  if (has_vertex_colors) {
+    new_colors = new float[new_nvertices * ncolor_channels];
+  }
+
+  float *new_vertex_metas = NULL;
+  if (nvertex_metas > 0) {
+    new_vertex_metas = new float[new_nvertices * nvertex_metas];
+  }
+
   delete[] tex1D_coords;
   delete[] tex2D_coords;
   delete[] occlusion;
@@ -1675,14 +1742,29 @@ void Trimesh::DisconnectFaces() {
   int *face = faces;
   float *position = new_positions;
   float *normal = new_normals;
+  float *color = new_colors;
+  float *vertex_meta = new_vertex_metas;
+
   for (int fi = 0, i = 0; fi < nfaces; fi++) {
     for (int vi = 0; vi < 3; ++vi, ++i) {
       memcpy(position, &positions[face[vi] * 3], sizeof(float) * 3);
       memcpy(normal, &(fnormals[fi][0]), sizeof(float) * 3);
+
+      if (has_vertex_colors) {
+        memcpy(color, &colors[face[vi] * 3], sizeof(float) * ncolor_channels);
+      }
+
+      if (nvertex_metas > 0) {
+        memcpy(vertex_meta, &vertex_metas[face[vi] * 3], sizeof(float) * nvertex_metas);
+      }
+
       face[vi] = i;
       position += 3;
       normal += 3;
+      color += 3;
+      vertex_meta += nvertex_metas;
     }
+
     face += 3;
   }
 
@@ -1691,6 +1773,12 @@ void Trimesh::DisconnectFaces() {
 
   delete[] positions;
   positions = new_positions;
+
+  delete[] colors;
+  colors = new_colors;
+
+  delete[] vertex_metas;
+  vertex_metas = new_vertex_metas;
 
   delete[] normals;
   normals = new_normals;
@@ -1709,6 +1797,22 @@ Trimesh& Trimesh::operator+=(const Trimesh& other) {
   memcpy(new_positions, positions, sizeof(float) * GetVertexCount() * 3);
   memcpy(new_positions + GetVertexCount() * 3, other.positions, sizeof(float) * other.GetVertexCount() * 3);
 
+  // Copy colors
+  float *new_colors = NULL;
+  if (colors != NULL && other.colors != NULL && ncolor_channels == other.ncolor_channels) {
+    new_colors = new float[new_nvertices * ncolor_channels];
+    memcpy(new_colors, colors, sizeof(float) * GetVertexCount() * ncolor_channels);
+    memcpy(new_colors + GetVertexCount() * ncolor_channels, other.colors, sizeof(float) * other.GetVertexCount() * ncolor_channels);
+  }
+ 
+  // Copy metas
+  float *new_vertex_metas = NULL;
+  if (vertex_metas != NULL && other.vertex_metas != NULL && nvertex_metas == other.nvertex_metas) {
+    new_vertex_metas = new float[new_nvertices * nvertex_metas];
+    memcpy(new_vertex_metas, vertex_metas, sizeof(float) * GetVertexCount() * nvertex_metas);
+    memcpy(new_vertex_metas + GetVertexCount() * nvertex_metas, other.vertex_metas, sizeof(float) * other.GetVertexCount() * nvertex_metas);
+  }
+
   // Copy faces
   int *new_faces = new int[new_nfaces * 3];
   memcpy(new_faces, faces, sizeof(int) * GetFaceCount() * 3);
@@ -1726,12 +1830,16 @@ Trimesh& Trimesh::operator+=(const Trimesh& other) {
 
   delete[] positions;
   delete[] faces;
+  delete[] colors;
+  delete[] vertex_metas;
 
   nvertices = new_nvertices;
   nfaces = new_nfaces;
 
   positions = new_positions;
   faces = new_faces;
+  colors = new_colors;
+  vertex_metas = new_vertex_metas;
 
   // TODO copy normals, texcoords, etc.
 
@@ -1840,6 +1948,12 @@ Trimesh::Trimesh(const Trimesh& other) {
     memcpy(normals, other.normals, sizeof(float) * 3 * nvertices);
   }
 
+  nvertex_metas = other.nvertex_metas;
+  if (other.vertex_metas) {
+    vertex_metas = new float[nvertex_metas * nvertices];
+    memcpy(vertex_metas, other.vertex_metas, sizeof(float) * nvertex_metas * nvertices);
+  }
+
   if (other.colors) {
     colors = new float[3 * nvertices];
     memcpy(colors, other.colors, sizeof(float) * 3 * nvertices);
@@ -1863,6 +1977,52 @@ Trimesh::Trimesh(const Trimesh& other) {
   if (other.occlusion) {
     occlusion = new float[nvertices];
     memcpy(occlusion, other.occlusion, sizeof(float) * nvertices);
+  }
+}
+
+/* ------------------------------------------------------------------------- */
+
+float *Trimesh::AllocateVertexColors(int nchannels) {
+  if (colors) delete[] colors;
+
+  ncolor_channels = nchannels;
+  colors = new float[nchannels * nvertices];
+  return colors;
+}
+
+/* ------------------------------------------------------------------------- */
+
+float *Trimesh::AllocateVertexMetas(int nvertex_metas) {
+  if (vertex_metas) delete[] vertex_metas;
+
+  this->nvertex_metas = nvertex_metas;
+  vertex_metas = new float[nvertex_metas * nvertices];
+  return vertex_metas;
+}
+
+/* ------------------------------------------------------------------------- */
+
+const float *Trimesh::GetVertexMetas() const {
+  return vertex_metas; 
+}
+
+/* ------------------------------------------------------------------------- */
+
+void Trimesh::MigrateVertexMetasToColors(int r, int g, int b) {
+  if (colors == NULL) {
+    AllocateVertexColors(3);
+  }
+
+  float *color = colors;
+  float *vertex_meta = vertex_metas;
+
+  for (int i = 0; i < GetVertexCount(); ++i) {
+    color[0] = vertex_meta[r];
+    color[1] = vertex_meta[g];
+    color[2] = vertex_meta[b];
+
+    color += 3;
+    vertex_meta += nvertex_metas;
   }
 }
 

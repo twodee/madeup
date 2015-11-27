@@ -666,7 +666,6 @@ var showWireframe = false;
 var showHeadings = true;
 var showCounterclockwise = true;
 var showClockwise = false;
-var modelColor = 'FF0000';
 var blocklyWorkspace = null;
 var fontSize = 14;
 var gridSpacing = 1.0;
@@ -682,7 +681,6 @@ var isAxisChanged = [false, false, false];
 var isGridChanged = [false, false, false];
 var isNSecondsTillPreviewChanged = false;
 var isShowHeadingsChanged = false;
-var isModelColorChanged = false;
 var isFontSizeChanged = false;
 var isGridSpacingChanged = false;
 var isGridExtentChanged = false;
@@ -704,7 +702,6 @@ function saveInCookies() {
   if (isShowHeadingsChanged) Cookies.set('showHeadings', showHeadings ? 1 : 0);
   if (isShowCounterclockwiseChanged) Cookies.set('showCounterclockwise', showCounterclockwise ? 1 : 0);
   if (isShowClockwiseChanged) Cookies.set('showClockwise', showClockwise ? 1 : 0);
-  if (isModelColorChanged) Cookies.set('modelColor', modelColor);
   if (isShowWireframeChanged) Cookies.set('showWireframe', showWireframe ? 1 : 0);
   if (isFlatShadedChanged) Cookies.set('isFlatShaded', isFlatShaded ? 1 : 0);
   if (isEditorTextChanged) Cookies.set('isEditorText', isEditorText ? 1 : 0);
@@ -732,7 +729,6 @@ function saveInCookies() {
   isShowCounterclockwiseChanged = false;
   isShowClockwiseChanged = false;
   isFlatShadedChanged = false;
-  isModelColorChanged = false;
   isShowWireframeChanged = false;
   isEditorTextChanged = false;
   isShowHeadingsChanged = false;
@@ -796,11 +792,6 @@ $(document).ready(function() {
     }
     $('#showClockwise').prop('checked', showClockwise);
 
-    if (Cookies.get('modelColor')) {
-      modelColor = Cookies.get('modelColor');
-    }
-    $('#modelColor').css('background-color', '#' + modelColor);
-
     if (Cookies.get('showWireframe')) {
       showWireframe = parseInt(Cookies.get('showWireframe')) != 0;
     } else {
@@ -850,17 +841,6 @@ $(document).ready(function() {
       log('No WebGL.');
     } else {
       updateCulling();
-
-      swatch = $('#modelColor').ColorPicker({
-        flat: false,
-        color: modelColor,
-        onSubmit: function(hsb, hex, rgb) {
-          modelColor = hex;
-          isModelColorChanged = true;
-          $('#modelColor').css('background-color', '#' + modelColor);
-          run(getSource(), GeometryMode.SURFACE);
-        }
-      });
 
       if (Cookies.get('axisX')) {
         if (parseInt(Cookies.get('axisX')) != 0) {
@@ -1516,7 +1496,7 @@ function run(source, mode) {
         if (mode == GeometryMode.SURFACE) {
           var loader = new THREE.JSONLoader();
           var model = loader.parse(JSON.parse(data['model']));
-          var material = new THREE.MeshLambertMaterial({color: parseInt(modelColor, 16), wireframe: showWireframe, wireframeLinewidth: 5});
+          var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: showWireframe, wireframeLinewidth: 5});
           meshes[0] = new THREE.Mesh(model.geometry, material);
           model.geometry.computeFaceNormals();
           model.geometry.computeVertexNormals();
@@ -1616,12 +1596,20 @@ function fit() {
   var xform = new THREE.Matrix4().makeTranslation(-centroid.x, -centroid.y, -centroid.z);
   modelScene.matrix = xform;
 
-  var verticalFitZ = bounds.max.y / Math.tan(camera.fov * Math.PI / 180.0 * 0.5);
-  var fovX = 2 * Math.atan(Math.tan(camera.fov * Math.PI / 180.0 * 0.5) * camera.aspect);
-  var horizontalFitZ = bounds.max.x / Math.tan(fovX * 0.5);
+  var constraint;
+  if (camera.aspect >= 1) {
+    var fovX = 2 * Math.atan(Math.tan(camera.fov * Math.PI / 180.0 * 0.5) * camera.aspect);
+    constraint = Math.tan(fovX * 0.5);
+  } else {
+    constraint = Math.tan(camera.fov * Math.PI / 180.0 * 0.5);
+  }
+
+  var dimensions = bounds.size();
+  var maxSpan = Math.max(dimensions.x, Math.max(dimensions.y, dimensions.z));
+  var fit = maxSpan / constraint;
 
   controls.reset(); 
-  camera.position.z = bounds.max.z + (verticalFitZ > horizontalFitZ ? verticalFitZ : horizontalFitZ);
+  camera.position.z = bounds.max.z + fit;
   camera.updateProjectionMatrix();
 }
 
