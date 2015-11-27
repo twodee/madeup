@@ -50,9 +50,22 @@ if (!(strcmp($in['extension'], 'json') == 0 || strcmp($in['extension'], 'obj') =
   error_log("Input file: $in_path");
   error_log("Output file: $out_path");
 
-  // Execute the interpreter and collect its output.
+  if (preg_match('/^--\s*timeout\s*=\s*(\d+)/m', $in['source'], $timeout_matches)) {
+    $timeout = $timeout_matches[1]; 
+    if ($timeout < 1) {
+      $timeout = 15;
+    }
+  } else {
+    $timeout = 15;
+  }
+
+  error_log("Timeout: $timeout");
+  $forn_timeout = $timeout + 5;
+
+  // Execute the interpreter and collect its output. Forn requires 
+  // Process.spawn, which isn't available in older Rubies.
   $lines = array();
-  $command = sprintf("bash -c \"source /etc/profile; rvm use 2.1 2>&1 >/dev/null; ./forn 15 ./merp --timeout 10 --shading %s -o %s --geometry %s %s\" 2>&1",
+  $command = sprintf("bash -c \"rvm use 2.1 2>/dev/null >/dev/null; ./forn $forn_timeout ./merp --timeout $timeout --shading %s -o %s --geometry %s %s\" 2>&1",
                      escapeshellarg($in['shading_mode']),
                      $out_path,
                      escapeshellarg($in['geometry_mode']),
@@ -61,7 +74,7 @@ if (!(strcmp($in['extension'], 'json') == 0 || strcmp($in['extension'], 'obj') =
   $out['stdout'] = implode("\n", $lines);
 
   $lines = array();
-  $command = sprintf("bash -c \"source /etc/profile; rvm use 2.1 2>&1 >/dev/null; ./forn 15 ./merp --tree -q %s\"", $in_path);
+  $command = sprintf("bash -c \"rvm use 2.1 2>/dev/null >/dev/null; ./forn $forn_timeout ./merp --tree -q %s\"", $in_path);
   exec($command, $lines, $tree_status);
   $out['tree'] = implode("\n", $lines);
 

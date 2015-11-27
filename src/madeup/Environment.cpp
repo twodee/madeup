@@ -1432,7 +1432,7 @@ void Environment::checkTimeout(const SourceLocation &location) {
   auto now_time = std::chrono::high_resolution_clock::now();
   if (std::chrono::duration<double>(now_time - start_time).count() > max_seconds) {
     std::stringstream ss;
-    ss << location.toAnchor() << ": Uh oh. Your program was taking a long time to finish, and I was worried that it would run forever. I stopped it after " << max_seconds << " seconds.";
+    ss << location.toAnchor() << ": Uh oh. Your program was taking a long time to finish, and I was worried that it would run forever. I stopped it after " << max_seconds << " second" << (max_seconds == 1 ? "" : "s") << ".";
     throw MessagedException(ss.str());
   }
 }
