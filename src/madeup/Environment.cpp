@@ -1131,8 +1131,8 @@ Co<Trimesh> Environment::spheres() {
   if (geometry_mode == GeometryMode::SURFACE) {
     Co<Expression> nsides_value = (*this)["nsides"]->evaluate(*this);
     int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->toInteger();
-    if (nsides < 4) {
-      throw UnlocatedException("I expect nsides to be at least 4 for the spheres solidifier.");
+    if (nsides < 3) {
+      throw UnlocatedException("I expect nsides to be at least 3 for the spheres solidifier.");
     }
 
     for (unsigned int i = 0; i < run.size(); ++i) {
