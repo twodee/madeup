@@ -143,20 +143,21 @@ Trimesh::~Trimesh() {
 /* ------------------------------------------------------------------------- */
 
 Trimesh *Trimesh::GetSphere(int nslices, int nstacks, float radius) {
-  Trimesh *mesh = new Trimesh((nslices + 1) * (nstacks + 1), nslices * nstacks * 2);
+  // Slices are the vertical wedges, which wrap around and reconnect. Stacks
+  // are the horizontal stripes, not counting the top and bottom crowns.
+  Trimesh *mesh = new Trimesh(nslices * (nstacks + 1) + 2, nslices * nstacks * 2 + nslices * 2);
 
-  float stack_delta = PI / nstacks;
+  float stack_delta = PI / (nstacks + 2);
   float slice_delta = 2.0f * PI / nslices;
 
   float *position = mesh->positions;
-  // TODO: Allocate elsewhere?
   mesh->tex2D_coords = new float[mesh->nvertices * 2];
   float *tex2D_coord = mesh->tex2D_coords;
 
-  float stack_at = 0.0f;
+  float stack_at = stack_delta;
   for (int r = 0; r <= nstacks; ++r, stack_at += stack_delta) {
     float slice_at = 0.0f;
-    for (int c = 0; c <= nslices; ++c, slice_at += slice_delta) {
+    for (int c = 0; c < nslices; ++c, slice_at += slice_delta) {
       position[0] = radius * cos(slice_at) * sin(stack_at);
       position[1] = radius *                 cos(stack_at);
       position[2] = radius * sin(slice_at) * sin(stack_at);
@@ -168,23 +169,50 @@ Trimesh *Trimesh::GetSphere(int nslices, int nstacks, float radius) {
     }
   }
 
+  // Top
+  position[0] = 0.0f;
+  position[1] = radius;
+  position[2] = 0.0f;
+  position += 3;
+
+  // Bottom
+  position[0] = 0.0f;
+  position[1] = -radius;
+  position[2] = 0.0f;
+
   int *face = mesh->faces;
   for (int r = 0; r < nstacks; ++r) {
     for (int c = 0; c < nslices; ++c) {
       int next_stack = (r + 1) % (nstacks + 1);
-      int next_slice = (c + 1) % (nslices + 1);
+      int next_slice = (c + 1) % (nslices + 0);
 
-      face[0] = r * (nslices + 1) + c;
-      face[1] = r * (nslices + 1) + next_slice;
-      face[2] = next_stack * (nslices + 1) + c;
+      face[0] = r * nslices + c;
+      face[1] = r * nslices + next_slice;
+      face[2] = next_stack * nslices + c;
       face[3] = face[2];
       face[4] = face[1];
-      face[5] = next_stack * (nslices + 1) + next_slice;
+      face[5] = next_stack * nslices + next_slice;
       face += 6;
     }
   }
 
-  mesh->ComputeMeta();
+  // Now incorporate the bottom and top.
+  int itop = nslices * (nstacks + 1);
+  int ibottom = nslices * (nstacks + 1) + 1;
+  for (int c = 0; c < nslices; ++c) {
+    face[0] = (c + 1) % nslices;
+    face[1] = c;
+    face[2] = itop;
+    face += 3;
+
+    face[0] = nstacks * nslices + c;
+    face[1] = nstacks * nslices + (c + 1) % nslices;
+    face[2] = ibottom;
+    face += 3;
+  }
+
+  // TODO do this manually
+  /* mesh->ComputeMeta(); */
 
   return mesh;
 }
