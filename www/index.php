@@ -11,8 +11,6 @@
   <script src="jquery.js"></script>
   <script src="jquery-ui/jquery-ui.js"></script>
   <script src="js-cookie/src/js.cookie.js"></script>
-  <link rel="stylesheet" media="screen" type="text/css" href="colorpicker/css/colorpicker.css"/>
-  <script type="text/javascript" src="colorpicker/js/colorpicker.js"></script>
 
   <!-- ThreeJS dependencies -->
   <script src="three-js/build/three.js"></script>
@@ -179,7 +177,6 @@
       <input type="checkbox" id="showCounterclockwise"/>Show counterclockwise faces<br/>
       <input type="checkbox" id="showClockwise"/>Show clockwise faces<br/>
       <input type="checkbox" id="isFlatShaded"/>Flat shading<br/>
-      <div id="modelColor" style="width: 100px; display: inline-block; padding: 5px">Model color</div>
     </div>
   </div>
 
