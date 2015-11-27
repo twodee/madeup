@@ -984,14 +984,14 @@ Trimesh *Polyline<T>::Extrude(const QVector3<T> &axis, T distance, const QMatrix
   }
 
   vector<QVector3<T> > positions;
-  for (int i = 0; i < vertices.size(); ++i) {
+  for (unsigned int i = 0; i < vertices.size(); ++i) {
     positions.push_back(vertices[i].position);
   }
   Trimesh *extruded = new Trimesh(positions, faces);
 
   if (nmetas > 0) {
     float *vertex_meta = extruded->AllocateVertexMetas(nmetas);
-    for (int i = 0; i < vertices.size(); ++i) {
+    for (unsigned int i = 0; i < vertices.size(); ++i) {
       memcpy(vertex_meta, vertices[i].meta, sizeof(float) * nmetas);
       vertex_meta += nmetas;
     }

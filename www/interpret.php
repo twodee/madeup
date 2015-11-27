@@ -52,7 +52,7 @@ if (!(strcmp($in['extension'], 'json') == 0 || strcmp($in['extension'], 'obj') =
 
   // Execute the interpreter and collect its output.
   $lines = array();
-  $command = sprintf("./forn 15 ./merp --timeout 10 --shading %s -o %s --geometry %s %s 2>&1",
+  $command = sprintf("bash -c \"source /etc/profile; rvm use 2.1 2>&1 >/dev/null; ./forn 15 ./merp --timeout 10 --shading %s -o %s --geometry %s %s\" 2>&1",
                      escapeshellarg($in['shading_mode']),
                      $out_path,
                      escapeshellarg($in['geometry_mode']),
@@ -61,7 +61,7 @@ if (!(strcmp($in['extension'], 'json') == 0 || strcmp($in['extension'], 'obj') =
   $out['stdout'] = implode("\n", $lines);
 
   $lines = array();
-  $command = sprintf("./forn 15 ./merp --tree -q %s", $in_path);
+  $command = sprintf("bash -c \"source /etc/profile; rvm use 2.1 2>&1 >/dev/null; ./forn 15 ./merp --tree -q %s\"", $in_path);
   exec($command, $lines, $tree_status);
   $out['tree'] = implode("\n", $lines);
 
