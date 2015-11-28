@@ -69,3 +69,10 @@ end
 
 ##Next
 The `boxes` solidifier excels at building voxelated creations algorithmically. Like `spheres`, it may result in overlapping geometry that will need to be cleaned up before printing. But it's simple. On the other end of the complexity spectrum, we've got the [`surface`](surface.html) solidifier, which is the least automatic of them all.
+
+----------------------------------------------------------------------------------
+
+{:style="text-align: center"}
+[Home](introduction.html)
+[Previous](spheres.html){:.floatleft}
+[Next](surface.html){:.floatright}

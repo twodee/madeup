@@ -55,3 +55,10 @@ The pulling direction doesn't have to be perpendicular to the path. Also, for th
 
 ##Next
 The `extrude` solidifier is great for stretching your model's cross section out into a solid. But what if instead of pulling the cross section out, we spun it around an axis? Read on to learn about [`revolve`](revolve.html).
+
+----------------------------------------------------------------------------------
+
+{:style="text-align: center"}
+[Home](introduction.html)
+[Previous](introduction.html){:.floatleft}
+[Next](revolve.html){:.floatright}

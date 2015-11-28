@@ -1,3 +1,4 @@
+# Drop this into the coderay directory.
 # https://github.com/rubychan/coderay/wiki/Scanner-Requests
 
 # Namespace; use this form instead of CodeRay::Scanners to avoid messages like
@@ -75,7 +76,7 @@ module Scanners
               encoder.text_token match, :comment
             elsif match = scan(/".*?"/)
               encoder.text_token match, :string
-            elsif match = scan(/([-()^+*%|,\[\]:\/<>=!]|\.\.)/)
+            elsif match = scan(/([-(){}^+*%|,\[\]:\/<>=!]|\.\.)/)
               encoder.text_token match, :operator
             elsif match = scan(/ true | false | null /x)
               encoder.text_token match, IDENT_KIND[match]

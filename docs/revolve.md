@@ -157,3 +157,10 @@ revolve 0, 1, 0, 360
 
 ##Next
 The `revolve` solidifier excels at generating radially symmetric models. Speaking of radially symmetric, let's next check out drawing with spheres using the [`spheres`](spheres.html) solidifier.
+
+----------------------------------------------------------------------------------
+
+{:style="text-align: center"}
+[Home](introduction.html)
+[Previous](extrude.html){:.floatleft}
+[Next](spheres.html){:.floatright}

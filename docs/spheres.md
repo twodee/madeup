@@ -84,3 +84,10 @@ Our first example yielded a bunch of loose spheres, which is hardly a printable 
 
 ##Next
 The `spheres` solidifier is useful for chemists and people wanting to add eyes to their models. Rounded models present challenges to many printers. The companion [`boxes`](boxes.html) solidifier, on the other hand, is happy to make very ordinary and printable models.
+
+----------------------------------------------------------------------------------
+
+{:style="text-align: center"}
+[Home](introduction.html)
+[Previous](revolve.html){:.floatleft}
+[Next](boxes.html){:.floatright}
