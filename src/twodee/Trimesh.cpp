@@ -1322,7 +1322,6 @@ Trimesh *Trimesh::GetParametric(const NField<float, 2>& quadric_map, bool wrap_x
     for (int i = 0; i < nvertices; ++i) {
       memcpy(position, quadric_map(i), sizeof(float) * 3);
       memcpy(vertex_meta, &quadric_map(i)[3], sizeof(float) * nmetas);
-      std::cout << "vertex_meta[#](# in 0,4): " << vertex_meta[0] << ", " << vertex_meta[1] << ", " << vertex_meta[2] << ", " << vertex_meta[3] << std::endl;
       position += 3;
       vertex_meta += nmetas;
     }
