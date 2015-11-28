@@ -506,12 +506,14 @@ void Parser::atom() {
   } else if (isUp(Token::REPEAT)) {
     Token repeat_token = tokens[i];
     ++i;
+
     expressionLevel0();
+    Co<Expression> n = popExpression();
+
     if (isUp(Token::NEWLINE)) {
       ++i;
       block();
       if (isUp(Token::END)) {
-        Co<Expression> n = popExpression();
         Co<ExpressionBlock> block = popBlock();
         pushExpression(new ExpressionRepeat(n, block), repeat_token.getLocation(), tokens[i].getLocation());
         ++i;
@@ -520,11 +522,16 @@ void Parser::atom() {
         ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'end'.";
         throw MessagedException(ss.str());
       }
-    } else {
-      std::stringstream ss;
-      ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected a linebreak.";
-      throw MessagedException(ss.str());
     }
+    
+    // Read single-line repeat:
+    //   repeat 4 print "hi"
+    else {
+      expressionLevel0();
+      Co<Expression> body = popExpression();
+      pushExpression(new ExpressionRepeat(n, body), repeat_token.getLocation(), body->getSourceLocation());
+    }
+
   } else if (isUp(Token::REPEATWICH)) {
     Token repeat_token = tokens[i];
     ++i;
@@ -902,9 +909,9 @@ void Parser::atom() {
           throw MessagedException(ss.str());
         }
       } else {
-        std::stringstream ss;
-        ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected a linebreak.";
-        throw MessagedException(ss.str());
+        expressionLevel0();
+        Co<Expression> body = popExpression();
+        pushExpression(new ExpressionFor(iterator_id, start, stop, by, body, is_inclusive), for_token.getLocation(), body->getSourceLocation());
       }
     } else {
       std::stringstream ss;
