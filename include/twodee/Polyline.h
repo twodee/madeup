@@ -405,7 +405,6 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
     }
 
     const T *meta = &(*this)(vi)[3];
-    std::cout << "meta[#](# in 0,4): " << meta[0] << ", " << meta[1] << ", " << meta[2] << ", " << meta[3] << std::endl;
 
     // See if we need to round this bend. We round if two things are true: 1)
     // the bend exceeds the maximum allowed, and 2) we're not an endpoint node
@@ -618,7 +617,6 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
   int i = 0;
   while (c.HasNext()) {
     c.Next();
-    std::cout << "vertices[i].meta[#](# in 0,4): " << vertices[i].meta[0] << ", " << vertices[i].meta[1] << ", " << vertices[i].meta[2] << ", " << vertices[i].meta[3] << std::endl;
     memcpy(img(c), &vertices[i].position[0], sizeof(T) * 3);
     memcpy(&img(c)[3], vertices[i].meta, sizeof(T) * nmetas);
     ++i;
