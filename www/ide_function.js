@@ -1462,12 +1462,17 @@ function convertTextToBlocks(source) {
 }
 
 var allGeometry = undefined;
+var timeOfLatestRun = undefined;
+
 function run(source, mode) {
+  timeOfLatestRun = new Date().getTime();
+
   $.ajax({
     type: 'POST',
     url: 'interpret.php',
     data: JSON.stringify(
       {
+        timestamp: timeOfLatestRun,
         source: source,
         extension: 'json',
         geometry_mode: mode,
@@ -1477,6 +1482,11 @@ function run(source, mode) {
     contentType: 'application/json; charset=utf-8',
     dataType: 'json',
     success: function(data) {
+      // Only listen to responses to latest run.
+      if (data['timestamp'] != timeOfLatestRun) {
+        return;
+      }
+
       var sansDebug = data['stdout'].replace(/^Debug:.*$\n/gm, '');
       if (sansDebug.length > 0) {
         console.log(sansDebug);

@@ -14,14 +14,17 @@ if (isset($_REQUEST['source'])) {
 //   geometry_mode: One of the geometry modes recognized by the interpreter.
 //   extension: One of json or obj.
 //   tag: The name of the model used for exporting.
+//   timestamp: Time request submitted.
 
 // $out is a dictionary we send back to the client with the following 
 // key-value pairs:
-//   exit_status: the exit value of the interpreter
-//   stdout: the interpreter's stdout
-//   model: the JSON representation of the model if in.extension is json,
-//      otherwise undefined
+//   exit_status: The exit value of the interpreter.
+//   stdout: The interpreter's stdout.
+//   model: The JSON representation of the model if in.extension is json,
+//      otherwise undefined.
+//   timestamp: Time request submitted.
 $out = array();
+$out['timestamp'] = $in['timestamp'];
 
 // The interpreter checks that shading_mode and geometry_mode are legal.
 // But we should check that the output path is legal -- that the extension
