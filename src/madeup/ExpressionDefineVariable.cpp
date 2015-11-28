@@ -2,6 +2,7 @@
 #include "madeup/ExpressionDefine.h"
 #include "madeup/ExpressionDefineVariable.h"
 #include "madeup/ExpressionNumber.h"
+#include "madeup/ExpressionUnit.h"
 
 using std::string;
 using std::vector;
@@ -25,7 +26,7 @@ Co<Expression> ExpressionDefineVariable::evaluate(Environment &env) const {
   define->setSource(getSource(), getSourceLocation());
   Co<ExpressionClosure> closure(new ExpressionClosure(define, env));
   env.add(name, closure);
-  return rhs_value;
+  return ExpressionUnit::getSingleton();
 }
 
 /* ------------------------------------------------------------------------- */

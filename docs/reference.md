@@ -251,13 +251,14 @@ print {1, 1} == 1 -- prints false
 ~~~
 
 ###Assignment (`=`)
-Bind a value to a name using the `=` operator. This operator is right-associative, meaning that in an expression with multiple `=` operations, the rightmost `=` will be evaluated first.
+Bind a value to a name using the `=` operator.
 
 {:.mup}
 ~~~
-a = b = 3
-print a -- 3
-print b -- 3
+a = 3
+b = a + 1
+print a -- prints 3
+print b -- prints 4
 sum = a + b -- sum holds 6
 diff = a - b -- diff holds 0
 ~~~

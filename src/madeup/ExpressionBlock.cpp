@@ -1,5 +1,6 @@
 #include "madeup/ExpressionBlock.h"
 #include "madeup/ExpressionClosure.h"
+#include "madeup/ExpressionMesh.h"
 #include "madeup/ExpressionUnit.h"
 
 using std::vector;
@@ -29,6 +30,10 @@ Co<Expression> ExpressionBlock::evaluate(Environment &env) const {
   Co<Expression> value(ExpressionUnit::getSingleton());
   for (vector<Co<Expression> >::const_iterator i = statements.begin(); i != statements.end(); ++i) {
     value = (*i)->evaluate(env);
+    ExpressionMesh *mesh = dynamic_cast<ExpressionMesh *>(value.GetPointer());
+    if (mesh) {
+      env.echoWithoutTransform(mesh->toMesh());
+    }
   }
   return value;
 }

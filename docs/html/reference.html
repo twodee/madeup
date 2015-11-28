@@ -380,14 +380,15 @@
 </div>
 
 <h3 id="assignment-">Assignment (<code>=</code>)</h3>
-<p>Bind a value to a name using the <code>=</code> operator. This operator is right-associative, meaning that in an expression with multiple <code>=</code> operations, the rightmost <code>=</code> will be evaluated first.</p>
+<p>Bind a value to a name using the <code>=</code> operator.</p>
 
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre><span style="color:#606">a</span> = <span style="color:#606">b</span> = <span style="color:#00D">3</span>
-<span style="color:#369;font-weight:bold">print</span> <span style="color:#606">a</span> <span style="color:#777">-- 3</span>
-<span style="color:#369;font-weight:bold">print</span> <span style="color:#606">b</span> <span style="color:#777">-- 3</span>
+  <div class="code"><pre><span style="color:#606">a</span> = <span style="color:#00D">3</span>
+<span style="color:#606">b</span> = <span style="color:#606">a</span> + <span style="color:#00D">1</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#606">a</span> <span style="color:#777">-- prints 3</span>
+<span style="color:#369;font-weight:bold">print</span> <span style="color:#606">b</span> <span style="color:#777">-- prints 4</span>
 <span style="color:#606">sum</span> = <span style="color:#606">a</span> + <span style="color:#606">b</span> <span style="color:#777">-- sum holds 6</span>
 <span style="color:#606">diff</span> = <span style="color:#606">a</span> - <span style="color:#606">b</span> <span style="color:#777">-- diff holds 0</span>
 </pre></div>

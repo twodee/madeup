@@ -1976,11 +1976,12 @@ Trimesh::Trimesh(const Trimesh& other) {
   }
 
   nvertex_metas = other.nvertex_metas;
-  if (other.vertex_metas) {
+  if (other.nvertex_metas > 0) {
     vertex_metas = new float[nvertex_metas * nvertices];
     memcpy(vertex_metas, other.vertex_metas, sizeof(float) * nvertex_metas * nvertices);
   }
 
+  ncolor_channels = other.ncolor_channels;
   if (other.colors) {
     colors = new float[3 * nvertices];
     memcpy(colors, other.colors, sizeof(float) * 3 * nvertices);

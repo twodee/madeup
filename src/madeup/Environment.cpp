@@ -674,6 +674,12 @@ void Environment::echo(Co<Trimesh> mesh) {
 
 /* ------------------------------------------------------------------------- */
 
+void Environment::echoWithoutTransform(Co<Trimesh> mesh) {
+  *shapes += *mesh;
+}
+
+/* ------------------------------------------------------------------------- */
+
 void Environment::roll(float degrees) {
   turtle.camera.Roll(degrees);
  
@@ -710,8 +716,6 @@ void Environment::yaw(float degrees) {
 /* ------------------------------------------------------------------------- */
 
 Trimesh *Environment::getMesh() {
-  /* shapes->ComputeNormals(); */
-  /* shapes->DisconnectFaces(); */
   return shapes;
 }
 
@@ -774,7 +778,6 @@ Co<Trimesh> Environment::polygon(bool is_flipped) {
         trimesh->ReverseWinding();
       }
       *trimesh *= xforms.top();
-      *shapes += *trimesh;
     }
   }
 
@@ -837,8 +840,6 @@ Co<Trimesh> Environment::dowel(float twist, float max_bend) {
 
         delete line;
         line = NULL;
-
-        *shapes += *trimesh;
       }
     }
   }
@@ -1013,8 +1014,6 @@ Co<Trimesh> Environment::tube(float twist, float max_bend) {
 
           *trimesh += *innermesh;
         }
-
-        *shapes += *trimesh;
       }
     }
   }
@@ -1077,7 +1076,6 @@ Co<Trimesh> Environment::revolve() {
         trimesh = Co<Trimesh>(line->Revolve(QVector3<float>(x, y, z), nsides, degrees));
         trimesh->MigrateVertexMetasToColors(0, 1, 2);
         *trimesh *= xforms.top();
-        *shapes += *trimesh;
       }
     }
   }
@@ -1113,7 +1111,6 @@ Co<Trimesh> Environment::extrude(const QVector3<float> &axis, float length) {
 
       trimesh = Co<Trimesh>(line->Extrude(axis, length, xforms.top()));
       trimesh->MigrateVertexMetasToColors(0, 1, 2);
-      *shapes += *trimesh;
     } 
   }
 
@@ -1150,7 +1147,6 @@ Co<Trimesh> Environment::spheres() {
 
       *trimesh *= xforms.top();
       *trimesh += run[i].position;
-      *shapes += *trimesh;
     }
   }
 
@@ -1181,7 +1177,6 @@ Co<Trimesh> Environment::boxes() {
 
       *trimesh *= xforms.top();
       *trimesh += run[i].position;
-      *shapes += *trimesh;
     }
   }
 
@@ -1265,7 +1260,6 @@ Co<Trimesh> Environment::blobs(float grain, float iso) {
       float *positions;
       field.GetIsocontour(iso, ntriangles, positions);
       trimesh = Co<Trimesh>(new Trimesh(ntriangles, positions));
-      *shapes += *trimesh;
       *trimesh += min;
       *trimesh *= xforms.top();
 
@@ -1308,7 +1302,6 @@ Co<Trimesh> Environment::surface(int width, int height) {
     trimesh = Co<Trimesh>(Trimesh::GetParametric(grid));
     trimesh->MigrateVertexMetasToColors(0, 1, 2);
     *trimesh *= xforms.top();
-    *shapes += *trimesh;
   }
 
   paths.push_back(vector<Turtle>());
