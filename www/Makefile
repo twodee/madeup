@@ -14,7 +14,7 @@ check:
 		exit 1; \
 	fi
 
-libdeps: $(WWW_ROOT)/ace $(WWW_ROOT)/three-js $(WWW_ROOT)/jquery.js $(WWW_ROOT)/js-cookie $(WWW_ROOT)/jquery-ui $(WWW_ROOT)/colorpicker $(WWW_ROOT)/blockly $(WWW_ROOT)/closure-library $(WWW_ROOT)/filesaver
+libdeps: $(WWW_ROOT)/ace $(WWW_ROOT)/three-js $(WWW_ROOT)/jquery.js $(WWW_ROOT)/js-cookie $(WWW_ROOT)/jquery-ui $(WWW_ROOT)/blockly $(WWW_ROOT)/closure-library $(WWW_ROOT)/filesaver
 
 init: libdeps madeup all
 
@@ -47,12 +47,6 @@ $(WWW_ROOT)/jquery-ui:
 	sudo unzip -d $(WWW_ROOT) $(WWW_ROOT)/jquery-ui.zip
 	sudo ln -s $(WWW_ROOT)/jquery-ui-$(JQUERY_UI_VERSION) $(WWW_ROOT)/jquery-ui
 	sudo chmod -R a+rX $(WWW_ROOT)/jquery-ui $(WWW_ROOT)/jquery-ui-$(JQUERY_UI_VERSION)
-
-$(WWW_ROOT)/colorpicker:
-	sudo mkdir -p $(WWW_ROOT)/colorpicker
-	sudo curl -o $(WWW_ROOT)/colorpicker/colorpicker.zip http://www.eyecon.ro/colorpicker/colorpicker.zip
-	sudo unzip -d $(WWW_ROOT)/colorpicker $(WWW_ROOT)/colorpicker/colorpicker.zip
-	sudo chmod -R a+rX $(WWW_ROOT)/colorpicker
 
 $(WWW_ROOT)/three-js:
 	sudo git clone https://github.com/mrdoob/three.js.git $(WWW_ROOT)/three-js

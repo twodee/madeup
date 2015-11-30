@@ -222,3 +222,9 @@ dowel 1
 
 ##Next
 You've seen the `dowel` solidifier. Let's now check out [`extrude`](extrude.html).
+
+----------------------------------------------------------------------------------
+
+{:style="text-align: center"}
+[Home](introduction.html)
+[Next](extrude.html){:.floatright}

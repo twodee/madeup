@@ -69,6 +69,7 @@ class Environment {
     void home();
     void reverse();
     void echo(Co<Trimesh> mesh);
+    void echoWithoutTransform(Co<Trimesh> mesh);
     void yaw(float degrees);
     void pitch(float degrees);
     void roll(float degrees);

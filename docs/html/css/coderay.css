@@ -190,3 +190,17 @@ p {
 h1, h2 {
 	font-family: sans-serif;
 }
+
+.floatleft {
+  float: left;
+}
+
+.floatright {
+  float: right;
+}
+
+.floatcenter {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}

@@ -7,7 +7,9 @@ The easiest way to write Madeup programs is through its [web client](http://made
 Madeup is still in alpha stage, so you will likely discover bugs, slowness, and missing features. We invite bug reports, contributions, and patience.
 
 ## Building the Interpreter
-If you'd like to build the Madeup interpreter on your local machine, you can follow these steps:
+If you'd like to build the Madeup interpreter on your local machine, you'll need CMake and a compiler that supports `c++0x`.
+
+Build following these steps:
 
     $ git clone git@github.com:twodee/madeup.git
     $ cd madeup
@@ -16,10 +18,10 @@ If you'd like to build the Madeup interpreter on your local machine, you can fol
     $ cmake ..
     $ make
 
-You'll need a compiler that supports `c++0x` and `cmake`.
-
 ## Building the Web Client
-To build the web client locally, you'll want to set `WWW_ROOT` to the location of your web server. On OS X this defaults to `/Library/WebServer/Documents`. On Linux to `/var/www/madeup`.
+To build and run the web client locally, you'll also need PHP and Ruby installed.
+
+When building, set `WWW_ROOT` to the location of your web server. On OS X this defaults to `/Library/WebServer/Documents`. On Linux to `/var/www/madeup`.
 
     $ cd build
     $ cmake -DWWW_ROOT=path/to/webserver ..
@@ -32,3 +34,15 @@ Then you'll want to grab several JavaScript libraries and copy over the document
 Finally, you can copy the actual web client into the web server directory:
 
     $ make www
+
+## Building the Documentation
+Copying the prebuilt documentation doesn't require anything but `make wwwdocs` from the build directory. If you want to make changes the documentation and rebuild the HTML pages, you'll need Ruby and a couple of gems:
+
+    $ gem install coderay kramdown
+
+Then you'll need to let the Coderay gem know about the Madeup scanner:
+
+    $ cd <madeup-source-directory>/docs
+    $ ln -s madeup_scanner.rb $GEM_HOME/gems/coderay-<version>/lib/coderay/scanners/madeup.rb
+
+To rebuild the HTML, run `make` from the `docs` source directory---not the build directory.

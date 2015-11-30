@@ -14,14 +14,17 @@ if (isset($_REQUEST['source'])) {
 //   geometry_mode: One of the geometry modes recognized by the interpreter.
 //   extension: One of json or obj.
 //   tag: The name of the model used for exporting.
+//   timestamp: Time request submitted.
 
 // $out is a dictionary we send back to the client with the following 
 // key-value pairs:
-//   exit_status: the exit value of the interpreter
-//   stdout: the interpreter's stdout
-//   model: the JSON representation of the model if in.extension is json,
-//      otherwise undefined
+//   exit_status: The exit value of the interpreter.
+//   stdout: The interpreter's stdout.
+//   model: The JSON representation of the model if in.extension is json,
+//      otherwise undefined.
+//   timestamp: Time request submitted.
 $out = array();
+$out['timestamp'] = $in['timestamp'];
 
 // The interpreter checks that shading_mode and geometry_mode are legal.
 // But we should check that the output path is legal -- that the extension
@@ -50,9 +53,22 @@ if (!(strcmp($in['extension'], 'json') == 0 || strcmp($in['extension'], 'obj') =
   error_log("Input file: $in_path");
   error_log("Output file: $out_path");
 
-  // Execute the interpreter and collect its output.
+  if (preg_match('/^--\s*timeout\s*=\s*(\d+)/m', $in['source'], $timeout_matches)) {
+    $timeout = $timeout_matches[1]; 
+    if ($timeout < 1) {
+      $timeout = 15;
+    }
+  } else {
+    $timeout = 15;
+  }
+
+  error_log("Timeout: $timeout");
+  $forn_timeout = $timeout + 5;
+
+  // Execute the interpreter and collect its output. Forn requires 
+  // Process.spawn, which isn't available in older Rubies.
   $lines = array();
-  $command = sprintf("./forn 15 ./merp --timeout 10 --shading %s -o %s --geometry %s %s 2>&1",
+  $command = sprintf("bash --login -c \"rvm use 2.1 2>/dev/null >/dev/null; ./forn $forn_timeout ./merp --timeout $timeout --shading %s -o %s --geometry %s %s\" 2>&1",
                      escapeshellarg($in['shading_mode']),
                      $out_path,
                      escapeshellarg($in['geometry_mode']),
@@ -61,7 +77,7 @@ if (!(strcmp($in['extension'], 'json') == 0 || strcmp($in['extension'], 'obj') =
   $out['stdout'] = implode("\n", $lines);
 
   $lines = array();
-  $command = sprintf("./forn 15 ./merp --tree -q %s", $in_path);
+  $command = sprintf("bash --login -c \"rvm use 2.1 2>/dev/null >/dev/null; ./forn $forn_timeout ./merp --tree -q %s\"", $in_path);
   exec($command, $lines, $tree_status);
   $out['tree'] = implode("\n", $lines);
 

@@ -105,6 +105,7 @@ Environment::Environment(const Environment &other) :
 
 void Environment::prime() {
   shapes = new Trimesh(0, 0);
+  shapes->AllocateVertexColors();
 
   Co<Environment> globals(new Environment());;
 
@@ -673,6 +674,12 @@ void Environment::echo(Co<Trimesh> mesh) {
 
 /* ------------------------------------------------------------------------- */
 
+void Environment::echoWithoutTransform(Co<Trimesh> mesh) {
+  *shapes += *mesh;
+}
+
+/* ------------------------------------------------------------------------- */
+
 void Environment::roll(float degrees) {
   turtle.camera.Roll(degrees);
  
@@ -709,8 +716,6 @@ void Environment::yaw(float degrees) {
 /* ------------------------------------------------------------------------- */
 
 Trimesh *Environment::getMesh() {
-  /* shapes->ComputeNormals(); */
-  /* shapes->DisconnectFaces(); */
   return shapes;
 }
 
@@ -758,11 +763,21 @@ Co<Trimesh> Environment::polygon(bool is_flipped) {
       }
 
       trimesh = Co<Trimesh>(line->Triangulate());
+      
+      // Add per vertex colors to mesh.
+      float *colors = trimesh->AllocateVertexColors();
+      float *color = colors;
+      for (unsigned int i = 0; i < run.size(); ++i) {
+        color[0] = run[i].rgb[0];
+        color[1] = run[i].rgb[1];
+        color[2] = run[i].rgb[2];
+        color += 3;
+      }
+
       if (is_flipped) {
         trimesh->ReverseWinding();
       }
       *trimesh *= xforms.top();
-      *shapes += *trimesh;
     }
   }
 
@@ -797,12 +812,15 @@ Co<Trimesh> Environment::dowel(float twist, float max_bend) {
         float radius = run[0].outer_radius;
         bool is_homoradius = true;
 
-        Polyline<float> *line = new Polyline<float>(run.size(), 4, mode);
+        Polyline<float> *line = new Polyline<float>(run.size(), 7, mode);
         for (unsigned int i = 0; i < run.size(); ++i) {
           (*line)(i)[0] = run[i].position[0];
           (*line)(i)[1] = run[i].position[1];
           (*line)(i)[2] = run[i].position[2];
           (*line)(i)[3] = run[i].outer_radius;
+          (*line)(i)[4] = run[i].rgb[0];
+          (*line)(i)[5] = run[i].rgb[1];
+          (*line)(i)[6] = run[i].rgb[2];
           is_homoradius = is_homoradius && fabs(run[i].outer_radius - radius) < 1.0e-3f;
         }
 
@@ -817,12 +835,11 @@ Co<Trimesh> Environment::dowel(float twist, float max_bend) {
         }
 
         trimesh = Co<Trimesh>(line->Dowel(nsides, radius, true, twist, max_bend));
+        trimesh->MigrateVertexMetasToColors(1, 2, 3);
         *trimesh *= xforms.top();
 
         delete line;
         line = NULL;
-
-        *shapes += *trimesh;
       }
     }
   }
@@ -858,12 +875,15 @@ Co<Trimesh> Environment::tube(float twist, float max_bend) {
         float radius = run[0].outer_radius;
         bool is_homoradius = true;
 
-        Polyline<float> *line = new Polyline<float>(run.size(), 4, mode);
+        Polyline<float> *line = new Polyline<float>(run.size(), 7, mode);
         for (unsigned int i = 0; i < run.size(); ++i) {
           (*line)(i)[0] = run[i].position[0];
           (*line)(i)[1] = run[i].position[1];
           (*line)(i)[2] = run[i].position[2];
           (*line)(i)[3] = run[i].outer_radius;
+          (*line)(i)[4] = run[i].rgb[0];
+          (*line)(i)[5] = run[i].rgb[1];
+          (*line)(i)[6] = run[i].rgb[2];
           is_homoradius = is_homoradius && fabs(run[i].outer_radius - radius) < 1.0e-3f;
         }
 
@@ -887,12 +907,15 @@ Co<Trimesh> Environment::tube(float twist, float max_bend) {
           float radius = run[0].inner_radius;
           bool is_homoradius = true;
 
-          Polyline<float> *line = new Polyline<float>(run.size(), 4, mode);
+          Polyline<float> *line = new Polyline<float>(run.size(), 7, mode);
           for (unsigned int i = 0; i < run.size(); ++i) {
             (*line)(i)[0] = run[i].position[0];
             (*line)(i)[1] = run[i].position[1];
             (*line)(i)[2] = run[i].position[2];
             (*line)(i)[3] = run[i].inner_radius;
+            (*line)(i)[4] = run[i].rgb[0];
+            (*line)(i)[5] = run[i].rgb[1];
+            (*line)(i)[6] = run[i].rgb[2];
             is_homoradius = is_homoradius && fabs(run[i].outer_radius - radius) < 1.0e-3f;
           }
 
@@ -915,9 +938,20 @@ Co<Trimesh> Environment::tube(float twist, float max_bend) {
             memcpy(positions, innermesh->GetPositions(), sizeof(float) * 3 * nsides);
             memcpy(positions + 3 * nsides, trimesh->GetPositions(), sizeof(float) * 3 * nsides);
 
-            float *position = positions;
-            for (int vi = 0; vi < nsides * 2; ++vi) {
-              position += 3;
+            float *colors = cap_a->AllocateVertexColors();
+
+            // The first half of the vertices get their color from the inner mesh.
+            float *color = colors;
+            for (int ci = 0; ci < nsides; ++ci) {
+              memcpy(color, innermesh->GetColors(), sizeof(float) * 3);
+              color += 3;
+            }
+
+            // The second half of the vertices get their color from the outer mesh.
+            color = colors + nsides * 3;
+            for (int ci = 0; ci < nsides; ++ci) {
+              memcpy(color, trimesh->GetColors(), sizeof(float) * 3);
+              color += 3;
             }
 
             // Connect up the vertices.
@@ -942,9 +976,20 @@ Co<Trimesh> Environment::tube(float twist, float max_bend) {
             memcpy(positions, innermesh->GetPositions() + (innermesh->GetVertexCount() - nsides) * 3, sizeof(float) * 3 * nsides);
             memcpy(positions + 3 * nsides, trimesh->GetPositions() + (trimesh->GetVertexCount() - nsides) * 3, sizeof(float) * 3 * nsides);
 
-            position = positions;
-            for (int vi = 0; vi < nsides * 2; ++vi) {
-              position += 3;
+            colors = cap_b->AllocateVertexColors();
+
+            // The first half of the vertices get their color from the inner mesh.
+            color = colors;
+            for (int ci = 0; ci < nsides; ++ci) {
+              memcpy(color, innermesh->GetColors() + (innermesh->GetVertexCount() - nsides) * 3, sizeof(float) * 3);
+              color += 3;
+            }
+
+            // The second half of the vertices get their color from the outer mesh.
+            color = colors + nsides * 3;
+            for (int ci = 0; ci < nsides; ++ci) {
+              memcpy(color, trimesh->GetColors() + (trimesh->GetVertexCount() - nsides) * 3, sizeof(float) * 3);
+              color += 3;
             }
 
             // Connect up the vertices.
@@ -969,8 +1014,6 @@ Co<Trimesh> Environment::tube(float twist, float max_bend) {
 
           *trimesh += *innermesh;
         }
-
-        *shapes += *trimesh;
       }
     }
   }
@@ -1003,11 +1046,14 @@ Co<Trimesh> Environment::revolve() {
       }
 
       if (run.size() > 0) {
-        Polyline<float> *line = new Polyline<float>(run.size(), 3, mode);
+        Polyline<float> *line = new Polyline<float>(run.size(), 6, mode);
         for (unsigned int i = 0; i < run.size(); ++i) {
           (*line)(i)[0] = run[i].position[0];
           (*line)(i)[1] = run[i].position[1];
           (*line)(i)[2] = run[i].position[2];
+          (*line)(i)[3] = run[i].rgb[0];
+          (*line)(i)[4] = run[i].rgb[1];
+          (*line)(i)[5] = run[i].rgb[2];
         }
 
         Co<Expression> nsides_value = (*this)["nsides"]->evaluate(*this);
@@ -1023,18 +1069,13 @@ Co<Trimesh> Environment::revolve() {
         Co<Expression> z_value = (*this)["z"]->evaluate(*this);
         float z = dynamic_cast<ExpressionNumber *>(z_value.GetPointer())->toReal();
 
-        /* Co<Expression> fracture_value = (*this)["fracture"]->evaluate(*this); */
-        /* ExpressionNumber *fracture_number = dynamic_cast<ExpressionNumber *>(fracture_value.GetPointer()); */
-        /* float fracture = fracture_number->toReal(); */
-        /* line->Fracture(fracture); */
-
         Co<Expression> degrees_expr = (*this)["degrees"]->evaluate(*this);
         ExpressionNumber *degrees_number = dynamic_cast<ExpressionNumber *>(degrees_expr.GetPointer());
         float degrees = degrees_number->toReal();
 
         trimesh = Co<Trimesh>(line->Revolve(QVector3<float>(x, y, z), nsides, degrees));
+        trimesh->MigrateVertexMetasToColors(0, 1, 2);
         *trimesh *= xforms.top();
-        *shapes += *trimesh;
       }
     }
   }
@@ -1058,15 +1099,18 @@ Co<Trimesh> Environment::extrude(const QVector3<float> &axis, float length) {
         run.pop_back();
       }
 
-      Polyline<float> *line = new Polyline<float>(run.size(), 3, Polyline<float>::CLOSED);
+      Polyline<float> *line = new Polyline<float>(run.size(), 6, Polyline<float>::CLOSED);
       for (unsigned int i = 0; i < run.size(); ++i) {
         (*line)(i)[0] = run[i].position[0];
         (*line)(i)[1] = run[i].position[1];
         (*line)(i)[2] = run[i].position[2];
+        (*line)(i)[3] = run[i].rgb[0];
+        (*line)(i)[4] = run[i].rgb[1];
+        (*line)(i)[5] = run[i].rgb[2];
       }
 
       trimesh = Co<Trimesh>(line->Extrude(axis, length, xforms.top()));
-      *shapes += *trimesh;
+      trimesh->MigrateVertexMetasToColors(0, 1, 2);
     } 
   }
 
@@ -1084,16 +1128,25 @@ Co<Trimesh> Environment::spheres() {
   if (geometry_mode == GeometryMode::SURFACE) {
     Co<Expression> nsides_value = (*this)["nsides"]->evaluate(*this);
     int nsides = dynamic_cast<ExpressionInteger *>(nsides_value.GetPointer())->toInteger();
-    if (nsides < 4) {
-      throw UnlocatedException("I expect nsides to be at least 4 for the spheres solidifier.");
+    if (nsides < 3) {
+      throw UnlocatedException("I expect nsides to be at least 3 for the spheres solidifier.");
     }
 
     for (unsigned int i = 0; i < run.size(); ++i) {
       trimesh = Co<Trimesh>(Trimesh::GetSphere(nsides, nsides / 2, run[i].outer_radius));
+ 
+      // Add per vertex colors to mesh.
+      float *colors = trimesh->AllocateVertexColors();
+      float *color = colors;
+      for (int vi = 0; vi < trimesh->GetVertexCount(); ++vi) {
+        color[0] = run[i].rgb[0];
+        color[1] = run[i].rgb[1];
+        color[2] = run[i].rgb[2];
+        color += 3;
+      }
 
       *trimesh *= xforms.top();
       *trimesh += run[i].position;
-      *shapes += *trimesh;
     }
   }
 
@@ -1112,9 +1165,18 @@ Co<Trimesh> Environment::boxes() {
     for (unsigned int i = 0; i < run.size(); ++i) {
       trimesh = Co<Trimesh>(Trimesh::GetBox(run[i].outer_radius));
 
+      // Add per vertex colors to mesh.
+      float *colors = trimesh->AllocateVertexColors();
+      float *color = colors;
+      for (int vi = 0; vi < trimesh->GetVertexCount(); ++vi) {
+        color[0] = run[i].rgb[0];
+        color[1] = run[i].rgb[1];
+        color[2] = run[i].rgb[2];
+        color += 3;
+      }
+
       *trimesh *= xforms.top();
       *trimesh += run[i].position;
-      *shapes += *trimesh;
     }
   }
 
@@ -1198,7 +1260,6 @@ Co<Trimesh> Environment::blobs(float grain, float iso) {
       float *positions;
       field.GetIsocontour(iso, ntriangles, positions);
       trimesh = Co<Trimesh>(new Trimesh(ntriangles, positions));
-      *shapes += *trimesh;
       *trimesh += min;
       *trimesh *= xforms.top();
 
@@ -1246,12 +1307,15 @@ Co<Trimesh> Environment::surface(int width, int height) {
       grid(c)[0] = run[i].position[0];
       grid(c)[1] = run[i].position[1];
       grid(c)[2] = run[i].position[2];
+      grid(c)[3] = run[i].rgb[0];
+      grid(c)[4] = run[i].rgb[1];
+      grid(c)[5] = run[i].rgb[2];
       ++i;
     }
 
     trimesh = Co<Trimesh>(Trimesh::GetParametric(grid, false, false));
+    trimesh->MigrateVertexMetasToColors(0, 1, 2);
     *trimesh *= xforms.top();
-    *shapes += *trimesh;
   }
 
   paths.push_back(vector<Turtle>());
@@ -1375,7 +1439,7 @@ void Environment::checkTimeout(const SourceLocation &location) {
   auto now_time = std::chrono::high_resolution_clock::now();
   if (std::chrono::duration<double>(now_time - start_time).count() > max_seconds) {
     std::stringstream ss;
-    ss << location.toAnchor() << ": Uh oh. Your program was taking a long time to finish, and I was worried that it would run forever. I stopped it after " << max_seconds << " seconds.";
+    ss << location.toAnchor() << ": Uh oh. Your program was taking a long time to finish, and I was worried that it would run forever. I stopped it after " << max_seconds << " second" << (max_seconds == 1 ? "" : "s") << ".";
     throw MessagedException(ss.str());
   }
 }
