@@ -1224,6 +1224,20 @@ Co<Trimesh> Environment::surface(int width, int height) {
       throw UnlocatedException(ss.str());
     }
 
+    bool wrap_y = true;
+    for (int c = 0; wrap_y && c < width; ++c) {
+      if (run[c].position.GetDistanceTo(run[(height - 1) * width + c].position) > 1.0e-3f) {
+        wrap_y = false;
+      }
+    }
+
+    bool wrap_x = true;
+    for (int r = 0; wrap_x && r < height; ++r) {
+      if (run[r * width + 0].position.GetDistanceTo(run[(r + 1) * width - 1].position) > 1.0e-3f) {
+        wrap_x = false;
+      }
+    }
+
     NField<float, 2> grid(QVector2<int>(width, height), 3);
     NFieldIterator<2> c(grid.GetDimensions());
     int i = 0;
@@ -1235,7 +1249,7 @@ Co<Trimesh> Environment::surface(int width, int height) {
       ++i;
     }
 
-    trimesh = Co<Trimesh>(Trimesh::GetParametric(grid));
+    trimesh = Co<Trimesh>(Trimesh::GetParametric(grid, false, false));
     *trimesh *= xforms.top();
     *shapes += *trimesh;
   }
