@@ -1124,6 +1124,7 @@ Co<Trimesh> Environment::extrude(const QVector3<float> &axis, float length) {
 
 Co<Trimesh> Environment::spheres() {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
+  trimesh->AllocateVertexColors();
 
   if (geometry_mode == GeometryMode::SURFACE) {
     Co<Expression> nsides_value = (*this)["nsides"]->evaluate(*this);
@@ -1133,20 +1134,21 @@ Co<Trimesh> Environment::spheres() {
     }
 
     for (unsigned int i = 0; i < run.size(); ++i) {
-      trimesh = Co<Trimesh>(Trimesh::GetSphere(nsides, nsides / 2, run[i].outer_radius));
+      Co<Trimesh> sphere(Trimesh::GetSphere(nsides, nsides / 2, run[i].outer_radius));
  
       // Add per vertex colors to mesh.
-      float *colors = trimesh->AllocateVertexColors();
+      float *colors = sphere->AllocateVertexColors();
       float *color = colors;
-      for (int vi = 0; vi < trimesh->GetVertexCount(); ++vi) {
+      for (int vi = 0; vi < sphere->GetVertexCount(); ++vi) {
         color[0] = run[i].rgb[0];
         color[1] = run[i].rgb[1];
         color[2] = run[i].rgb[2];
         color += 3;
       }
 
-      *trimesh *= xforms.top();
-      *trimesh += run[i].position;
+      *sphere *= xforms.top();
+      *sphere += run[i].position;
+      *trimesh += *sphere;
     }
   }
 
@@ -1160,23 +1162,25 @@ Co<Trimesh> Environment::spheres() {
 
 Co<Trimesh> Environment::boxes() {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
+  trimesh->AllocateVertexColors();
 
   if (geometry_mode == GeometryMode::SURFACE) {
     for (unsigned int i = 0; i < run.size(); ++i) {
-      trimesh = Co<Trimesh>(Trimesh::GetBox(run[i].outer_radius));
+      Co<Trimesh> box(Trimesh::GetBox(run[i].outer_radius));
 
       // Add per vertex colors to mesh.
-      float *colors = trimesh->AllocateVertexColors();
+      float *colors = box->AllocateVertexColors();
       float *color = colors;
-      for (int vi = 0; vi < trimesh->GetVertexCount(); ++vi) {
+      for (int vi = 0; vi < box->GetVertexCount(); ++vi) {
         color[0] = run[i].rgb[0];
         color[1] = run[i].rgb[1];
         color[2] = run[i].rgb[2];
         color += 3;
       }
 
-      *trimesh *= xforms.top();
-      *trimesh += run[i].position;
+      *box *= xforms.top();
+      *box += run[i].position;
+      *trimesh += *box;
     }
   }
 
