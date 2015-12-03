@@ -151,7 +151,7 @@
       <p></p> 
       <a href="#" id="fileDelete" class="fileLink">Delete</a><br/>
       <hr>
-      <span id="mups"></span>
+      <div id="mupsContainer"><div id="mups"></div></div>
     </div>
 
     <div id="editorPopup" class="popup">

@@ -149,3 +149,12 @@ body {
 .fileLink {
   color: #FFFFFF;
 }
+
+#mupsContainer {
+  height: 400px;
+}
+
+#mups {
+  height: 100%;
+  overflow: auto;
+}
