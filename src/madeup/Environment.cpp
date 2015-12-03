@@ -746,6 +746,7 @@ void Environment::pop() {
 
 Co<Trimesh> Environment::polygon(bool is_flipped) {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
+  trimesh->AllocateVertexColors();
   
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() > 0) {
@@ -791,6 +792,7 @@ Co<Trimesh> Environment::polygon(bool is_flipped) {
 
 Co<Trimesh> Environment::dowel(float twist, float max_bend) {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
+  trimesh->AllocateVertexColors();
 
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() >= 2) {
@@ -854,6 +856,7 @@ Co<Trimesh> Environment::dowel(float twist, float max_bend) {
 
 Co<Trimesh> Environment::tube(float twist, float max_bend) {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
+  trimesh->AllocateVertexColors();
 
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() >= 2) {
@@ -1028,6 +1031,7 @@ Co<Trimesh> Environment::tube(float twist, float max_bend) {
 
 Co<Trimesh> Environment::revolve() {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
+  trimesh->AllocateVertexColors();
 
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() >= 2) {
@@ -1090,6 +1094,7 @@ Co<Trimesh> Environment::revolve() {
 
 Co<Trimesh> Environment::extrude(const QVector3<float> &axis, float length) {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
+  trimesh->AllocateVertexColors();
 
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() > 0) {
@@ -1194,6 +1199,7 @@ Co<Trimesh> Environment::boxes() {
 
 Co<Trimesh> Environment::blobs(float grain, float iso) {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
+  trimesh->AllocateVertexColors();
 
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() > 0) {
@@ -1281,6 +1287,7 @@ Co<Trimesh> Environment::blobs(float grain, float iso) {
 
 Co<Trimesh> Environment::surface(int width, int height) {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
+  trimesh->AllocateVertexColors(3);
 
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() != (unsigned int) (width * height)) {
@@ -1303,7 +1310,7 @@ Co<Trimesh> Environment::surface(int width, int height) {
       }
     }
 
-    NField<float, 2> grid(QVector2<int>(width, height), 3);
+    NField<float, 2> grid(QVector2<int>(width, height), 6);
     NFieldIterator<2> c(grid.GetDimensions());
     int i = 0;
     while (c.HasNext()) {
