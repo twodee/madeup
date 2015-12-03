@@ -61,7 +61,9 @@ Trimesh::Trimesh(int nvertices, int nfaces) :
   positions(new float[nvertices * 3]),
   faces(new int[nfaces * 3]),
   normals(NULL),
+  ncolor_channels(0),
   colors(NULL),
+  nvertex_metas(0),
   vertex_metas(NULL),
   tex1D_coords(NULL),
   tex2D_coords(NULL),
@@ -77,7 +79,9 @@ Trimesh::Trimesh(const std::vector<td::QVector3<float> >& positions, const std::
   positions(new float[nvertices * 3]),
   faces(new int[nfaces * 3]),
   normals(NULL),
+  ncolor_channels(0),
   colors(NULL),
+  nvertex_metas(0),
   vertex_metas(NULL),
   tex1D_coords(NULL),
   tex2D_coords(NULL),
@@ -107,7 +111,9 @@ Trimesh::Trimesh(int ntriangles, const float *positions) :
   positions(new float[ntriangles * 3 * 3]),
   faces(new int[ntriangles * 3]),
   normals(NULL),
+  ncolor_channels(0),
   colors(NULL),
+  nvertex_metas(0),
   vertex_metas(NULL),
   tex1D_coords(NULL),
   tex2D_coords(NULL),
@@ -1031,9 +1037,9 @@ void Trimesh::NullBuffers() {
   nvertices = 0;
   nfaces = 0;
   ncolor_channels = 0;
-  nvertex_metas = 0;
   positions = normals = colors = tex1D_coords = tex2D_coords = tex3D_coords = occlusion = NULL;
   faces = NULL;
+  nvertex_metas = 0;
   vertex_metas = NULL;
 }
 
@@ -1782,7 +1788,7 @@ void Trimesh::DisconnectFaces() {
       }
 
       if (nvertex_metas > 0) {
-        memcpy(vertex_meta, &vertex_metas[face[vi] * 3], sizeof(float) * nvertex_metas);
+        memcpy(vertex_meta, &vertex_metas[face[vi] * nvertex_metas], sizeof(float) * nvertex_metas);
       }
 
       face[vi] = i;

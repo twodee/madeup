@@ -332,11 +332,11 @@ class Trimesh {
     float *normals;
 
     /** Per-vertex colors */
-    float *colors;
     int ncolor_channels;
+    float *colors;
 
-    float *vertex_metas;
     int nvertex_metas;
+    float *vertex_metas;
 
     /** Per-vertex 1-D texture coordinates */
     float *tex1D_coords;

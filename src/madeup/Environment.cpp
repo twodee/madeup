@@ -746,6 +746,7 @@ void Environment::pop() {
 
 Co<Trimesh> Environment::polygon(bool is_flipped) {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
+  trimesh->AllocateVertexColors();
   
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() > 0) {
@@ -791,6 +792,7 @@ Co<Trimesh> Environment::polygon(bool is_flipped) {
 
 Co<Trimesh> Environment::dowel(float twist, float max_bend) {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
+  trimesh->AllocateVertexColors();
 
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() >= 2) {
@@ -854,6 +856,7 @@ Co<Trimesh> Environment::dowel(float twist, float max_bend) {
 
 Co<Trimesh> Environment::tube(float twist, float max_bend) {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
+  trimesh->AllocateVertexColors();
 
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() >= 2) {
@@ -1028,6 +1031,7 @@ Co<Trimesh> Environment::tube(float twist, float max_bend) {
 
 Co<Trimesh> Environment::revolve() {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
+  trimesh->AllocateVertexColors();
 
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() >= 2) {
@@ -1090,6 +1094,7 @@ Co<Trimesh> Environment::revolve() {
 
 Co<Trimesh> Environment::extrude(const QVector3<float> &axis, float length) {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
+  trimesh->AllocateVertexColors();
 
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() > 0) {
@@ -1124,6 +1129,7 @@ Co<Trimesh> Environment::extrude(const QVector3<float> &axis, float length) {
 
 Co<Trimesh> Environment::spheres() {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
+  trimesh->AllocateVertexColors();
 
   if (geometry_mode == GeometryMode::SURFACE) {
     Co<Expression> nsides_value = (*this)["nsides"]->evaluate(*this);
@@ -1133,20 +1139,21 @@ Co<Trimesh> Environment::spheres() {
     }
 
     for (unsigned int i = 0; i < run.size(); ++i) {
-      trimesh = Co<Trimesh>(Trimesh::GetSphere(nsides, nsides / 2, run[i].outer_radius));
+      Co<Trimesh> sphere(Trimesh::GetSphere(nsides, nsides / 2, run[i].outer_radius));
  
       // Add per vertex colors to mesh.
-      float *colors = trimesh->AllocateVertexColors();
+      float *colors = sphere->AllocateVertexColors();
       float *color = colors;
-      for (int vi = 0; vi < trimesh->GetVertexCount(); ++vi) {
+      for (int vi = 0; vi < sphere->GetVertexCount(); ++vi) {
         color[0] = run[i].rgb[0];
         color[1] = run[i].rgb[1];
         color[2] = run[i].rgb[2];
         color += 3;
       }
 
-      *trimesh *= xforms.top();
-      *trimesh += run[i].position;
+      *sphere *= xforms.top();
+      *sphere += run[i].position;
+      *trimesh += *sphere;
     }
   }
 
@@ -1160,23 +1167,25 @@ Co<Trimesh> Environment::spheres() {
 
 Co<Trimesh> Environment::boxes() {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
+  trimesh->AllocateVertexColors();
 
   if (geometry_mode == GeometryMode::SURFACE) {
     for (unsigned int i = 0; i < run.size(); ++i) {
-      trimesh = Co<Trimesh>(Trimesh::GetBox(run[i].outer_radius));
+      Co<Trimesh> box(Trimesh::GetBox(run[i].outer_radius));
 
       // Add per vertex colors to mesh.
-      float *colors = trimesh->AllocateVertexColors();
+      float *colors = box->AllocateVertexColors();
       float *color = colors;
-      for (int vi = 0; vi < trimesh->GetVertexCount(); ++vi) {
+      for (int vi = 0; vi < box->GetVertexCount(); ++vi) {
         color[0] = run[i].rgb[0];
         color[1] = run[i].rgb[1];
         color[2] = run[i].rgb[2];
         color += 3;
       }
 
-      *trimesh *= xforms.top();
-      *trimesh += run[i].position;
+      *box *= xforms.top();
+      *box += run[i].position;
+      *trimesh += *box;
     }
   }
 
@@ -1190,6 +1199,7 @@ Co<Trimesh> Environment::boxes() {
 
 Co<Trimesh> Environment::blobs(float grain, float iso) {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
+  trimesh->AllocateVertexColors();
 
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() > 0) {
@@ -1277,12 +1287,27 @@ Co<Trimesh> Environment::blobs(float grain, float iso) {
 
 Co<Trimesh> Environment::surface(int width, int height) {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
+  trimesh->AllocateVertexColors(3);
 
   if (geometry_mode == GeometryMode::SURFACE) {
     if (run.size() != (unsigned int) (width * height)) {
       std::stringstream ss;
       ss << "The surface command expected " << width << "x" << height << " vertices. However, " << run.size() << " vertices were visited.";
       throw UnlocatedException(ss.str());
+    }
+
+    bool wrap_y = true;
+    for (int c = 0; wrap_y && c < width; ++c) {
+      if (run[c].position.GetDistanceTo(run[(height - 1) * width + c].position) > 1.0e-3f) {
+        wrap_y = false;
+      }
+    }
+
+    bool wrap_x = true;
+    for (int r = 0; wrap_x && r < height; ++r) {
+      if (run[r * width + 0].position.GetDistanceTo(run[(r + 1) * width - 1].position) > 1.0e-3f) {
+        wrap_x = false;
+      }
     }
 
     NField<float, 2> grid(QVector2<int>(width, height), 6);
@@ -1299,7 +1324,7 @@ Co<Trimesh> Environment::surface(int width, int height) {
       ++i;
     }
 
-    trimesh = Co<Trimesh>(Trimesh::GetParametric(grid));
+    trimesh = Co<Trimesh>(Trimesh::GetParametric(grid, false, false));
     trimesh->MigrateVertexMetasToColors(0, 1, 2);
     *trimesh *= xforms.top();
   }
