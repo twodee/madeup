@@ -13,17 +13,13 @@ body {
 }
 
 #tools {
-  background: #000000;
-  color: #FFFFFF;
   float: left;
   width: 300px;
 }
 
 .popup {
   padding: 5px;
-  background-color: #333333;
   border: 0px;
-  color: white;
   font-size: 10pt;
   outline: none;
   font-family: sans-serif;
@@ -48,7 +44,6 @@ body {
   padding: 0;
   width: 420px;
   height: auto;
-  background-color: #000000;
   z-index: 0;
 }
 
@@ -67,20 +62,16 @@ body {
 
 #blocksEditor {
   display: none;
-  background-color: blue;
   margin: 0px;
 }
 
 #blocksCanvas { 
   position: absolute;
-  background-color: black;
 }
 
 #console {
   font-family: Courier;
   outline: none;
-  background-color: #333333;
-  color: #FFFFFF;
   height: 200px;
   overflow: auto;
   z-index: 1000;
@@ -98,13 +89,11 @@ body {
 }
 
 #menu input[type="button"] {
-  background-color: #000000;
   border: 0px;
   margin-left: 4px;
   margin-right: 4px;
   margin-top: 0px;
   margin-bottom: 0px;
-  color: #FFFFFF;
   font-size: 10pt;
   outline: none;
   pointer-events: auto;
@@ -112,27 +101,21 @@ body {
 }
 
 #menu input[type="button"]:active {
-  background-color: #333333;
 }
 
 .srclink:link {
-  color: #FF9999; 
 }
 
 .srclink:visited {
-  color: #000000; 
 }
 
 .srclink:hover {
-  color: #FF9900; 
 }
 
 .srclink:active {
-  color: #FF99FF; 
 }
 
 #menu {
-  background-color: #000000;
   position: relative;
   margin: 0px;
   padding: 0px;
@@ -147,7 +130,6 @@ body {
 }
 
 .fileLink {
-  color: #FFFFFF;
 }
 
 #mupsContainer {

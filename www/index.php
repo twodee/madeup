@@ -38,6 +38,7 @@
 
   <!-- Madeup IDE dependencies -->
   <link rel="stylesheet" href="ide_skin.css"/>
+  <link rel="stylesheet" href="ide_skin_dark.css" title="theme"/>
   <script src="ide_function.js"></script>
 </head>
 
@@ -157,6 +158,8 @@
     <div id="editorPopup" class="popup">
       <input type="radio" name="editorMode" id="isEditorText" value="Text" checked="checked"/>Text or 
       <input type="radio" name="editorMode" id="isEditorBlocks" value="Blocks"/>Blocks<br/>
+      <input type="radio" name="theme" id="isDark" value="isDark" checked="checked"/>Dark or 
+      <input type="radio" name="theme" id="isLight" value="isLight"/>Light<br/>
       <input type="checkbox" id="autopreview" checked="checked"/>Preview <input type="text" id="nSecondsTillPreview" size="5"/> seconds after last edit<br/>
     </div>
 

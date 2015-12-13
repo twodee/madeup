@@ -1,0 +1,70 @@
+#tools {
+  background: #FF0000;
+  color: #FFFFFF;
+}
+
+.popup {
+  background-color: #CCCCCC;
+  color: #000000;
+}
+
+#left {
+  background-color: #000000;
+}
+
+#console {
+  background-color: #CCCCCC;
+  color: #000000;
+}
+
+#menu input[type="button"] {
+  background-color: #999999;
+  color: #000000;
+}
+
+#menu input[type="button"].open {
+  background-color: #CCCCCC;
+  color: #000000;
+}
+
+#menu input[type="button"].closed {
+  background-color: #999999;
+  color: #000000;
+}
+
+#menu input[type="button"]:active {
+  background-color: #CCCCCC;
+}
+
+.srclink:link {
+  color: #CC9900; 
+}
+
+.srclink:visited {
+  color: #FF9900; 
+}
+
+.srclink:hover {
+  color: #FF9900; 
+}
+
+.srclink:active {
+  color: #FF99FF; 
+}
+
+#menu {
+  background-color: #999999;
+}
+
+.fileLink {
+  color: #000000;
+}
+
+#download.unclickable {
+  color: #CCCCCC !important;
+}
+
+#download.clickable {
+  color: #000000 !important;
+}
+

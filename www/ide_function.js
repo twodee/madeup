@@ -628,10 +628,10 @@ function populateFileMenu() {
 function enableDownload(enable) {
   if (enable) {
     $('#download').prop('disabled', false);
-    $('#download').css('color', '#FFFFFF');
+    $('#download').removeClass('unclickable').addClass('clickable');
   } else {
     $('#download').prop('disabled', true);
-    $('#download').css('color', '#666666');
+    $('#download').removeClass('clickable').addClass('unclickable');
   }
 }
 
@@ -673,8 +673,11 @@ var gridExtent = 10.0;
 var isFlatShaded = true;
 var isEditorText = true;
 var tree = null;
+var preview = undefined;
+var isThemeDark = true;
 var isSourceDirty = false;
 
+var isThemeDarkChanged = false;
 var isEditorTextChanged = false;
 var isShowWireframeChanged = false;
 var isAxisChanged = [false, false, false];
@@ -705,6 +708,7 @@ function saveInCookies() {
   if (isShowWireframeChanged) Cookies.set('showWireframe', showWireframe ? 1 : 0);
   if (isFlatShadedChanged) Cookies.set('isFlatShaded', isFlatShaded ? 1 : 0);
   if (isEditorTextChanged) Cookies.set('isEditorText', isEditorText ? 1 : 0);
+  if (isThemeDarkChanged) Cookies.set('isThemeDark', isThemeDark ? 1 : 0);
   if (isAxisChanged[0]) Cookies.set('axisX', $('#axisX').prop('checked') ? 1 : 0);
   if (isAxisChanged[1]) Cookies.set('axisY', $('#axisY').prop('checked') ? 1 : 0);
   if (isAxisChanged[2]) Cookies.set('axisZ', $('#axisZ').prop('checked') ? 1 : 0);
@@ -731,6 +735,7 @@ function saveInCookies() {
   isFlatShadedChanged = false;
   isShowWireframeChanged = false;
   isEditorTextChanged = false;
+  isThemeDarkChanged = false;
   isShowHeadingsChanged = false;
   isNSecondsTillPreviewChanged = false;
   isGridSpacingChanged = false;
@@ -807,6 +812,16 @@ $(document).ready(function() {
       $("#isEditorText").prop('checked', true);
     } else {
       $("#isEditorBlocks").prop('checked', true);
+    }
+
+    if (Cookies.get('isThemeDark')) {
+      setTheme(parseInt(Cookies.get('isThemeDark')) != 0);
+    }
+
+    if (isThemeDark) {
+      $("#isDark").prop('checked', true);
+    } else {
+      $("#isLight").prop('checked', true);
     }
 
     if (Cookies.get('gridExtent')) {
@@ -930,6 +945,11 @@ $(document).ready(function() {
     hideMenus(); // setEditor may pop open a dialog, which doesn't look good with a menu still open
     var editorMode = $(this).val();
     setEditor(editorMode != "Blocks");
+  });
+
+  $('input[type=radio][name=theme]').change(function() {
+    var isDark = $(this).val() == 'isDark';
+    setTheme(isDark);
   });
 
   $('#showHeadings').click(function() {
@@ -1115,13 +1135,13 @@ $(document).ready(function() {
 
     // Hilite the menu if it's opening.
     if (!$(id).is(":visible")) {
-      $(buttonID).css('background-color', '#333333');
+      $(buttonID).removeClass('closed').addClass('open');
     }
 
     $(id).slideToggle('fast', function() {
       // Unhilite the menu once it's closed.
       if (!$(id).is(":visible")) {
-        $(buttonID).css('background-color', '#000000');
+        $(buttonID).removeClass('open').addClass('closed');
       }
     });
   }
@@ -1309,9 +1329,26 @@ var onEditorChange = function(delta) {
   }, nSecondsTillPreview * 1000);
 }
 
-var preview = undefined;
 function schedulePreview() {
   textEditor.getSession().on('change', onEditorChange);
+}
+
+function setTheme(isDark) {
+  console.log(isDark);
+  if (isThemeDark == isDark) return;
+  isThemeDark = isDark;
+
+  isThemeDarkChanged = true;
+
+  // Update radio buttons to reflect current editor.
+  if (isThemeDark) {
+    $("#isDark").prop('checked', true);
+  } else {
+    $("#isLight").prop('checked', true);
+  }
+
+  $('link[title="theme"]').attr('href', isThemeDark ? 'ide_skin_dark.css' : 'ide_skin_light.css');
+  textEditor.setTheme(isThemeDark ? 'ace/theme/twilight' : 'ace/theme/katzenmilch');
 }
 
 function setEditor(isText) {
@@ -1776,10 +1813,10 @@ function render() {
 function hideMenus(exceptID) {
   if (exceptID === undefined) {
     $('.popup').hide();
-    $('.togglePopup').css('background-color', '#000000');
+    $('.togglePopup').removeClass('open').addClass('closed');
   } else {
     $('.popup').not(exceptID).hide();
-    $('.togglePopup').not('#toggle' + exceptID.charAt(1).toUpperCase() + exceptID.substring(2)).css('background-color', '#000000');
+    $('.togglePopup').not('#toggle' + exceptID.charAt(1).toUpperCase() + exceptID.substring(2)).removeClass('open').addClass('closed');
   }
 
   if (swatch) {
