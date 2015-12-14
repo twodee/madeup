@@ -323,16 +323,16 @@ Blockly.Blocks['madeup_movement_reverse'] = {
   }
 };
 
-Blockly.Blocks['madeup_io_where'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendDummyInput().appendField("where");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  }
-};
+// Blockly.Blocks['madeup_io_where'] = {
+  // init: function() {
+    // this.setHelpUrl('http://www.example.com/');
+    // this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
+    // this.appendDummyInput().appendField("where");
+    // this.setPreviousStatement(true);
+    // this.setNextStatement(true);
+    // this.setTooltip('');
+  // }
+// };
 
 Blockly.Blocks['madeup_generate_dowel'] = {
   init: function() {

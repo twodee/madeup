@@ -91,7 +91,6 @@
     <category name="I/O">
       <block type="madeup_io_print"></block>
       <block type="madeup_io_debug"></block>
-      <block type="madeup_io_where"></block>
     </category>
     <category name="Math">
       <block type="madeup_math_binary_arithmetic_operator"></block>
@@ -125,6 +124,7 @@
       <input id="bigger" type="button" value="+abc"/>
       <input id="toggleEditorPopup" class="togglePopup" type="button" value="Editor"/>
       <input id="docs" type="button" value="Docs"/>
+      <input id="magic" type="button" value="Magic"/>
     </div>
 
     <div style="display: inline-block; position: absolute; left: 0px; right: 0px; text-align: center; pointer-events: none;" class="fileLink">
