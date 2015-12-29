@@ -71,11 +71,22 @@ Blockly.Madeup.ORDER_CONDITIONAL = 16;      // if else
 //Blockly.Madeup.ORDER_LAMBDA = 17;           // lambda
 // Blockly.Madeup.ORDER_FUNCTION_CALL = 29;     // ()
 Blockly.Madeup.ORDER_FUNCTION_CALL_FIRST_PARAMETER = 30;     // ()
+Blockly.Madeup.ORDER_FUNCTION_CALL_ONLY_PARAMETER = 30;     // ()
 Blockly.Madeup.ORDER_UNARY_NEGATION = 31;        // + -
 Blockly.Madeup.ORDER_FUNCTION_CALL_NOT_FIRST_PARAMETER = 32;     // ()
-Blockly.Madeup.ORDER_FUNCTION_CALL = 32;     // ()
 Blockly.Madeup.ORDER_NONE = 99;             // (...)
 
+Blockly.Madeup.ORDER_FUNCTION_CALL = 33;     // ()
+
+// Unary negation has lower precedence than first parameter. Meaning a unary
+// negation in a first parameter slot will be parenthesized. Unary negation has
+// higher precedence than non-first parameter, meaning in a non-first parameter
+// slot it will not be parenthesized.
+//
+// I'd like to avoid parenthesizing parameters when the function only has one
+// parameter. But I can't do this if the operation is unary negation.
+//
+// lower numbers - higher precedence
 
 /**
  * Initialise the database of variable names.
@@ -176,13 +187,13 @@ Blockly.Madeup.scrub_ = function(block, code) {
  */
 
 Blockly.Madeup['madeup_io_print'] = function(block) {
-  var value_message = Blockly.Madeup.valueToCode(block, 'MESSAGE', Blockly.Madeup.ORDER_FUNCTION_CALL_FIRST_PARAMETER);
+  var value_message = Blockly.Madeup.valueToCode(block, 'MESSAGE', Blockly.Madeup.ORDER_FUNCTION_CALL_ONLY_PARAMETER);
   var code = 'print ' + value_message + '\n';
   return code;
 };
 
 Blockly.Madeup['madeup_io_debug'] = function(block) {
-  var value_message = Blockly.Madeup.valueToCode(block, 'MESSAGE', Blockly.Madeup.ORDER_FUNCTION_CALL_FIRST_PARAMETER);
+  var value_message = Blockly.Madeup.valueToCode(block, 'MESSAGE', Blockly.Madeup.ORDER_FUNCTION_CALL_ONLY_PARAMETER);
   var code = 'debug ' + value_message + '\n';
   return code;
 };
@@ -208,7 +219,7 @@ Blockly.Madeup['madeup_math_random'] = function(block) {
 };
 
 Blockly.Madeup['madeup_movement_move'] = function(block) {
-  var value_distance = Blockly.Madeup.valueToCode(block, 'DISTANCE', Blockly.Madeup.ORDER_FUNCTION_CALL_FIRST_PARAMETER);
+  var value_distance = Blockly.Madeup.valueToCode(block, 'DISTANCE', Blockly.Madeup.ORDER_FUNCTION_CALL_ONLY_PARAMETER);
   var code = 'move ' + value_distance + '\n';
   return code;
 };
@@ -244,14 +255,14 @@ Blockly.Madeup['madeup_loop_repeatwich'] = function(block) {
 };
 
 Blockly.Madeup['madeup_movement_turn'] = function(block) {
-  var value_degrees = Blockly.Madeup.valueToCode(block, 'DEGREES', Blockly.Madeup.ORDER_FUNCTION_CALL_FIRST_PARAMETER);
+  var value_degrees = Blockly.Madeup.valueToCode(block, 'DEGREES', Blockly.Madeup.ORDER_FUNCTION_CALL_ONLY_PARAMETER);
   var dropdown_type = block.getFieldValue('TYPE');
   var code = dropdown_type.toLowerCase() + ' ' + value_degrees + '\n';
   return code;
 };
 
 Blockly.Madeup['madeup_math_sign'] = function(block) {
-  var value_x = Blockly.Madeup.valueToCode(block, 'X', Blockly.Madeup.ORDER_FUNCTION_CALL_FIRST_PARAMETER);
+  var value_x = Blockly.Madeup.valueToCode(block, 'X', Blockly.Madeup.ORDER_FUNCTION_CALL_ONLY_PARAMETER);
   var code = 'sign ' + value_x;
   return [code, Blockly.Madeup.ORDER_FUNCTION_CALL];
 };
@@ -265,14 +276,14 @@ Blockly.Madeup['madeup_math_abs'] = function(block) {
 };
 
 Blockly.Madeup['madeup_math_sincostan'] = function(block) {
-  var value_degrees = Blockly.Madeup.valueToCode(block, 'DEGREES', Blockly.Madeup.ORDER_FUNCTION_CALL_FIRST_PARAMETER);
+  var value_degrees = Blockly.Madeup.valueToCode(block, 'DEGREES', Blockly.Madeup.ORDER_FUNCTION_CALL_ONLY_PARAMETER);
   var dropdown_f = block.getFieldValue('F');
   var code = dropdown_f.toLowerCase() + ' ' + value_degrees;
   return [code, Blockly.Madeup.ORDER_FUNCTION_CALL];
 };
 
 Blockly.Madeup['madeup_math_inverse_sincostan'] = function(block) {
-  var value_ratio = Blockly.Madeup.valueToCode(block, 'RATIO', Blockly.Madeup.ORDER_FUNCTION_CALL_FIRST_PARAMETER);
+  var value_ratio = Blockly.Madeup.valueToCode(block, 'RATIO', Blockly.Madeup.ORDER_FUNCTION_CALL_ONLY_PARAMETER);
   var dropdown_f = block.getFieldValue('F');
   var code = dropdown_f.toLowerCase() + ' ' + value_ratio;
   return [code, Blockly.Madeup.ORDER_FUNCTION_CALL];
@@ -334,13 +345,13 @@ Blockly.Madeup['madeup_movement_reverse'] = function(block) {
 // };
 
 Blockly.Madeup['madeup_generate_dowel'] = function(block) {
-  var value_maxBend = Blockly.Madeup.valueToCode(block, 'MAXBEND', Blockly.Madeup.ORDER_FUNCTION_CALL_NOT_FIRST_PARAMETER);
+  var value_maxBend = Blockly.Madeup.valueToCode(block, 'MAXBEND', Blockly.Madeup.ORDER_FUNCTION_CALL_ONLY_PARAMETER);
   var code = 'dowel maxBend:' + value_maxBend + '\n';
   return code;
 };
 
 Blockly.Madeup['madeup_generate_tube'] = function(block) {
-  var value_maxBend = Blockly.Madeup.valueToCode(block, 'MAXBEND', Blockly.Madeup.ORDER_FUNCTION_CALL_NOT_FIRST_PARAMETER);
+  var value_maxBend = Blockly.Madeup.valueToCode(block, 'MAXBEND', Blockly.Madeup.ORDER_FUNCTION_CALL_ONLY_PARAMETER);
   var code = 'tube maxBend:' + value_maxBend + '\n';
   return code;
 };
@@ -584,21 +595,37 @@ Blockly.Madeup['procedures_defnoreturn'] = function(block) {
 Blockly.Madeup['procedures_callnoreturn'] = function(block) {
   var funcName = Blockly.Madeup.variableDB_.getName(block.getFieldValue('NAME'), Blockly.Procedures.NAME_TYPE);
   var args = [];
-  for (var x = 0; x < block.arguments_.length; x++) {
-    args[x] = Blockly.Madeup.valueToCode(block, 'ARG' + x, Blockly.Madeup.ORDER_ATOMIC) || '';
+  var precedence;
+  for (var i = 0; i < block.arguments_.length; i++) {
+    if (block.arguments_.length == 1) {
+      precedence = Blockly.Madeup.ORDER_FUNCTION_CALL_ONLY_PARAMETER;
+    } else if (i == 0) {
+      precedence = Blockly.Madeup.ORDER_FUNCTION_CALL_FIRST_PARAMETER;
+    } else {
+      precedence = Blockly.Madeup.ORDER_FUNCTION_CALL_NOT_FIRST_PARAMETER;
+    }
+    args[i] = Blockly.Madeup.valueToCode(block, 'ARG' + i, precedence) || '';
   }
   var code = funcName + ' ' + args.join(', ') + '\n';
-  return [code, Blockly.Madeup.ORDER_ATOMIC];
+  return code;
 };
 
 Blockly.Madeup['procedures_callreturn'] = function(block) {
   var funcName = Blockly.Madeup.variableDB_.getName(block.getFieldValue('NAME'), Blockly.Procedures.NAME_TYPE);
   var args = [];
-  for (var x = 0; x < block.arguments_.length; x++) {
-    args[x] = Blockly.Madeup.valueToCode(block, 'ARG' + x, Blockly.Madeup.ORDER_ATOMIC) || '';
+  var precedence;
+  for (var i = 0; i < block.arguments_.length; i++) {
+    if (block.arguments_.length == 1) {
+      precedence = Blockly.Madeup.ORDER_FUNCTION_CALL_ONLY_PARAMETER;
+    } else if (i == 0) {
+      precedence = Blockly.Madeup.ORDER_FUNCTION_CALL_FIRST_PARAMETER;
+    } else {
+      precedence = Blockly.Madeup.ORDER_FUNCTION_CALL_NOT_FIRST_PARAMETER;
+    }
+    args[i] = Blockly.Madeup.valueToCode(block, 'ARG' + i, precedence) || '';
   }
   var code = funcName + ' ' + args.join(', ');
-  return [code, Blockly.Madeup.ORDER_ATOMIC];
+  return [code, Blockly.Madeup.ORDER_FUNCTION_CALL];
 };
 
 Blockly.Madeup['madeup_string'] = function(block) {
