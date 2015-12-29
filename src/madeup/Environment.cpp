@@ -618,14 +618,35 @@ void Environment::home() {
 
 int Environment::coalesce(float threshold) {
   int ndoubles = 0;
-  for (int i = run.size() - 1; i > 0; --i) {
+
+  for (int i = run.size() - 1; i >= 0; --i) {
+    // TODO: handle closed?
     float distance = run[i].position.GetDistanceTo(run[i - 1].position); 
+    std::cout << "distance " << i << ": " << distance << std::endl;
     if (distance <= threshold) {
       run.erase(run.begin() + i);
       paths[paths.size() - 1].erase(paths[paths.size() - 1].begin() + i);
       ++ndoubles;
     }
   }
+
+  /*
+  for (int i = run.size() - 1; i > 0; --i) {
+    QVector3<float> to_next = run[(i + run.size() + 1) % run.size()].position - run[i].position;
+    QVector3<float> to_prev = run[i - 1].position - run[i].position;
+
+    to_next.Normalize();
+    to_prev.Normalize();
+
+    if (fabs(to_next.Dot(to_prev) - -1.0f) < 1.0e-3f) {
+      std::cout << "removing" << std::endl;
+      run.erase(run.begin() + i);
+      paths[paths.size() - 1].erase(paths[paths.size() - 1].begin() + i);
+      ++ndoubles;
+    }
+  }
+  */
+
   return ndoubles;
 }
 

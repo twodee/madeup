@@ -18,6 +18,7 @@ add_library(madeup
   ExpressionCenter.cpp
   ExpressionClosure.cpp
   ExpressionCoalesce.cpp
+  ExpressionComment.cpp
   ExpressionCosine.cpp
   ExpressionCross.cpp
   ExpressionDebug.cpp
@@ -92,9 +93,28 @@ add_library(madeup
   ExpressionWhile.cpp
   ExpressionYaw.cpp
   Lexer.cpp
+  MeshBoolean.cpp
   Token.cpp
   SourceLocation.cpp
   Parser.cpp
 )
-target_link_libraries(madeup twodee)
-include_directories(madeup ${CMAKE_SOURCE_DIR}/include)
+
+target_link_libraries(madeup
+  twodee 
+  /usr/local/lib/libmpfr.dylib
+  /usr/local/lib/libgmp.dylib
+  /usr/local/lib/libCGAL.dylib
+  ${Boost_LOG_SETUP_LIBRARY}
+  ${Boost_LOG_LIBRARY}
+  ${Boost_FILESYSTEM_LIBRARY}
+  ${Boost_THREAD_LIBRARY}
+  ${Boost_SYSTEM_LIBRARY}
+)
+
+include_directories(
+  madeup
+  ${CMAKE_SOURCE_DIR}/include
+  /usr/local/include
+  ${CMAKE_BINARY_DIR}/libigl/include
+  /usr/local/include/eigen3
+)

@@ -2,9 +2,11 @@
 
 #include "madeup/ExpressionArray.h"
 #include "madeup/ExpressionInteger.h"
+#include "madeup/ExpressionMesh.h"
 #include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionSubtract.h"
 #include "madeup/ExpressionUnit.h"
+#include "madeup/MeshBoolean.h"
 #include "twodee/MessagedException.h"
 
 using namespace td;
@@ -83,6 +85,13 @@ Co<Expression> ExpressionSubtract::subtract(Co<Expression> l,
       array->setElement(i, subtract(l_value, (*r_array->getArray())[i], source, location, env));
     }
     return Co<Expression>(new ExpressionArrayReference(array));
+  }
+ 
+  // Meshes
+  ExpressionMesh *l_mesh = dynamic_cast<ExpressionMesh *>(l_value.GetPointer());
+  ExpressionMesh *r_mesh = dynamic_cast<ExpressionMesh *>(r_value.GetPointer());
+  if (l_mesh && r_mesh) {
+    return MeshBoolean::construct_and_color(l_mesh, r_mesh, env, MeshBoolean::DIFFERENCE);
   }
 
   throw MessagedException(location.toAnchor() + ": Operator - doesn't know how to join " + l->getSource() + " and " + r->getSource() + ".");

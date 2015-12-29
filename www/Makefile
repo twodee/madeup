@@ -26,6 +26,10 @@ $(WWW_ROOT)/ace:
 	sudo git clone https://github.com/ajaxorg/ace-builds.git $(WWW_ROOT)/ace
 	sudo chmod -R a+rX $(WWW_ROOT)/ace
 
+# $(WWW_ROOT)/libigl:
+	# sudo git clone https://github.com/ajaxorg/ace-builds.git $(WWW_ROOT)/ace
+	# sudo chmod -R a+rX $(WWW_ROOT)/ace
+
 $(WWW_ROOT)/filesaver:
 	sudo git clone https://github.com/eligrey/FileSaver.js $(WWW_ROOT)/filesaver
 	sudo chmod -R a+rX $(WWW_ROOT)/filesaver

@@ -1,6 +1,8 @@
 #include "madeup/ExpressionArray.h"
 #include "madeup/ExpressionAnd.h"
 #include "madeup/ExpressionBoolean.h"
+#include "madeup/ExpressionMesh.h"
+#include "madeup/MeshBoolean.h"
 #include "twodee/MessagedException.h"
 
 using namespace td;
@@ -72,6 +74,13 @@ Co<Expression> ExpressionAnd::evaluate_helper(Co<Expression> l,
       array->setElement(i, evaluate_helper(l_value, (*r_array->getArray())[i], source, location, env));
     }
     return Co<Expression>(new ExpressionArrayReference(array));
+  }
+ 
+  // Meshes
+  ExpressionMesh *l_mesh = dynamic_cast<ExpressionMesh *>(l_value.GetPointer());
+  ExpressionMesh *r_mesh = dynamic_cast<ExpressionMesh *>(r_value.GetPointer());
+  if (l_mesh && r_mesh) {
+    return MeshBoolean::construct_and_color(l_mesh, r_mesh, env, MeshBoolean::INTERSECTION);
   }
 
   throw MessagedException(location.toAnchor() + ": Operator and doesn't know how to join " + l->getSource() + " and " + r->getSource() + ".");
