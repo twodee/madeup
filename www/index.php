@@ -124,7 +124,7 @@
       <input id="bigger" type="button" value="+abc"/>
       <input id="toggleEditorPopup" class="togglePopup" type="button" value="Editor"/>
       <input id="docs" type="button" value="Docs"/>
-      <input id="magic" type="button" value="Magic"/>
+<!--      <input id="magic" type="button" value="Magic"/> -->
     </div>
 
     <div style="display: inline-block; position: absolute; left: 0px; right: 0px; text-align: center; pointer-events: none;" class="fileLink">
@@ -177,9 +177,15 @@
     <div id="displayPopup" class="popup">
       <input type="checkbox" id="showWireframe"/>Show wireframe<br/>
       <input type="checkbox" id="showHeadings"/>Show heading<br/>
+      <input type="checkbox" id="showPoints"/>Show points<br/>
       <input type="checkbox" id="showCounterclockwise"/>Show counterclockwise faces<br/>
       <input type="checkbox" id="showClockwise"/>Show clockwise faces<br/>
       <input type="checkbox" id="isFlatShaded"/>Flat shading<br/>
+      <hr>
+      View From:
+      <a href="#" id="cameraLeft" class="fileLink">-X</a> <a href="#" id="cameraRight" class="fileLink">+X</a>
+      <a href="#" id="cameraBottom" class="fileLink">-Y</a> <a href="#" id="cameraTop" class="fileLink">+Y</a>
+      <a href="#" id="cameraBack" class="fileLink">-Z</a> <a href="#" id="cameraFront" class="fileLink">+Z</a><br/>
     </div>
   </div>
 

@@ -676,9 +676,9 @@ var tree = null;
 var preview = undefined;
 var isThemeDark = true;
 var isSourceDirty = false;
+var showPoints = true;
 
 var isThemeDarkChanged = false;
-var isEditorTextChanged = false;
 var isShowWireframeChanged = false;
 var isAxisChanged = [false, false, false];
 var isGridChanged = [false, false, false];
@@ -690,6 +690,7 @@ var isGridExtentChanged = false;
 var isShowCounterclockwiseChanged = false;
 var isShowClockwiseChanged = false;
 var isFlatShadedChanged = false;
+var isShowPointsChanged = false;
 
 function updateTitle() {
   $('#toggleFilePopup').attr('value', mupName + (isSourceDirty ? '*' : ''));
@@ -707,7 +708,6 @@ function saveInCookies() {
   if (isShowClockwiseChanged) Cookies.set('showClockwise', showClockwise ? 1 : 0);
   if (isShowWireframeChanged) Cookies.set('showWireframe', showWireframe ? 1 : 0);
   if (isFlatShadedChanged) Cookies.set('isFlatShaded', isFlatShaded ? 1 : 0);
-  if (isEditorTextChanged) Cookies.set('isEditorText', isEditorText ? 1 : 0);
   if (isThemeDarkChanged) Cookies.set('isThemeDark', isThemeDark ? 1 : 0);
   if (isAxisChanged[0]) Cookies.set('axisX', $('#axisX').prop('checked') ? 1 : 0);
   if (isAxisChanged[1]) Cookies.set('axisY', $('#axisY').prop('checked') ? 1 : 0);
@@ -718,6 +718,7 @@ function saveInCookies() {
   if (isNSecondsTillPreviewChanged) Cookies.set('nSecondsTillPreview', nSecondsTillPreview);
   if (isGridSpacingChanged) Cookies.set('gridSpacing', gridSpacing);
   if (isGridExtentChanged) Cookies.set('gridExtent', gridExtent);
+  if (isShowPointsChanged) Cookies.set('showPoints', showPoints ? 1 : 0);
   Cookies.set('leftWidth', $('#left').width());
   Cookies.set('consoleHeight', $('#console').height());
 
@@ -734,12 +735,12 @@ function saveInCookies() {
   isShowClockwiseChanged = false;
   isFlatShadedChanged = false;
   isShowWireframeChanged = false;
-  isEditorTextChanged = false;
   isThemeDarkChanged = false;
   isShowHeadingsChanged = false;
   isNSecondsTillPreviewChanged = false;
   isGridSpacingChanged = false;
   isGridExtentChanged = false;
+  isShowPointsChanged = false;
   for (var d = 0; d < 3; ++d) {
     isAxisChanged[d] = false;
     isGridChanged[d] = false;
@@ -804,10 +805,6 @@ $(document).ready(function() {
     }
     $('#showWireframe').prop('checked', showWireframe);
 
-    if (Cookies.get('isEditorText')) {
-      setEditor(parseInt(Cookies.get('isEditorText')) != 0);
-    }
-
     if (isEditorText) {
       $("#isEditorText").prop('checked', true);
     } else {
@@ -823,6 +820,11 @@ $(document).ready(function() {
     } else {
       $("#isLight").prop('checked', true);
     }
+
+    if (Cookies.get('showPoints')) {
+      showPoints = parseInt(Cookies.get('showPoints')) != 0;
+    }
+    $("#showPoints").prop('checked', showPoints);
 
     if (Cookies.get('gridExtent')) {
       gridExtent = parseFloat(Cookies.get('gridExtent'));
@@ -938,6 +940,36 @@ $(document).ready(function() {
 
   $('#fit').click(function() {
     fit();
+    textEditor.focus();
+  });
+
+  $('#cameraLeft').click(function() {
+    viewFrom(0, -1);
+    textEditor.focus();
+  });
+
+  $('#cameraRight').click(function() {
+    viewFrom(0, 1);
+    textEditor.focus();
+  });
+
+  $('#cameraBottom').click(function() {
+    viewFrom(1, -1);
+    textEditor.focus();
+  });
+
+  $('#cameraTop').click(function() {
+    viewFrom(1, 1);
+    textEditor.focus();
+  });
+
+  $('#cameraBack').click(function() {
+    viewFrom(2, -1);
+    textEditor.focus();
+  });
+
+  $('#cameraFront').click(function() {
+    viewFrom(2, 1);
     textEditor.focus();
   });
 
@@ -1124,6 +1156,12 @@ $(document).ready(function() {
   $('#showWireframe').click(function() {
     isShowWireframeChanged = true;
     showWireframe = this.checked;
+    run(getSource(), GeometryMode.SURFACE);
+  });
+
+  $('#showPoints').click(function() {
+    isShowPointsChanged = true;
+    showPoints = this.checked;
     run(getSource(), GeometryMode.SURFACE);
   });
 
@@ -1364,7 +1402,6 @@ function setEditor(isText) {
   }
 
   isEditorText = isText;
-  isEditorTextChanged = true;
 
   // Update radio buttons to reflect current editor.
   if (isEditorText) {
@@ -1388,7 +1425,17 @@ function setEditor(isText) {
   // We're heading to blocks.
   else {
     if (!blocklyWorkspace) {
-      blocklyWorkspace = Blockly.inject('blocksCanvas', {toolbox: document.getElementById('toolbox')});
+      blocklyWorkspace = Blockly.inject('blocksCanvas', {
+        toolbox: document.getElementById('toolbox'),
+        zoom: {
+          controls: true,
+          wheel: false,
+          startScale: 1.0,
+          maxScale: 3,
+          minScale: 0.3,
+          scaleSpeed: 1.2
+        }
+      });
     }
 
     // Any text to convert to blocks?
@@ -1434,6 +1481,7 @@ function load(mup) {
     if (isEditorText) {
       textEditor.session.setValue(file.source, -1);
     } else {
+      console.log("b");
       blocklyWorkspace.clear();
       var xml = Blockly.Xml.textToDom(file.source);
       Blockly.Xml.domToWorkspace(blocklyWorkspace, xml);
@@ -1556,14 +1604,18 @@ function run(source, mode) {
         } else {
           var paths = JSON.parse(data['model']);
           allGeometry = new THREE.Geometry();
-          var dotsGeometry = new THREE.Geometry();
+          if (showPoints) {
+            var dotsGeometry = new THREE.Geometry();
+          }
 
           for (var pi = 0; pi < paths.length; ++pi) {
             var geometry = new THREE.Geometry();
             for (var i = 0; i < paths[pi].vertices.length; ++i) {
               var v = new THREE.Vector3(paths[pi].vertices[i][0], paths[pi].vertices[i][1], paths[pi].vertices[i][2]);
               geometry.vertices.push(v);
-              dotsGeometry.vertices.push(v);
+              if (showPoints) {
+                dotsGeometry.vertices.push(v);
+              }
               allGeometry.vertices.push(v);
             }
             meshes[meshes.length] = new THREE.Line(geometry, new THREE.LineBasicMaterial({
@@ -1607,11 +1659,13 @@ function run(source, mode) {
             }
           }
 
-          meshes[meshes.length] = new THREE.PointCloud(dotsGeometry, new THREE.PointCloudMaterial({
-            color: 0x000000,
-            size: 8,
-            sizeAttenuation: false
-          }));
+          if (showPoints) {
+            meshes[meshes.length] = new THREE.PointCloud(dotsGeometry, new THREE.PointCloudMaterial({
+              color: 0x000000,
+              size: 8,
+              sizeAttenuation: false
+            }));
+          }
         }
 
         for (var mi = 0; mi < meshes.length; ++mi) {
@@ -1661,6 +1715,51 @@ function fit() {
 
   controls.reset(); 
   camera.position.z = bounds.max.z + fit;
+  camera.updateProjectionMatrix();
+}
+
+function viewFrom(dim, sign) {
+  if (allGeometry === undefined) {
+    return;
+  }
+
+  allGeometry.computeBoundingBox();
+
+  var bounds = allGeometry.boundingBox;
+  var centroid = bounds.center();
+
+  var xform = new THREE.Matrix4().makeTranslation(-centroid.x, -centroid.y, -centroid.z);
+  modelScene.matrix = xform;
+
+  var constraint;
+  if (camera.aspect >= 1) {
+    var fovX = 2 * Math.atan(Math.tan(camera.fov * Math.PI / 180.0 * 0.5) * camera.aspect);
+    constraint = Math.tan(fovX * 0.5);
+  } else {
+    constraint = Math.tan(camera.fov * Math.PI / 180.0 * 0.5);
+  }
+
+  var dimensions = bounds.size();
+  var maxSpan = Math.max(dimensions.x, Math.max(dimensions.y, dimensions.z));
+  var fit = maxSpan / constraint;
+
+  controls.reset(); 
+  if (dim == 0) {
+    camera.up = new THREE.Vector3(0, 1, 0);
+    camera.position.x = (bounds.max.x + fit) * sign;
+    camera.position.y = 0;
+    camera.position.z = 0;
+  } else if (dim == 1) {
+    camera.up = new THREE.Vector3(0, 0, -sign);
+    camera.position.x = 0;
+    camera.position.y = (bounds.max.y + fit) * sign;
+    camera.position.z = 0;
+  } else if (dim == 2) {
+    camera.up = new THREE.Vector3(0, 1, 0);
+    camera.position.x = 0;
+    camera.position.y = 0;
+    camera.position.z = (bounds.max.z + fit) * sign;
+  }
   camera.updateProjectionMatrix();
 }
 
