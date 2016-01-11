@@ -94,6 +94,7 @@ class Environment {
     Trimesh *getMesh();
     std::string getPathsJSON() const;
     void setGeometryMode(GeometryMode::geometry_mode_t mode);
+    GeometryMode::geometry_mode_t getGeometryMode() const;
 
     float getVariableAsFloat(const std::string &id);
     const Turtle &getTurtle() const;

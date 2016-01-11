@@ -550,8 +550,8 @@ void Environment::move(float distance) {
 
   // Do we apply the transform to the offset between our old position and 
   // our new? No, not for the time being.
-  turtle.position += xforms.top() * offset;
-  /* turtle.position += offset; */
+  /* turtle.position += xforms.top() * offset; */
+  turtle.position += offset;
 
   // DON'T DO THIS. Move is a relative command. We want to transform the offset.
   /* turtle.position = xforms.top() * turtle.position; */
@@ -1485,10 +1485,38 @@ void Environment::setTimeout(int max_seconds) {
 /* ------------------------------------------------------------------------- */
 
 void Environment::reframe() {
-  QMatrix4<float> xform = xforms.top();
+  /* QMatrix4<float> xform = xforms.top(); */
   xforms.pop();
-  xform = xform * QMatrix4<float>::GetTranslate(turtle.position[0], turtle.position[1], turtle.position[2]) * turtle.camera.GetViewMatrix();
+  /* std::cout << "xform: " << xform << std::endl; */
+  /* std::cout << "turtle.position: " << turtle.position << std::endl; */
+  /* std::cout << "turtle.camera.GetViewMatrix(): " << turtle.camera.GetViewMatrix() << std::endl; */
+  /* std::cout << "" << std::endl; */
+  /* std::cout << "turtle.camera.GetViewMatrix() * QVector4<float>(1, 0, 0, 1): " << turtle.camera.GetViewMatrix().GetOrthonormalInverse() * QVector4<float>(1, 0, 0, 1) << std::endl; */
+  QMatrix4<float> view(1.0f);
+  view(0, 0) = turtle.camera.GetViewMatrix()(0, 0);
+  view(0, 1) = turtle.camera.GetViewMatrix()(0, 1);
+  view(0, 2) = turtle.camera.GetViewMatrix()(0, 2);
+  view(1, 0) = -turtle.camera.GetViewMatrix()(2, 0);
+  view(1, 1) = -turtle.camera.GetViewMatrix()(2, 1);
+  view(1, 2) = -turtle.camera.GetViewMatrix()(2, 2);
+  view(2, 0) = -turtle.camera.GetViewMatrix()(1, 0);
+  view(2, 1) = -turtle.camera.GetViewMatrix()(1, 1);
+  view(2, 2) = -turtle.camera.GetViewMatrix()(1, 2);
+  /* std::cout << "view: " << view << std::endl; */
+  /* QMatrix4<float> transform = turtle.camera.GetViewMatrix() * QMatrix4<float>::GetTranslate(-turtle.position[0], -turtle.position[1], -turtle.position[2]); */
+  QMatrix4<float> transform = view * QMatrix4<float>::GetTranslate(-turtle.position[0], -turtle.position[1], -turtle.position[2]);
+  QMatrix4<float> xform = transform.GetOrthonormalInverse();
+  /* turtle.position = QVector3<float>(0.0f); */
+  /* turtle.camera = Camera(QVector3<float>(0.0f, 0.0f, 0.0f), */
+                         /* QVector3<float>(0.0f, 0.0f, 1.0f), */
+                         /* QVector3<float>(0.0f, 1.0f, 0.0f)); */
   xforms.push(xform);
+}
+
+/* ------------------------------------------------------------------------- */
+
+GeometryMode::geometry_mode_t Environment::getGeometryMode() const {
+  return geometry_mode; 
 }
 
 /* ------------------------------------------------------------------------- */
