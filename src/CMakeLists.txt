@@ -4,11 +4,13 @@ target_link_libraries(lex madeup twodee)
 set_target_properties(lex PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 set(IGL_LIBRARIES 
-  # ${Boost_LOG_SETUP_LIBRARY} 
   ${Boost_LOG_LIBRARY}
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}
-  # ${Boost_SYSTEM_LIBRARY} 
+
+  ${Boost_LOG_SETUP_LIBRARY}
+  ${Boost_SYSTEM_LIBRARY}
+
   ${CGAL_LIBRARY}
   ${GMP_LIBRARIES}
   ${MPFR_LIBRARIES}
