@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 project(madeup)
 
+LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
+
 option(USE_DEBUG "Enable debug information" ON)
 
 if(APPLE)
