@@ -99,18 +99,6 @@ add_library(madeup
   Parser.cpp
 )
 
-target_link_libraries(madeup
-  twodee 
-  /usr/local/lib/libmpfr.dylib
-  /usr/local/lib/libgmp.dylib
-  /usr/local/lib/libCGAL.dylib
-  ${Boost_LOG_SETUP_LIBRARY}
-  ${Boost_LOG_LIBRARY}
-  ${Boost_FILESYSTEM_LIBRARY}
-  ${Boost_THREAD_LIBRARY}
-  ${Boost_SYSTEM_LIBRARY}
-)
-
 include_directories(
   madeup
   ${CMAKE_SOURCE_DIR}/include

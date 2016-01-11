@@ -59,6 +59,7 @@ class Token {
       WHILE,
       NOTHING,
       AROUND,
+      COMMENT,
       END_OF_FILE
     };
 
