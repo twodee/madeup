@@ -17,8 +17,20 @@ endif()
 
 if(USE_DEBUG AND CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   set(CMAKE_C_FLAGS "-g -pedantic -Wall -std=c99")
-  set(CMAKE_CXX_FLAGS "-g -pedantic -Wall -std=c++0x")
+  set(CMAKE_CXX_FLAGS "-g -pedantic -Wall -std=c++11 -frounding-math")
 endif()
+
+find_package(Boost COMPONENTS log log_setup thread filesystem system)
+
+if(NOT DEFINED EIGEN3_INCLUDE_DIR)
+  find_package(Eigen3 REQUIRED)
+endif()
+message(${EIGEN3_INCLUDE_DIR})
+
+find_package(CGAL REQUIRED)
+LIST(APPEND CMAKE_MODULE_PATH ${CGAL_DIR})
+find_package(GMP REQUIRED)
+find_package(MPFR REQUIRED)
 
 add_subdirectory(src/twodee)
 add_subdirectory(src/madeup)

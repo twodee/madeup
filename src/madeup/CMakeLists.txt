@@ -102,7 +102,7 @@ add_library(madeup
 include_directories(
   madeup
   ${CMAKE_SOURCE_DIR}/include
-  /usr/local/include
   ${CMAKE_BINARY_DIR}/libigl/include
-  /usr/local/include/eigen3
+  ${EIGEN3_INCLUDE_DIR}
+  /usr/local/include
 )

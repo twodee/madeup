@@ -1,5 +1,6 @@
 #include <iostream>
 
+#define EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
 #define IGL_NO_CORK
 #include <igl/copyleft/boolean/mesh_boolean.h>
 #include <igl/per_corner_normals.h>
@@ -95,8 +96,6 @@ Trimesh *construct(const Trimesh &a,
   Eigen::MatrixXd N_corners;
   igl::per_corner_normals(vertices[2], faces[2], 20, N_corners);
 
-  std::cout << "vertices[2].rows(): " << vertices[2].rows() << std::endl;
-  std::cout << "faces[2].rows(): " << faces[2].rows() << std::endl;
   return EigenToTrimesh(vertices[2], faces[2]);
 }
 
