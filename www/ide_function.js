@@ -1220,9 +1220,16 @@ $(document).ready(function() {
   });
 
   $('#solidify').click(function() {
-    log('Running...'); 
+    log('Solidifying...'); 
     saveInCookies();
     run(getSource(), GeometryMode.SURFACE);
+    textEditor.focus();
+  });
+
+  $('#pathify').click(function() {
+    log('Pathifying...'); 
+    saveInCookies();
+    run(getSource(), GeometryMode.PATH);
     textEditor.focus();
   });
 

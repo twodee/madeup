@@ -78,7 +78,7 @@
       <block type="madeup_movement_pop"></block>
       <block type="madeup_movement_reverse"></block>
     </category>
-    <category name="Generate">
+    <category name="Solidifiers">
       <block type="madeup_generate_spheres"></block>
       <block type="madeup_generate_boxes"></block>
       <block type="madeup_generate_dowel"></block>
@@ -120,6 +120,7 @@
   <div id="menu">
     <div style="display: inline-block; position: absolute: left: 0px;">
       <input id="solidify" type="button" value="Solidify"/>
+      <input id="pathify" type="button" value="Pathify"/>
       <input id="smaller" type="button" value="-abc"/>
       <input id="bigger" type="button" value="+abc"/>
       <input id="toggleEditorPopup" class="togglePopup" type="button" value="Editor"/>
