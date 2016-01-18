@@ -824,7 +824,7 @@ Co<Trimesh> Environment::dowel(float twist, float max_bend) {
       // In which case, let's just drop the last position all together and let the
       // Extuber method seal up the join.
       int mode;
-      if (fabs(squared_length) < 1.0e-6f) {
+      if (fabs(squared_length) < 1.0e-6f && run.size() > 2) {
         mode = Polyline<float>::CLOSED; 
         run.pop_back();
       } else {

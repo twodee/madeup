@@ -43,8 +43,12 @@ Co<Expression> ExpressionTube::evaluate(Environment &env) const {
   float max_bend = max_bend_number->toReal();
 
   // Emit dowel.
-  Co<Trimesh> trimesh = env.tube(twist, max_bend);
-  return Co<Expression>(new ExpressionMesh(trimesh));
+  try {
+    Co<Trimesh> trimesh = env.tube(twist, max_bend);
+    return Co<Expression>(new ExpressionMesh(trimesh));
+  } catch (MessagedException e) {
+    throw UnlocatedException(e.GetMessage());
+  }
 }
 
 /* ------------------------------------------------------------------------- */

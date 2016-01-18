@@ -368,7 +368,7 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
   QVector3<T> *normals = new QVector3<T>[nvertices]; 
   for (int vi = 0; vi < nvertices; ++vi) {
     if (fores[vi].GetSquaredLength() < EPSILON && afts[vi].GetSquaredLength() < EPSILON) {
-      throw MessagedException("no good vecs");
+      throw MessagedException("I can't solidify this dowel. Too many of its vertices are piled on top of each other.");
     } else if (fores[vi].GetSquaredLength() < EPSILON) {
       normals[vi] = afts[vi] * (T) -1;
     } else if (afts[vi].GetSquaredLength() < EPSILON) {
