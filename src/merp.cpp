@@ -195,6 +195,10 @@ int main(int argc, char **argv) {
       }
     }
 
+  } catch (std::bad_alloc e) {
+    std::cerr << "Whoa! I don't have enough memory for that." << std::endl;
+    in.close();
+    exit(1);
   } catch (td::MessagedException e) {
     std::cerr << e.GetMessage() << std::endl;
     in.close();
