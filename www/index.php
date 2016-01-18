@@ -45,7 +45,7 @@
 <body>
   <!-- The Blockly toolbox __________________________________________________ -->
   <xml id="toolbox" style="display: none">
-    <category name="Primitives">
+    <category name="Data">
       <block type="madeup_math_integer"></block>
       <block type="madeup_math_real"></block>
       <block type="madeup_string"></block>
@@ -53,16 +53,16 @@
       <block type="madeup_eval"></block>
       <block type="madeup_nothing"></block>
     </category>
-    <category name="Loops">
-      <block type="madeup_loop_repeat"></block>
-      <block type="madeup_loop_while"></block>
-      <block type="madeup_loop_for_to"></block>
-      <block type="madeup_loop_for_to_by"></block>
-      <block type="madeup_loop_for_through"></block>
-      <block type="madeup_loop_for_through_by"></block>
-      <block type="madeup_loop_for_in"></block>
-      <block type="madeup_loop_for_in_by"></block>
-      <block type="madeup_loop_repeatwich"></block>
+    <category name="Math">
+      <block type="madeup_math_binary_arithmetic_operator"></block>
+      <block type="madeup_math_unary_operator"></block>
+      <block type="madeup_math_sincostan"></block>
+      <block type="madeup_math_inverse_sincostan"></block>
+      <block type="madeup_math_minmax"></block>
+      <block type="madeup_math_abs"></block>
+      <block type="madeup_math_sign"></block>
+      <block type="madeup_math_random"></block>
+      <block type="madeup_math_log"></block>
     </category>
     <category name="Movement">
       <block type="madeup_movement_moveto"></block>
@@ -88,23 +88,21 @@
       <block type="madeup_generate_surface"></block>
       <block type="madeup_generate_forget"></block>
     </category>
+    <category name="Loops">
+      <block type="madeup_loop_repeat"></block>
+      <block type="madeup_loop_while"></block>
+      <block type="madeup_loop_for_to"></block>
+      <block type="madeup_loop_for_to_by"></block>
+      <block type="madeup_loop_for_through"></block>
+      <block type="madeup_loop_for_through_by"></block>
+      <block type="madeup_loop_for_in"></block>
+      <block type="madeup_loop_for_in_by"></block>
+      <block type="madeup_loop_repeatwich"></block>
+    </category>
     <category name="I/O">
       <block type="madeup_io_print"></block>
       <block type="madeup_io_debug"></block>
     </category>
-    <category name="Math">
-      <block type="madeup_math_binary_arithmetic_operator"></block>
-      <block type="madeup_math_unary_operator"></block>
-      <block type="madeup_math_sincostan"></block>
-      <block type="madeup_math_inverse_sincostan"></block>
-      <block type="madeup_math_minmax"></block>
-      <block type="madeup_math_abs"></block>
-      <block type="madeup_math_sign"></block>
-      <block type="madeup_math_random"></block>
-      <block type="madeup_math_log"></block>
-    </category>
-    <category name="Variables" custom="VARIABLE"></category>
-    <category name="Functions" custom="PROCEDURE"></category>
     <category name="Logic">
       <block type="madeup_logic_junction"></block>
       <block type="madeup_logic_not"></block>
@@ -113,6 +111,8 @@
       <block type="madeup_logic_if_else_statement"></block>
       <block type="madeup_math_relational_operator"></block>
     </category>
+    <category name="Variables" custom="VARIABLE"></category>
+    <category name="Functions" custom="PROCEDURE"></category>
   </xml>
 
   <!-- The layout _________________________________________________________ -->
