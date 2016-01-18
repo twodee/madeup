@@ -7,6 +7,24 @@ function hasWebGL() {
   } 
 }
 
+// Prime Blockly with some builtin variables. There's no API exposed for this,
+// but Blockly.Variables.allVariables walks the blocks in the workspace and
+// returns the names of all variables. Our builtin variables don't necessarily
+// appear in the workspace (yet), so we hijack this function and add them
+// manually.
+(function() {
+  var oldAllVariables = Blockly.Variables.allVariables;
+  Blockly.Variables.allVariables = function(root) {
+    var vars = oldAllVariables.call(this, root);
+    vars.push('nsides');
+    vars.push('.rgb');
+    vars.push('.radius');
+    vars.push('.innerRadius');
+    vars.push('.outerRadius');
+    return vars;
+  };
+})();
+
 // Warn on leaving the page if there are unsaved changes. Downloading triggers
 // this, even though we're not leaving the page, so we add a special flag to
 // filter out these events.

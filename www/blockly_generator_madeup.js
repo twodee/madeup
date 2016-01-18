@@ -94,16 +94,18 @@ Blockly.Madeup.ORDER_FUNCTION_CALL = 33;     // ()
  */
 Blockly.Madeup.init = function(workspace) {
   // Create a dictionary of definitions to be printed before the code.
-  Blockly.Madeup.definitions_ = Object.create(null);
+  // Blockly.Madeup.definitions_ = Object.create(null);
   // Create a dictionary mapping desired function names in definitions_
   // to actual function names (to avoid collisions with user functions).
-  Blockly.Madeup.functionNames_ = Object.create(null);
+  // Blockly.Madeup.functionNames_ = Object.create(null);
 
-  if (!Blockly.Madeup.variableDB_) {
-    Blockly.Madeup.variableDB_ = new Blockly.Names(Blockly.Madeup.RESERVED_WORDS_);
-  } else {
-    Blockly.Madeup.variableDB_.reset();
-  }
+  // if (!Blockly.Madeup.variableDB_) {
+    // Blockly.Madeup.variableDB_ = new Blockly.Names(Blockly.Madeup.RESERVED_WORDS_);
+  // } else {
+    // Blockly.Madeup.variableDB_.reset();
+  // }
+
+
 
   //var defvars = [];
   //var variables = Blockly.Variables.allVariables(workspace);
@@ -121,18 +123,19 @@ Blockly.Madeup.init = function(workspace) {
  */
 Blockly.Madeup.finish = function(code) {
   // Convert the definitions dictionary into a list.
-  var imports = [];
-  var definitions = [];
-  for (var name in Blockly.Madeup.definitions_) {
-    var def = Blockly.Madeup.definitions_[name];
-    if (def.match(/^(from\s+\S+\s+)?import\s+\S+/)) {
-      imports.push(def);
-    } else {
-      definitions.push(def);
-    }
-  }
-  var allDefs = imports.join('\n') + '\n\n' + definitions.join('\n\n');
-  return allDefs.replace(/\n\n+/g, '\n\n').replace(/\n*$/, '\n\n\n') + code;
+  // var imports = [];
+  // var definitions = [];
+  // for (var name in Blockly.Madeup.definitions_) {
+    // var def = Blockly.Madeup.definitions_[name];
+    // if (def.match(/^(from\s+\S+\s+)?import\s+\S+/)) {
+      // imports.push(def);
+    // } else {
+      // definitions.push(def);
+    // }
+  // }
+  // var allDefs = imports.join('\n') + '\n\n' + definitions.join('\n\n');
+  // return allDefs.replace(/\n\n+/g, '\n\n').replace(/\n*$/, '\n\n\n') + code;
+  return code;
 };
 
 /**
