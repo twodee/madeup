@@ -2,8 +2,11 @@
 #include "madeup/ExpressionAnd.h"
 #include "madeup/ExpressionBoolean.h"
 #include "madeup/ExpressionMesh.h"
-#include "madeup/MeshBoolean.h"
 #include "twodee/MessagedException.h"
+
+#ifdef USE_IGL
+#include "madeup/MeshBoolean.h"
+#endif
 
 using namespace td;
 
@@ -76,12 +79,14 @@ Co<Expression> ExpressionAnd::evaluate_helper(Co<Expression> l,
     return Co<Expression>(new ExpressionArrayReference(array));
   }
  
+#ifdef USE_IGL
   // Meshes
   ExpressionMesh *l_mesh = dynamic_cast<ExpressionMesh *>(l_value.GetPointer());
   ExpressionMesh *r_mesh = dynamic_cast<ExpressionMesh *>(r_value.GetPointer());
   if (l_mesh && r_mesh) {
     return MeshBoolean::construct_and_color(l_mesh, r_mesh, env, MeshBoolean::INTERSECTION);
   }
+#endif
 
   throw MessagedException(location.toAnchor() + ": Operator and doesn't know how to join " + l->getSource() + " and " + r->getSource() + ".");
 }

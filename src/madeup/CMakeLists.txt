@@ -1,3 +1,8 @@
+set(LIBMADEUP_SRC_EXTRAS)
+if(USE_IGL)
+  list(APPEND LIBMADEUP_SRC_EXTRAS MeshBoolean.cpp)
+endif()
+
 add_library(madeup
   STATIC
   Environment.cpp
@@ -93,16 +98,19 @@ add_library(madeup
   ExpressionWhile.cpp
   ExpressionYaw.cpp
   Lexer.cpp
-  MeshBoolean.cpp
   Token.cpp
   SourceLocation.cpp
   Parser.cpp
+  ${LIBMADEUP_SRC_EXTRAS}
 )
 
-include_directories(
-  madeup
-  ${CMAKE_SOURCE_DIR}/include
-  ${CMAKE_BINARY_DIR}/libigl/include
-  ${EIGEN3_INCLUDE_DIR}
-  /usr/local/include
-)
+include_directories(madeup ${CMAKE_SOURCE_DIR}/include)
+
+if(USE_IGL)
+  include_directories(
+    madeup
+    ${CMAKE_BINARY_DIR}/libigl/include
+    ${EIGEN3_INCLUDE_DIR}
+    /usr/local/include
+  )
+endif()
