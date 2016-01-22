@@ -3,8 +3,52 @@
 goog.provide('Blockly.Blocks.madeup');
 goog.require('Blockly.Blocks');
 
+function setStatementExpression(block, isExpression) {
+  block.unplug(true, true);
+  if (isExpression) {
+    block.setPreviousStatement(false);
+    block.setNextStatement(false);
+    block.setOutput(true);
+  } else {
+    block.setOutput(false);
+    block.setPreviousStatement(true);
+    block.setNextStatement(true);
+  }
+}
+
+function toggleStatementExpression(options) {
+  var isExpression = !!this.outputConnection;
+  var block = this;
+  var option = {
+    enabled: true,
+    text: isExpression ? 'Convert to Statement' : 'Convert to Expression',
+    callback: function() {
+      setStatementExpression(block, !isExpression);
+    }
+  };
+  options.push(option);
+}
+
+function mutationModeToDom(block, container) {
+  var isExpression = !!block.outputConnection;
+  // Something forces lowercase attribute names. I'm not going to fight it.
+  container.setAttribute('isexpression', isExpression);
+}
+
+function mutationToDom() {
+  var container = document.createElement('mutation');
+  mutationModeToDom(this, container);
+  return container;
+}
+
+function domModeToMutation(element) {
+  var isExpression = element.getAttribute('isexpression') == 'true';
+  setStatementExpression(this, isExpression); 
+}
+
 Blockly.Blocks.madeup.STATEMENT_HUE = 210;
 Blockly.Blocks.madeup.INTEGER_HUE = 45;
+Blockly.Blocks.madeup.ARRAY_HUE = 90;
 Blockly.Blocks.madeup.STRING_HUE = 260;
 Blockly.Blocks.madeup.REAL_HUE = 160;
 Blockly.Blocks.madeup.NUMBER_HUE = 180;
@@ -23,7 +67,10 @@ Blockly.Blocks['madeup_math_sign'] = {
     this.setInputsInline(true);
     this.setOutput(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_math_abs'] = {
@@ -34,7 +81,10 @@ Blockly.Blocks['madeup_math_abs'] = {
     this.setInputsInline(true);
     this.setOutput(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -48,7 +98,10 @@ Blockly.Blocks['madeup_io_print'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_io_debug'] = {
@@ -61,7 +114,10 @@ Blockly.Blocks['madeup_io_debug'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -73,7 +129,10 @@ Blockly.Blocks['madeup_math_integer'] = {
     this.appendDummyInput().appendField(new Blockly.FieldTextInput("0"), "INTEGER");
     this.setOutput(true, "Integer");
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_math_real'] = {
@@ -83,7 +142,10 @@ Blockly.Blocks['madeup_math_real'] = {
     this.appendDummyInput().appendField(new Blockly.FieldTextInput("0.0"), "REAL");
     this.setOutput(true, "Real");
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_nothing'] = {
@@ -93,7 +155,10 @@ Blockly.Blocks['madeup_nothing'] = {
     this.appendDummyInput().appendField("nothing");
     this.setOutput(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -105,7 +170,10 @@ Blockly.Blocks['madeup_logic_boolean'] = {
     this.appendDummyInput().appendField(new Blockly.FieldDropdown([["true", "TRUE"], ["false", "FALSE"]]), "BOOLEAN");
     this.setOutput(true, "Boolean");
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -129,7 +197,10 @@ Blockly.Blocks['madeup_movement_moveto'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -145,7 +216,10 @@ Blockly.Blocks['madeup_movement_move'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -163,7 +237,10 @@ Blockly.Blocks['madeup_loop_repeat'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -183,7 +260,10 @@ Blockly.Blocks['madeup_loop_repeatwich'] = {
     this.setColour(330);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -198,7 +278,10 @@ Blockly.Blocks['madeup_movement_turn'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -212,7 +295,10 @@ Blockly.Blocks['madeup_math_sincostan'] = {
     this.setInputsInline(true);
     this.setOutput(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_math_inverse_sincostan'] = {
@@ -224,7 +310,10 @@ Blockly.Blocks['madeup_math_inverse_sincostan'] = {
     this.setInputsInline(true);
     this.setOutput(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -239,7 +328,10 @@ Blockly.Blocks['madeup_logic_junction'] = {
     this.setInputsInline(true);
     this.setOutput(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -252,7 +344,10 @@ Blockly.Blocks['madeup_logic_not'] = {
     this.setInputsInline(true);
     this.setOutput(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -265,7 +360,10 @@ Blockly.Blocks['madeup_movement_center'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_movement_identity'] = {
@@ -276,7 +374,10 @@ Blockly.Blocks['madeup_movement_identity'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_movement_reframe'] = {
@@ -287,7 +388,10 @@ Blockly.Blocks['madeup_movement_reframe'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_movement_push'] = {
@@ -298,7 +402,10 @@ Blockly.Blocks['madeup_movement_push'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_movement_pop'] = {
@@ -309,7 +416,10 @@ Blockly.Blocks['madeup_movement_pop'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_movement_reverse'] = {
@@ -320,7 +430,10 @@ Blockly.Blocks['madeup_movement_reverse'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // Blockly.Blocks['madeup_io_where'] = {
@@ -345,7 +458,10 @@ Blockly.Blocks['madeup_generate_dowel'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_generate_tube'] = {
@@ -359,7 +475,10 @@ Blockly.Blocks['madeup_generate_tube'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_generate_spheres'] = {
@@ -370,7 +489,10 @@ Blockly.Blocks['madeup_generate_spheres'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_generate_forget'] = {
@@ -381,7 +503,10 @@ Blockly.Blocks['madeup_generate_forget'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_generate_polygon'] = {
@@ -392,7 +517,10 @@ Blockly.Blocks['madeup_generate_polygon'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_generate_boxes'] = {
@@ -403,7 +531,10 @@ Blockly.Blocks['madeup_generate_boxes'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -431,7 +562,10 @@ Blockly.Blocks['madeup_generate_extrude'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_generate_revolve'] = {
@@ -457,7 +591,10 @@ Blockly.Blocks['madeup_generate_revolve'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -476,7 +613,10 @@ Blockly.Blocks['madeup_generate_surface'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -494,7 +634,10 @@ Blockly.Blocks['madeup_math_binary_arithmetic_operator'] = {
     this.setInputsInline(true);
     this.setOutput(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -509,7 +652,10 @@ Blockly.Blocks['madeup_math_relational_operator'] = {
     this.setInputsInline(true);
     this.setOutput(true, "Boolean");
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -524,7 +670,10 @@ Blockly.Blocks['madeup_math_unary_operator'] = {
     this.setInputsInline(true);
     this.setOutput(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -539,7 +688,10 @@ Blockly.Blocks['madeup_math_minmax'] = {
     this.appendValueInput("B");
     this.setOutput(true, ["Integer", "Real"]);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -560,7 +712,10 @@ Blockly.Blocks['madeup_math_random'] = {
     this.setColour(Blockly.Blocks.madeup.NUMBER_HUE);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -581,7 +736,10 @@ Blockly.Blocks['madeup_math_log'] = {
     this.setInputsInline(false);
     this.setOutput(true, "Real");
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -600,7 +758,10 @@ Blockly.Blocks['madeup_logic_if_expr'] = {
     this.setInputsInline(true);
     this.setOutput(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -618,7 +779,10 @@ Blockly.Blocks['madeup_logic_if_statement'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_logic_if_else_statement'] = {
@@ -636,7 +800,10 @@ Blockly.Blocks['madeup_logic_if_else_statement'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -664,7 +831,10 @@ Blockly.Blocks['madeup_movement_rotate'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_movement_scale'] = {
@@ -686,7 +856,10 @@ Blockly.Blocks['madeup_movement_scale'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_movement_translate'] = {
@@ -708,7 +881,10 @@ Blockly.Blocks['madeup_movement_translate'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -725,7 +901,10 @@ Blockly.Blocks['madeup_loop_while'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -744,7 +923,10 @@ Blockly.Blocks['madeup_loop_for_to'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_loop_for_to_by'] = {
@@ -764,7 +946,10 @@ Blockly.Blocks['madeup_loop_for_to_by'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_loop_for_through'] = {
@@ -781,7 +966,10 @@ Blockly.Blocks['madeup_loop_for_through'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_loop_for_through_by'] = {
@@ -801,7 +989,10 @@ Blockly.Blocks['madeup_loop_for_through_by'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -823,7 +1014,10 @@ Blockly.Blocks['madeup_loop_for_in'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -848,7 +1042,10 @@ Blockly.Blocks['madeup_loop_for_in_by'] = {
     this.setColour(330);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -860,7 +1057,10 @@ Blockly.Blocks['madeup_string'] = {
     this.setOutput(true);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------
@@ -873,7 +1073,169 @@ Blockly.Blocks['madeup_eval'] = {
     this.setNextStatement(true);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
-  }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
+};
+
+// ----------------------------------------------------------------------------
+
+Blockly.Blocks['madeup_array_literal'] = {
+  /**
+   * Block for creating a list with any number of elements of any type.
+   * @this Blockly.Block
+   */
+  init: function() {
+    // this.setHelpUrl(Blockly.Msg.LISTS_CREATE_WITH_HELPURL);
+    this.setColour(Blockly.Blocks.madeup.ARRAY_HUE);
+    this.itemCount_ = 3;
+    this.updateShape_();
+    this.setOutput(true, 'Array');
+    this.setMutator(new Blockly.Mutator(['madeup_array_element']));
+    this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_TOOLTIP);
+  },
+  /**
+   * Create XML to represent list inputs.
+   * @return {!Element} XML storage element.
+   * @this Blockly.Block
+   */
+  mutationToDom: function() {
+    var container = document.createElement('mutation');
+    container.setAttribute('items', this.itemCount_);
+    mutationModeToDom(this, container);
+    return container;
+  },
+  /**
+   * Parse XML to restore the list inputs.
+   * @param {!Element} xmlElement XML storage element.
+   * @this Blockly.Block
+   */
+  domToMutation: function(xmlElement) {
+    domModeToMutation(xmlElement);
+    this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
+    this.updateShape_();
+  },
+  /**
+   * Populate the mutator's dialog with this block's components.
+   * @param {!Blockly.Workspace} workspace Mutator's workspace.
+   * @return {!Blockly.Block} Root block in mutator.
+   * @this Blockly.Block
+   */
+  decompose: function(workspace) {
+    var containerBlock =
+        Blockly.Block.obtain(workspace, 'madeup_array_create_with_container');
+    containerBlock.initSvg();
+    var connection = containerBlock.getInput('STACK').connection;
+    for (var i = 0; i < this.itemCount_; i++) {
+      var itemBlock = Blockly.Block.obtain(workspace, 'madeup_array_element');
+      itemBlock.initSvg();
+      connection.connect(itemBlock.previousConnection);
+      connection = itemBlock.nextConnection;
+    }
+    return containerBlock;
+  },
+  /**
+   * Reconfigure this block based on the mutator dialog's components.
+   * @param {!Blockly.Block} containerBlock Root block in mutator.
+   * @this Blockly.Block
+   */
+  compose: function(containerBlock) {
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    // Count number of inputs.
+    var connections = [];
+    while (itemBlock) {
+      connections.push(itemBlock.valueConnection_);
+      itemBlock = itemBlock.nextConnection && itemBlock.nextConnection.targetBlock();
+    }
+    this.itemCount_ = connections.length;
+    this.updateShape_();
+    // Reconnect any child blocks.
+    for (var i = 0; i < this.itemCount_; i++) {
+      if (connections[i]) {
+        this.getInput('ELEMENT' + i).connection.connect(connections[i]);
+      }
+    }
+  },
+  /**
+   * Store pointers to any connected child blocks.
+   * @param {!Blockly.Block} containerBlock Root block in mutator.
+   * @this Blockly.Block
+   */
+  saveConnections: function(containerBlock) {
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    var i = 0;
+    while (itemBlock) {
+      var input = this.getInput('ELEMENT' + i);
+      itemBlock.valueConnection_ = input && input.connection.targetConnection;
+      i++;
+      itemBlock = itemBlock.nextConnection && itemBlock.nextConnection.targetBlock();
+    }
+  },
+  /**
+   * Modify this block to have the correct number of inputs.
+   * @private
+   * @this Blockly.Block
+   */
+  updateShape_: function() {
+    // Delete everything.
+    if (this.getInput('EMPTY')) {
+      this.removeInput('EMPTY');
+    } else {
+      var i = 0;
+      while (this.getInput('ELEMENT' + i)) {
+        this.removeInput('ELEMENT' + i);
+        i++;
+      }
+    }
+    // Rebuild block.
+    if (this.itemCount_ == 0) {
+      this.appendDummyInput('EMPTY')
+          .appendField('empty');
+    } else {
+      for (var i = 0; i < this.itemCount_; i++) {
+        var input = this.appendValueInput('ELEMENT' + i);
+        if (i == 0) {
+          input.appendField('array');
+        }
+      }
+    }
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
+};
+
+Blockly.Blocks['madeup_array_create_with_container'] = {
+  /**
+   * Mutator block for list container.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(Blockly.Blocks.lists.HUE);
+    this.appendDummyInput()
+        .appendField('array');
+    this.appendStatementInput('STACK');
+    this.contextMenu = false;
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
+};
+
+Blockly.Blocks['madeup_array_element'] = {
+  init: function() {
+    this.setColour(Blockly.Blocks.lists.HUE);
+    this.appendDummyInput()
+        .appendField('element');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    // this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_ITEM_TOOLTIP);
+    this.contextMenu = false;
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
 };
 
 // ----------------------------------------------------------------------------

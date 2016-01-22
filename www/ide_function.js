@@ -1506,7 +1506,6 @@ function load(mup) {
     if (isEditorText) {
       textEditor.session.setValue(file.source, -1);
     } else {
-      console.log("b");
       blocklyWorkspace.clear();
       var xml = Blockly.Xml.textToDom(file.source);
       Blockly.Xml.domToWorkspace(blocklyWorkspace, xml);

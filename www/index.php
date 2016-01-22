@@ -50,7 +50,6 @@
       <block type="madeup_math_real"></block>
       <block type="madeup_string"></block>
       <block type="madeup_logic_boolean"></block>
-      <block type="madeup_eval"></block>
       <block type="madeup_nothing"></block>
     </category>
     <category name="Math">
@@ -111,6 +110,9 @@
       <block type="madeup_logic_if_else_statement"></block>
       <block type="madeup_math_relational_operator"></block>
     </category>
+    <category name="Arrays">
+      <block type="madeup_array_literal"></block>
+    </category>
     <category name="Variables" custom="VARIABLE"></category>
     <category name="Functions" custom="PROCEDURE"></category>
   </xml>
@@ -121,11 +123,11 @@
     <div style="display: inline-block; position: absolute: left: 0px;">
       <input id="solidify" type="button" value="Solidify"/>
       <input id="pathify" type="button" value="Pathify"/>
+      <input id="docs" type="button" value="Docs"/>
       <input id="smaller" type="button" value="-abc"/>
       <input id="bigger" type="button" value="+abc"/>
       <input id="toggleEditorPopup" class="togglePopup" type="button" value="Editor"/>
-      <input id="docs" type="button" value="Docs"/>
-<!--      <input id="magic" type="button" value="Magic"/> -->
+      <input id="magic" type="button" value="Magic"/>
     </div>
 
     <div style="display: inline-block; position: absolute; left: 0px; right: 0px; text-align: center; pointer-events: none;" class="fileLink">
