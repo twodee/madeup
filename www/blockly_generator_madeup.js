@@ -621,27 +621,6 @@ Blockly.Madeup['procedures_callnoreturn'] = function(block) {
   return generateInMode(block, code, Blockly.Madeup.ORDER_FUNCTION_CALL);
 };
 
-Blockly.Madeup['procedures_callreturn'] = function(block) {
-  var funcName = Blockly.Madeup.variableDB_.getName(block.getFieldValue('NAME'), Blockly.Procedures.NAME_TYPE);
-  var args = [];
-  var precedence;
-  for (var i = 0; i < block.arguments_.length; i++) {
-    if (block.arguments_.length == 1) {
-      precedence = Blockly.Madeup.ORDER_FUNCTION_CALL_ONLY_PARAMETER;
-    } else if (i == 0) {
-      precedence = Blockly.Madeup.ORDER_FUNCTION_CALL_FIRST_PARAMETER;
-    } else {
-      precedence = Blockly.Madeup.ORDER_FUNCTION_CALL_NOT_FIRST_PARAMETER;
-    }
-    args[i] = Blockly.Madeup.valueToCode(block, 'ARG' + i, precedence) || '';
-  }
-  var code = funcName;
-  if (args.length) {
-    code += ' ' + args.join(', ');
-  }
-  return generateInMode(block, code, Blockly.Madeup.ORDER_FUNCTION_CALL);
-};
-
 Blockly.Madeup['madeup_string'] = function(block) {
   var text_string = block.getFieldValue('STRING');
   var code = '"' + text_string + '"';

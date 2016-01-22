@@ -1244,3 +1244,49 @@ Blockly.Blocks['madeup_array_element'] = {
 // statements.
 Blockly.Blocks['procedures_ifreturn'] = null;
 Blockly.Blocks['procedures_defreturn'] = null;
+
+// Blockly makes the function definition blocks for us. Let's tweak them
+// so they can change betweeen statements and expressions.
+(function() {
+  var oldContextMenu = Blockly.Blocks['procedures_defnoreturn'].customContextMenu;
+  Blockly.Blocks['procedures_defnoreturn'].customContextMenu = function(options) {
+    oldContextMenu.call(this, options);
+    toggleStatementExpression.call(this, options);
+  };
+
+  var oldDomToMutation = Blockly.Blocks['procedures_defnoreturn'].domToMutation;
+  Blockly.Blocks['procedures_defnoreturn'].domToMutation = function(xmlElement) {
+    oldDomToMutation.call(this, xmlElement);
+    domModeToMutation.call(this, xmlElement);
+  };
+
+  var oldMutationToDom = Blockly.Blocks['procedures_defnoreturn'].mutationToDom;
+  Blockly.Blocks['procedures_defnoreturn'].mutationToDom = function() {
+    var container = oldMutationToDom.call(this);
+    mutationModeToDom(this, container);
+    return container;
+  };
+})();
+
+// Blockly makes the function call blocks for us. Let's tweak them so they can
+// change betweeen statements and expressions.
+(function() {
+  var oldContextMenu = Blockly.Blocks['procedures_callnoreturn'].customContextMenu;
+  Blockly.Blocks['procedures_callnoreturn'].customContextMenu = function(options) {
+    oldContextMenu.call(this, options);
+    toggleStatementExpression.call(this, options);
+  };
+
+  var oldDomToMutation = Blockly.Blocks['procedures_callnoreturn'].domToMutation;
+  Blockly.Blocks['procedures_callnoreturn'].domToMutation = function(xmlElement) {
+    oldDomToMutation.call(this, xmlElement);
+    domModeToMutation.call(this, xmlElement);
+  };
+
+  var oldMutationToDom = Blockly.Blocks['procedures_callnoreturn'].mutationToDom;
+  Blockly.Blocks['procedures_callnoreturn'].mutationToDom = function() {
+    var container = oldMutationToDom.call(this);
+    mutationModeToDom(this, container);
+    return container;
+  };
+})();
