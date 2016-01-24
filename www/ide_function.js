@@ -1618,15 +1618,25 @@ function run(source, mode) {
         
         if (mode == GeometryMode.SURFACE) {
           var loader = new THREE.JSONLoader();
-          var model = loader.parse(JSON.parse(data['model']));
-          var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: showWireframe, wireframeLinewidth: 5});
-          meshes[0] = new THREE.Mesh(model.geometry, material);
-          model.geometry.computeFaceNormals();
-          model.geometry.computeVertexNormals();
-          allGeometry = model.geometry;
-          enableDownload(true);
+          try {
+            var model = loader.parse(JSON.parse(data['model']));
+            var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: showWireframe, wireframeLinewidth: 5});
+            meshes[0] = new THREE.Mesh(model.geometry, material);
+            model.geometry.computeFaceNormals();
+            model.geometry.computeVertexNormals();
+            allGeometry = model.geometry;
+            enableDownload(true);
+          } catch (err) {
+            log('The geometry I got back had some funny stuff in it that I didn\'t know how to read.');
+          }
         } else {
-          var paths = JSON.parse(data['model']);
+          var paths = [];
+          try {
+            paths = JSON.parse(data['model']);
+          } catch (err) {
+            log('The geometry I got back had some funny stuff in it that I didn\'t know how to read.');
+          }
+
           allGeometry = new THREE.Geometry();
           if (showPoints) {
             var dotsGeometry = new THREE.Geometry();
@@ -1794,8 +1804,13 @@ function log(message) {
   });
 
   // $1 is the whole source span. $2 is the start. $3 is the end.
-  var linkMessage = message.replace(/^((\d+)\((\d+)(?:-(\d+))?\))/gm, function(match, full, startLine, startIndex, stopIndex) {
-    return '<div style="color: #FF9999; display: inline;">Error on <a style="text-decoration: underline;" onclick="javascript:highlight(' + startIndex + ', ' + stopIndex + ')" class="srclink">line ' + startLine + /*':' + startIndex + ':' + stopIndex +*/ '</a></div>';
+  var linkMessage = message.replace(/^((\d+)\((\d+)(?:-(\d+))?\)):\s*/gm, function(match, full, startLine, startIndex, stopIndex) {
+    if (isEditorText) {
+      return '<div style="color: #FF9999; display: inline;">Error on <a style="text-decoration: underline;" onclick="javascript:highlight(' + startIndex + ', ' + stopIndex + ')" class="srclink">line ' + startLine + '</a></div>: ';
+    } else {
+      // return '<div style="color: #FF9999; display: inline;">Error</div>';
+      return '';
+    }
   });
 
 
