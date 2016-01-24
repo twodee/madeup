@@ -1,5 +1,7 @@
 <?php
 
+error_reporting(E_ALL);
+
 function to_bytes($val) {
   $val = trim($val);
   $last = strtolower($val[strlen($val) - 1]);
@@ -116,19 +118,15 @@ if (!(strcmp($in['extension'], 'json') == 0 || strcmp($in['extension'], 'obj') =
     header("Content-Disposition: attachment; filename=$tag.obj");
     readfile($out_path);
   } else {
-    if (memory_get_usage() + filesize($out_path) > to_bytes(ini_get('memory_limit'))) {
+    if (memory_get_usage() + 5 * filesize($out_path) > to_bytes(ini_get('memory_limit'))) {
       $out['exit_status'] = 1;  
-      $a = memory_get_usage();
-      $b = filesize($out_path);
-      $c = ini_get('memory_limit');
       $out['stdout'] = "Whoa! I don't have enough memory for this.";
       $out['model'] = '';
-    } if ($out['exit_status'] == 0) {
+    } else if ($out['exit_status'] == 0) {
       $out['model'] = file_get_contents($out_path);
-    } else {
-      $out['model'] = '';
     }
-    echo json_encode($out);
+    $json = json_encode($out);
+    echo $json;
   }
 
   // Clean up the temporary files we created for the interpreter.
