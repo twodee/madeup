@@ -67,6 +67,7 @@
       <block type="madeup_movement_moveto"></block>
       <block type="madeup_movement_move"></block>
       <block type="madeup_movement_turn"></block>
+      <block type="madeup_movement_where"></block>
       <block type="madeup_movement_center"></block>
       <block type="madeup_movement_rotate"></block>
       <block type="madeup_movement_scale"></block>
@@ -112,6 +113,8 @@
     </category>
     <category name="Arrays">
       <block type="madeup_array_literal"></block>
+      <block type="madeup_array_by"></block>
+      <block type="madeup_array_of"></block>
     </category>
     <category name="Variables" custom="VARIABLE"></category>
     <category name="Functions" custom="PROCEDURE"></category>

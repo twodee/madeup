@@ -53,6 +53,7 @@ Blockly.Madeup.ORDER_ATOMIC = 0;            // 0 "" ...
 //Blockly.Madeup.ORDER_COLLECTION = 1;        // tuples, lists, dictionaries
 //Blockly.Madeup.ORDER_STRING_CONVERSION = 1; // `expression...`
 //Blockly.Madeup.ORDER_MEMBER = 2;            // . []
+Blockly.Madeup.ORDER_ARRAY_CTOR = 2;
 Blockly.Madeup.ORDER_EXPONENTIATION = 3;    // **
 //Blockly.Madeup.ORDER_BITWISE_NOT = 4;       // ~
 Blockly.Madeup.ORDER_MULTIPLICATIVE = 5;    // * / // %
@@ -627,6 +628,11 @@ Blockly.Madeup['madeup_string'] = function(block) {
   return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
 };
 
+Blockly.Madeup['madeup_movement_where'] = function(block) {
+  var code = 'where';
+  return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+};
+
 Blockly.Madeup['madeup_array_literal'] = function(block) {
   var elements = [];
   for (var i = 0; i < block.itemCount_; i++) {
@@ -634,4 +640,18 @@ Blockly.Madeup['madeup_array_literal'] = function(block) {
   }
   var code = '{' + elements.join(', ') + '}';
   return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+};
+
+Blockly.Madeup['madeup_array_by'] = function(block) {
+  var value_outer = Blockly.Madeup.valueToCode(block, 'OUTER', Blockly.Madeup.ORDER_ARRAY_CTOR);
+  var value_inner = Blockly.Madeup.valueToCode(block, 'INNER', Blockly.Madeup.ORDER_ARRAY_CTOR);
+  var code = value_outer + ' by ' + value_inner;
+  return generateInMode(block, code, Blockly.Madeup.ORDER_ARRAY_CTOR);
+};
+
+Blockly.Madeup['madeup_array_of'] = function(block) {
+  var value_n = Blockly.Madeup.valueToCode(block, 'N', Blockly.Madeup.ORDER_ARRAY_CTOR);
+  var value_item = Blockly.Madeup.valueToCode(block, 'ITEM', Blockly.Madeup.ORDER_ARRAY_CTOR);
+  var code = value_n + ' of ' + value_item;
+  return generateInMode(block, code, Blockly.Madeup.ORDER_ARRAY_CTOR);
 };
