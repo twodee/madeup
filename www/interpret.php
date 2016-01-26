@@ -1,5 +1,21 @@
 <?php
 
+function to_bytes($val) {
+  $val = trim($val);
+  $last = strtolower($val[strlen($val) - 1]);
+
+  switch($last) {
+    case 'g':
+      $val *= 1024;
+    case 'm':
+      $val *= 1024;
+    case 'k':
+      $val *= 1024;
+  }
+
+  return $val;
+}
+
 if (isset($_REQUEST['source'])) {
   $in = $_REQUEST;
 } else {
@@ -100,7 +116,14 @@ if (!(strcmp($in['extension'], 'json') == 0 || strcmp($in['extension'], 'obj') =
     header("Content-Disposition: attachment; filename=$tag.obj");
     readfile($out_path);
   } else {
-    if ($out['exit_status'] == 0) {
+    if (memory_get_usage() + filesize($out_path) > to_bytes(ini_get('memory_limit'))) {
+      $out['exit_status'] = 1;  
+      $a = memory_get_usage();
+      $b = filesize($out_path);
+      $c = ini_get('memory_limit');
+      $out['stdout'] = "Whoa! I don't have enough memory for this.";
+      $out['model'] = '';
+    } if ($out['exit_status'] == 0) {
       $out['model'] = file_get_contents($out_path);
     } else {
       $out['model'] = '';

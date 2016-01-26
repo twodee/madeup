@@ -50,6 +50,8 @@ template<class T> class Polyline : public NField<T, 1> {
     Trimesh *Triangulate() const;
     Trimesh *Extrude(const QVector3<T> &axis, T distance, const QMatrix4<float>& xform = QMatrix4<float>(1.0f)) const;
 
+    bool IsPlanar(T threshold) const;
+
     std::string ToString() const;
 
   private:
@@ -159,8 +161,8 @@ Trimesh *Polyline<T>::Revolve(const QVector3<T>& axis, int nstops, float degrees
     base->ReverseWinding();
   }
 
-  // Add caps if this isn't a full revolution.
-  if (!is_full) {
+  // Add caps if this isn't a full revolution but the cross section is planar.
+  if (this->IsPlanar(1.0e-6f) && !is_full) {
     // The first cap is easy. Just take our framing polyline and
     // triangulate it.
     Trimesh *cap_a_mesh = this->Triangulate(); 
@@ -366,7 +368,7 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
   QVector3<T> *normals = new QVector3<T>[nvertices]; 
   for (int vi = 0; vi < nvertices; ++vi) {
     if (fores[vi].GetSquaredLength() < EPSILON && afts[vi].GetSquaredLength() < EPSILON) {
-      throw MessagedException("no good vecs");
+      throw MessagedException("I can't solidify this dowel. Too many of its vertices are piled on top of each other.");
     } else if (fores[vi].GetSquaredLength() < EPSILON) {
       normals[vi] = afts[vi] * (T) -1;
     } else if (afts[vi].GetSquaredLength() < EPSILON) {
@@ -938,6 +940,7 @@ template<class T>
 Trimesh *Polyline<T>::Extrude(const QVector3<T> &axis, T distance, const QMatrix4<float>& xform) const {
   // assumes axis is normalized
   int nvertices = this->GetElementCount();
+  bool is_planar = this->IsPlanar(1.0e-6f);
 
   // Two directions...
   const QVector3<T> delta = axis * distance;
@@ -957,7 +960,7 @@ Trimesh *Polyline<T>::Extrude(const QVector3<T> &axis, T distance, const QMatrix
   int nmetas = this->GetChannelCount() - 3;
 
   // End A
-  Trimesh *cap_a = this->Triangulate(); 
+  Trimesh *cap_a = is_planar ? this->Triangulate() : new Trimesh(0, 0); 
   float *vertex_meta = NULL;
   if (nmetas > 0) {
     vertex_meta = cap_a->AllocateVertexMetas(nmetas);
@@ -965,7 +968,7 @@ Trimesh *Polyline<T>::Extrude(const QVector3<T> &axis, T distance, const QMatrix
 
   for (int i = 0; i < nvertices; ++i) {
     vertices.push_back(VertexMeta<T>(QVector3<T>((*this)(i)), &(*this)(i)[3]));
-    if (vertex_meta) {
+    if (is_planar && vertex_meta) {
       memcpy(vertex_meta, &(*this)(i)[3], sizeof(float) * nmetas);
       vertex_meta += nmetas;
     }
@@ -1022,6 +1025,38 @@ Trimesh *Polyline<T>::Extrude(const QVector3<T> &axis, T distance, const QMatrix
 template<class T>
 bool Polyline<T>::IsOpen() const {
   return is_open;
+}
+
+/* ------------------------------------------------------------------------- */
+
+template<class T>
+bool Polyline<T>::IsPlanar(T threshold) const {
+  if (this->GetChannelCount() < 3) {
+    return true;
+  }
+
+  // First compute plane determined by first three vertices. 
+  QVector3<T> a((*this)(0));
+  QVector3<T> b((*this)(1));
+  QVector3<T> c((*this)(2));
+
+  QVector3<T> a2b = b - a;
+  QVector3<T> a2c = c - a;
+
+  QVector3<T> normal = a2b.Cross(a2c);
+  normal.Normalize();
+
+  Plane<T, 3> plane(a, normal);
+
+  // Next make sure each remaining vertex is on that plane.
+  for (int i = 3; i < this->GetElementCount(); ++i) {
+    T distance = plane.DistanceTo(QVector3<T>((*this)(i)));
+    if (fabs(distance) > threshold) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 /* ------------------------------------------------------------------------- */

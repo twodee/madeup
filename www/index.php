@@ -38,30 +38,30 @@
 
   <!-- Madeup IDE dependencies -->
   <link rel="stylesheet" href="ide_skin.css"/>
+  <link rel="stylesheet" href="ide_skin_dark.css" title="theme"/>
   <script src="ide_function.js"></script>
 </head>
 
 <body>
   <!-- The Blockly toolbox __________________________________________________ -->
   <xml id="toolbox" style="display: none">
-    <category name="Primitives">
+    <category name="Data">
       <block type="madeup_math_integer"></block>
       <block type="madeup_math_real"></block>
       <block type="madeup_string"></block>
       <block type="madeup_logic_boolean"></block>
-      <block type="madeup_eval"></block>
       <block type="madeup_nothing"></block>
     </category>
-    <category name="Loops">
-      <block type="madeup_loop_repeat"></block>
-      <block type="madeup_loop_while"></block>
-      <block type="madeup_loop_for_to"></block>
-      <block type="madeup_loop_for_to_by"></block>
-      <block type="madeup_loop_for_through"></block>
-      <block type="madeup_loop_for_through_by"></block>
-      <block type="madeup_loop_for_in"></block>
-      <block type="madeup_loop_for_in_by"></block>
-      <block type="madeup_loop_repeatwich"></block>
+    <category name="Math">
+      <block type="madeup_math_binary_arithmetic_operator"></block>
+      <block type="madeup_math_unary_operator"></block>
+      <block type="madeup_math_sincostan"></block>
+      <block type="madeup_math_inverse_sincostan"></block>
+      <block type="madeup_math_minmax"></block>
+      <block type="madeup_math_abs"></block>
+      <block type="madeup_math_sign"></block>
+      <block type="madeup_math_random"></block>
+      <block type="madeup_math_log"></block>
     </category>
     <category name="Movement">
       <block type="madeup_movement_moveto"></block>
@@ -77,7 +77,7 @@
       <block type="madeup_movement_pop"></block>
       <block type="madeup_movement_reverse"></block>
     </category>
-    <category name="Generate">
+    <category name="Solidifiers">
       <block type="madeup_generate_spheres"></block>
       <block type="madeup_generate_boxes"></block>
       <block type="madeup_generate_dowel"></block>
@@ -87,24 +87,21 @@
       <block type="madeup_generate_surface"></block>
       <block type="madeup_generate_forget"></block>
     </category>
+    <category name="Loops">
+      <block type="madeup_loop_repeat"></block>
+      <block type="madeup_loop_while"></block>
+      <block type="madeup_loop_for_to"></block>
+      <block type="madeup_loop_for_to_by"></block>
+      <block type="madeup_loop_for_through"></block>
+      <block type="madeup_loop_for_through_by"></block>
+      <block type="madeup_loop_for_in"></block>
+      <block type="madeup_loop_for_in_by"></block>
+      <block type="madeup_loop_repeatwich"></block>
+    </category>
     <category name="I/O">
       <block type="madeup_io_print"></block>
       <block type="madeup_io_debug"></block>
-      <block type="madeup_io_where"></block>
     </category>
-    <category name="Math">
-      <block type="madeup_math_binary_arithmetic_operator"></block>
-      <block type="madeup_math_unary_operator"></block>
-      <block type="madeup_math_sincostan"></block>
-      <block type="madeup_math_inverse_sincostan"></block>
-      <block type="madeup_math_minmax"></block>
-      <block type="madeup_math_abs"></block>
-      <block type="madeup_math_sign"></block>
-      <block type="madeup_math_random"></block>
-      <block type="madeup_math_log"></block>
-    </category>
-    <category name="Variables" custom="VARIABLE"></category>
-    <category name="Functions" custom="PROCEDURE"></category>
     <category name="Logic">
       <block type="madeup_logic_junction"></block>
       <block type="madeup_logic_not"></block>
@@ -113,6 +110,11 @@
       <block type="madeup_logic_if_else_statement"></block>
       <block type="madeup_math_relational_operator"></block>
     </category>
+    <category name="Arrays">
+      <block type="madeup_array_literal"></block>
+    </category>
+    <category name="Variables" custom="VARIABLE"></category>
+    <category name="Functions" custom="PROCEDURE"></category>
   </xml>
 
   <!-- The layout _________________________________________________________ -->
@@ -120,10 +122,12 @@
   <div id="menu">
     <div style="display: inline-block; position: absolute: left: 0px;">
       <input id="solidify" type="button" value="Solidify"/>
+      <input id="pathify" type="button" value="Pathify"/>
+      <input id="docs" type="button" value="Docs"/>
       <input id="smaller" type="button" value="-abc"/>
       <input id="bigger" type="button" value="+abc"/>
       <input id="toggleEditorPopup" class="togglePopup" type="button" value="Editor"/>
-      <input id="docs" type="button" value="Docs"/>
+      <input id="magic" type="button" value="Magic"/>
     </div>
 
     <div style="display: inline-block; position: absolute; left: 0px; right: 0px; text-align: center; pointer-events: none;" class="fileLink">
@@ -157,6 +161,8 @@
     <div id="editorPopup" class="popup">
       <input type="radio" name="editorMode" id="isEditorText" value="Text" checked="checked"/>Text or 
       <input type="radio" name="editorMode" id="isEditorBlocks" value="Blocks"/>Blocks<br/>
+      <input type="radio" name="theme" id="isDark" value="isDark" checked="checked"/>Dark or 
+      <input type="radio" name="theme" id="isLight" value="isLight"/>Light<br/>
       <input type="checkbox" id="autopreview" checked="checked"/>Preview <input type="text" id="nSecondsTillPreview" size="5"/> seconds after last edit<br/>
     </div>
 
@@ -174,9 +180,15 @@
     <div id="displayPopup" class="popup">
       <input type="checkbox" id="showWireframe"/>Show wireframe<br/>
       <input type="checkbox" id="showHeadings"/>Show heading<br/>
+      <input type="checkbox" id="showPoints"/>Show points<br/>
       <input type="checkbox" id="showCounterclockwise"/>Show counterclockwise faces<br/>
       <input type="checkbox" id="showClockwise"/>Show clockwise faces<br/>
       <input type="checkbox" id="isFlatShaded"/>Flat shading<br/>
+      <hr>
+      View From:
+      <a href="#" id="cameraLeft" class="fileLink">-X</a> <a href="#" id="cameraRight" class="fileLink">+X</a>
+      <a href="#" id="cameraBottom" class="fileLink">-Y</a> <a href="#" id="cameraTop" class="fileLink">+Y</a>
+      <a href="#" id="cameraBack" class="fileLink">-Z</a> <a href="#" id="cameraFront" class="fileLink">+Z</a><br/>
     </div>
   </div>
 

@@ -7,6 +7,24 @@ function hasWebGL() {
   } 
 }
 
+// Prime Blockly with some builtin variables. There's no API exposed for this,
+// but Blockly.Variables.allVariables walks the blocks in the workspace and
+// returns the names of all variables. Our builtin variables don't necessarily
+// appear in the workspace (yet), so we hijack this function and add them
+// manually.
+(function() {
+  var oldAllVariables = Blockly.Variables.allVariables;
+  Blockly.Variables.allVariables = function(root) {
+    var vars = oldAllVariables.call(this, root);
+    vars.push('nsides');
+    vars.push('.rgb');
+    vars.push('.radius');
+    vars.push('.innerRadius');
+    vars.push('.outerRadius');
+    return vars;
+  };
+})();
+
 // Warn on leaving the page if there are unsaved changes. Downloading triggers
 // this, even though we're not leaving the page, so we add a special flag to
 // filter out these events.
@@ -628,10 +646,10 @@ function populateFileMenu() {
 function enableDownload(enable) {
   if (enable) {
     $('#download').prop('disabled', false);
-    $('#download').css('color', '#FFFFFF');
+    $('#download').removeClass('unclickable').addClass('clickable');
   } else {
     $('#download').prop('disabled', true);
-    $('#download').css('color', '#666666');
+    $('#download').removeClass('clickable').addClass('unclickable');
   }
 }
 
@@ -673,9 +691,12 @@ var gridExtent = 10.0;
 var isFlatShaded = true;
 var isEditorText = true;
 var tree = null;
+var preview = undefined;
+var isThemeDark = true;
 var isSourceDirty = false;
+var showPoints = true;
 
-var isEditorTextChanged = false;
+var isThemeDarkChanged = false;
 var isShowWireframeChanged = false;
 var isAxisChanged = [false, false, false];
 var isGridChanged = [false, false, false];
@@ -687,6 +708,7 @@ var isGridExtentChanged = false;
 var isShowCounterclockwiseChanged = false;
 var isShowClockwiseChanged = false;
 var isFlatShadedChanged = false;
+var isShowPointsChanged = false;
 
 function updateTitle() {
   $('#toggleFilePopup').attr('value', mupName + (isSourceDirty ? '*' : ''));
@@ -704,7 +726,7 @@ function saveInCookies() {
   if (isShowClockwiseChanged) Cookies.set('showClockwise', showClockwise ? 1 : 0);
   if (isShowWireframeChanged) Cookies.set('showWireframe', showWireframe ? 1 : 0);
   if (isFlatShadedChanged) Cookies.set('isFlatShaded', isFlatShaded ? 1 : 0);
-  if (isEditorTextChanged) Cookies.set('isEditorText', isEditorText ? 1 : 0);
+  if (isThemeDarkChanged) Cookies.set('isThemeDark', isThemeDark ? 1 : 0);
   if (isAxisChanged[0]) Cookies.set('axisX', $('#axisX').prop('checked') ? 1 : 0);
   if (isAxisChanged[1]) Cookies.set('axisY', $('#axisY').prop('checked') ? 1 : 0);
   if (isAxisChanged[2]) Cookies.set('axisZ', $('#axisZ').prop('checked') ? 1 : 0);
@@ -714,6 +736,7 @@ function saveInCookies() {
   if (isNSecondsTillPreviewChanged) Cookies.set('nSecondsTillPreview', nSecondsTillPreview);
   if (isGridSpacingChanged) Cookies.set('gridSpacing', gridSpacing);
   if (isGridExtentChanged) Cookies.set('gridExtent', gridExtent);
+  if (isShowPointsChanged) Cookies.set('showPoints', showPoints ? 1 : 0);
   Cookies.set('leftWidth', $('#left').width());
   Cookies.set('consoleHeight', $('#console').height());
 
@@ -730,11 +753,12 @@ function saveInCookies() {
   isShowClockwiseChanged = false;
   isFlatShadedChanged = false;
   isShowWireframeChanged = false;
-  isEditorTextChanged = false;
+  isThemeDarkChanged = false;
   isShowHeadingsChanged = false;
   isNSecondsTillPreviewChanged = false;
   isGridSpacingChanged = false;
   isGridExtentChanged = false;
+  isShowPointsChanged = false;
   for (var d = 0; d < 3; ++d) {
     isAxisChanged[d] = false;
     isGridChanged[d] = false;
@@ -799,15 +823,26 @@ $(document).ready(function() {
     }
     $('#showWireframe').prop('checked', showWireframe);
 
-    if (Cookies.get('isEditorText')) {
-      setEditor(parseInt(Cookies.get('isEditorText')) != 0);
-    }
-
     if (isEditorText) {
       $("#isEditorText").prop('checked', true);
     } else {
       $("#isEditorBlocks").prop('checked', true);
     }
+
+    if (Cookies.get('isThemeDark')) {
+      setTheme(parseInt(Cookies.get('isThemeDark')) != 0);
+    }
+
+    if (isThemeDark) {
+      $("#isDark").prop('checked', true);
+    } else {
+      $("#isLight").prop('checked', true);
+    }
+
+    if (Cookies.get('showPoints')) {
+      showPoints = parseInt(Cookies.get('showPoints')) != 0;
+    }
+    $("#showPoints").prop('checked', showPoints);
 
     if (Cookies.get('gridExtent')) {
       gridExtent = parseFloat(Cookies.get('gridExtent'));
@@ -926,10 +961,45 @@ $(document).ready(function() {
     textEditor.focus();
   });
 
+  $('#cameraLeft').click(function() {
+    viewFrom(0, -1);
+    textEditor.focus();
+  });
+
+  $('#cameraRight').click(function() {
+    viewFrom(0, 1);
+    textEditor.focus();
+  });
+
+  $('#cameraBottom').click(function() {
+    viewFrom(1, -1);
+    textEditor.focus();
+  });
+
+  $('#cameraTop').click(function() {
+    viewFrom(1, 1);
+    textEditor.focus();
+  });
+
+  $('#cameraBack').click(function() {
+    viewFrom(2, -1);
+    textEditor.focus();
+  });
+
+  $('#cameraFront').click(function() {
+    viewFrom(2, 1);
+    textEditor.focus();
+  });
+
   $('input[type=radio][name=editorMode]').change(function() {
     hideMenus(); // setEditor may pop open a dialog, which doesn't look good with a menu still open
     var editorMode = $(this).val();
     setEditor(editorMode != "Blocks");
+  });
+
+  $('input[type=radio][name=theme]').change(function() {
+    var isDark = $(this).val() == 'isDark';
+    setTheme(isDark);
   });
 
   $('#showHeadings').click(function() {
@@ -1107,6 +1177,12 @@ $(document).ready(function() {
     run(getSource(), GeometryMode.SURFACE);
   });
 
+  $('#showPoints').click(function() {
+    isShowPointsChanged = true;
+    showPoints = this.checked;
+    run(getSource(), GeometryMode.SURFACE);
+  });
+
   function toggleMenu(id) {
     var buttonID = '#toggle' + id.charAt(1).toUpperCase() + id.substring(2);
 
@@ -1115,13 +1191,13 @@ $(document).ready(function() {
 
     // Hilite the menu if it's opening.
     if (!$(id).is(":visible")) {
-      $(buttonID).css('background-color', '#333333');
+      $(buttonID).removeClass('closed').addClass('open');
     }
 
     $(id).slideToggle('fast', function() {
       // Unhilite the menu once it's closed.
       if (!$(id).is(":visible")) {
-        $(buttonID).css('background-color', '#000000');
+        $(buttonID).removeClass('open').addClass('closed');
       }
     });
   }
@@ -1156,10 +1232,22 @@ $(document).ready(function() {
     window.open('docs/introduction.html', '_blank');
   });
 
+  $('#magic').click(function() {
+    var source = Blockly.Madeup.workspaceToCode(blocklyWorkspace);
+    log(source);
+  });
+
   $('#solidify').click(function() {
-    log('Running...'); 
+    log('Solidifying...'); 
     saveInCookies();
     run(getSource(), GeometryMode.SURFACE);
+    textEditor.focus();
+  });
+
+  $('#pathify').click(function() {
+    log('Pathifying...'); 
+    saveInCookies();
+    run(getSource(), GeometryMode.PATH);
     textEditor.focus();
   });
 
@@ -1309,9 +1397,25 @@ var onEditorChange = function(delta) {
   }, nSecondsTillPreview * 1000);
 }
 
-var preview = undefined;
 function schedulePreview() {
   textEditor.getSession().on('change', onEditorChange);
+}
+
+function setTheme(isDark) {
+  if (isThemeDark == isDark) return;
+  isThemeDark = isDark;
+
+  isThemeDarkChanged = true;
+
+  // Update radio buttons to reflect current editor.
+  if (isThemeDark) {
+    $("#isDark").prop('checked', true);
+  } else {
+    $("#isLight").prop('checked', true);
+  }
+
+  $('link[title="theme"]').attr('href', isThemeDark ? 'ide_skin_dark.css' : 'ide_skin_light.css');
+  textEditor.setTheme(isThemeDark ? 'ace/theme/twilight' : 'ace/theme/katzenmilch');
 }
 
 function setEditor(isText) {
@@ -1323,7 +1427,6 @@ function setEditor(isText) {
   }
 
   isEditorText = isText;
-  isEditorTextChanged = true;
 
   // Update radio buttons to reflect current editor.
   if (isEditorText) {
@@ -1347,7 +1450,17 @@ function setEditor(isText) {
   // We're heading to blocks.
   else {
     if (!blocklyWorkspace) {
-      blocklyWorkspace = Blockly.inject('blocksCanvas', {toolbox: document.getElementById('toolbox')});
+      blocklyWorkspace = Blockly.inject('blocksCanvas', {
+        toolbox: document.getElementById('toolbox'),
+        zoom: {
+          controls: true,
+          wheel: false,
+          startScale: 1.0,
+          maxScale: 3,
+          minScale: 0.3,
+          scaleSpeed: 1.2
+        }
+      });
     }
 
     // Any text to convert to blocks?
@@ -1515,14 +1628,18 @@ function run(source, mode) {
         } else {
           var paths = JSON.parse(data['model']);
           allGeometry = new THREE.Geometry();
-          var dotsGeometry = new THREE.Geometry();
+          if (showPoints) {
+            var dotsGeometry = new THREE.Geometry();
+          }
 
           for (var pi = 0; pi < paths.length; ++pi) {
             var geometry = new THREE.Geometry();
             for (var i = 0; i < paths[pi].vertices.length; ++i) {
               var v = new THREE.Vector3(paths[pi].vertices[i][0], paths[pi].vertices[i][1], paths[pi].vertices[i][2]);
               geometry.vertices.push(v);
-              dotsGeometry.vertices.push(v);
+              if (showPoints) {
+                dotsGeometry.vertices.push(v);
+              }
               allGeometry.vertices.push(v);
             }
             meshes[meshes.length] = new THREE.Line(geometry, new THREE.LineBasicMaterial({
@@ -1566,11 +1683,13 @@ function run(source, mode) {
             }
           }
 
-          meshes[meshes.length] = new THREE.PointCloud(dotsGeometry, new THREE.PointCloudMaterial({
-            color: 0x000000,
-            size: 8,
-            sizeAttenuation: false
-          }));
+          if (showPoints) {
+            meshes[meshes.length] = new THREE.PointCloud(dotsGeometry, new THREE.PointCloudMaterial({
+              color: 0x000000,
+              size: 8,
+              sizeAttenuation: false
+            }));
+          }
         }
 
         for (var mi = 0; mi < meshes.length; ++mi) {
@@ -1623,11 +1742,62 @@ function fit() {
   camera.updateProjectionMatrix();
 }
 
+function viewFrom(dim, sign) {
+  if (allGeometry === undefined) {
+    return;
+  }
+
+  allGeometry.computeBoundingBox();
+
+  var bounds = allGeometry.boundingBox;
+  var centroid = bounds.center();
+
+  var xform = new THREE.Matrix4().makeTranslation(-centroid.x, -centroid.y, -centroid.z);
+  modelScene.matrix = xform;
+
+  var constraint;
+  if (camera.aspect >= 1) {
+    var fovX = 2 * Math.atan(Math.tan(camera.fov * Math.PI / 180.0 * 0.5) * camera.aspect);
+    constraint = Math.tan(fovX * 0.5);
+  } else {
+    constraint = Math.tan(camera.fov * Math.PI / 180.0 * 0.5);
+  }
+
+  var dimensions = bounds.size();
+  var maxSpan = Math.max(dimensions.x, Math.max(dimensions.y, dimensions.z));
+  var fit = maxSpan / constraint;
+
+  controls.reset(); 
+  if (dim == 0) {
+    camera.up = new THREE.Vector3(0, 1, 0);
+    camera.position.x = (bounds.max.x + fit) * sign;
+    camera.position.y = 0;
+    camera.position.z = 0;
+  } else if (dim == 1) {
+    camera.up = new THREE.Vector3(0, 0, -sign);
+    camera.position.x = 0;
+    camera.position.y = (bounds.max.y + fit) * sign;
+    camera.position.z = 0;
+  } else if (dim == 2) {
+    camera.up = new THREE.Vector3(0, 1, 0);
+    camera.position.x = 0;
+    camera.position.y = 0;
+    camera.position.z = (bounds.max.z + fit) * sign;
+  }
+  camera.updateProjectionMatrix();
+}
+
 function log(message) {
+  // Replace indents with nbsps.
+  message = message.replace(/^( +)/gm, function (match, spaces, offset, s) {
+    return spaces.replace(/ /g, '\u00a0');
+  });
+
   // $1 is the whole source span. $2 is the start. $3 is the end.
   var linkMessage = message.replace(/^((\d+)\((\d+)(?:-(\d+))?\))/gm, function(match, full, startLine, startIndex, stopIndex) {
     return '<div style="color: #FF9999; display: inline;">Error on <a style="text-decoration: underline;" onclick="javascript:highlight(' + startIndex + ', ' + stopIndex + ')" class="srclink">line ' + startLine + /*':' + startIndex + ':' + stopIndex +*/ '</a></div>';
   });
+
 
   $('#console #message').html(linkMessage.replace(/\n/g, '<br/>'));
 }
@@ -1662,7 +1832,6 @@ function resize() {
 function highlight(startIndex, stopIndex) {
   var doc = textEditor.getSession().getDocument();
   var lines = doc.getAllLines();
-  //console.log(lines);
 
   if (stopIndex === undefined) {
     stopIndex = startIndex;
@@ -1776,10 +1945,10 @@ function render() {
 function hideMenus(exceptID) {
   if (exceptID === undefined) {
     $('.popup').hide();
-    $('.togglePopup').css('background-color', '#000000');
+    $('.togglePopup').removeClass('open').addClass('closed');
   } else {
     $('.popup').not(exceptID).hide();
-    $('.togglePopup').not('#toggle' + exceptID.charAt(1).toUpperCase() + exceptID.substring(2)).css('background-color', '#000000');
+    $('.togglePopup').not('#toggle' + exceptID.charAt(1).toUpperCase() + exceptID.substring(2)).removeClass('open').addClass('closed');
   }
 
   if (swatch) {

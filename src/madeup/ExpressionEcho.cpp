@@ -1,6 +1,7 @@
 #include "madeup/ExpressionClosure.h"
 #include "madeup/ExpressionEcho.h"
 #include "madeup/ExpressionMesh.h"
+#include "madeup/ExpressionUnit.h"
 #include "twodee/MessagedException.h"
 
 using namespace td;
@@ -26,7 +27,7 @@ Co<Expression> ExpressionEcho::evaluate(Environment &env) const {
   ExpressionMesh *mesh_value = dynamic_cast<ExpressionMesh *>(value.GetPointer());
   if (mesh_value) {
     env.echo(mesh_value->toMesh());
-    return value;
+    return ExpressionUnit::getSingleton();
   } else {
     throw MessagedException(getSourceLocation().toAnchor() + ": I expect function echo to be given a mesh, but that's not what you gave it.");
   }

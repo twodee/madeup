@@ -48,6 +48,8 @@ const SourceLocation &Token::getLocation() const {
 
 const std::string Token::getTypeString() const {
   switch (type) {
+    case COMMENT:
+      return "COMMENT";
     case LEFT_PARENTHESIS:
       return "LEFT_PARENTHESIS";
     case RIGHT_PARENTHESIS:

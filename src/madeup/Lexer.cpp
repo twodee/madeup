@@ -188,6 +188,7 @@ Token Lexer::getTokenAfterDot() {
 Token Lexer::getTokenAfterMinus() {
   int c = in.get();
   if (c == '-') {
+    text_so_far += c;
     ++location.end_column;
     ++location.end_index;
     return getTokenAfterMinusMinus();
@@ -214,6 +215,9 @@ Token Lexer::getTokenAfterMinusMinus() {
 
     int ndashes = 0;
     do {
+      text_so_far += c;
+      ++location.end_column;
+      ++location.end_index;
       c = in.get();
       if (c == '-') {
         ++ndashes;
@@ -229,20 +233,24 @@ Token Lexer::getTokenAfterMinusMinus() {
       std::stringstream ss;
       ss << location.toAnchor() << ": I was reading a multiline comment, but I couldn't find its ending ---.";
       throw MessagedException(ss.str());
+    } else {
+      text_so_far += c;
     }
   }
 
   // We only saw --, so this must be a one-line comment. Read to the end of
   // the line.
   else {
-    do {
+    while (c != EOF && c != '\n') {
+      text_so_far += c;
       ++location.end_column;
       ++location.end_index;
       c = in.get();
-    } while (c != EOF && c != '\n');
+    }
     in.putback(c);
   }
 
+  /* return Token(Token::COMMENT, text_so_far, location); */
   return getToken();
 }
 

@@ -1,3 +1,8 @@
+set(LIBMADEUP_SRC_EXTRAS)
+if(USE_IGL)
+  list(APPEND LIBMADEUP_SRC_EXTRAS MeshBoolean.cpp)
+endif()
+
 add_library(madeup
   STATIC
   Environment.cpp
@@ -18,6 +23,7 @@ add_library(madeup
   ExpressionCenter.cpp
   ExpressionClosure.cpp
   ExpressionCoalesce.cpp
+  ExpressionComment.cpp
   ExpressionCosine.cpp
   ExpressionCross.cpp
   ExpressionDebug.cpp
@@ -95,6 +101,16 @@ add_library(madeup
   Token.cpp
   SourceLocation.cpp
   Parser.cpp
+  ${LIBMADEUP_SRC_EXTRAS}
 )
-target_link_libraries(madeup twodee)
+
 include_directories(madeup ${CMAKE_SOURCE_DIR}/include)
+
+if(USE_IGL)
+  include_directories(
+    madeup
+    ${CMAKE_BINARY_DIR}/libigl/include
+    ${EIGEN3_INCLUDE_DIR}
+    /usr/local/include
+  )
+endif()

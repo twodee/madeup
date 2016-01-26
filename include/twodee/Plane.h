@@ -17,6 +17,7 @@ template<typename T, int ndims> class Plane {
     const QVector<T, ndims>& GetPoint() const;
 
     bool Intersect(const Line<T, ndims>& line, QVector<T, ndims>& intersection_point) const;
+    T DistanceTo(const QVector<T, ndims>& point) const;
 
   protected:
     QVector<T, ndims> point;
@@ -65,6 +66,13 @@ bool Plane<T, ndims>::Intersect(const Line<T, ndims>& line, QVector<T, ndims>& i
     intersection_point = line.GetPoint() + line.GetDirection() * alpha;
     return true;
   }
+}
+
+/* ------------------------------------------------------------------------- */
+
+template<typename T, int ndims>
+T Plane<T, ndims>::DistanceTo(const QVector<T, ndims>& point) const {
+  return normal.Dot(point - this->point);
 }
 
 /* ------------------------------------------------------------------------- */

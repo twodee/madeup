@@ -184,7 +184,7 @@ int main(int argc, char **argv) {
           }
 
           if (trimesh->GetVertexCount() == 0) {
-            std::cerr << "Uh oh. You didn't visit any locations. I can't make any models until you move around some." << std::endl;
+            std::cerr << "Uh oh. You either didn't visit any locations or didn't invoke a solidifier. I can't make any models without more information from you." << std::endl;
           }
         }
 
@@ -195,6 +195,10 @@ int main(int argc, char **argv) {
       }
     }
 
+  } catch (std::bad_alloc e) {
+    std::cerr << "Whoa! I don't have enough memory for that." << std::endl;
+    in.close();
+    exit(1);
   } catch (td::MessagedException e) {
     std::cerr << e.GetMessage() << std::endl;
     in.close();

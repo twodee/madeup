@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 project(madeup)
 
+LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
+
 option(USE_DEBUG "Enable debug information" ON)
 
 if(APPLE)
@@ -9,13 +11,28 @@ elseif(UNIX)
   set(WWW_ROOT "/var/www/madeup" CACHE STRING "Directory in which to install web resources")
 endif()
 
-# Put all the executables and libs at the top level for easy access.
-# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}) 
-# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}) 
-
 if(USE_DEBUG AND CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   set(CMAKE_C_FLAGS "-g -pedantic -Wall -std=c99")
-  set(CMAKE_CXX_FLAGS "-g -pedantic -Wall -std=c++0x")
+  set(CMAKE_CXX_FLAGS "-g -pedantic -Wall -std=c++11 -frounding-math")
+endif()
+
+# Libigl imposes a bunch of dependencies that aren't fun to sort through. Let's
+# allow for it to be disabled.
+option(USE_IGL "Enable libigl" ON)
+if(USE_IGL)
+  add_definitions(-DUSE_IGL)
+
+  find_package(Boost COMPONENTS log log_setup thread filesystem system)
+
+  if(NOT DEFINED EIGEN3_INCLUDE_DIR)
+    find_package(Eigen3 REQUIRED)
+  endif()
+  message(${EIGEN3_INCLUDE_DIR})
+
+  find_package(CGAL REQUIRED)
+  LIST(APPEND CMAKE_MODULE_PATH ${CGAL_DIR})
+  find_package(GMP REQUIRED)
+  find_package(MPFR REQUIRED)
 endif()
 
 add_subdirectory(src/twodee)
