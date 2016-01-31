@@ -1,4 +1,4 @@
-SRC = forn index.php translate.php interpret.php blockly_generator_madeup.js blockly_blocks_madeup.js ide_editor.js ide_function.js ide_skin.css ide_skin_dark.css ide_skin_light.css favicon-16x16.png favicon-32x32.png 
+SRC = forn index.php translate.php interpret.php blockly_generator_madeup.js blockly_blocks_madeup.js text_to_blocks.js ide_editor.js ide_function.js ide_skin.css ide_skin_dark.css ide_skin_light.css favicon-16x16.png favicon-32x32.png 
 DST = $(addprefix $(WWW_ROOT)/, $(SRC))
 JQUERY_UI_VERSION = 1.11.2
 

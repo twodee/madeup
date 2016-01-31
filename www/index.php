@@ -39,6 +39,7 @@
   <!-- Madeup IDE dependencies -->
   <link rel="stylesheet" href="ide_skin.css"/>
   <link rel="stylesheet" href="ide_skin_dark.css" title="theme"/>
+  <script src="text_to_blocks.js"></script>
   <script src="ide_function.js"></script>
 </head>
 
@@ -51,6 +52,11 @@
       <block type="madeup_string"></block>
       <block type="madeup_logic_boolean"></block>
       <block type="madeup_nothing"></block>
+      <block type="madeup_array_literal"></block>
+      <block type="madeup_array_by"></block>
+      <block type="madeup_array_of"></block>
+      <block type="madeup_subscript"></block>
+      <block type="madeup_subrange"></block>
     </category>
     <category name="Math">
       <block type="madeup_math_binary_arithmetic_operator"></block>
@@ -111,11 +117,6 @@
       <block type="madeup_logic_if_statement"></block>
       <block type="madeup_logic_if_else_statement"></block>
       <block type="madeup_math_relational_operator"></block>
-    </category>
-    <category name="Arrays">
-      <block type="madeup_array_literal"></block>
-      <block type="madeup_array_by"></block>
-      <block type="madeup_array_of"></block>
     </category>
     <category name="Variables" custom="VARIABLE"></category>
     <category name="Functions" custom="PROCEDURE"></category>

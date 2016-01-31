@@ -662,3 +662,18 @@ Blockly.Madeup['madeup_array_of'] = function(block) {
   var code = value_n + ' of ' + value_item;
   return generateInMode(block, code, Blockly.Madeup.ORDER_ARRAY_OF);
 };
+
+Blockly.Madeup['madeup_subscript'] = function(block) {
+  var value_i = Blockly.Madeup.valueToCode(block, 'I', Blockly.Madeup.ORDER_ATOMIC);
+  var value_collection = Blockly.Madeup.valueToCode(block, 'COLLECTION', Blockly.Madeup.ORDER_ATOMIC);
+  var code = value_collection + '[' + value_i + ']';
+  return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+};
+
+Blockly.Madeup['madeup_subrange'] = function(block) {
+  var value_i = Blockly.Madeup.valueToCode(block, 'I', Blockly.Madeup.ORDER_ATOMIC);
+  var value_j = Blockly.Madeup.valueToCode(block, 'J', Blockly.Madeup.ORDER_ATOMIC);
+  var value_collection = Blockly.Madeup.valueToCode(block, 'COLLECTION', Blockly.Madeup.ORDER_ATOMIC);
+  var code = value_collection + '[' + value_i + '..' + value_j + ']';
+  return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+};

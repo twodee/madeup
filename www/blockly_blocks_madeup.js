@@ -1291,6 +1291,37 @@ Blockly.Blocks['madeup_array_of'] = {
   domToMutation: domModeToMutation
 };
 
+Blockly.Blocks['madeup_subscript'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.madeup.UNKNOWN_TYPE_HUE);
+    this.appendValueInput("I").setCheck(null).appendField('item');
+    this.appendValueInput("COLLECTION").appendField("of");
+    this.setInputsInline(true);
+    this.setOutput(true);
+    this.setTooltip('');
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
+};
+
+Blockly.Blocks['madeup_subrange'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.madeup.UNKNOWN_TYPE_HUE);
+    this.appendValueInput("I").setCheck(null).appendField('items');
+    this.appendValueInput("J").setCheck(null).appendField('through');
+    this.appendValueInput("COLLECTION").appendField("of");
+    this.setInputsInline(true);
+    this.setOutput(true);
+    this.setTooltip('');
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
+};
+
 // ----------------------------------------------------------------------------
 // Remove the return blocks that Blockly automatically generates in the
 // PROCEDURES node of the toolbox. Madeup doesn't support explicit return
