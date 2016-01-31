@@ -87,6 +87,7 @@
       <block type="madeup_generate_revolve"></block>
       <block type="madeup_generate_surface"></block>
       <block type="madeup_generate_forget"></block>
+      <block type="madeup_generate_echo"></block>
     </category>
     <category name="Loops">
       <block type="madeup_loop_repeat"></block>
@@ -166,7 +167,7 @@
       <input type="radio" name="editorMode" id="isEditorBlocks" value="Blocks"/>Blocks<br/>
       <input type="radio" name="theme" id="isDark" value="isDark" checked="checked"/>Dark or 
       <input type="radio" name="theme" id="isLight" value="isLight"/>Light<br/>
-      <input type="checkbox" id="autopreview" checked="checked"/>Preview <input type="text" id="nSecondsTillPreview" size="5"/> seconds after last edit<br/>
+      <input type="checkbox" id="autopathify" checked="checked"/>Auto-pathify <input type="text" id="nSecondsTillAutopathify" size="5"/> seconds after last edit<br/>
     </div>
 
     <div id="gridPopup" class="popup">

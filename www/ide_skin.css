@@ -73,8 +73,10 @@ body {
   font-family: Courier;
   outline: none;
   height: 200px;
+  /* height: 0px; */
   overflow: auto;
   z-index: 1000;
+  /* visibility: hidden; */
 }
 
 #message {

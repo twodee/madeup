@@ -4,15 +4,18 @@ goog.provide('Blockly.Blocks.madeup');
 goog.require('Blockly.Blocks');
 
 function setStatementExpression(block, isExpression) {
-  block.unplug(true, true);
-  if (isExpression) {
-    block.setPreviousStatement(false);
-    block.setNextStatement(false);
-    block.setOutput(true);
-  } else {
-    block.setOutput(false);
-    block.setPreviousStatement(true);
-    block.setNextStatement(true);
+  var isExpressionAlready = !!block.outputConnection;
+  if (isExpression != isExpressionAlready) {
+    block.unplug(true, true);
+    if (isExpression) {
+      block.setPreviousStatement(false);
+      block.setNextStatement(false);
+      block.setOutput(true);
+    } else {
+      block.setOutput(false);
+      block.setPreviousStatement(true);
+      block.setNextStatement(true);
+    }
   }
 }
 
@@ -454,6 +457,22 @@ Blockly.Blocks['madeup_generate_dowel'] = {
               .setCheck(["Integer", "Real"])
               .appendField("dowel")
               .appendField("maxBend");
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('');
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
+};
+
+Blockly.Blocks['madeup_generate_echo'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
+    this.appendValueInput("MESH")
+              .setCheck(null)
+              .appendField("echo");
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('');
@@ -1241,10 +1260,10 @@ Blockly.Blocks['madeup_array_by'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
     this.setColour(Blockly.Blocks.madeup.UNKNOWN_TYPE_HUE);
-    this.appendValueInput("OUTER")
+    this.appendValueInput("N")
         .setCheck("Integer");
         // .appendField("if");
-    this.appendValueInput("INNER")
+    this.appendValueInput("ITEM")
         .appendField("by");
     this.setInputsInline(true);
     this.setOutput(true);
