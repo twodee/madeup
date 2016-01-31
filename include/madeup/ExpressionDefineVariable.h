@@ -16,7 +16,7 @@ class ExpressionDefineVariable : public Expression {
     void write(ostream &out) const;
     const std::string &getName() { return name; }
 
-  private:
+  protected:
     std::string name;
     Co<Expression> rhs;
 };
