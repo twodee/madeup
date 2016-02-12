@@ -377,7 +377,7 @@ print n -- prints 5
 ~~~
 
 ##Loops
-Madeup supports several kinds of loops to help you repeat processes. 
+Madeup supports several kinds of loops to help you repeat processes.
 
 ###`repeat`
 Running a sequence multiple times is very simply accomplished using the `repeat` loop:
@@ -398,6 +398,13 @@ n = random 0, 100
 repeat n
   sum = sum + n
 end
+~~~
+
+Short loops can be written in one line:
+
+{:.mup}
+~~~
+repeat 10 print "x"
 ~~~
 
 ###repeatwich
@@ -427,6 +434,15 @@ end
 ~~~
 
 The upper-bound is exclusive and must be an integer. This loop starts at 0.
+
+Short loops can be written in one line:
+
+{:.mup}
+~~~
+for i to 3 .rgb[i] = 1
+~~~
+
+This applies to the other kinds of `for` loops as well.
 
 ###for-through
 The `for-through` loop is almost identical to `for-to`, except the upper-bound is inclusive:

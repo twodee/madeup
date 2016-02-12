@@ -589,6 +589,18 @@
 
 </div>
 
+<p>Short loops can be written in one line:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span style="color:#080;font-weight:bold">repeat</span> <span style="color:#00D">10</span> <span style="color:#369;font-weight:bold">print</span> <span style="background-color:hsla(0,100%,50%,0.05)">&quot;x&quot;</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
 <h3 id="repeatwich">repeatwich</h3>
 <p>Sometimes half of the repeated sequence needs to run one more time than the other half. We refer to this sometimes as a "loop and a half." These situations arise frequently enough in 3D construction and path walking that Madeup provides support for such loops. The "and a half" portion sandwiches or surrounds the internal portion. Therefore, we call this a <code>repeatwich</code> loop.</p>
 
@@ -626,6 +638,20 @@
 </div>
 
 <p>The upper-bound is exclusive and must be an integer. This loop starts at 0.</p>
+
+<p>Short loops can be written in one line:</p>
+
+<div class="imgcode">
+
+  <div class="mup highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span style="color:#080;font-weight:bold">for</span> <span style="color:#606">i</span> <span style="color:#080;font-weight:bold">to</span> <span style="color:#00D">3</span> <span style="color:#606">.rgb</span>[<span style="color:#606">i</span>] = <span style="color:#00D">1</span>
+</pre></div>
+</div>
+  </div>
+
+</div>
+
+<p>This applies to the other kinds of <code>for</code> loops as well.</p>
 
 <h3 id="for-through">for-through</h3>
 <p>The <code>for-through</code> loop is almost identical to <code>for-to</code>, except the upper-bound is inclusive:</p>

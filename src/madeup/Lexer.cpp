@@ -211,6 +211,9 @@ Token Lexer::getTokenAfterMinusMinus() {
 
   // We saw ---, so we need to read until the next ---.
   if (c == '-') {
+    ++location.end_column;
+    ++location.end_index;
+
     int ndashes = 0;
     do {
       text_so_far += c;
@@ -222,6 +225,8 @@ Token Lexer::getTokenAfterMinusMinus() {
       } else {
         ndashes = 0;
       }
+      ++location.end_column;
+      ++location.end_index;
     } while (c != EOF && ndashes < 3);
 
     if (c == EOF) {
