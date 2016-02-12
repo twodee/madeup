@@ -510,28 +510,6 @@ void Parser::atom() {
     if (isUp(Token::NEWLINE)) {
       ++i;
       block();
-      if (isUp(Token::END)) {
-        Co<Expression> n = popExpression();
-        Co<ExpressionBlock> block = popBlock();
-        pushExpression(new ExpressionRepeat(n, block), repeat_token.getLocation(), tokens[i].getLocation());
-        ++i;
-      } else {
-        std::stringstream ss;
-        ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'end'.";
-        throw MessagedException(ss.str());
-      }
-    } else {
-      std::stringstream ss;
-      ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected a linebreak.";
-      throw MessagedException(ss.str());
-    }
-  } else if (isUp(Token::REPEATWICH)) {
-    Token repeat_token = tokens[i];
-    ++i;
-    expressionLevel0();
-    if (isUp(Token::NEWLINE)) {
-      ++i;
-      block();
       if (isUp(Token::AROUND)) {
         ++i;
         block();
@@ -546,9 +524,14 @@ void Parser::atom() {
           ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'end'.";
           throw MessagedException(ss.str());
         }
+      } else if (isUp(Token::END)) {
+        Co<Expression> n = popExpression();
+        Co<ExpressionBlock> block = popBlock();
+        pushExpression(new ExpressionRepeat(n, block), repeat_token.getLocation(), tokens[i].getLocation());
+        ++i;
       } else {
         std::stringstream ss;
-        ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'around'.";
+        ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'end'.";
         throw MessagedException(ss.str());
       }
     } else {
@@ -556,6 +539,37 @@ void Parser::atom() {
       ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected a linebreak.";
       throw MessagedException(ss.str());
     }
+  /* } else if (isUp(Token::REPEATWICH)) { */
+    /* Token repeat_token = tokens[i]; */
+    /* ++i; */
+    /* expressionLevel0(); */
+    /* if (isUp(Token::NEWLINE)) { */
+      /* ++i; */
+      /* block(); */
+      /* if (isUp(Token::AROUND)) { */
+        /* ++i; */
+        /* block(); */
+        /* if (isUp(Token::END)) { */
+          /* Co<Expression> n = popExpression(); */
+          /* Co<ExpressionBlock> less = popBlock(); */
+          /* Co<ExpressionBlock> more = popBlock(); */
+          /* pushExpression(new ExpressionRepeatwich(n, more, less), repeat_token.getLocation(), tokens[i].getLocation()); */
+          /* ++i; */
+        /* } else { */
+          /* std::stringstream ss; */
+          /* ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'end'."; */
+          /* throw MessagedException(ss.str()); */
+        /* } */
+      /* } else { */
+        /* std::stringstream ss; */
+        /* ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'around'."; */
+        /* throw MessagedException(ss.str()); */
+      /* } */
+    /* } else { */
+      /* std::stringstream ss; */
+      /* ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected a linebreak."; */
+      /* throw MessagedException(ss.str()); */
+    /* } */
   } else if (isUp(Token::WHILE)) {
     Token while_token = tokens[i];
     ++i;
@@ -628,6 +642,10 @@ void Parser::atom() {
             ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'end'.";
             throw MessagedException(ss.str());
           }
+        } else if (isUp(Token::IF)) {
+          block();
+          --i; // unget the linebreak of the nested if, which will be needed to close off this statement
+          end_location = tokens[i].getLocation();
         } else {
           std::stringstream ss;
           ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected a linebreak.";

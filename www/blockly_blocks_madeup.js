@@ -449,6 +449,22 @@ Blockly.Blocks['madeup_movement_reverse'] = {
   domToMutation: domModeToMutation
 };
 
+Blockly.Blocks['madeup_path_coalesce'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
+    this.appendValueInput("THRESHOLD")
+              .setCheck(["Integer", "Real"])
+              .appendField("coalesce");
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('');
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
+};
+
 Blockly.Blocks['madeup_generate_dowel'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
@@ -727,6 +743,28 @@ Blockly.Blocks['madeup_math_random'] = {
         .appendField("max");
     this.setInputsInline(false);
     this.setOutput(true, "Integer");
+    this.setColour(Blockly.Blocks.madeup.NUMBER_HUE);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
+};
+
+Blockly.Blocks['madeup_math_atan2'] = {
+  init: function() {
+    this.appendValueInput("OPPOSITE")
+        .setCheck(['Integer', 'Real'])
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("atan2")
+        .appendField("opposite");
+    this.appendValueInput("ADJACENT")
+        .setCheck(['Integer', 'Real'])
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("adjacent");
+    this.setInputsInline(false);
+    this.setOutput(true, "Real");
     this.setColour(Blockly.Blocks.madeup.NUMBER_HUE);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
@@ -1297,6 +1335,64 @@ Blockly.Blocks['madeup_subscript'] = {
     this.setColour(Blockly.Blocks.madeup.UNKNOWN_TYPE_HUE);
     this.appendValueInput("I").setCheck(null).appendField('item');
     this.appendValueInput("COLLECTION").appendField("of");
+    this.setInputsInline(true);
+    this.setOutput(true);
+    this.setTooltip('');
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
+};
+
+Blockly.Blocks['madeup_normalize'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.madeup.UNKNOWN_TYPE_HUE);
+    this.appendValueInput("VECTOR").appendField("normalize");
+    this.setInputsInline(true);
+    this.setOutput(true);
+    this.setTooltip('');
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
+};
+
+Blockly.Blocks['madeup_magnitude'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.madeup.UNKNOWN_TYPE_HUE);
+    this.appendValueInput("VECTOR").appendField("magnitude");
+    this.setInputsInline(true);
+    this.setOutput(true);
+    this.setTooltip('');
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
+};
+
+Blockly.Blocks['madeup_cross'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.madeup.UNKNOWN_TYPE_HUE);
+    this.appendValueInput("A");
+    this.appendValueInput("B").appendField("cross");
+    this.setInputsInline(true);
+    this.setOutput(true);
+    this.setTooltip('');
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
+};
+
+Blockly.Blocks['madeup_dot'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.madeup.UNKNOWN_TYPE_HUE);
+    this.appendValueInput("A");
+    this.appendValueInput("B").appendField("dot");
     this.setInputsInline(true);
     this.setOutput(true);
     this.setTooltip('');

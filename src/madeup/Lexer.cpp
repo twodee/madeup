@@ -18,6 +18,7 @@ Lexer::Lexer(std::istream &in) :
   }
 }
 
+/* ------------------------------------------------------------------------- */
 
 const std::vector<Token> &Lexer::getTokens() const {
   return tokens;

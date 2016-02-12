@@ -26,7 +26,7 @@ Co<Expression> ExpressionRepeatwich::evaluate(Environment &env) const {
   Co<Expression> v = nmores->evaluate(env);
   ExpressionInteger *nmores_value = dynamic_cast<ExpressionInteger *>(v.GetPointer());
   if (!nmores_value) {
-    throw MessagedException(nmores->getSourceLocation().toAnchor() + ": A repeatwich loop expects its number of iterations to be an integer. " + nmores->getSource() + " is not an integer.");
+    throw MessagedException(nmores->getSourceLocation().toAnchor() + ": A repeat loop expects its number of iterations to be an integer. " + nmores->getSource() + " is not an integer.");
   }
 
   int n = nmores_value->toInteger();

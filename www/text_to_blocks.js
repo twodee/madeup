@@ -145,12 +145,25 @@ function parse(peeker) {
       block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_math_random');
       connectExpression(block, 'MIN', min);
       connectExpression(block, 'MAX', max);
+    } else if (id == 'atan2') {
+      peeker.get(); // eat space
+      var opposite = parse(peeker);
+      peeker.get(); // eat space
+      var adjacent = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_math_atan2');
+      connectExpression(block, 'OPPOSITE', opposite);
+      connectExpression(block, 'ADJACENT', adjacent);
     } else if (id == 'yaw' || id == 'roll' || id == 'pitch') {
       peeker.get(); // eat space
       var degrees = parse(peeker);
       block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_movement_turn');
       block.setFieldValue(id, 'TYPE');
       connectExpression(block, 'DEGREES', degrees);
+    } else if (id == 'coalesce') {
+      peeker.get(); // eat space
+      var threshold = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_path_coalesce');
+      connectExpression(block, 'THRESHOLD', threshold);
     } else if (id == 'translate' || id == 'scale') {
       peeker.get(); // eat space
       var x = parse(peeker);
@@ -260,6 +273,19 @@ function parse(peeker) {
       var b = parse(peeker);
       block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_math_minmax');
       block.setFieldValue(id, 'F');
+      connectExpression(block, 'A', a);
+      connectExpression(block, 'B', b);
+    } else if (id == 'normalize' || id == 'magnitude') {
+      peeker.get(); // eat space
+      var v = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_' + id);
+      connectExpression(block, 'VECTOR', v);
+    } else if (id == 'cross' || id == 'dot') {
+      peeker.get(); // eat space
+      var a = parse(peeker);
+      peeker.get(); // eat space
+      var b = parse(peeker);
+      block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_' + id);
       connectExpression(block, 'A', a);
       connectExpression(block, 'B', b);
     } else {
@@ -463,6 +489,7 @@ function parse(peeker) {
   else if (token == 'define-variable') {
     peeker.get(); // eat space
     var id = peeker.getToken();
+    console.log(id);
     peeker.get(); // eat space
     var rhs = parse(peeker);
 

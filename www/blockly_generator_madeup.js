@@ -261,7 +261,7 @@ Blockly.Madeup['madeup_loop_repeatwich'] = function(block) {
   var value_count = Blockly.Madeup.valueToCode(block, 'COUNT', Blockly.Madeup.ORDER_NONE);
   var surrounder_block = Blockly.Madeup.statementToCode(block, 'SURROUNDER');
   var surroundee_block = Blockly.Madeup.statementToCode(block, 'SURROUNDEE');
-  var code = 'repeatwich ' + value_count + '\n' + surrounder_block + '\naround\n' + surroundee_block + 'end';
+  var code = 'repeat ' + value_count + '\n' + surrounder_block + '\naround\n' + surroundee_block + 'end';
   return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
 };
 
@@ -677,3 +677,43 @@ Blockly.Madeup['madeup_subrange'] = function(block) {
   var code = value_collection + '[' + value_i + '..' + value_j + ']';
   return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
 };
+
+Blockly.Madeup['madeup_normalize'] = function(block) {
+  var value_vector = Blockly.Madeup.valueToCode(block, 'VECTOR', Blockly.Madeup.ORDER_ATOMIC);
+  var code = 'normalize ' + value_vector;
+  return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+};
+
+Blockly.Madeup['madeup_magnitude'] = function(block) {
+  var value_vector = Blockly.Madeup.valueToCode(block, 'VECTOR', Blockly.Madeup.ORDER_ATOMIC);
+  var code = 'magnitude ' + value_vector;
+  return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+};
+
+Blockly.Madeup['madeup_dot'] = function(block) {
+  var value_a = Blockly.Madeup.valueToCode(block, 'A', Blockly.Madeup.ORDER_ATOMIC);
+  var value_b = Blockly.Madeup.valueToCode(block, 'B', Blockly.Madeup.ORDER_ATOMIC);
+  var code = 'dot ' + a + ', ' + b;
+  return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+};
+
+Blockly.Madeup['madeup_cross'] = function(block) {
+  var value_a = Blockly.Madeup.valueToCode(block, 'A', Blockly.Madeup.ORDER_ATOMIC);
+  var value_b = Blockly.Madeup.valueToCode(block, 'B', Blockly.Madeup.ORDER_ATOMIC);
+  var code = 'cross ' + a + ', ' + b;
+  return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+};
+
+Blockly.Madeup['madeup_math_atan2'] = function(block) {
+  var value_opposite = Blockly.Madeup.valueToCode(block, 'OPPOSITE', Blockly.Madeup.ORDER_ATOMIC);
+  var value_adjacent = Blockly.Madeup.valueToCode(block, 'ADJACENT', Blockly.Madeup.ORDER_ATOMIC);
+  var code = 'atan2 ' + value_opposite + ', ' + value_adjacent;
+  return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+};
+
+Blockly.Madeup['madeup_path_coalesce'] = function(block) {
+  var value_threshold = Blockly.Madeup.valueToCode(block, 'THRESHOLD', Blockly.Madeup.ORDER_ATOMIC);
+  var code = 'coalesce ' + value_threshold;
+  return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+};
+

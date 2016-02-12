@@ -52,17 +52,15 @@
       <block type="madeup_string"></block>
       <block type="madeup_logic_boolean"></block>
       <block type="madeup_nothing"></block>
-      <block type="madeup_array_literal"></block>
-      <block type="madeup_array_by"></block>
-      <block type="madeup_array_of"></block>
-      <block type="madeup_subscript"></block>
-      <block type="madeup_subrange"></block>
     </category>
+    <category name="Variables" custom="VARIABLE"></category>
+    <category name="Functions" custom="PROCEDURE"></category>
     <category name="Math">
       <block type="madeup_math_binary_arithmetic_operator"></block>
       <block type="madeup_math_unary_operator"></block>
       <block type="madeup_math_sincostan"></block>
       <block type="madeup_math_inverse_sincostan"></block>
+      <block type="madeup_math_atan2"></block>
       <block type="madeup_math_minmax"></block>
       <block type="madeup_math_abs"></block>
       <block type="madeup_math_sign"></block>
@@ -82,7 +80,6 @@
       <block type="madeup_movement_reframe"></block>
       <block type="madeup_movement_push"></block>
       <block type="madeup_movement_pop"></block>
-      <block type="madeup_movement_reverse"></block>
     </category>
     <category name="Solidifiers">
       <block type="madeup_generate_spheres"></block>
@@ -94,6 +91,10 @@
       <block type="madeup_generate_surface"></block>
       <block type="madeup_generate_forget"></block>
       <block type="madeup_generate_echo"></block>
+    </category>
+    <category name="Path">
+      <block type="madeup_path_coalesce"></block>
+      <block type="madeup_movement_reverse"></block>
     </category>
     <category name="Loops">
       <block type="madeup_loop_repeat"></block>
@@ -118,8 +119,17 @@
       <block type="madeup_logic_if_else_statement"></block>
       <block type="madeup_math_relational_operator"></block>
     </category>
-    <category name="Variables" custom="VARIABLE"></category>
-    <category name="Functions" custom="PROCEDURE"></category>
+    <category name="Arrays">
+      <block type="madeup_array_literal"></block>
+      <block type="madeup_array_by"></block>
+      <block type="madeup_array_of"></block>
+      <block type="madeup_subscript"></block>
+      <block type="madeup_subrange"></block>
+      <block type="madeup_normalize"></block>
+      <block type="madeup_magnitude"></block>
+      <block type="madeup_cross"></block>
+      <block type="madeup_dot"></block>
+    </category>
   </xml>
 
   <!-- The layout _________________________________________________________ -->
