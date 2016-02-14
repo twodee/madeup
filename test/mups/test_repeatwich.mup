@@ -1,0 +1,5 @@
+repeat 4
+  print "x"
+around
+  print "o"
+end

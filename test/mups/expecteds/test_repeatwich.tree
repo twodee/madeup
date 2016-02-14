@@ -1,0 +1,1 @@
+(block (repeatwich (INTEGER 4) (block (call print (STRING x))) (block (call print (STRING o)))))

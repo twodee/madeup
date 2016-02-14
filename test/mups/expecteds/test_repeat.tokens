@@ -1,0 +1,12 @@
+1(0-5) REPEAT: repeat
+1(7-7) INTEGER: 4
+1(8-8) NEWLINE: \n
+2(11-15) ID: print
+2(17-19) STRING: x
+2(20-20) NEWLINE: \n
+3(23-27) ID: print
+3(29-31) STRING: o
+3(32-32) NEWLINE: \n
+4(33-35) END: end
+4(36-36) NEWLINE: \n
+5(37-37) END_OF_FILE: END OF FILE
