@@ -136,8 +136,6 @@ const std::string Token::getTypeString() const {
       return "OR";
     case REPEAT:
       return "REPEAT";
-    case REPEATWICH:
-      return "REPEATWICH";
     case THEN:
       return "THEN";
     case THROUGH:

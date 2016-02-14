@@ -322,8 +322,6 @@ Token Lexer::getTokenAfterLetter() {
     return makeToken(Token::OR);
   } else if (text_so_far == "repeat") {
     return makeToken(Token::REPEAT);
-  } else if (text_so_far == "repeatwich") {
-    return makeToken(Token::REPEATWICH);
   } else if (text_so_far == "then") {
     return makeToken(Token::THEN);
   } else if (text_so_far == "around") {

@@ -51,7 +51,6 @@ class Token {
       OF,
       OR,
       REPEAT,
-      REPEATWICH,
       THEN,
       THROUGH,
       TO,

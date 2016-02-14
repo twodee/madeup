@@ -82,7 +82,6 @@ bool Parser::isInExpressionFirst(int k) const {
          isUp(Token::IF, k) ||
          isUp(Token::FOR, k) ||
          isUp(Token::REPEAT, k) ||
-         isUp(Token::REPEATWICH, k) ||
          isUp(Token::WHILE, k) ||
          isUp(Token::NOT, k) ||
          isUp(Token::TO, k) ||
@@ -517,7 +516,7 @@ void Parser::atom() {
         ++i;
         block();
         if (isUp(Token::END)) {
-          Co<Expression> n = popExpression();
+          /* Co<Expression> n = popExpression(); */
           Co<ExpressionBlock> less = popBlock();
           Co<ExpressionBlock> more = popBlock();
           pushExpression(new ExpressionRepeatwich(n, more, less), repeat_token.getLocation(), tokens[i].getLocation());
@@ -528,7 +527,7 @@ void Parser::atom() {
           throw MessagedException(ss.str());
         }
       } else if (isUp(Token::END)) {
-        Co<Expression> n = popExpression();
+        /* Co<Expression> n = popExpression(); */
         Co<ExpressionBlock> block = popBlock();
         pushExpression(new ExpressionRepeat(n, block), repeat_token.getLocation(), tokens[i].getLocation());
         ++i;
