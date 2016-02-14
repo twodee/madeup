@@ -685,6 +685,7 @@ $(document).ready(function() {
   $('#download').click(function() {
     $('#tag').val(mupName);
     $('#source').val(getSource());
+    $('#timestamp').val(new Date().getTime());
     isDownloading = true;
     $('#downloader').submit();
     textEditor.focus();

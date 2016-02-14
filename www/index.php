@@ -226,6 +226,7 @@
     <input id="tag" type="text" value="model" name="tag"/>
     <input id="geometry_mode" type="text" value="SURFACE" name="geometry_mode"/>
     <input id="shading_mode" type="text" value="SMOOTH" name="shading_mode"/>
+    <input id="timestamp" type="text" name="timestamp"/>
     <textarea id="source" name="source"></textarea>
   </form>
 
