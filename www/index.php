@@ -232,5 +232,12 @@
 
   <script src="ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
   <script src="ide_editor.js"></script>
+
+<?php
+  if (strpos($_SERVER['HTTP_HOST'], 'to.madeup') !== false) {
+    printf("<script>setEditor(false);</script>");
+  }
+?>
+
 </body>
 </html>
