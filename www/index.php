@@ -142,7 +142,7 @@
       <input id="smaller" type="button" value="-abc"/>
       <input id="bigger" type="button" value="+abc"/>
       <input id="toggleEditorPopup" class="togglePopup" type="button" value="Editor"/>
-      <input id="magic" type="button" value="Magic"/>
+      <!-- <input id="magic" type="button" value="Magic"/> -->
     </div>
 
     <div style="display: inline-block; position: absolute; left: 0px; right: 0px; text-align: center; pointer-events: none;" class="fileLink">
@@ -160,6 +160,8 @@
       <a href="#" id="fileSave" class="fileLink">Save</a><br/>
       <a href="#" id="fileSaveAs" class="fileLink">Save As</a><br/>
       <a href="#" id="fileClose" class="fileLink">Close</a><br/>
+      <p></p>
+      <a href="#" id="magic" class="fileLink">Send to Chris</a><br/>
       <p></p> 
       <a href="#" id="exportArchive" class="fileLink">Export Archive</a><br/>
       <a href="#" id="importArchive" class="fileLink">Import Archive</a><br/>
@@ -178,6 +180,7 @@
       <input type="radio" name="editorMode" id="isEditorBlocks" value="Blocks"/>Blocks<br/>
       <input type="radio" name="theme" id="isDark" value="isDark" checked="checked"/>Dark or 
       <input type="radio" name="theme" id="isLight" value="isLight"/>Light<br/>
+      <input type="checkbox" id="showConsole" checked="checked"/>Show Console<br/>
       <input type="checkbox" id="autopathify" checked="checked"/>Auto-pathify <input type="text" id="nSecondsTillAutopathify" size="5"/> seconds after last edit<br/>
     </div>
 
@@ -235,7 +238,14 @@
 
 <?php
   if (strpos($_SERVER['HTTP_HOST'], 'to.madeup') !== false) {
-    printf("<script>setEditor(false);</script>");
+?>
+  <script>
+    $(document).ready(function() {
+      setEditor(false);
+      showConsole(false);
+    });
+  </script>
+<?php
   }
 ?>
 

@@ -7,6 +7,19 @@ function hasWebGL() {
   } 
 }
 
+function showConsole(isShown) {
+  $('#showConsole').prop('checked', isShown);
+  if (isShown) {
+    $('#console').height(100);
+    resize();
+    Blockly.fireUiEvent(window, 'resize');
+  } else {
+    $('#console').height(0);
+    resize();
+    Blockly.fireUiEvent(window, 'resize');
+  }
+}
+
 // Prime Blockly with some builtin variables. There's no API exposed for this,
 // but Blockly.Variables.allVariables walks the blocks in the workspace and
 // returns the names of all variables. Our builtin variables don't necessarily
@@ -64,7 +77,6 @@ function getBlocklyProcedureFormals(name) {
   // allProcedures gives back [procedures with return, procedures without
   // return]. We only have the latter.
 
-  console.log('foo!');
   console.log(Blockly.Procedures.allProcedures(blocklyWorkspace));
   var procs = Blockly.Procedures.allProcedures(blocklyWorkspace)[0];
   // TODO
@@ -461,6 +473,10 @@ $(document).ready(function() {
     setTheme(isDark);
   });
 
+  $('#showConsole').click(function() {
+    showConsole(this.checked);
+  });
+
   $('#showHeadings').click(function() {
     isShowHeadingsChanged = true;
     showHeadings = this.checked;
@@ -697,7 +713,24 @@ $(document).ready(function() {
 
   $('#magic').click(function() {
     var source = Blockly.Madeup.workspaceToCode(blocklyWorkspace);
-    log(source);
+    var name = prompt("What's your name?");
+    $.ajax({
+      type: 'POST',
+      url: 'save.php',
+      data: JSON.stringify({
+        name: name,
+        source: source
+      }),
+      contentType: 'application/json; charset=utf-8',
+      dataType: 'json',
+      success: function(data) {
+        console.log("Saved!");
+      },
+      failure: function(errorMessage) {
+        console.log('Failure. :(');
+      }
+    });
+    // log(source); 
   });
 
   $('#solidify').click(function() {
