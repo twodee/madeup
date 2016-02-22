@@ -139,8 +139,8 @@
       <input id="solidify" type="button" value="Solidify"/>
       <input id="pathify" type="button" value="Pathify"/>
       <input id="docs" type="button" value="Docs"/>
-      <input id="smaller" type="button" value="-abc"/>
-      <input id="bigger" type="button" value="+abc"/>
+      <!-- <input id="smaller" type="button" value="-abc"/> -->
+      <!-- <input id="bigger" type="button" value="+abc"/> -->
       <input id="toggleEditorPopup" class="togglePopup" type="button" value="Editor"/>
       <!-- <input id="magic" type="button" value="Magic"/> -->
     </div>
@@ -176,6 +176,7 @@
     </div>
 
     <div id="editorPopup" class="popup">
+      Text size: <a href="#" id="smaller" class="fileLink">smaller</a> or <a href="#" id="bigger" class="fileLink">bigger</a><br/>
       <input type="radio" name="editorMode" id="isEditorText" value="Text" checked="checked"/>Text or 
       <input type="radio" name="editorMode" id="isEditorBlocks" value="Blocks"/>Blocks<br/>
       <input type="radio" name="theme" id="isDark" value="isDark" checked="checked"/>Dark or 

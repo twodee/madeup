@@ -414,6 +414,9 @@ $(document).ready(function() {
     textEditor.setFontSize(fontSize);
     $('#console')[0].style.fontSize = fontSize + 'px';
     textEditor.focus();
+
+    resize();
+    Blockly.fireUiEvent(window, 'resize');
   });
 
   $('#bigger').click(function() {
@@ -425,6 +428,9 @@ $(document).ready(function() {
     textEditor.setFontSize(fontSize);
     $('#console')[0].style.fontSize = fontSize + 'px';
     textEditor.focus();
+
+    resize();
+    Blockly.fireUiEvent(window, 'resize');
   });
 
   $('#fit').click(function() {
