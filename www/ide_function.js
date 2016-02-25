@@ -993,7 +993,7 @@ function load(mup) {
   }
 
   // Clear the editors so they don't try to get converted.
-  textEditor.setValue();
+  textEditor.setValue('');
   if (blocklyWorkspace) blocklyWorkspace.clear();
 
   mupName = mup;
