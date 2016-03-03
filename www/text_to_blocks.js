@@ -498,6 +498,28 @@ function parse(peeker) {
     connectExpression(block, 'VALUE', rhs);
   }
 
+  else if (token == 'define-element') {
+    peeker.get(); // eat space
+    peeker.get(); // eat (
+    peeker.getToken(); // eat SUBSCRIPT
+    peeker.get(); // eat space
+
+    var collection = parse(peeker);
+    peeker.get(); // eat space
+    var i = parse(peeker);
+    peeker.get(); // eat )
+    peeker.get(); // eat space
+    var rhs = parse(peeker);
+
+    block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_subscript_set');
+    console.log(collection);
+    console.log(i);
+    console.log(rhs);
+    connectExpression(block, 'I', i);
+    connectExpression(block, 'COLLECTION', collection);
+    connectExpression(block, 'RHS', rhs);
+  }
+
   else if (token == '>' || token == '>=' || token == '<' || token == '<=' || token == '==' || token == '!=') {
     peeker.get(); // eat space
     var a = parse(peeker);

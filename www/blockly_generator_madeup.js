@@ -670,6 +670,14 @@ Blockly.Madeup['madeup_subscript'] = function(block) {
   return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
 };
 
+Blockly.Madeup['madeup_subscript_set'] = function(block) {
+  var value_i = Blockly.Madeup.valueToCode(block, 'I', Blockly.Madeup.ORDER_ATOMIC);
+  var value_collection = Blockly.Madeup.valueToCode(block, 'COLLECTION', Blockly.Madeup.ORDER_ATOMIC);
+  var value_rhs = Blockly.Madeup.valueToCode(block, 'RHS', Blockly.Madeup.ORDER_ATOMIC);
+  var code = value_collection + '[' + value_i + '] = ' + value_rhs;
+  return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+};
+
 Blockly.Madeup['madeup_subrange'] = function(block) {
   var value_i = Blockly.Madeup.valueToCode(block, 'I', Blockly.Madeup.ORDER_ATOMIC);
   var value_j = Blockly.Madeup.valueToCode(block, 'J', Blockly.Madeup.ORDER_ATOMIC);
@@ -694,6 +702,12 @@ Blockly.Madeup['madeup_dot'] = function(block) {
   var value_a = Blockly.Madeup.valueToCode(block, 'A', Blockly.Madeup.ORDER_ATOMIC);
   var value_b = Blockly.Madeup.valueToCode(block, 'B', Blockly.Madeup.ORDER_ATOMIC);
   var code = 'dot ' + a + ', ' + b;
+  return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+};
+
+Blockly.Madeup['madeup_size'] = function(block) {
+  var value_a = Blockly.Madeup.valueToCode(block, 'A', Blockly.Madeup.ORDER_ATOMIC);
+  var code = 'size ' + a;
   return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
 };
 

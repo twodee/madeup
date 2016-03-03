@@ -1344,6 +1344,22 @@ Blockly.Blocks['madeup_subscript'] = {
   domToMutation: domModeToMutation
 };
 
+Blockly.Blocks['madeup_subscript_set'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.madeup.UNKNOWN_TYPE_HUE);
+    this.appendValueInput("I").setCheck(null).appendField('set item');
+    this.appendValueInput("COLLECTION").appendField("of");
+    this.appendValueInput("RHS").appendField("to");
+    this.setInputsInline(true);
+    this.setOutput(true);
+    this.setTooltip('');
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
+};
+
 Blockly.Blocks['madeup_normalize'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
@@ -1402,6 +1418,20 @@ Blockly.Blocks['madeup_dot'] = {
   domToMutation: domModeToMutation
 };
 
+Blockly.Blocks['madeup_size'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.madeup.UNKNOWN_TYPE_HUE);
+    this.appendValueInput("A").appendField("size");
+    this.setInputsInline(true);
+    this.setOutput(true);
+    this.setTooltip('');
+  },
+  customContextMenu: toggleStatementExpression,
+  mutationToDom: mutationToDom,
+  domToMutation: domModeToMutation
+};
+
 Blockly.Blocks['madeup_subrange'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
@@ -1427,46 +1457,61 @@ Blockly.Blocks['procedures_defreturn'] = null;
 
 // Blockly makes the function definition blocks for us. Let's tweak them
 // so they can change betweeen statements and expressions.
-(function() {
-  var oldContextMenu = Blockly.Blocks['procedures_defnoreturn'].customContextMenu;
-  Blockly.Blocks['procedures_defnoreturn'].customContextMenu = function(options) {
+
+function extendBuiltin(id) {
+  console.log(id);
+  console.log(Blockly.Blocks[id] == null);
+  console.log(Blockly.Blocks[id]);
+
+  var oldContextMenu = Blockly.Blocks[id].customContextMenu;
+  Blockly.Blocks[id].customContextMenu = function(options) {
     oldContextMenu.call(this, options);
     toggleStatementExpression.call(this, options);
   };
 
-  var oldDomToMutation = Blockly.Blocks['procedures_defnoreturn'].domToMutation;
-  Blockly.Blocks['procedures_defnoreturn'].domToMutation = function(xmlElement) {
+  var oldDomToMutation = Blockly.Blocks[id].domToMutation;
+  Blockly.Blocks[id].domToMutation = function(xmlElement) {
     oldDomToMutation.call(this, xmlElement);
     domModeToMutation.call(this, xmlElement);
   };
 
-  var oldMutationToDom = Blockly.Blocks['procedures_defnoreturn'].mutationToDom;
-  Blockly.Blocks['procedures_defnoreturn'].mutationToDom = function() {
-    var container = oldMutationToDom.call(this);
-    mutationModeToDom(this, container);
-    return container;
-  };
-})();
+  // Not every block has a mutation.
+  var oldMutationToDom = Blockly.Blocks[id].mutationToDom;
+  if (oldMutationToDom) {
+    Blockly.Blocks[id].mutationToDom = function() {
+      var container = oldMutationToDom.call(this);
+      mutationModeToDom(this, container);
+      return container;
+    };
+  }
+}
 
-// Blockly makes the function call blocks for us. Let's tweak them so they can
-// change betweeen statements and expressions.
-(function() {
-  var oldContextMenu = Blockly.Blocks['procedures_callnoreturn'].customContextMenu;
-  Blockly.Blocks['procedures_callnoreturn'].customContextMenu = function(options) {
+function extendMadeup(id) {
+  var oldContextMenu = Blockly.Madeup[id].customContextMenu;
+  // console.log(Blockly.Madeup[id]);
+  Blockly.Madeup[id].customContextMenu = function(options) {
     oldContextMenu.call(this, options);
     toggleStatementExpression.call(this, options);
   };
 
-  var oldDomToMutation = Blockly.Blocks['procedures_callnoreturn'].domToMutation;
-  Blockly.Blocks['procedures_callnoreturn'].domToMutation = function(xmlElement) {
+  var oldDomToMutation = Blockly.Madeup[id].domToMutation;
+  Blockly.Madeup[id].domToMutation = function(xmlElement) {
     oldDomToMutation.call(this, xmlElement);
     domModeToMutation.call(this, xmlElement);
   };
 
-  var oldMutationToDom = Blockly.Blocks['procedures_callnoreturn'].mutationToDom;
-  Blockly.Blocks['procedures_callnoreturn'].mutationToDom = function() {
+  var oldMutationToDom = Blockly.Madeup[id].mutationToDom;
+  Blockly.Madeup[id].mutationToDom = function() {
     var container = oldMutationToDom.call(this);
     mutationModeToDom(this, container);
     return container;
   };
-})();
+}
+
+extendBuiltin('procedures_defnoreturn');
+// extendBuiltin('procedures_defreturn');
+extendBuiltin('procedures_callnoreturn');
+extendBuiltin('variables_get');
+extendBuiltin('variables_set');
+// extendMadeup('variables_get');
+// extendMadeup('variables_set');

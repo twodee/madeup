@@ -124,11 +124,13 @@
       <block type="madeup_array_by"></block>
       <block type="madeup_array_of"></block>
       <block type="madeup_subscript"></block>
+      <block type="madeup_subscript_set"></block>
       <block type="madeup_subrange"></block>
       <block type="madeup_normalize"></block>
       <block type="madeup_magnitude"></block>
       <block type="madeup_cross"></block>
       <block type="madeup_dot"></block>
+      <block type="madeup_size"></block>
     </category>
   </xml>
 

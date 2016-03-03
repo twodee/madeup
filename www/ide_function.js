@@ -719,6 +719,8 @@ $(document).ready(function() {
 
   $('#magic').click(function() {
     var source = Blockly.Madeup.workspaceToCode(blocklyWorkspace);
+    log(source);
+    return;
     var name = prompt("What's your name?");
     $.ajax({
       type: 'POST',
@@ -736,7 +738,6 @@ $(document).ready(function() {
         console.log('Failure. :(');
       }
     });
-    // log(source); 
   });
 
   $('#solidify').click(function() {
