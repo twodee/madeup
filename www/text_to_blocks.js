@@ -512,9 +512,6 @@ function parse(peeker) {
     var rhs = parse(peeker);
 
     block = Blockly.Block.obtain(blocklyWorkspace, 'madeup_subscript_set');
-    console.log(collection);
-    console.log(i);
-    console.log(rhs);
     connectExpression(block, 'I', i);
     connectExpression(block, 'COLLECTION', collection);
     connectExpression(block, 'RHS', rhs);

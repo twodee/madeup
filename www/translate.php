@@ -27,7 +27,7 @@ error_log("Madeup source: {$in['source']}");
 error_log("Input file: $in_path");
 
 $lines = array();
-$command = sprintf("./forn 15 ./merp --tree -q %s", $in_path);
+$command = sprintf("./merp --tree -q %s", $in_path);
 exec($command, $lines, $out['exit_status']);
 $out['tree'] = implode("\n", $lines);
 

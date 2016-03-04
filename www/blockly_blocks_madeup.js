@@ -1459,10 +1459,6 @@ Blockly.Blocks['procedures_defreturn'] = null;
 // so they can change betweeen statements and expressions.
 
 function extendBuiltin(id) {
-  console.log(id);
-  console.log(Blockly.Blocks[id] == null);
-  console.log(Blockly.Blocks[id]);
-
   var oldContextMenu = Blockly.Blocks[id].customContextMenu;
   Blockly.Blocks[id].customContextMenu = function(options) {
     oldContextMenu.call(this, options);
