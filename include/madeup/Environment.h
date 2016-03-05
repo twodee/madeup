@@ -69,6 +69,7 @@ class Environment {
     void home();
     void reverse();
     void echo(Co<Trimesh> mesh);
+    void echo(const std::vector<Node> &path);
     void echoWithoutTransform(Co<Trimesh> mesh);
     void yaw(float degrees);
     void pitch(float degrees);
@@ -99,6 +100,7 @@ class Environment {
     float getVariableAsFloat(const std::string &id);
     const Turtle &getTurtle() const;
     void setTimeout(int max_seconds);
+    std::vector<Node> popPath();
 
   private:
     bool hasMoved() const;

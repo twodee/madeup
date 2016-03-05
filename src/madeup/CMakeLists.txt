@@ -59,11 +59,13 @@ add_library(madeup
   ExpressionMoveTo.cpp
   ExpressionMultiply.cpp
   ExpressionNegation.cpp
+  ExpressionNodes.cpp
   ExpressionNormalize.cpp
   ExpressionNot.cpp
   ExpressionNotEqual.cpp
   ExpressionNumber.cpp
   ExpressionOr.cpp
+  ExpressionPath.cpp
   ExpressionPitch.cpp
   ExpressionPolygon.cpp
   ExpressionPop.cpp

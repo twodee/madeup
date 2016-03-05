@@ -1,6 +1,7 @@
 #include "madeup/ExpressionClosure.h"
 #include "madeup/ExpressionEcho.h"
 #include "madeup/ExpressionMesh.h"
+#include "madeup/ExpressionNodes.h"
 #include "madeup/ExpressionUnit.h"
 #include "twodee/MessagedException.h"
 
@@ -28,9 +29,15 @@ Co<Expression> ExpressionEcho::evaluate(Environment &env) const {
   if (mesh_value) {
     env.echo(mesh_value->toMesh());
     return ExpressionUnit::getSingleton();
-  } else {
-    throw MessagedException(getSourceLocation().toAnchor() + ": I expect function echo to be given a mesh, but that's not what you gave it.");
   }
+
+  ExpressionNodes *turtles_value = dynamic_cast<ExpressionNodes *>(value.GetPointer());
+  if (turtles_value) {
+    env.echo(turtles_value->getPath());
+    return ExpressionUnit::getSingleton();
+  }
+
+  throw MessagedException(getSourceLocation().toAnchor() + ": I expect function echo to be given a mesh, but that's not what you gave it.");
 }
 
 /* ------------------------------------------------------------------------- */

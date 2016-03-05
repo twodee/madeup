@@ -36,6 +36,7 @@
 #include "madeup/ExpressionMove.h"
 #include "madeup/ExpressionMoveTo.h"
 #include "madeup/ExpressionNormalize.h"
+#include "madeup/ExpressionPath.h"
 #include "madeup/ExpressionPitch.h"
 #include "madeup/ExpressionPolygon.h"
 #include "madeup/ExpressionPop.h"
@@ -317,6 +318,8 @@ void Environment::prime() {
 
   Co<ExpressionDefine> define_forget(new ExpressionDefine("forget", Co<Expression>(new ExpressionForget())));
 
+  Co<ExpressionDefine> define_path(new ExpressionDefine("path", Co<Expression>(new ExpressionPath())));
+
   add("sin", Co<ExpressionClosure>(new ExpressionClosure(define_sine, globals)));
   add("cos", Co<ExpressionClosure>(new ExpressionClosure(define_cosine, globals)));
   add("size", Co<ExpressionClosure>(new ExpressionClosure(define_size, globals)));
@@ -366,6 +369,7 @@ void Environment::prime() {
   add("revolve", Co<ExpressionClosure>(new ExpressionClosure(define_revolve, globals)));
   add("extrude", Co<ExpressionClosure>(new ExpressionClosure(define_extrude, globals)));
   add("forget", Co<ExpressionClosure>(new ExpressionClosure(define_forget, globals)));
+  add("path", Co<ExpressionClosure>(new ExpressionClosure(define_path, globals)));
   add("push", Co<ExpressionClosure>(new ExpressionClosure(define_push, globals)));
   add("pop", Co<ExpressionClosure>(new ExpressionClosure(define_pop, globals)));
   add("print", Co<ExpressionClosure>(new ExpressionClosure(define_print, globals)));
@@ -421,6 +425,7 @@ void Environment::prime() {
   globals->add("sin", (*this)["sin"]);
   globals->add("extrude", (*this)["extrude"]);
   globals->add("forget", (*this)["forget"]);
+  globals->add("path", (*this)["path"]);
 
   xforms.push(QMatrix4<float>(1.0f));
   paths.push_back(vector<Turtle>());
@@ -691,6 +696,18 @@ void Environment::echo(Co<Trimesh> mesh) {
   Trimesh *trimesh(new Trimesh(*mesh));
   *trimesh *= xforms.top();
   *shapes += *trimesh;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void Environment::echo(const std::vector<Node> &path) {
+  for (std::vector<Node>::const_iterator i = path.begin(); i != path.end(); ++i) {
+    Node node = *i;
+    node.position = xforms.top() * node.position;
+    Turtle path_turtle = {node.position, turtle.camera};
+    paths[paths.size() - 1].push_back(path_turtle);
+    run.push_back(node);
+  }
 }
 
 /* ------------------------------------------------------------------------- */
@@ -1354,6 +1371,14 @@ Co<Trimesh> Environment::surface(int width, int height) {
   run.clear();
 
   return trimesh;
+}
+
+/* ------------------------------------------------------------------------- */
+
+std::vector<Node> Environment::popPath() {
+  std::vector<Node> path = run;
+  forget();
+  return path;
 }
 
 /* ------------------------------------------------------------------------- */
