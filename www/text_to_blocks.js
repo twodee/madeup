@@ -489,7 +489,6 @@ function parse(peeker) {
   else if (token == 'define-variable') {
     peeker.get(); // eat space
     var id = peeker.getToken();
-    console.log(id);
     peeker.get(); // eat space
     var rhs = parse(peeker);
 
@@ -633,8 +632,6 @@ function parse(peeker) {
     var count = parse(peeker);
     peeker.get(); // eat space
     var element = parse(peeker);
-
-    console.log(element);
 
     block = Blockly.Block.obtain(blocklyWorkspace, element.type == 'madeup_array_of' ? 'madeup_array_by' : 'madeup_array_of');
     connectExpression(block, 'N', count);

@@ -77,13 +77,11 @@ function getBlocklyProcedureFormals(name) {
   // allProcedures gives back [procedures with return, procedures without
   // return]. We only have the latter.
 
-  console.log(Blockly.Procedures.allProcedures(blocklyWorkspace));
   var procs = Blockly.Procedures.allProcedures(blocklyWorkspace)[0];
   // TODO
 
   // Find the procedure in the list with the given name.
   for (var i = 0; i < procs.length; ++i) {
-    console.log("procedure " + i + ": " + procs[i][0]);
     if (procs[i][0] == name) {
       return procs[i][1];
     }
@@ -142,7 +140,7 @@ var renderer, camera, controls;
 var meshes = [];
 var isAutopathify = true;
 var nSecondsTillAutopathify = 1.0;
-var showWireframe = false;
+var showMode = 'solid';
 var showHeadings = true;
 var showCounterclockwise = true;
 var showClockwise = false;
@@ -159,7 +157,7 @@ var isSourceDirty = false;
 var showPoints = true;
 
 var isThemeDarkChanged = false;
-var isShowWireframeChanged = false;
+var isShowModeChanged = false;
 var isAxisChanged = [false, false, false];
 var isGridChanged = [false, false, false];
 var isAutopathifyChanged = false;
@@ -187,7 +185,7 @@ function saveInCookies() {
   if (isShowHeadingsChanged) Cookies.set('showHeadings', showHeadings ? 1 : 0);
   if (isShowCounterclockwiseChanged) Cookies.set('showCounterclockwise', showCounterclockwise ? 1 : 0);
   if (isShowClockwiseChanged) Cookies.set('showClockwise', showClockwise ? 1 : 0);
-  if (isShowWireframeChanged) Cookies.set('showWireframe', showWireframe ? 1 : 0);
+  if (isShowModeChanged) Cookies.set('showMode', showMode);
   if (isFlatShadedChanged) Cookies.set('isFlatShaded', isFlatShaded ? 1 : 0);
   if (isThemeDarkChanged) Cookies.set('isThemeDark', isThemeDark ? 1 : 0);
   if (isAxisChanged[0]) Cookies.set('axisX', $('#axisX').prop('checked') ? 1 : 0);
@@ -216,7 +214,7 @@ function saveInCookies() {
   isShowCounterclockwiseChanged = false;
   isShowClockwiseChanged = false;
   isFlatShadedChanged = false;
-  isShowWireframeChanged = false;
+  isShowModeChanged = false;
   isThemeDarkChanged = false;
   isShowHeadingsChanged = false;
   isNSecondsTillAutopathifyChanged = false;
@@ -280,12 +278,12 @@ $(document).ready(function() {
     }
     $('#showClockwise').prop('checked', showClockwise);
 
-    if (Cookies.get('showWireframe')) {
-      showWireframe = parseInt(Cookies.get('showWireframe')) != 0;
+    if (Cookies.get('showMode')) {
+      showMode = Cookies.get('showMode');
     } else {
-      showWireframe = false;
+      showMode = 'solid';
     }
-    $('#showWireframe').prop('checked', showWireframe);
+    $('#showMode').val(showMode);
 
     if (isEditorText) {
       $("#isEditorText").prop('checked', true);
@@ -655,16 +653,16 @@ $(document).ready(function() {
     }
   });
 
-  $('#showWireframe').click(function() {
-    isShowWireframeChanged = true;
-    showWireframe = this.checked;
-    run(getSource(), GeometryMode.SURFACE);
+  $('#showMode').change(function() {
+    isShowModeChanged = true;
+    showMode = $('#showMode').find(":selected").val();
+    run(getSource(), GeometryMode.PATH);
   });
 
   $('#showPoints').click(function() {
     isShowPointsChanged = true;
     showPoints = this.checked;
-    run(getSource(), GeometryMode.SURFACE);
+    run(getSource(), GeometryMode.PATH);
   });
 
   function toggleMenu(id) {
@@ -1125,8 +1123,22 @@ function run(source, mode) {
           var loader = new THREE.JSONLoader();
           try {
             var model = loader.parse(JSON.parse(data['model']));
-            var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: showWireframe, wireframeLinewidth: 5});
-            meshes[0] = new THREE.Mesh(model.geometry, material);
+
+            if (showMode == 'triangles' || showMode == 'shaded_triangles') {
+              var solidMaterial;
+              if (showMode == 'shaded_triangles') {
+                solidMaterial = new THREE.MeshLambertMaterial({color: 0xcccccc});
+              } else {
+                solidMaterial = new THREE.MeshBasicMaterial({color: 0xcccccc});
+              }
+              var wireframeMaterial = new THREE.MeshBasicMaterial({color: 0x333333, wireframe: true, transparent: true, wireframeLinewidth: 3}); 
+              var material = [solidMaterial, wireframeMaterial];
+              meshes[0] = THREE.SceneUtils.createMultiMaterialObject(model.geometry, material);
+            } else {
+              var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: showMode == 'wireframe', wireframeLinewidth: 5});
+              meshes[0] = new THREE.Mesh(model.geometry, material);
+            }
+
             model.geometry.computeFaceNormals();
             model.geometry.computeVertexNormals();
             allGeometry = model.geometry;

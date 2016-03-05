@@ -16,7 +16,6 @@ oop.inherits(Mode, TextMode);
   this.getNextLineIndent = function(state, line, tab) {
     var match = line.match(/^\s*/);
     var currentIndent = match[0];
-    console.log('get: ' + line);
     if (/^\s*(if|else|to|for|repeat|while|around)\b/.test(line)) {
       return currentIndent + '  ';
     } else {
@@ -26,7 +25,6 @@ oop.inherits(Mode, TextMode);
 
   // Do I need to fix the indent?
   this.checkOutdent = function(state, line, input) {
-    console.log('check: ' + line);
     return /^\s{2,}(en|els|aroun)\s*$/.test(line);
   };
 
@@ -34,7 +32,6 @@ oop.inherits(Mode, TextMode);
   this.autoOutdent = function(state, doc, row) {
     var line = doc.getLine(row);
     var match = line.match(/^\s{2,}(end|else|around)\b/);
-    console.log('auto: ' + line);
     if (match) {
       doc.replace(new Range(row, 0, row, 2), '');
     }

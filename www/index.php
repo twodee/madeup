@@ -199,7 +199,12 @@
     </div>
 
     <div id="displayPopup" class="popup">
-      <input type="checkbox" id="showWireframe"/>Show wireframe<br/>
+      Show <select name="showMode" id="showMode">
+        <option value="solid" selected>Solid</option> 
+        <option value="triangles">Triangles</option> 
+        <option value="shaded_triangles">Shaded Triangles</option> 
+        <option value="wireframe">Wireframe</option> 
+      </select><br/>
       <input type="checkbox" id="showHeadings"/>Show heading<br/>
       <input type="checkbox" id="showPoints"/>Show points<br/>
       <input type="checkbox" id="showCounterclockwise"/>Show counterclockwise faces<br/>

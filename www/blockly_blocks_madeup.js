@@ -1482,32 +1482,7 @@ function extendBuiltin(id) {
   }
 }
 
-function extendMadeup(id) {
-  var oldContextMenu = Blockly.Madeup[id].customContextMenu;
-  // console.log(Blockly.Madeup[id]);
-  Blockly.Madeup[id].customContextMenu = function(options) {
-    oldContextMenu.call(this, options);
-    toggleStatementExpression.call(this, options);
-  };
-
-  var oldDomToMutation = Blockly.Madeup[id].domToMutation;
-  Blockly.Madeup[id].domToMutation = function(xmlElement) {
-    oldDomToMutation.call(this, xmlElement);
-    domModeToMutation.call(this, xmlElement);
-  };
-
-  var oldMutationToDom = Blockly.Madeup[id].mutationToDom;
-  Blockly.Madeup[id].mutationToDom = function() {
-    var container = oldMutationToDom.call(this);
-    mutationModeToDom(this, container);
-    return container;
-  };
-}
-
 extendBuiltin('procedures_defnoreturn');
-// extendBuiltin('procedures_defreturn');
 extendBuiltin('procedures_callnoreturn');
 extendBuiltin('variables_get');
 extendBuiltin('variables_set');
-// extendMadeup('variables_get');
-// extendMadeup('variables_set');
