@@ -9,12 +9,14 @@ Madeup is still in alpha stage, so you will likely discover bugs, slowness, and 
 ## Building the Interpreter
 If you'd like to build the Madeup interpreter on your local machine, you'll need CMake and a compiler that supports `c++0x`.
 
-Build following these steps:
+Build on Ubuntu following these steps:
 
     $ git clone git@github.com:twodee/madeup.git
     $ cd madeup
     $ mkdir build
     $ cd build
+    $ sudo apt-get install libeigen3-dev libcgal-dev
+    $ git clone https://github.com/libigl/libigl.git
     $ cmake ..
     $ make
 
