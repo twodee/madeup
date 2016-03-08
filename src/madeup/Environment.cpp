@@ -1072,7 +1072,7 @@ Co<Trimesh> Environment::revolve() {
   trimesh->AllocateVertexColors();
 
   if (geometry_mode == GeometryMode::SURFACE) {
-    if (run.size() >= 2) {
+    if (run.size() > 2) {
       QVector3<float> diff = run[0].position - run[run.size() - 1].position;
       float squared_length = diff.GetSquaredLength();
 
@@ -1122,6 +1122,8 @@ Co<Trimesh> Environment::revolve() {
         trimesh->MigrateVertexMetasToColors(0, 1, 2);
         *trimesh *= xforms.top();
       }
+    } else {
+      throw UnlocatedException("I expect revolve to be given a path of at least three vertices.");
     }
   }
 
