@@ -1115,7 +1115,10 @@ Co<Trimesh> Environment::revolve() {
         ExpressionNumber *degrees_number = dynamic_cast<ExpressionNumber *>(degrees_expr.GetPointer());
         float degrees = degrees_number->toReal();
 
-        trimesh = Co<Trimesh>(line->Revolve(QVector3<float>(x, y, z), nsides, degrees));
+        QVector3<float> axis(x, y, z);
+        axis.Normalize();
+
+        trimesh = Co<Trimesh>(line->Revolve(axis, nsides, degrees));
         trimesh->MigrateVertexMetasToColors(0, 1, 2);
         *trimesh *= xforms.top();
       }
