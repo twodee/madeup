@@ -739,14 +739,12 @@ $(document).ready(function() {
   });
 
   $('#solidify').click(function() {
-    log('Solidifying...'); 
     saveInCookies();
     run(getSource(), GeometryMode.SURFACE);
     textEditor.focus();
   });
 
   $('#pathify').click(function() {
-    log('Pathifying...'); 
     saveInCookies();
     run(getSource(), GeometryMode.PATH);
     textEditor.focus();
@@ -1081,6 +1079,12 @@ var allGeometry = undefined;
 var timeOfLatestRun = undefined;
 
 function run(source, mode) {
+  if (mode == GeometryMode.SURFACE) {
+    log('Solidifying...'); 
+  } else if (mode == GeometryMode.PATH) {
+    log('Pathifying...'); 
+  }
+
   timeOfLatestRun = new Date().getTime();
 
   $.ajax({
