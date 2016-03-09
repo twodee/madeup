@@ -696,8 +696,8 @@ $(document).ready(function() {
     toggleMenu('#editorPopup');
   });
 
-  $('#toggleGridPopup').click(function() {
-    toggleMenu('#gridPopup');
+  $('#toggleAboutPopup').click(function() {
+    toggleMenu('#aboutPopup');
   });
 
   $('#toggleDisplayPopup').click(function() {

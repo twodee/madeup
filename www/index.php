@@ -142,10 +142,10 @@
     <div style="display: inline-block; position: absolute: left: 0px;">
       <input id="solidify" type="button" value="Solidify"/>
       <input id="pathify" type="button" value="Pathify"/>
-      <input id="docs" type="button" value="Docs"/>
       <!-- <input id="smaller" type="button" value="-abc"/> -->
       <!-- <input id="bigger" type="button" value="+abc"/> -->
       <input id="toggleEditorPopup" class="togglePopup" type="button" value="Editor"/>
+      <input id="toggleAboutPopup" class="togglePopup" type="button" value="?"/>
       <!-- <input id="magic" type="button" value="Magic"/> -->
     </div>
 
@@ -155,9 +155,13 @@
 
     <div style="display: inline-block; position: absolute; right: 0px;">
       <input id="toggleDisplayPopup" class="togglePopup" type="button" value="Display"/>
-      <input id="toggleGridPopup" class="togglePopup" type="button" value="Grid"/>
+      <!-- <input id="toggleGridPopup" class="togglePopup" type="button" value="Grid"/> -->
       <input id="fit" type="button" value="Fit"/>
       <input id="download" type="button" value="Download"/>
+    </div>
+
+    <div id="aboutPopup" class="popup">
+      <a href="#" id="docs" class="fileLink">Documentation</a>
     </div>
 
     <div id="filePopup" class="popup">
@@ -189,17 +193,6 @@
       <input type="checkbox" id="autopathify" checked="checked"/>Auto-pathify <input type="text" id="nSecondsTillAutopathify" size="5"/> seconds after last edit<br/>
     </div>
 
-    <div id="gridPopup" class="popup">
-      <input type="checkbox" id="axisX"/>X axis<br/>
-      <input type="checkbox" id="axisY"/>Y axis<br/>
-      <input type="checkbox" id="axisZ"/>Z axis<br/>
-      <input type="checkbox" id="gridX"/>X = 0 plane<br/>
-      <input type="checkbox" id="gridY"/>Y = 0 plane<br/>
-      <input type="checkbox" id="gridZ"/>Z = 0 plane<br/>
-      Grid Extent: <input type="text" id="gridExtent" size="5"/><br/>
-      Grid Spacing: <input type="text" id="gridSpacing" size="5"/><br/>
-    </div>
-
     <div id="displayPopup" class="popup">
       Show <select name="showMode" id="showMode" class="popupDropdown">
         <option value="solid" selected>Solid</option> 
@@ -217,6 +210,16 @@
       <a href="#" id="cameraLeft" class="fileLink">-X</a> <a href="#" id="cameraRight" class="fileLink">+X</a>
       <a href="#" id="cameraBottom" class="fileLink">-Y</a> <a href="#" id="cameraTop" class="fileLink">+Y</a>
       <a href="#" id="cameraBack" class="fileLink">-Z</a> <a href="#" id="cameraFront" class="fileLink">+Z</a><br/>
+      <hr>
+      Grid:<br/>
+      <input type="checkbox" id="axisX"/>X axis<br/>
+      <input type="checkbox" id="axisY"/>Y axis<br/>
+      <input type="checkbox" id="axisZ"/>Z axis<br/>
+      <input type="checkbox" id="gridX"/>X = 0 plane<br/>
+      <input type="checkbox" id="gridY"/>Y = 0 plane<br/>
+      <input type="checkbox" id="gridZ"/>Z = 0 plane<br/>
+      Grid Extent: <input type="text" id="gridExtent" size="5"/><br/>
+      Grid Spacing: <input type="text" id="gridSpacing" size="5"/><br/>
     </div>
   </div>
 
