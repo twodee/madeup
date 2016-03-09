@@ -142,3 +142,12 @@ body {
   height: 100%;
   overflow: auto;
 }
+
+.popupDropdown {
+  font-size: 30px;
+  background: transparent;
+  padding: 5px;
+  text-indent: 10px;
+  color: #ffffff;
+  -webkit-appearance: none;
+}

@@ -201,7 +201,7 @@
     </div>
 
     <div id="displayPopup" class="popup">
-      Show <select name="showMode" id="showMode">
+      Show <select name="showMode" id="showMode" class="popupDropdown">
         <option value="solid" selected>Solid</option> 
         <option value="triangles">Triangles</option> 
         <option value="shaded_triangles">Shaded Triangles</option> 

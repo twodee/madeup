@@ -251,12 +251,7 @@ $(document).ready(function() {
     } else {
       fontSize = 14;
     }
-    textEditor.setFontSize(fontSize);
-    $('#console')[0].style.fontSize = fontSize + 'px';
-    $('#menu input').each(function (i) {
-      var delta = (fontSize - 14) / 2;
-      this.style.fontSize = (parseInt($(this).css('font-size')) + delta) + 'px';
-    });
+    setFontSize(fontSize);
 
     if (Cookies.get('showHeadings')) {
       showHeadings = parseInt(Cookies.get('showHeadings')) != 0;
@@ -404,29 +399,15 @@ $(document).ready(function() {
   });
 
   $('#smaller').click(function() {
-    isFontSizeChanged = true;
-    fontSize -= 2;
-    $('#menu input').each(function (i) {
-      this.style.fontSize = (parseInt($(this).css('font-size')) - 1) + 'px';
-    });
-    textEditor.setFontSize(fontSize);
-    $('#console')[0].style.fontSize = fontSize + 'px';
+    setFontSize(fontSize - 2);
     textEditor.focus();
-
     resize();
     Blockly.fireUiEvent(window, 'resize');
   });
 
   $('#bigger').click(function() {
-    isFontSizeChanged = true;
-    fontSize += 2;
-    $('#menu input').each(function (i) {
-      this.style.fontSize = (parseInt($(this).css('font-size')) + 1) + 'px';
-    });
-    textEditor.setFontSize(fontSize);
-    $('#console')[0].style.fontSize = fontSize + 'px';
+    setFontSize(fontSize + 2);
     textEditor.focus();
-
     resize();
     Blockly.fireUiEvent(window, 'resize');
   });
@@ -508,6 +489,28 @@ $(document).ready(function() {
     textEditor.focus();
     updateCulling();
   });
+
+  function setFontSize(newSize) {
+    if (newSize != fontSize) {
+      fontSize = newSize;
+      isFontSizeChanged = true;
+    }
+
+    $('#menu input').each(function (i) {
+      this.style.fontSize = fontSize + 'px';
+    });
+
+    $('.popup').each(function (i) {
+      this.style.fontSize = fontSize + 'px';
+    });
+
+    $('.popupDropdown').each(function (i) {
+      this.style.fontSize = fontSize + 'px';
+    });
+
+    textEditor.setFontSize(fontSize);
+    $('#console')[0].style.fontSize = fontSize + 'px';
+  }
 
   var red = 0xB80000;
   var green = 0x006100;
@@ -847,13 +850,6 @@ $(document).ready(function() {
   });
 
   $(document).on('click', function(event) {
-    // Don't do any hiding when color picker clicked on.
-    if ($(event.target).closest('.colorpicker').length != 0) {
-      event.preventDefault();
-      return;
-      // return false;
-    }
-
     // If a non-menu was clicked on, so let's close all the menus.
     if ($(event.target).closest('.togglePopup').length == 0 &&
         $(event.target).closest('.popup').length == 0) {
@@ -872,7 +868,7 @@ $(document).ready(function() {
  
     // Otherwise, if got a click on a menu itself, let's hide any other menus. 
     else if ($(event.target).hasClass('popup')) {
-      hideMenus(event.target.id);
+      hideMenus('#' + event.target.id);
     }
 
     return true;
