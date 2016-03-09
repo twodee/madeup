@@ -140,24 +140,19 @@
 <div id="entire" style="z-index: 0">
   <div id="menu">
     <div style="display: inline-block; position: absolute: left: 0px;">
-      <input id="solidify" type="button" value="Solidify"/>
-      <input id="pathify" type="button" value="Pathify"/>
-      <!-- <input id="smaller" type="button" value="-abc"/> -->
-      <!-- <input id="bigger" type="button" value="+abc"/> -->
+      <input style="color: yellow" id="toggleFilePopup" class="togglePopup" type="button" value="File"/>
       <input id="toggleEditorPopup" class="togglePopup" type="button" value="Editor"/>
-      <input id="toggleAboutPopup" class="togglePopup" type="button" value="?"/>
-      <!-- <input id="magic" type="button" value="Magic"/> -->
+      <input id="toggleDisplayPopup" class="togglePopup" type="button" value="Display"/>
+      <input id="toggleAboutPopup" class="togglePopup" type="button" value="About"/>
     </div>
 
     <div style="display: inline-block; position: absolute; left: 0px; right: 0px; text-align: center; pointer-events: none;" class="fileLink">
-      <input style="color: yellow" id="toggleFilePopup" class="togglePopup" type="button" value="File"/>
     </div>
 
     <div style="display: inline-block; position: absolute; right: 0px;">
-      <input id="toggleDisplayPopup" class="togglePopup" type="button" value="Display"/>
-      <!-- <input id="toggleGridPopup" class="togglePopup" type="button" value="Grid"/> -->
+      <input id="solidify" type="button" value="Solidify"/>
+      <input id="pathify" type="button" value="Pathify"/>
       <input id="fit" type="button" value="Fit"/>
-      <input id="download" type="button" value="Download"/>
     </div>
 
     <div id="aboutPopup" class="popup">
@@ -170,6 +165,8 @@
       <a href="#" id="fileClose" class="fileLink">Close</a><br/>
       <p></p>
       <a href="#" id="magic" class="fileLink">Send to Chris</a><br/>
+      <p></p> 
+      <a href="#" id="download" class="fileLink">Export OBJ Model</a><br/>
       <p></p> 
       <a href="#" id="exportArchive" class="fileLink">Export Archive</a><br/>
       <a href="#" id="importArchive" class="fileLink">Import Archive</a><br/>
