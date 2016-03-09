@@ -35,3 +35,12 @@ textEditor.commands.addCommand({
   },
   'readOnly' : true
 });
+
+textEditor.commands.addCommand({
+  'name' : 'fit',
+  'bindKey' : { 'win' : 'Ctrl-F', 'mac' : 'Ctrl-F' },
+  'exec' : function(editor) {
+    fit();
+  },
+  'readOnly' : true
+});
