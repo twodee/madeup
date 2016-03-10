@@ -38,7 +38,7 @@ textEditor.commands.addCommand({
 
 textEditor.commands.addCommand({
   'name' : 'fit',
-  'bindKey' : { 'win' : 'Ctrl-F', 'mac' : 'Ctrl-F' },
+  'bindKey' : { 'win' : 'Ctrl-/', 'mac' : 'Ctrl-/' },
   'exec' : function(editor) {
     fit();
   },
