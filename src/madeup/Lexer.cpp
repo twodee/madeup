@@ -217,8 +217,6 @@ Token Lexer::getTokenAfterMinusMinus() {
     int ndashes = 0;
     do {
       text_so_far += c;
-      ++location.end_column;
-      ++location.end_index;
       c = in.get();
       if (c == '-') {
         ++ndashes;
