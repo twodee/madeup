@@ -229,6 +229,7 @@ function saveInCookies() {
 
 $(document).ready(function() {
   $(window).load(function() {
+    $('#textEditor textarea').addClass('mousetrap');
     Cookies.defaults = {
       expires: 10 * 365
     };
@@ -393,58 +394,45 @@ $(document).ready(function() {
     });
   });
 
-  $('#clear').click(function() {
-    log('');
-    textEditor.focus();
-  });
-
   $('#smaller').click(function() {
     setFontSize(fontSize - 2);
-    textEditor.focus();
     resize();
     Blockly.fireUiEvent(window, 'resize');
   });
 
   $('#bigger').click(function() {
     setFontSize(fontSize + 2);
-    textEditor.focus();
     resize();
     Blockly.fireUiEvent(window, 'resize');
   });
 
   $('#fit').click(function() {
     fit();
-    textEditor.focus();
+    focusEditor();
   });
 
   $('#cameraLeft').click(function() {
     viewFrom(0, -1);
-    textEditor.focus();
   });
 
   $('#cameraRight').click(function() {
     viewFrom(0, 1);
-    textEditor.focus();
   });
 
   $('#cameraBottom').click(function() {
     viewFrom(1, -1);
-    textEditor.focus();
   });
 
   $('#cameraTop').click(function() {
     viewFrom(1, 1);
-    textEditor.focus();
   });
 
   $('#cameraBack').click(function() {
     viewFrom(2, -1);
-    textEditor.focus();
   });
 
   $('#cameraFront').click(function() {
     viewFrom(2, 1);
-    textEditor.focus();
   });
 
   $('input[type=radio][name=editorMode]').change(function() {
@@ -465,28 +453,24 @@ $(document).ready(function() {
   $('#showHeadings').click(function() {
     isShowHeadingsChanged = true;
     showHeadings = this.checked;
-    textEditor.focus();
     run(getSource(), GeometryMode.PATH);
   });
 
   $('#isFlatShaded').click(function() {
     isFlatShadedChanged = true;
     isFlatShaded = this.checked;
-    textEditor.focus();
-    render();
+    run(getSource(), GeometryMode.PATH);
   });
 
   $('#showCounterclockwise').click(function() {
     isShowCounterclockwiseChanged = true;
     showCounterclockwise = this.checked;
-    textEditor.focus();
     updateCulling();
   });
 
   $('#showClockwise').click(function() {
     isShowClockwiseChanged = true;
     showClockwise = this.checked;
-    textEditor.focus();
     updateCulling();
   });
 
@@ -711,11 +695,12 @@ $(document).ready(function() {
     $('#timestamp').val(new Date().getTime());
     isDownloading = true;
     $('#downloader').submit();
-    textEditor.focus();
+    focusEditor();
   });
 
   $('#docs').click(function() {
     window.open('docs/introduction.html', '_blank');
+    focusEditor();
   });
 
   $('#magic').click(function() {
@@ -744,13 +729,13 @@ $(document).ready(function() {
   $('#solidify').click(function() {
     saveInCookies();
     run(getSource(), GeometryMode.SURFACE);
-    textEditor.focus();
+    focusEditor();
   });
 
   $('#pathify').click(function() {
     saveInCookies();
     run(getSource(), GeometryMode.PATH);
-    textEditor.focus();
+    focusEditor();
   });
 
   $('#fileSaveAs').click(function() {
@@ -864,11 +849,13 @@ $(document).ready(function() {
       var id = event.target.id.substring(6);
       var id = '#' + id.charAt(0).toLowerCase() + id.substring(1);
       hideMenus(id);
+      focusEditor();
     }
  
     // Otherwise, if got a click on a menu itself, let's hide any other menus. 
     else if ($(event.target).hasClass('popup')) {
       hideMenus('#' + event.target.id);
+      focusEditor();
     }
 
     return true;
@@ -1347,8 +1334,9 @@ function resize() {
   // camera.top = camera.left / camera.aspect;
   // camera.bottom = -camera.top;
   camera.updateProjectionMatrix();
-  $("#textEditor").height($(document).height() - $('#menu').height() - $('#console').height());
-  $("#blocksEditor").height($(document).height() - $('#menu').height() - $('#console').height());
+
+  $("#textEditor").height($(window).height() - $('#menu').height() - $('#console').height());
+  $("#blocksEditor").height($(window).height() - $('#menu').height() - $('#console').height());
 
   var blocklyArea = document.getElementById('blocksEditor');
   var blocklyDiv = document.getElementById('blocksCanvas');
@@ -1488,3 +1476,23 @@ function hideMenus(exceptID) {
     swatch.ColorPickerHide();
   }
 }
+
+function focusEditor() {
+  textEditor.focus();
+}
+
+Mousetrap.bind('ctrl+s', function(e) {
+  save();
+});
+
+Mousetrap.bind('ctrl+,', function(e) {
+  run(getSource(), GeometryMode.SURFACE);
+});
+
+Mousetrap.bind('ctrl+.', function(e) {
+  run(getSource(), GeometryMode.PATH);
+});
+
+Mousetrap.bind('ctrl+/', function(e) {
+  fit();
+});

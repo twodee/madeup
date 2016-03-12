@@ -13,6 +13,9 @@
   <script src="jquery.js"></script>
   <script src="jquery-ui/jquery-ui.js"></script>
   <script src="js-cookie/src/js.cookie.js"></script>
+  <script src="jquery_ui_touch_punch/jquery.ui.touch-punch.min.js"></script>
+
+  <script src="mousetrap/mousetrap.min.js"></script>
 
   <!-- ThreeJS dependencies -->
   <script src="three-js/build/three.js"></script>
@@ -222,7 +225,7 @@
 
   <div id="left">
     <div id="editorPane">
-      <div id="textEditor"></div>
+      <div id="textEditor" class="mousetrap"></div>
       <div id="blocksEditor">
         <div id="blocksCanvas"></div>
       </div>

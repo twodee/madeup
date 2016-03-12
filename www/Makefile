@@ -14,7 +14,7 @@ check:
 		exit 1; \
 	fi
 
-libdeps: $(WWW_ROOT)/ace $(WWW_ROOT)/three-js $(WWW_ROOT)/jquery.js $(WWW_ROOT)/js-cookie $(WWW_ROOT)/jquery-ui $(WWW_ROOT)/blockly $(WWW_ROOT)/closure-library $(WWW_ROOT)/filesaver
+libdeps: $(WWW_ROOT)/ace $(WWW_ROOT)/three-js $(WWW_ROOT)/jquery.js $(WWW_ROOT)/js-cookie $(WWW_ROOT)/jquery-ui $(WWW_ROOT)/blockly $(WWW_ROOT)/closure-library $(WWW_ROOT)/filesaver $(WWW_ROOT)/jquery_ui_touch_punch $(WWW_ROOT)/mousetrap
 
 init: libdeps madeup all
 
@@ -63,6 +63,14 @@ $(WWW_ROOT)/blockly:
 $(WWW_ROOT)/closure-library:
 	sudo git clone https://github.com/google/closure-library.git $(WWW_ROOT)/closure-library
 	sudo chmod -R a+rX $(WWW_ROOT)/closure-library
+
+$(WWW_ROOT)/jquery_ui_touch_punch:
+	sudo git clone https://github.com/furf/jquery-ui-touch-punch.git $(WWW_ROOT)/jquery_ui_touch_punch
+	sudo chmod -R a+rX $(WWW_ROOT)/jquery_ui_touch_punch
+
+$(WWW_ROOT)/mousetrap:
+	sudo git clone https://github.com/ccampbell/mousetrap.git $(WWW_ROOT)/mousetrap
+	sudo chmod -R a+rX $(WWW_ROOT)/mousetrap
 
 $(DST): $(WWW_ROOT)/%: %
 	sudo cp $^ $@
