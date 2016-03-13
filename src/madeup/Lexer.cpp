@@ -137,7 +137,7 @@ Token Lexer::getToken() {
     return getTokenAfterBang();
   } else if (c == '"') {
     return getTokenAfterQuote();
-  } else if (isalpha(c)) {
+  } else if (isalpha(c) || c == '_') {
     return getTokenAfterLetter();
   } else if (isdigit(c)) {
     return getTokenAfterDigit();
@@ -286,7 +286,7 @@ Token Lexer::getTokenAfterQuote() {
 Token Lexer::getTokenAfterLetter() {
   int c = in.get();
 
-  while (c != EOF && (isalpha(c) || isdigit(c) || (c == '.' && in.peek() != '.'))) {
+  while (c != EOF && (isalpha(c) || isdigit(c) || c == '_' || (c == '.' && in.peek() != '.'))) {
     ++location.end_column;
     ++location.end_index;
     text_so_far += (char) c;
