@@ -17,7 +17,7 @@ Use `---` to get a multiline comment, which spans until the next occurrence of `
 
 {:.mup}
 ~~~
---- Let's disable this code for the time beiing.
+--- Let's disable this code for the time being.
 print pi
 nsides = 100
 print where
@@ -379,7 +379,7 @@ print n -- prints 5
 ##Loops
 Madeup supports several kinds of loops to help you repeat processes.
 
-###`repeat`
+###repeat
 Running a sequence multiple times is very simply accomplished using the `repeat` loop:
 
 {:.mup}
@@ -407,13 +407,13 @@ Short loops can be written in one line:
 repeat 10 print "x"
 ~~~
 
-###repeatwich
-Sometimes half of the repeated sequence needs to run one more time than the other half. We refer to this sometimes as a "loop and a half." These situations arise frequently enough in 3D construction and path walking that Madeup provides support for such loops. The "and a half" portion sandwiches or surrounds the internal portion. Therefore, we call this a `repeatwich` loop.
+###repeat-and-a-half
+Sometimes half of the repeated sequence needs to run one more time than the other half. We refer to this sometimes as a "loop and a half." These situations arise frequently enough in 3D construction and path walking that Madeup provides support for such loops. The "and a half" portion sandwiches or surrounds the internal portion:
 
 {:.mup}
 ~~~
 -- prints xoxox
-repeatwich 3
+repeat 3
   print "x"
 around
   print "o"

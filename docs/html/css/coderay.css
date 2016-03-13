@@ -17,6 +17,10 @@ h3 {
 }
 
 .CodeRay pre {
+  /* These two override Bootstrap's styling. */
+  border: 0px;
+  background-color: transparent;
+
   margin: 0px;
   padding: 1.5em;
 }
@@ -162,6 +166,8 @@ ol.CodeRay li { white-space: pre }
 	/* Needed to surround contained floats. */
   width: 100%;
 	overflow: auto;
+
+  margin-bottom: 1em;
 }
 
 .imgcode img {
@@ -184,7 +190,9 @@ ol.CodeRay li { white-space: pre }
 }
 
 p {
-	font-family: serif;
+	/* font-family: serif; */
+  font-size: 18px;
+  font-family: 'Crimson Text', serif;
 }
 
 h1, h2 {

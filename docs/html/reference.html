@@ -3,10 +3,38 @@
 <head>
   <title>Madeup Documentation</title>
   <link rel="stylesheet" type="text/css" href="css/coderay.css">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <script>
+
+$(document).ready(function() {
+  var basename = location.pathname;
+  basename = basename.substring(basename.lastIndexOf('/') + 1); 
+  $('#navbar a[href="' + basename + '"]').parent().addClass('active');  
+});
+
+  </script>
 </head>
 <body>
+
+<div class="container">
+
+<ul class="nav nav-tabs" id="navbar">
+  <li><a href="introduction.html">Dowel</a></li>
+  <li><a href="extrude.html">Extrude</a></li>
+  <li><a href="revolve.html">Revolve</a></li>
+  <li><a href="spheres.html">Spheres</a></li>
+  <li><a href="boxes.html">Boxes</a></li>
+  <li><a href="surface.html">Surface</a></li>
+  <li><a href="reference.html">Reference</a></li>
+</ul>
 <h1 id="language-reference">Language Reference</h1>
 <p>Every fun thing that has ever happened started with some rules (gravitational law, oldest player rolls first, etc.), and Madeup is no exception. Let's describe the grammar of the Madeup language.</p>
 
@@ -32,7 +60,7 @@
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre><span style="color:#777">---</span><span style="color:#777"> </span><span style="color:#777">L</span><span style="color:#777">e</span><span style="color:#777">t</span><span style="color:#777">'</span><span style="color:#777">s</span><span style="color:#777"> </span><span style="color:#777">d</span><span style="color:#777">i</span><span style="color:#777">s</span><span style="color:#777">a</span><span style="color:#777">b</span><span style="color:#777">l</span><span style="color:#777">e</span><span style="color:#777"> </span><span style="color:#777">t</span><span style="color:#777">h</span><span style="color:#777">i</span><span style="color:#777">s</span><span style="color:#777"> </span><span style="color:#777">c</span><span style="color:#777">o</span><span style="color:#777">d</span><span style="color:#777">e</span><span style="color:#777"> </span><span style="color:#777">f</span><span style="color:#777">o</span><span style="color:#777">r</span><span style="color:#777"> </span><span style="color:#777">t</span><span style="color:#777">h</span><span style="color:#777">e</span><span style="color:#777"> </span><span style="color:#777">t</span><span style="color:#777">i</span><span style="color:#777">m</span><span style="color:#777">e</span><span style="color:#777"> </span><span style="color:#777">b</span><span style="color:#777">e</span><span style="color:#777">i</span><span style="color:#777">i</span><span style="color:#777">n</span><span style="color:#777">g</span><span style="color:#777">.</span><span style="color:#777">
+  <div class="code"><pre><span style="color:#777">---</span><span style="color:#777"> </span><span style="color:#777">L</span><span style="color:#777">e</span><span style="color:#777">t</span><span style="color:#777">'</span><span style="color:#777">s</span><span style="color:#777"> </span><span style="color:#777">d</span><span style="color:#777">i</span><span style="color:#777">s</span><span style="color:#777">a</span><span style="color:#777">b</span><span style="color:#777">l</span><span style="color:#777">e</span><span style="color:#777"> </span><span style="color:#777">t</span><span style="color:#777">h</span><span style="color:#777">i</span><span style="color:#777">s</span><span style="color:#777"> </span><span style="color:#777">c</span><span style="color:#777">o</span><span style="color:#777">d</span><span style="color:#777">e</span><span style="color:#777"> </span><span style="color:#777">f</span><span style="color:#777">o</span><span style="color:#777">r</span><span style="color:#777"> </span><span style="color:#777">t</span><span style="color:#777">h</span><span style="color:#777">e</span><span style="color:#777"> </span><span style="color:#777">t</span><span style="color:#777">i</span><span style="color:#777">m</span><span style="color:#777">e</span><span style="color:#777"> </span><span style="color:#777">b</span><span style="color:#777">e</span><span style="color:#777">i</span><span style="color:#777">n</span><span style="color:#777">g</span><span style="color:#777">.</span><span style="color:#777">
 </span><span style="color:#777">p</span><span style="color:#777">r</span><span style="color:#777">i</span><span style="color:#777">n</span><span style="color:#777">t</span><span style="color:#777"> </span><span style="color:#777">p</span><span style="color:#777">i</span><span style="color:#777">
 </span><span style="color:#777">n</span><span style="color:#777">s</span><span style="color:#777">i</span><span style="color:#777">d</span><span style="color:#777">e</span><span style="color:#777">s</span><span style="color:#777"> </span><span style="color:#777">=</span><span style="color:#777"> </span><span style="color:#777">1</span><span style="color:#777">0</span><span style="color:#777">0</span><span style="color:#777">
 </span><span style="color:#777">p</span><span style="color:#777">r</span><span style="color:#777">i</span><span style="color:#777">n</span><span style="color:#777">t</span><span style="color:#777"> </span><span style="color:#777">w</span><span style="color:#777">h</span><span style="color:#777">e</span><span style="color:#777">r</span><span style="color:#777">e</span><span style="color:#777">
@@ -558,7 +586,7 @@
 <h2 id="loops">Loops</h2>
 <p>Madeup supports several kinds of loops to help you repeat processes.</p>
 
-<h3 id="repeat"><code>repeat</code></h3>
+<h3 id="repeat">repeat</h3>
 <p>Running a sequence multiple times is very simply accomplished using the <code>repeat</code> loop:</p>
 
 <div class="imgcode">
@@ -601,14 +629,14 @@
 
 </div>
 
-<h3 id="repeatwich">repeatwich</h3>
-<p>Sometimes half of the repeated sequence needs to run one more time than the other half. We refer to this sometimes as a "loop and a half." These situations arise frequently enough in 3D construction and path walking that Madeup provides support for such loops. The "and a half" portion sandwiches or surrounds the internal portion. Therefore, we call this a <code>repeatwich</code> loop.</p>
+<h3 id="repeat-and-a-half">repeat-and-a-half</h3>
+<p>Sometimes half of the repeated sequence needs to run one more time than the other half. We refer to this sometimes as a "loop and a half." These situations arise frequently enough in 3D construction and path walking that Madeup provides support for such loops. The "and a half" portion sandwiches or surrounds the internal portion:</p>
 
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
   <div class="code"><pre><span style="color:#777">-- prints xoxox</span>
-<span style="color:#080;font-weight:bold">repeatwich</span> <span style="color:#00D">3</span>
+<span style="color:#080;font-weight:bold">repeat</span> <span style="color:#00D">3</span>
   <span style="color:#369;font-weight:bold">print</span> <span style="background-color:hsla(0,100%,50%,0.05)">&quot;x&quot;</span>
 <span style="color:#080;font-weight:bold">around</span>
   <span style="color:#369;font-weight:bold">print</span> <span style="background-color:hsla(0,100%,50%,0.05)">&quot;o&quot;</span>
@@ -644,7 +672,7 @@
 <div class="imgcode">
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre><span style="color:#080;font-weight:bold">for</span> <span style="color:#606">i</span> <span style="color:#080;font-weight:bold">to</span> <span style="color:#00D">3</span> <span style="color:#606">.rgb</span>[<span style="color:#606">i</span>] = <span style="color:#00D">1</span>
+  <div class="code"><pre><span style="color:#080;font-weight:bold">for</span> <span style="color:#606">i</span> <span style="color:#080;font-weight:bold">to</span> <span style="color:#00D">3</span> <span style="color:#369;font-weight:bold">.rgb</span>[<span style="color:#606">i</span>] = <span style="color:#00D">1</span>
 </pre></div>
 </div>
   </div>
@@ -945,5 +973,7 @@
 
 <p style="text-align: center"><a href="introduction.html">Home</a>
 <a href="surface.html" class="floatleft">Previous</a></p>
+</div>
+
 </body>
 </html>

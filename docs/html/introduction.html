@@ -3,10 +3,38 @@
 <head>
   <title>Madeup Documentation</title>
   <link rel="stylesheet" type="text/css" href="css/coderay.css">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <script>
+
+$(document).ready(function() {
+  var basename = location.pathname;
+  basename = basename.substring(basename.lastIndexOf('/') + 1); 
+  $('#navbar a[href="' + basename + '"]').parent().addClass('active');  
+});
+
+  </script>
 </head>
 <body>
+
+<div class="container">
+
+<ul class="nav nav-tabs" id="navbar">
+  <li><a href="introduction.html">Dowel</a></li>
+  <li><a href="extrude.html">Extrude</a></li>
+  <li><a href="revolve.html">Revolve</a></li>
+  <li><a href="spheres.html">Spheres</a></li>
+  <li><a href="boxes.html">Boxes</a></li>
+  <li><a href="surface.html">Surface</a></li>
+  <li><a href="reference.html">Reference</a></li>
+</ul>
 <h1 id="madeup">Madeup</h1>
 <p>Madeup is a programming language for generating 3D models&mdash;it is a language for makings things <em>up</em>. Its speakers use commands like <code>move</code> and <code>yaw</code> to walk paths through space. These paths trace the cross sections or skeletons of solid models. They then use commands like <code>extrude</code> or <code>revolve</code> to generate a solid model around the paths. The models can then be exported and then printed or imported in another 3D application.</p>
 
@@ -301,5 +329,7 @@
 
 <p style="text-align: center"><a href="introduction.html">Home</a>
 <a href="extrude.html" class="floatright">Next</a></p>
+</div>
+
 </body>
 </html>
