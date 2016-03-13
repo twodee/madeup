@@ -1496,3 +1496,10 @@ Mousetrap.bind('ctrl+.', function(e) {
 Mousetrap.bind('ctrl+/', function(e) {
   fit();
 });
+
+Mousetrap.bind('ctrl+t', function(e) {
+  if (!isEditorText) {
+    var source = Blockly.Madeup.workspaceToCode(blocklyWorkspace);
+    log(source);
+  }
+});
