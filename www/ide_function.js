@@ -1414,12 +1414,61 @@ function init() {
   controls = new THREE.TrackballControls(camera, renderer.domElement);
   controls.addEventListener('change', render);
 
+  // (function() {
+    // var oldUpdate = controls.update;
+    // controls.update = function() {
+      // oldUpdate();
+      // console.log("updating controls...");
+      // this.rotateCamera();
+      // this.staticMoving = true;
+    // };
+  // })();
+
+  (function() {
+    var x = 0;
+    var y = 0;
+    var dx = 0;
+    var dy = 0;
+
+    function onMouseMove(event) {
+      dx = event.x - x;
+      dy = event.y - y;
+      x = event.x;
+      y = event.y;
+    }
+
+    function onMouseUp(event) {
+      var velocity = Math.sqrt(dx * dx + dy * dy);
+
+      if (event.button == 0 && !event.altKey && !event.metaKey && !event.ctrlKey && velocity > 3) {
+        controls.staticMoving = false;
+        controls.rotateSpeed = velocity * 0.01;
+      } else {
+        controls.staticMoving = true;
+      }
+
+      renderer.domElement.removeEventListener('mousemove', onMouseMove);
+      renderer.domElement.removeEventListener('mouseup', onMouseUp);
+    }
+    
+    renderer.domElement.addEventListener('mousedown', function(event) {
+      x = event.x;
+      y = event.y;
+      dx = 0;
+      dy = 0;
+      controls.rotateSpeed = 3.0;
+      renderer.domElement.addEventListener('mousemove', onMouseMove, false);
+      renderer.domElement.addEventListener('mouseup', onMouseUp, false);
+    }, false);
+  })();
+
   controls.rotateSpeed = 3.0;
   controls.zoomSpeed = 1.2;
   controls.panSpeed = 0.8;
   controls.noZoom = false;
   controls.noPan = false;
   controls.staticMoving = true;
+  controls.dynamicDampingFactor = 0.0;
 
   // pointerScene = new THREE.Scene(); 
   modelScene = new THREE.Scene();
