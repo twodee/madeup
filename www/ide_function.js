@@ -20,6 +20,47 @@ function showConsole(isShown) {
   }
 }
 
+var onMouseDown = (function() {
+  var x = 0;
+  var y = 0;
+  var dx = 0;
+  var dy = 0;
+
+  function onMouseMove(event) {
+    dx = event.x - x;
+    dy = event.y - y;
+    x = event.x;
+    y = event.y;
+  }
+
+  function onMouseUp(event) {
+    var velocity = Math.sqrt(dx * dx + dy * dy);
+
+    if (event.button == 0 && !event.altKey && !event.metaKey && !event.ctrlKey && velocity > 3) {
+      controls.staticMoving = false;
+      controls.rotateSpeed = velocity * 0.01;
+    } else {
+      controls.staticMoving = true;
+    }
+
+    renderer.domElement.removeEventListener('mousemove', onMouseMove);
+    renderer.domElement.removeEventListener('mouseup', onMouseUp);
+  }
+  
+  function onMouseDown(event) {
+    controls.staticMoving = true;
+    x = event.x;
+    y = event.y;
+    dx = 0;
+    dy = 0;
+    controls.rotateSpeed = 3.0;
+    renderer.domElement.addEventListener('mousemove', onMouseMove, false);
+    renderer.domElement.addEventListener('mouseup', onMouseUp, false);
+  };
+
+  return onMouseDown;
+})();
+
 // Prime Blockly with some builtin variables. There's no API exposed for this,
 // but Blockly.Variables.allVariables walks the blocks in the workspace and
 // returns the names of all variables. Our builtin variables don't necessarily
@@ -149,6 +190,7 @@ var fontSize = 14;
 var gridSpacing = 1.0;
 var gridExtent = 10.0;
 var isFlatShaded = true;
+var isAutorotate = false;
 var isEditorText = true;
 var tree = null;
 var preview = undefined;
@@ -169,6 +211,7 @@ var isGridExtentChanged = false;
 var isShowCounterclockwiseChanged = false;
 var isShowClockwiseChanged = false;
 var isFlatShadedChanged = false;
+var isAutorotateChanged = false;
 var isShowPointsChanged = false;
 
 function updateTitle() {
@@ -187,6 +230,7 @@ function saveInCookies() {
   if (isShowClockwiseChanged) Cookies.set('showClockwise', showClockwise ? 1 : 0);
   if (isShowModeChanged) Cookies.set('showMode', showMode);
   if (isFlatShadedChanged) Cookies.set('isFlatShaded', isFlatShaded ? 1 : 0);
+  if (isAutorotateChanged) Cookies.set('isAutorotate', isAutorotate ? 1 : 0);
   if (isThemeDarkChanged) Cookies.set('isThemeDark', isThemeDark ? 1 : 0);
   if (isAxisChanged[0]) Cookies.set('axisX', $('#axisX').prop('checked') ? 1 : 0);
   if (isAxisChanged[1]) Cookies.set('axisY', $('#axisY').prop('checked') ? 1 : 0);
@@ -214,6 +258,7 @@ function saveInCookies() {
   isShowCounterclockwiseChanged = false;
   isShowClockwiseChanged = false;
   isFlatShadedChanged = false;
+  isAutorotateChanged = false;
   isShowModeChanged = false;
   isThemeDarkChanged = false;
   isShowHeadingsChanged = false;
@@ -263,6 +308,12 @@ $(document).ready(function() {
       isFlatShaded = parseInt(Cookies.get('isFlatShaded')) != 0;
     }
     $('#isFlatShaded').prop('checked', isFlatShaded);
+
+    if (Cookies.get('isAutorotate')) {
+      isAutorotate = parseInt(Cookies.get('isAutorotate')) != 0;
+    }
+    $('#isAutorotate').prop('checked', isAutorotate);
+    enableAutorotate(isAutorotate);
 
     if (Cookies.get('showCounterclockwise')) {
       showCounterclockwise = parseInt(Cookies.get('showCounterclockwise')) != 0;
@@ -456,10 +507,9 @@ $(document).ready(function() {
     run(getSource(), GeometryMode.PATH);
   });
 
-  $('#isFlatShaded').click(function() {
-    isFlatShadedChanged = true;
-    isFlatShaded = this.checked;
-    run(getSource(), GeometryMode.PATH);
+  $('#isAutorotate').click(function() {
+    isAutorotateChanged = true;
+    enableAutorotate(this.checked);
   });
 
   $('#showCounterclockwise').click(function() {
@@ -473,6 +523,18 @@ $(document).ready(function() {
     showClockwise = this.checked;
     updateCulling();
   });
+
+  function enableAutorotate(isEnabled) {
+    isAutorotate = isEnabled;
+    if (isAutorotate) {
+      renderer.domElement.addEventListener('mousedown', onMouseDown, false);
+    } else {
+      renderer.domElement.removeEventListener('mousedown', onMouseDown);
+      // renderer.domElement.removeEventListener('mouseup', mouseHandlers['onMouseUp']);
+      // renderer.domElement.removeEventListener('mousemove', mouseHandlers['onMouseMove']);
+      controls.staticMoving = true;
+    }
+  }
 
   function setFontSize(newSize) {
     if (newSize != fontSize) {
@@ -1418,49 +1480,8 @@ function init() {
     // var oldUpdate = controls.update;
     // controls.update = function() {
       // oldUpdate();
-      // console.log("updating controls...");
-      // this.rotateCamera();
-      // this.staticMoving = true;
     // };
   // })();
-
-  (function() {
-    var x = 0;
-    var y = 0;
-    var dx = 0;
-    var dy = 0;
-
-    function onMouseMove(event) {
-      dx = event.x - x;
-      dy = event.y - y;
-      x = event.x;
-      y = event.y;
-    }
-
-    function onMouseUp(event) {
-      var velocity = Math.sqrt(dx * dx + dy * dy);
-
-      if (event.button == 0 && !event.altKey && !event.metaKey && !event.ctrlKey && velocity > 3) {
-        controls.staticMoving = false;
-        controls.rotateSpeed = velocity * 0.01;
-      } else {
-        controls.staticMoving = true;
-      }
-
-      renderer.domElement.removeEventListener('mousemove', onMouseMove);
-      renderer.domElement.removeEventListener('mouseup', onMouseUp);
-    }
-    
-    renderer.domElement.addEventListener('mousedown', function(event) {
-      x = event.x;
-      y = event.y;
-      dx = 0;
-      dy = 0;
-      controls.rotateSpeed = 3.0;
-      renderer.domElement.addEventListener('mousemove', onMouseMove, false);
-      renderer.domElement.addEventListener('mouseup', onMouseUp, false);
-    }, false);
-  })();
 
   controls.rotateSpeed = 3.0;
   controls.zoomSpeed = 1.2;

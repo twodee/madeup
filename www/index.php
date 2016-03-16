@@ -205,6 +205,7 @@
       <input type="checkbox" id="showCounterclockwise"/>Show counterclockwise faces<br/>
       <input type="checkbox" id="showClockwise"/>Show clockwise faces<br/>
       <input type="checkbox" id="isFlatShaded"/>Flat shading<br/>
+      <input type="checkbox" id="isAutorotate"/>Autorotate<br/>
       <hr>
       View From:
       <a href="#" id="cameraLeft" class="fileLink">-X</a> <a href="#" id="cameraRight" class="fileLink">+X</a>
