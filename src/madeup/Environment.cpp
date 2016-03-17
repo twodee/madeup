@@ -624,12 +624,11 @@ void Environment::home() {
 int Environment::coalesce(float threshold) {
   int ndoubles = 0;
 
-  for (int i = run.size() - 1; i >= 0; --i) {
-    // TODO: handle closed?
+  for (int i = run.size() - 1; i > 0; --i) {
     float distance = run[i].position.GetDistanceTo(run[i - 1].position); 
-    std::cout << "distance " << i << ": " << distance << std::endl;
     if (distance <= threshold) {
       run.erase(run.begin() + i);
+      // TODO: clear path and reissue instead of trying to tweak
       paths[paths.size() - 1].erase(paths[paths.size() - 1].begin() + i);
       ++ndoubles;
     }
@@ -801,22 +800,26 @@ Co<Trimesh> Environment::polygon(bool is_flipped) {
         (*line)(i)[2] = run[i].position[2];
       }
 
-      trimesh = Co<Trimesh>(line->Triangulate());
-      
-      // Add per vertex colors to mesh.
-      float *colors = trimesh->AllocateVertexColors();
-      float *color = colors;
-      for (unsigned int i = 0; i < run.size(); ++i) {
-        color[0] = run[i].rgb[0];
-        color[1] = run[i].rgb[1];
-        color[2] = run[i].rgb[2];
-        color += 3;
-      }
+      try {
+        trimesh = Co<Trimesh>(line->Triangulate());
+        
+        // Add per vertex colors to mesh.
+        float *colors = trimesh->AllocateVertexColors();
+        float *color = colors;
+        for (unsigned int i = 0; i < run.size(); ++i) {
+          color[0] = run[i].rgb[0];
+          color[1] = run[i].rgb[1];
+          color[2] = run[i].rgb[2];
+          color += 3;
+        }
 
-      if (is_flipped) {
-        trimesh->ReverseWinding();
+        if (is_flipped) {
+          trimesh->ReverseWinding();
+        }
+        *trimesh *= xforms.top();
+      } catch (MessagedException e) {
+        throw UnlocatedException("I tried turning your path into a polygon, but I couldn't. Do you have duplicated vertices or edges that cross over each other? Try removing those.");
       }
-      *trimesh *= xforms.top();
     }
   }
 
@@ -1118,9 +1121,13 @@ Co<Trimesh> Environment::revolve() {
         QVector3<float> axis(x, y, z);
         axis.Normalize();
 
-        trimesh = Co<Trimesh>(line->Revolve(axis, nsides, degrees));
-        trimesh->MigrateVertexMetasToColors(0, 1, 2);
-        *trimesh *= xforms.top();
+        try {
+          trimesh = Co<Trimesh>(line->Revolve(axis, nsides, degrees));
+          trimesh->MigrateVertexMetasToColors(0, 1, 2);
+          *trimesh *= xforms.top();
+        } catch (MessagedException e) {
+          throw UnlocatedException("I tried revolving your path, but I couldn't. Do you have duplicated vertices or edges that cross over each other? Try removing those.");
+        }
       }
     } else {
       throw UnlocatedException("I expect revolve to be given a path of at least three vertices.");
@@ -1157,8 +1164,12 @@ Co<Trimesh> Environment::extrude(const QVector3<float> &axis, float length) {
         (*line)(i)[5] = run[i].rgb[2];
       }
 
-      trimesh = Co<Trimesh>(line->Extrude(axis, length, xforms.top()));
-      trimesh->MigrateVertexMetasToColors(0, 1, 2);
+      try {
+        trimesh = Co<Trimesh>(line->Extrude(axis, length, xforms.top()));
+        trimesh->MigrateVertexMetasToColors(0, 1, 2);
+      } catch (MessagedException e) {
+        throw UnlocatedException("I tried extruding your path, but I couldn't. Do you have duplicated vertices or edges that cross over each other? Try removing those.");
+      }
     } 
   }
 
