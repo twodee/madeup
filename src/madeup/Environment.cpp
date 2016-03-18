@@ -793,6 +793,10 @@ Co<Trimesh> Environment::polygon(bool is_flipped) {
         run.pop_back();
       }
 
+      if (run.size() < 3) {
+        throw UnlocatedException("I tried turning your path into a polygon, but I couldn't. I expect function polygon to be given a path of at least three vertices.");
+      }
+
       Polyline<float> *line = new Polyline<float>(run.size(), 3, Polyline<float>::CLOSED);
       for (unsigned int i = 0; i < run.size(); ++i) {
         (*line)(i)[0] = run[i].position[0];
@@ -818,7 +822,7 @@ Co<Trimesh> Environment::polygon(bool is_flipped) {
         }
         *trimesh *= xforms.top();
       } catch (MessagedException e) {
-        throw UnlocatedException("I tried turning your path into a polygon, but I couldn't. Do you have duplicated vertices or edges that cross over each other? Try removing those.");
+        throw UnlocatedException("I tried turning your path into a polygon, but I couldn't. Do you have duplicated vertices, all your vertices in a line, or edges that cross over each other? Any of these spell geometric trouble.");
       }
     }
   }
@@ -1126,11 +1130,11 @@ Co<Trimesh> Environment::revolve() {
           trimesh->MigrateVertexMetasToColors(0, 1, 2);
           *trimesh *= xforms.top();
         } catch (MessagedException e) {
-          throw UnlocatedException("I tried revolving your path, but I couldn't. Do you have duplicated vertices or edges that cross over each other? Try removing those.");
+          throw UnlocatedException("I tried revolving your path, but I couldn't. Do you have duplicated vertices, all your vertices in a line, or edges that cross over each other? Any of these spell geometric trouble.");
         }
       }
     } else {
-      throw UnlocatedException("I expect revolve to be given a path of at least three vertices.");
+      throw UnlocatedException("I tried revolving your path, but I couldn't. I expect function revolve to be given a path of at least three vertices.");
     }
   }
 
@@ -1154,6 +1158,10 @@ Co<Trimesh> Environment::extrude(const QVector3<float> &axis, float length) {
         run.pop_back();
       }
 
+      if (run.size() < 3) {
+        throw UnlocatedException("I tried extruding your path, but I couldn't. I expect function polygon to be given a path of at least three vertices.");
+      }
+
       Polyline<float> *line = new Polyline<float>(run.size(), 6, Polyline<float>::CLOSED);
       for (unsigned int i = 0; i < run.size(); ++i) {
         (*line)(i)[0] = run[i].position[0];
@@ -1168,7 +1176,7 @@ Co<Trimesh> Environment::extrude(const QVector3<float> &axis, float length) {
         trimesh = Co<Trimesh>(line->Extrude(axis, length, xforms.top()));
         trimesh->MigrateVertexMetasToColors(0, 1, 2);
       } catch (MessagedException e) {
-        throw UnlocatedException("I tried extruding your path, but I couldn't. Do you have duplicated vertices or edges that cross over each other? Try removing those.");
+        throw UnlocatedException("I tried extruding your path, but I couldn't. Do you have duplicated vertices, all your vertices in a line, or edges that cross over each other? Any of these spell geometric trouble.");
       }
     } 
   }
