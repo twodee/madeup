@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Madeup Documentation</title>
+  <meta charset="UTF-8">
   <link rel="stylesheet" type="text/css" href="css/coderay.css">
   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet" type="text/css">
@@ -35,6 +36,13 @@ $(document).ready(function() {
   <li><a href="surface.html">Surface</a></li>
   <li><a href="reference.html">Reference</a></li>
 </ul>
+ending in initial
+ending in initial
+ending in initial
+ending in initial
+ending in initial
+ending in initial
+ending in initial
 <h1 id="boxes">Boxes</h1>
 <p>The <code>boxes</code> solidifier is almost identical to <code>spheres</code>&mdash;it very simply places a cube at each vertex on the path you walk. You can set each box's size independently.</p>
 
@@ -70,15 +78,15 @@ $(document).ready(function() {
 
   <div class="mup highlighter-coderay"><div class="CodeRay">
   <div class="code"><pre><span style="color:#606">reach</span> = <span style="color:#00D">4</span>
-<b style="background-color: #dcdcdc"><span style="color:#606">threshold</span> = <span style="color:#60E">0.6</span></b>
+<span style="background-color: #dcdcdc; font-weight: bold;"><span style="color:#606">threshold</span> = <span style="color:#60E">0.6</span></span>
 
 <span style="color:#080;font-weight:bold">for</span> <span style="color:#606">z</span> <span style="color:#080;font-weight:bold">in</span> -<span style="color:#606">reach</span>..<span style="color:#606">reach</span>
   <span style="color:#080;font-weight:bold">for</span> <span style="color:#606">y</span> <span style="color:#080;font-weight:bold">in</span> -<span style="color:#606">reach</span>..<span style="color:#606">reach</span>
     <span style="color:#080;font-weight:bold">for</span> <span style="color:#606">x</span> <span style="color:#080;font-weight:bold">in</span> -<span style="color:#606">reach</span>..<span style="color:#606">reach</span>
-      <b style="background-color: #dcdcdc"><span style="color:#606">distance</span> = (<span style="color:#606">x</span> * <span style="color:#606">x</span> + <span style="color:#606">y</span> * <span style="color:#606">y</span> + <span style="color:#606">z</span> * <span style="color:#606">z</span>) ^ <span style="color:#60E">0.5</span></b>
-      <b style="background-color: #dcdcdc"><span style="color:#080;font-weight:bold">if</span> |<span style="color:#606">distance</span> - <span style="color:#606">reach</span>| &lt;= <span style="color:#606">threshold</span></b>
-        <b style="background-color: #dcdcdc"><span style="color:#369;font-weight:bold">moveto</span> <span style="color:#606">x</span>, <span style="color:#606">y</span>, <span style="color:#606">z</span></b>
-      <b style="background-color: #dcdcdc"><span style="color:#080;font-weight:bold">end</span></b>
+      <span style="background-color: #dcdcdc; font-weight: bold;"><span style="color:#606">distance</span> = (<span style="color:#606">x</span> * <span style="color:#606">x</span> + <span style="color:#606">y</span> * <span style="color:#606">y</span> + <span style="color:#606">z</span> * <span style="color:#606">z</span>) ^ <span style="color:#60E">0.5</span></span>
+      <span style="background-color: #dcdcdc; font-weight: bold;"><span style="color:#080;font-weight:bold">if</span> |<span style="color:#606">distance</span> - <span style="color:#606">reach</span>| &lt;= <span style="color:#606">threshold</span></span>
+        <span style="background-color: #dcdcdc; font-weight: bold;"><span style="color:#369;font-weight:bold">moveto</span> <span style="color:#606">x</span>, <span style="color:#606">y</span>, <span style="color:#606">z</span></span>
+      <span style="background-color: #dcdcdc; font-weight: bold;"><span style="color:#080;font-weight:bold">end</span></span>
     <span style="color:#080;font-weight:bold">end</span>
   <span style="color:#080;font-weight:bold">end</span>
 <span style="color:#080;font-weight:bold">end</span>
@@ -97,7 +105,7 @@ $(document).ready(function() {
   <div class="mup highlighter-coderay"><div class="CodeRay">
   <div class="code"><pre><span style="color:#606">reach</span> = <span style="color:#00D">4</span>
 <span style="color:#606">threshold</span> = <span style="color:#60E">0.6</span>
-<b style="background-color: #dcdcdc"><span style="color:#369;font-weight:bold">.radius</span> = <span style="color:#60E">0.5</span></b>
+<span style="background-color: #dcdcdc; font-weight: bold;"><span style="color:#369;font-weight:bold">.radius</span> = <span style="color:#60E">0.5</span></span>
 
 <span style="color:#080;font-weight:bold">for</span> <span style="color:#606">z</span> <span style="color:#080;font-weight:bold">in</span> -<span style="color:#606">reach</span>..<span style="color:#606">reach</span>
   <span style="color:#080;font-weight:bold">for</span> <span style="color:#606">y</span> <span style="color:#080;font-weight:bold">in</span> -<span style="color:#606">reach</span>..<span style="color:#606">reach</span>
@@ -110,7 +118,7 @@ $(document).ready(function() {
   <span style="color:#080;font-weight:bold">end</span>
 <span style="color:#080;font-weight:bold">end</span>
 
-<b style="background-color: #dcdcdc"><span style="color:#369;font-weight:bold">boxes</span></b>
+<span style="background-color: #dcdcdc; font-weight: bold;"><span style="color:#369;font-weight:bold">boxes</span></span>
 </pre></div>
 </div>
   </div>

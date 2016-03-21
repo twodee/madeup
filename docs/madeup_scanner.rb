@@ -61,9 +61,12 @@ module Scanners
       # The scanner is always in a certain state, which is :initial by default.
       # We use local variables and symbols to maximize speed.
       state = :initial
+      in_group = false
+      text = ''
 
       # The main loop; eos? is true when the end of the code is reached.
       until eos?
+        # p options
 
         case state
           when :initial
@@ -72,10 +75,20 @@ module Scanners
             elsif match = scan(/---/)
               encoder.text_token match, :comment
               state = :multiline_comment
-            elsif match = scan(/--.*$/)
-              encoder.text_token match, :comment
+            elsif match = scan(/--/)
+              # encoder.text_token match, :comment
+              text = '--'
+              state = :singleline_comment
             elsif match = scan(/".*?"/)
               encoder.text_token match, :string
+            elsif in_group && match = scan(/\*\*/)
+              puts "ending in initial"
+              encoder.end_group :bold
+              in_group = false
+            elsif match = scan(/\*\*/)
+              # puts "opening in initial"
+              encoder.begin_group :bold
+              in_group = true
             elsif match = scan(/([-(){}^+*%|,\[\]:\/<>=!]|\.\.)/)
               encoder.text_token match, :operator
             elsif match = scan(/ true | false | null /x)
@@ -89,10 +102,31 @@ module Scanners
             else
               encoder.text_token getch, :error
             end
+          when :singleline_comment
+            if in_group && match = scan(/\*\*/)
+              # puts "ending in single"
+              encoder.end_group :bold
+              in_group = false
+            elsif match = scan(/(.*)\*\*/)
+              # text += match
+              encoder.text_token '--' + match.gsub(/\*\*$/, ''), :comment
+              encoder.end_group :bold
+              in_group = false
+            elsif match = scan(/.*$/)
+              # text += match
+              encoder.text_token match, :comment
+              state = :initial
+            # elsif match = scan(/$/)
+              # text =''
+              # encoder.text_token match, :comment
+            end
           when :multiline_comment
             if match = scan(/---/)
               encoder.text_token match, :comment
               state = :initial
+            elsif in_group && match = scan(/\*\*/)
+              encoder.end_group :bold
+              in_group = false
             else
               encoder.text_token getch, :comment
             end

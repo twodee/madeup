@@ -18,7 +18,8 @@ end
 md.gsub!(/<p>(<img.*?src="(.*?)".*?>)<\/p>/, '<a href="\2">\1</a>')
 
 # Bold code snippets.
-md.gsub!(/\*\*(.*?)\*\*/, '<b style="background-color: #dcdcdc">\1</b>')
+# md.gsub!(/\*\*(.*?)\*\*/, '<b style="background-color: #dcdcdc">\1</b>')
+md.gsub!(/<span>/, '<span style="background-color: #dcdcdc; font-weight: bold;">')
 
 # Kramdown inserts literal emdashes, which show up funny in my browser. Let's use the HTML entity instead.
 md.gsub!(/\u2014/, '&mdash;')

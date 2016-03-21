@@ -9,7 +9,7 @@ check:
 		exit 1; \
 	fi
 
-html/%.html: %.md header.html footer.html Makefile tohtml html/css/coderay.css
+html/%.html: %.md header.html footer.html Makefile tohtml html/css/coderay.css madeup_scanner.rb
 	./tohtml $*.md > $@
 
 wwwdocs: check
