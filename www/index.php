@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <title>Madeup</title>
-
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -174,7 +174,7 @@
       <a href="#" id="exportArchive" class="fileLink">Export Archive</a><br/>
       <a href="#" id="importArchive" class="fileLink">Import Archive</a><br/>
       <form id="importForm">
-        <input type="file" id="archive"></input>
+        <input type="file" id="archive">
         <a href="#" id="cancelImport" class="fileLink">Cancel Import</a>
       </form>
       <p></p> 
@@ -234,7 +234,7 @@
     <div id="console"><div id="message"></div></div>
   </div>
 
-  <div id="glcanvas" bgcolor="#00FF00"></div>
+  <div id="glcanvas"></div>
 </div>
 
   <!-- Setup ______________________________________________________________ -->
