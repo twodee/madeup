@@ -143,7 +143,7 @@
 <div id="entire" style="z-index: 0">
   <div id="menu">
     <div style="display: inline-block; position: absolute: left: 0px;">
-      <input style="color: yellow" id="toggleFilePopup" class="togglePopup" type="button" value="File"/>
+      <input id="toggleFilePopup" class="togglePopup" type="button" value="File"/>
       <input id="toggleEditorPopup" class="togglePopup" type="button" value="Editor"/>
       <input id="toggleDisplayPopup" class="togglePopup" type="button" value="Display"/>
       <input id="toggleAboutPopup" class="togglePopup" type="button" value="About"/>

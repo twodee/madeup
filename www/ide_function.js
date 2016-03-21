@@ -507,6 +507,11 @@ $(document).ready(function() {
     run(getSource(), GeometryMode.PATH);
   });
 
+  $('#isFlatShaded').click(function() {
+    isFlatShadedChanged = true;
+    isFlatShaded = this.checked;
+  });
+
   $('#isAutorotate').click(function() {
     isAutorotateChanged = true;
     enableAutorotate(this.checked);
@@ -1125,7 +1130,7 @@ var timeOfLatestRun = undefined;
 
 function run(source, mode) {
   if (mode == GeometryMode.SURFACE) {
-    log('Solidifying...'); 
+    log('Solidifying...' + isFlatShaded); 
   } else if (mode == GeometryMode.PATH) {
     log('Pathifying...'); 
   }

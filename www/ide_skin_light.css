@@ -5,7 +5,7 @@
 
 .popup {
   background-color: #CCCCCC;
-  color: #000000;
+  color: #800000;
 }
 
 #left {
@@ -13,23 +13,23 @@
 }
 
 #console {
-  background-color: #CCCCCC;
-  color: #000000;
+  background-color: #DEDEDE;
+  color: #800000;
 }
 
 #menu input[type="button"] {
-  background-color: #999999;
-  color: #000000;
+  background-color: #DEDEDE;
+  color: #800000;
 }
 
 #menu input[type="button"].open {
   background-color: #CCCCCC;
-  color: #000000;
+  color: #800000;
 }
 
 #menu input[type="button"].closed {
-  background-color: #999999;
-  color: #000000;
+  background-color: #DEDEDE;
+  color: #800000;
 }
 
 #menu input[type="button"]:active {
@@ -53,11 +53,11 @@
 }
 
 #menu {
-  background-color: #999999;
+  background-color: #DEDEDE;
 }
 
 .fileLink {
-  color: #000000;
+  color: #800000;
 }
 
 #download.unclickable {
@@ -68,3 +68,10 @@
   color: #000000 !important;
 }
 
+#toggleFilePopup {
+  color: #B000B0 !important;
+}
+
+.popupDropdown {
+  color: #000000;
+}

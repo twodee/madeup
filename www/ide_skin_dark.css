@@ -68,3 +68,10 @@
   color: #FFFFFF !important;
 }
 
+#toggleFilePopup {
+  color: yellow !important;
+}
+
+.popupDropdown {
+  color: #FFFFFF;
+}
