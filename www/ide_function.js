@@ -290,7 +290,9 @@ $(document).ready(function() {
       resize();
     }
 
-    load('untitled');
+    if (!isEmbedded) {
+      load('untitled');
+    }
 
     if (Cookies.get('fontSize')) {
       fontSize = parseInt(Cookies.get('fontSize'));
@@ -535,8 +537,6 @@ $(document).ready(function() {
       renderer.domElement.addEventListener('mousedown', onMouseDown, false);
     } else {
       renderer.domElement.removeEventListener('mousedown', onMouseDown);
-      // renderer.domElement.removeEventListener('mouseup', mouseHandlers['onMouseUp']);
-      // renderer.domElement.removeEventListener('mousemove', mouseHandlers['onMouseMove']);
       controls.staticMoving = true;
     }
   }
@@ -1128,9 +1128,9 @@ function convertTextToBlocks(source) {
 var allGeometry = undefined;
 var timeOfLatestRun = undefined;
 
-function run(source, mode) {
+function run(source, mode, pingback) {
   if (mode == GeometryMode.SURFACE) {
-    log('Solidifying...' + isFlatShaded); 
+    log('Solidifying...'); 
   } else if (mode == GeometryMode.PATH) {
     log('Pathifying...'); 
   }
@@ -1282,6 +1282,9 @@ function run(source, mode) {
         }
         updateCulling();
         render();
+        if (pingback) {
+          pingback();
+        }
       } else if (data['exit_status'] == 22) {
         log(data['stdout'] + '\nYour model was taking a long time to build. It felt like it was never going to finish! So, I stopped trying. Sorry.');
       } else {

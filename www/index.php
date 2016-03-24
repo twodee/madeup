@@ -41,6 +41,21 @@
   <script src="blockly_blocks_madeup.js"></script>
   <script src="blockly_generator_madeup.js"></script>
 
+  <script>
+    var isEmbedded = false;
+  </script>
+<?php
+if (array_key_exists('src', $_REQUEST)) {
+?>
+
+  <script>
+    isEmbedded = true;
+  </script>
+
+<?php
+}
+?>
+
   <!-- Madeup IDE dependencies -->
   <link rel="stylesheet" href="ide_skin.css"/>
   <link rel="stylesheet" href="ide_skin_dark.css" title="theme"/>
@@ -251,16 +266,31 @@
   <script src="ide_editor.js"></script>
 
 <?php
-  if (strpos($_SERVER['HTTP_HOST'], 'to.madeup') !== false) {
+if (strpos($_SERVER['HTTP_HOST'], 'to.madeup') !== false) {
 ?>
+
   <script>
     $(document).ready(function() {
       setEditor(false);
       showConsole(false);
     });
   </script>
+
 <?php
-  }
+}
+?>
+
+<?php
+if (array_key_exists('src', $_REQUEST)) {
+?>
+
+  <script>
+    textEditor.setValue('<?= str_replace(array("\r\n", "\n", "\r"), "\\n", $_REQUEST['src']) ?>', 1);
+    run(getSource(), GeometryMode.SURFACE, fit);
+  </script>
+
+<?php
+}
 ?>
 
 </body>
