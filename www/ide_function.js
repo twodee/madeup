@@ -1397,16 +1397,20 @@ function resize() {
 
   controls.handleResize();
 
+  var nonChromeHeight = $(window).height() - $('#menu').height() - $('#keystrokes').height();
+  console.log(nonChromeHeight);
+  var flexHeight = nonChromeHeight - $('#console').height();
+
   var width = window.innerWidth - $('#left').width();
   var height = window.innerHeight;
-  if (renderer) renderer.setSize(width, height);
+  if (renderer) renderer.setSize(width, nonChromeHeight);
   camera.aspect = width / height;
   // camera.top = camera.left / camera.aspect;
   // camera.bottom = -camera.top;
   camera.updateProjectionMatrix();
 
-  $("#textEditor").height($(window).height() - $('#menu').height() - $('#console').height());
-  $("#blocksEditor").height($(window).height() - $('#menu').height() - $('#console').height());
+  $("#textEditor").height(flexHeight);
+  $("#blocksEditor").height(flexHeight);
 
   var blocklyArea = document.getElementById('blocksEditor');
   var blocklyDiv = document.getElementById('blocksCanvas');
@@ -1478,6 +1482,7 @@ function init() {
   renderer.setMaterialFaces = function(material) {}
 
   renderer.setClearColor(0xFFFFFF, 1);
+  // renderer.setClearColor(0xCCCCCC, 1);
   document.getElementById("glcanvas").appendChild(renderer.domElement);
 
   // controls = new THREE.OrbitControls(camera, renderer.domElement);  
@@ -1580,4 +1585,27 @@ Mousetrap.bind('ctrl+t', function(e) {
     var source = Blockly.Madeup.workspaceToCode(blocklyWorkspace);
     log(source);
   }
+});
+
+$(document).ready(function() {
+  scrubber = $('#scrubber')[0];
+
+  $.getJSON("movie.json", function(data) {
+    movie = new KeystrokesMovie(data);
+  });
+
+  $('#scrubber').bind('seeking', function() {
+    show(scrubber.currentTime);
+  });
+
+  var periodicID;
+  $('#scrubber').bind('play', function() {
+    periodicID = window.setInterval(function() {
+      show(scrubber.currentTime);
+    }, 100);
+  });
+
+  $('#scrubber').bind('pause', function() {
+    window.clearInterval(periodicID);
+  });
 });

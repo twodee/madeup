@@ -37,6 +37,7 @@ body {
   width: 100%;
   padding: 0;
   margin: 0;
+  /* background: #00FF00; */
 }
 
 #left {
@@ -47,11 +48,21 @@ body {
   z-index: 0;
 }
 
+#glcanvas canvas {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: none;
+  overflow: hidden;
+}
+
 #glcanvas {
   float: left;
   width: auto;
   overflow: hidden;
-  z-index: 5000;
+  margin: 0;
+  padding: 0;
+  border: none;
 }
 
 #textEditor { 
@@ -141,6 +152,27 @@ body {
 #mups {
   height: 100%;
   overflow: auto;
+}
+
+audio::-webkit-media-controls-enclosure {
+  max-width: 100%;
+}
+
+#keystrokes {
+  clear: left;
+  float: left;
+  border: none;
+  margin: 0;
+  padding: 0;
+  background: #000000;
+  width: 100%;
+}
+
+#scrubber {
+  border: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
 }
 
 .popupDropdown {

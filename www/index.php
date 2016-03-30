@@ -61,6 +61,7 @@ if (array_key_exists('src', $_REQUEST)) {
   <link rel="stylesheet" href="ide_skin_dark.css" title="theme"/>
   <script src="text_to_blocks.js"></script>
   <script src="ide_function.js"></script>
+  <script src="keystrokes.js"></script>
 </head>
 
 <body>
@@ -250,7 +251,15 @@ if (array_key_exists('src', $_REQUEST)) {
   </div>
 
   <div id="glcanvas"></div>
+
+  <div id="keystrokes">
+    <audio controls="controls" id="scrubber">
+      <source src="audio.wav" type="audio/wav">
+      <source src="audio.ogg" type="audio/ogg">
+    </audio>
+  </div>
 </div>
+
 
   <!-- Setup ______________________________________________________________ -->
   <form id="downloader" action="interpret.php" method="post" style="display: none">
