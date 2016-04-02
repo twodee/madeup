@@ -771,9 +771,8 @@ $(document).ready(function() {
   });
 
   $('#magic').click(function() {
-    var source = Blockly.Madeup.workspaceToCode(blocklyWorkspace);
-    log(source);
-    return;
+    var source = getSource();
+
     var name = prompt("What's your name?");
     $.ajax({
       type: 'POST',
@@ -1398,7 +1397,6 @@ function resize() {
   controls.handleResize();
 
   var nonChromeHeight = $(window).height() - $('#menu').height() - $('#keystrokes').height();
-  console.log(nonChromeHeight);
   var flexHeight = nonChromeHeight - $('#console').height();
 
   var width = window.innerWidth - $('#left').width();
@@ -1585,27 +1583,4 @@ Mousetrap.bind('ctrl+t', function(e) {
     var source = Blockly.Madeup.workspaceToCode(blocklyWorkspace);
     log(source);
   }
-});
-
-$(document).ready(function() {
-  scrubber = $('#scrubber')[0];
-
-  $.getJSON("movie.json", function(data) {
-    movie = new KeystrokesMovie(data);
-  });
-
-  $('#scrubber').bind('seeking', function() {
-    show(scrubber.currentTime);
-  });
-
-  var periodicID;
-  $('#scrubber').bind('play', function() {
-    periodicID = window.setInterval(function() {
-      show(scrubber.currentTime);
-    }, 100);
-  });
-
-  $('#scrubber').bind('pause', function() {
-    window.clearInterval(periodicID);
-  });
 });

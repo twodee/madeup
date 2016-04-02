@@ -43,7 +43,9 @@
 
   <script>
     var isEmbedded = false;
+    var keystrokesMoviePrefix = null;
   </script>
+
 <?php
 if (array_key_exists('src', $_REQUEST)) {
 ?>
@@ -56,12 +58,25 @@ if (array_key_exists('src', $_REQUEST)) {
 }
 ?>
 
+<?php
+if (array_key_exists('movie', $_REQUEST)) {
+  $keystrokesMoviePrefix = $_REQUEST['movie'];
+?>
+
+  <script>
+    keystrokesMoviePrefix = '<?= $keystrokesMoviePrefix ?>';
+  </script>
+  <script src="keystrokes.js"></script>
+
+<?php
+}
+?>
+
   <!-- Madeup IDE dependencies -->
   <link rel="stylesheet" href="ide_skin.css"/>
   <link rel="stylesheet" href="ide_skin_dark.css" title="theme"/>
   <script src="text_to_blocks.js"></script>
   <script src="ide_function.js"></script>
-  <script src="keystrokes.js"></script>
 </head>
 
 <body>
@@ -252,43 +267,53 @@ if (array_key_exists('src', $_REQUEST)) {
 
   <div id="glcanvas"></div>
 
-  <div id="keystrokes">
-    <audio controls="controls" id="scrubber">
-      <source src="audio.wav" type="audio/wav">
-      <source src="audio.ogg" type="audio/ogg">
-    </audio>
-  </div>
-</div>
-
-
-  <!-- Setup ______________________________________________________________ -->
-  <form id="downloader" action="interpret.php" method="post" style="display: none">
-    <input id="extension" type="text" value="obj" name="extension"/>
-    <input id="tag" type="text" value="model" name="tag"/>
-    <input id="geometry_mode" type="text" value="SURFACE" name="geometry_mode"/>
-    <input id="shading_mode" type="text" value="SMOOTH" name="shading_mode"/>
-    <input id="timestamp" type="text" name="timestamp"/>
-    <textarea id="source" name="source"></textarea>
-  </form>
-
-  <script src="ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-  <script src="ide_editor.js"></script>
-
 <?php
-if (strpos($_SERVER['HTTP_HOST'], 'to.madeup') !== false) {
+if (array_key_exists('movie', $_REQUEST)) {
 ?>
 
-  <script>
-    $(document).ready(function() {
-      setEditor(false);
-      showConsole(false);
-    });
-  </script>
+  <div id="keystrokes">
+    <audio controls="controls" id="scrubber">
+      <source src="<?= $keystrokesMoviePrefix ?>.wav" type="audio/wav">
+      <source src="<?= $keystrokesMoviePrefix ?>.ogg" type="audio/ogg">
+    </audio>
+  </div>
 
 <?php
 }
 ?>
 
+</div>
+
+<!-- Hidden Download Form _________________________________________________ -->
+<form id="downloader" action="interpret.php" method="post" style="display: none">
+  <input id="extension" type="text" value="obj" name="extension"/>
+  <input id="tag" type="text" value="model" name="tag"/>
+  <input id="geometry_mode" type="text" value="SURFACE" name="geometry_mode"/>
+  <input id="shading_mode" type="text" value="SMOOTH" name="shading_mode"/>
+  <input id="timestamp" type="text" name="timestamp"/>
+  <textarea id="source" name="source"></textarea>
+</form>
+
+<script src="ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="ide_editor.js"></script>
+
+<!-- Blocks Switch ________________________________________________________ -->
+<?php
+if (strpos($_SERVER['HTTP_HOST'], 'to.madeup') !== false) {
+?>
+
+<script>
+  $(document).ready(function() {
+    setEditor(false);
+    showConsole(false);
+  });
+</script>
+
+<?php
+}
+?>
+
+<!-- Source Loader ________________________________________________________ -->
 <?php
 if (array_key_exists('src', $_REQUEST)) {
 ?>

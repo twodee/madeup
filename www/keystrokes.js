@@ -169,3 +169,26 @@ function show(nseconds) {
   }
   textEditor.focus();
 }
+
+$(document).ready(function() {
+  scrubber = $('#scrubber')[0];
+
+  $.getJSON(keystrokesMoviePrefix + '.json', function(data) {
+    movie = new KeystrokesMovie(data);
+  });
+
+  $('#scrubber').bind('seeking', function() {
+    show(scrubber.currentTime);
+  });
+
+  var periodicID;
+  $('#scrubber').bind('play', function() {
+    periodicID = window.setInterval(function() {
+      show(scrubber.currentTime);
+    }, 100);
+  });
+
+  $('#scrubber').bind('pause', function() {
+    window.clearInterval(periodicID);
+  });
+});
