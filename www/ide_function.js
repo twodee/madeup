@@ -1187,8 +1187,14 @@ function run(source, mode, pingback) {
               var wireframeMaterial = new THREE.MeshBasicMaterial({color: 0x333333, wireframe: true, transparent: true, wireframeLinewidth: 3}); 
               var material = [solidMaterial, wireframeMaterial];
               meshes[0] = THREE.SceneUtils.createMultiMaterialObject(model.geometry, material);
+            // } else if (true) {
+              // var diffuseMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: showMode == 'wireframe', wireframeLinewidth: 5});
+              // var specularMaterial = new THREE.MeshPhongMaterial({color: 0x0, specular: 0xFFFFFF, wireframe: showMode == 'wireframe', wireframeLinewidth: 5});
+              // var material = [diffuseMaterial, specularMaterial];
+              // meshes[0] = THREE.SceneUtils.createMultiMaterialObject(model.geometry, material);
             } else {
               var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: showMode == 'wireframe', wireframeLinewidth: 5});
+              // var material = new THREE.MeshPhongMaterial({vertexColors: THREE.VertexColors, specular: 0x999999, shininess: 20, wireframe: showMode == 'wireframe', wireframeLinewidth: 5});
               meshes[0] = new THREE.Mesh(model.geometry, material);
             }
 
@@ -1521,9 +1527,9 @@ function init() {
   var pointLight = new THREE.PointLight(0xFFFFFF);
 
   // set its position
-  pointLight.position.x = 10;
-  pointLight.position.y = 50;
-  pointLight.position.z = 130;
+  pointLight.position.x = 90;
+  pointLight.position.y = 150;
+  pointLight.position.z = 100;
 
   // add to the scene
   camera.add(pointLight);

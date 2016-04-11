@@ -1057,10 +1057,14 @@ Blockly.Blocks['madeup_loop_for_in'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
     this.setColour(Blockly.Blocks.madeup.LOOP_HUE);
+    this.appendValueInput("ITERATOR")
+        .setCheck(null)
+        .appendField("for");
     this.appendValueInput("START")
         .setCheck("Integer")
-        .appendField("for")
-        .appendField(new Blockly.FieldVariable("i"), "ITERATOR")
+        // .appendField("for")
+        // .appendField(new Blockly.FieldVariable("i"), "ITERATOR")
+        // .appendValueInput("ITERATOR")//new Blockly.FieldVariable("i"), "ITERATOR")
         .appendField("in");
     this.appendValueInput("STOP")
         .setCheck("Integer")

@@ -566,7 +566,8 @@ Blockly.Madeup['madeup_loop_for_through_by'] = function(block) {
 
 Blockly.Madeup['madeup_loop_for_in'] = function(block) {
   var value_start = Blockly.Madeup.valueToCode(block, 'START', Blockly.Madeup.ORDER_NONE);
-  var variable_iterator = Blockly.Madeup.variableDB_.getName(block.getFieldValue('ITERATOR'), Blockly.Variables.NAME_TYPE);
+  // var variable_iterator = Blockly.Madeup.variableDB_.getName(block.getFieldValue('ITERATOR'), Blockly.Variables.NAME_TYPE);
+  var variable_iterator = Blockly.Madeup.valueToCode(block, 'ITERATOR', Blockly.Madeup.ORDER_NONE);
   var value_stop = Blockly.Madeup.valueToCode(block, 'STOP', Blockly.Madeup.ORDER_NONE);
   var statements_body = Blockly.Madeup.statementToCode(block, 'BODY');
   var code = 'for ' + variable_iterator + ' in ' + value_start + '..' + value_stop + '\n' + statements_body + 'end';
