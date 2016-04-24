@@ -38,6 +38,8 @@ var onMouseDown = (function() {
 
     if (event.button == 0 && !event.altKey && !event.metaKey && !event.ctrlKey && velocity > 3) {
       controls.staticMoving = false;
+      controls.noPan = true;
+      controls.noZoom = true;
       controls.rotateSpeed = velocity * 0.01;
     } else {
       controls.staticMoving = true;
@@ -49,6 +51,8 @@ var onMouseDown = (function() {
   
   function onMouseDown(event) {
     controls.staticMoving = true;
+    controls.noPan = false;
+    controls.noZoom = false;
     x = event.x;
     y = event.y;
     dx = 0;
@@ -220,11 +224,10 @@ function updateTitle() {
 
 function saveInCookies() {
   // Cookies.set('lastMup', mupName); 
-
+ 
   // Only store a cookie if a setting has changed. If we unconditionally stored
   // these, then updates to the default value would not be seen by users, as
   // the old defaults persisted in the cookies would override the new ones.
-  if (isFontSizeChanged) Cookies.set('fontSize', fontSize);
   if (isShowHeadingsChanged) Cookies.set('showHeadings', showHeadings ? 1 : 0);
   if (isShowCounterclockwiseChanged) Cookies.set('showCounterclockwise', showCounterclockwise ? 1 : 0);
   if (isShowClockwiseChanged) Cookies.set('showClockwise', showClockwise ? 1 : 0);
@@ -243,8 +246,14 @@ function saveInCookies() {
   if (isGridSpacingChanged) Cookies.set('gridSpacing', gridSpacing);
   if (isGridExtentChanged) Cookies.set('gridExtent', gridExtent);
   if (isShowPointsChanged) Cookies.set('showPoints', showPoints ? 1 : 0);
-  Cookies.set('leftWidth', $('#left').width());
-  Cookies.set('consoleHeight', $('#console').height());
+
+  // Embedded views had differing size requirements, so we don't try to
+  // preserve their values long term.
+  if (!isEmbedded) {
+    if (isFontSizeChanged) Cookies.set('fontSize', fontSize);
+    Cookies.set('leftWidth', $('#left').width());
+    Cookies.set('consoleHeight', $('#console').height());
+  }
 
   if (blocklyWorkspace) {
     var xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
@@ -279,22 +288,23 @@ $(document).ready(function() {
       expires: 10 * 365
     };
 
-    if (Cookies.get('leftWidth')) {
-      $('#left').width(Cookies.get('leftWidth'));
-      resize();
-    }
-
-    if (Cookies.get('consoleHeight')) {
-      $('#console').height(Cookies.get('consoleHeight'));
-      // $('#console').height(0); // TODO
-      resize();
-    }
-
     if (!isEmbedded) {
-      load('untitled');
+      if (Cookies.get('leftWidth')) {
+        $('#left').width(Cookies.get('leftWidth'));
+        resize();
+      }
+
+      if (Cookies.get('consoleHeight')) {
+        $('#console').height(Cookies.get('consoleHeight'));
+        resize();
+      }
+
+      if (!isEmbedded) {
+        load('untitled');
+      }
     }
 
-    if (Cookies.get('fontSize')) {
+    if (!isEmbedded && Cookies.get('fontSize')) {
       fontSize = parseInt(Cookies.get('fontSize'));
     } else {
       fontSize = 14;
@@ -767,6 +777,11 @@ $(document).ready(function() {
 
   $('#docs').click(function() {
     window.open('docs/introduction.html', '_blank');
+    focusEditor();
+  });
+
+  $('#github').click(function() {
+    window.open('https://github.com/twodee/madeup', '_blank');
     focusEditor();
   });
 

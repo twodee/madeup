@@ -190,7 +190,9 @@ if (array_key_exists('movie', $_REQUEST)) {
     </div>
 
     <div id="aboutPopup" class="popup">
-      <a href="#" id="docs" class="fileLink">Documentation</a>
+      <a href="#" id="docs" class="fileLink">Documentation</a><br>
+      <a href="#" id="github" class="fileLink">Source Code</a><br>
+      <a href="mailto:crjjrc@gmail.com" id="email" class="fileLink">Email Us</a><br>
     </div>
 
     <div id="filePopup" class="popup">
