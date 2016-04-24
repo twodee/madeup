@@ -149,46 +149,48 @@ Trimesh *Polyline<T>::Revolve(const QVector3<T>& axis, int nstops, float degrees
 
   Trimesh *base = Trimesh::GetParametric(img, !is_open, is_full);
 
-  Polyline<T> *flattened = this->Flatten();
-  bool is_ccw = flattened->IsCounterclockwise();
-  delete flattened;
+  if (this->GetElementCount() >= 3) {
+    Polyline<T> *flattened = this->Flatten();
+    bool is_ccw = flattened->IsCounterclockwise();
+    delete flattened;
 
-  QVector3<T> normal = this->GetNormal();
-  T normal_dot_direction = normal.Dot(delta);
+    QVector3<T> normal = this->GetNormal();
+    T normal_dot_direction = normal.Dot(delta);
 
-  if ((is_ccw && normal_dot_direction < 0) ||
-      (!is_ccw && normal_dot_direction < 0)) {
-    base->ReverseWinding();
-  }
-
-  // Add caps if this isn't a full revolution but the cross section is planar.
-  if (this->IsPlanar(1.0e-6f) && !is_full) {
-    // The first cap is easy. Just take our framing polyline and
-    // triangulate it.
-    Trimesh *cap_a_mesh = this->Triangulate(); 
-
-    if (nmetas > 0) {
-      T *vertex_meta = cap_a_mesh->AllocateVertexMetas(nmetas);
-      for (int i = 0; i < this->GetElementCount(); ++i) {
-        memcpy(vertex_meta, (*this)(i) + 3, sizeof(T) * nmetas);
-        vertex_meta += nmetas;
-      }
-    }
-
-    if ((is_ccw && normal_dot_direction > 0) ||
+    if ((is_ccw && normal_dot_direction < 0) ||
         (!is_ccw && normal_dot_direction < 0)) {
-      cap_a_mesh->ReverseWinding();
+      base->ReverseWinding();
     }
 
-    QMatrix4<float> xform = QMatrix4<float>::GetRotate(degrees, axis);
-    Trimesh cap_b_mesh(*cap_a_mesh);
-    cap_b_mesh *= xform;
-    cap_b_mesh.ReverseWinding();
+    // Add caps if this isn't a full revolution but the cross section is planar.
+    if (this->IsPlanar(1.0e-6f) && !is_full) {
+      // The first cap is easy. Just take our framing polyline and
+      // triangulate it.
+      Trimesh *cap_a_mesh = this->Triangulate(); 
 
-    *base += *cap_a_mesh;
-    *base += cap_b_mesh;
+      if (nmetas > 0) {
+        T *vertex_meta = cap_a_mesh->AllocateVertexMetas(nmetas);
+        for (int i = 0; i < this->GetElementCount(); ++i) {
+          memcpy(vertex_meta, (*this)(i) + 3, sizeof(T) * nmetas);
+          vertex_meta += nmetas;
+        }
+      }
 
-    delete cap_a_mesh;
+      if ((is_ccw && normal_dot_direction > 0) ||
+          (!is_ccw && normal_dot_direction < 0)) {
+        cap_a_mesh->ReverseWinding();
+      }
+
+      QMatrix4<float> xform = QMatrix4<float>::GetRotate(degrees, axis);
+      Trimesh cap_b_mesh(*cap_a_mesh);
+      cap_b_mesh *= xform;
+      cap_b_mesh.ReverseWinding();
+
+      *base += *cap_a_mesh;
+      *base += cap_b_mesh;
+
+      delete cap_a_mesh;
+    }
   }
 
   return base;
