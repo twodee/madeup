@@ -78,9 +78,9 @@ Co<Expression> ExpressionDefineVariableSeed::evaluate(Environment &env) const {
 
 /* ------------------------------------------------------------------------- */
 
-ExpressionDefineVariableRadius::ExpressionDefineVariableRadius(const std::string &name, Co<Expression> rhs) :
-  ExpressionDefineVariable(".outerRadius", rhs) {
-}
+/* ExpressionDefineVariableRadius::ExpressionDefineVariableRadius(const std::string &name, Co<Expression> rhs) : */
+  /* ExpressionDefineVariable(".outerRadius", rhs) { */
+/* } */
 
 /* ------------------------------------------------------------------------- */
 

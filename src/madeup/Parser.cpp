@@ -718,8 +718,8 @@ void Parser::atom() {
     Co<ExpressionDefineVariable> define;
     if (name == "seed") {
       pushExpression(new ExpressionDefineVariableSeed(name.c_str(), rhs), id_token.getLocation(), end_location);
-    } else if (name == ".radius") {
-      pushExpression(new ExpressionDefineVariableRadius(name.c_str(), rhs), id_token.getLocation(), end_location);
+    /* } else if (name == ".radius") { */
+      /* pushExpression(new ExpressionDefineVariableRadius(name.c_str(), rhs), id_token.getLocation(), end_location); */
     } else {
       pushExpression(new ExpressionDefineVariable(name.c_str(), rhs), id_token.getLocation(), end_location);
     }
