@@ -114,7 +114,7 @@ module Scanners
               in_group = false
             elsif match = scan(/.*$/)
               # text += match
-              encoder.text_token match, :comment
+              encoder.text_token '--' + match, :comment
               state = :initial
             # elsif match = scan(/$/)
               # text =''

@@ -542,7 +542,26 @@ print where -- prints {0, 10, 0}
 Move directly to location (`x`, `y`, `z`). The location is transformed by any transform modifiers (such as `rotate`, `scale`, `translate`) that have been previously applied.
 
 ####`move length`
-Move `length` units along the current heading.
+Move `length` units along the current heading. Unlike `movex`, the relative location is not transformed by any previous scales, rotations, or translations.
+
+####`movex length`
+Move `length` units along the current heading. The relative location is transformed by the current transformation of scales, rotations, and translations. For example, in the following code, the `movex` command moves to (5, 10, 0).
+
+{:.mup}
+~~~
+moveto 0, 0, 0
+translate 5, 0, 0
+movex 10 -- we land at (5, 10, 0)
+~~~
+
+In contrast, the `move` command is not affected by any prior transformations:
+
+{:.mup}
+~~~
+moveto 0, 0, 0
+translate 5, 0, 0
+move 10 -- we land at (0, 10, 0)
+~~~
 
 ####`yaw degrees`
 Alter the current heading by turning right or left the given number of degrees. The direction of the turn depends on the sign of `degrees` and your point of view. If you are looking down on the cursor (and it is pointing up at you) and if degrees is positive, a right turn is made.
