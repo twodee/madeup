@@ -47,7 +47,7 @@ template<class T> class Polyline : public NField<T, 1> {
 
     Polyline<T> *Flatten() const;
     bool IsCounterclockwise() const;
-    Trimesh *Triangulate() const;
+    Trimesh *Triangulate(bool fixWinding = true) const;
     Trimesh *Extrude(const QVector3<T> &axis, T distance, const QMatrix4<float>& xform = QMatrix4<float>(1.0f)) const;
 
     bool IsPlanar(T threshold) const;
@@ -857,7 +857,7 @@ Polyline<T> *Polyline<T>::Flatten() const {
 /* ------------------------------------------------------------------------- */
 
 template<class T>
-Trimesh *Polyline<T>::Triangulate() const {
+Trimesh *Polyline<T>::Triangulate(bool fixWinding) const {
   // Assumes polyline traces planar polygon.
 
   // Solving this problem is a lot easier in two dimensions. We project the
@@ -879,8 +879,10 @@ Trimesh *Polyline<T>::Triangulate() const {
   // A negative signed area means the vertices are enumerated in clockwise
   // order in the Cartesian coordinate system with the origin at (0, 0) and
   // they y-axis pointing up.
+  bool is_reversed = false;
   if (!flattened->IsCounterclockwise()) {
     std::reverse(remaining.begin(), remaining.end());
+    is_reversed = true;
   }
 
   // While we have at least three vertices left, find an ear and make a face of it.
@@ -931,6 +933,10 @@ Trimesh *Polyline<T>::Triangulate() const {
   }
 
   Trimesh *mesh = new Trimesh(positions, faces);;
+  if (!fixWinding && is_reversed) {
+    mesh->ReverseWinding();
+  }
+
   return mesh;
 }
 
