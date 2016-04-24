@@ -34,6 +34,7 @@
 #include "madeup/ExpressionMesh.h"
 #include "madeup/ExpressionMin.h"
 #include "madeup/ExpressionMove.h"
+#include "madeup/ExpressionMoveX.h"
 #include "madeup/ExpressionMoveTo.h"
 #include "madeup/ExpressionNormalize.h"
 #include "madeup/ExpressionPath.h"
@@ -110,7 +111,9 @@ void Environment::prime() {
 
   Co<Environment> globals(new Environment());;
 
-  add(".outerRadius", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine(".outerRadius", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
+  Co<ExpressionClosure> radius_closure(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine(".radius", Co<Expression>(new ExpressionReal(1.0f)))), Environment()));
+  add(".radius", radius_closure);
+  add(".outerRadius", radius_closure);
   add(".innerRadius", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine(".innerRadius", Co<Expression>(new ExpressionReal(0.5f)))), Environment())));
   add("nsides", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("nsides", Co<Expression>(new ExpressionInteger(4)))), Environment())));
   add("fracture", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("fracture", Co<Expression>(new ExpressionReal(100)))), Environment())));
@@ -221,6 +224,9 @@ void Environment::prime() {
 
   Co<ExpressionDefine> define_move(new ExpressionDefine("move", Co<Expression>(new ExpressionMove())));
   define_move->addFormal("length");
+
+  Co<ExpressionDefine> define_movex(new ExpressionDefine("movex", Co<Expression>(new ExpressionMoveX())));
+  define_movex->addFormal("length");
 
   Co<ExpressionDefine> define_moveto(new ExpressionDefine("moveto", Co<Expression>(new ExpressionMoveTo())));
   define_moveto->addFormal("x");
@@ -340,6 +346,7 @@ void Environment::prime() {
   add("where", Co<ExpressionClosure>(new ExpressionClosure(define_where, globals)));
   add("reframe", Co<ExpressionClosure>(new ExpressionClosure(define_reframe, globals)));
   add("move", Co<ExpressionClosure>(new ExpressionClosure(define_move, globals)));
+  add("movex", Co<ExpressionClosure>(new ExpressionClosure(define_movex, globals)));
   add("moveto", Co<ExpressionClosure>(new ExpressionClosure(define_moveto, globals)));
   add("scale", Co<ExpressionClosure>(new ExpressionClosure(define_scale, globals)));
   add("translate", Co<ExpressionClosure>(new ExpressionClosure(define_translate, globals)));
@@ -396,6 +403,7 @@ void Environment::prime() {
   globals->add("acos", (*this)["acos"]);
   globals->add("move", (*this)["move"]);
   globals->add("moveto", (*this)["moveto"]);
+  globals->add("movex", (*this)["movex"]);
   globals->add("scale", (*this)["scale"]);
   globals->add("translate", (*this)["translate"]);
   globals->add("rotate", (*this)["rotate"]);
@@ -560,6 +568,16 @@ void Environment::move(float distance) {
 
   // DON'T DO THIS. Move is a relative command. We want to transform the offset.
   /* turtle.position = xforms.top() * turtle.position; */
+
+  recordVertex();
+  recordPreview();
+}
+
+/* ------------------------------------------------------------------------- */
+
+void Environment::movex(float distance) {
+  QVector3<float> offset(QVector4<float>(turtle.camera.GetTo() * distance, 0.0f));
+  turtle.position += xforms.top() * offset;
 
   recordVertex();
   recordPreview();
@@ -805,7 +823,7 @@ Co<Trimesh> Environment::polygon(bool is_flipped) {
       }
 
       try {
-        trimesh = Co<Trimesh>(line->Triangulate());
+        trimesh = Co<Trimesh>(line->Triangulate(false));
         
         // Add per vertex colors to mesh.
         float *colors = trimesh->AllocateVertexColors();

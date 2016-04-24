@@ -59,6 +59,7 @@ class Environment {
     void recordVertex();
     void recordPreview();
     void move(float distance);
+    void movex(float distance);
     void moveTo(float x, float y, float z);
     void scale(float x, float y, float z);
     void translate(float x, float y, float z);

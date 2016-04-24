@@ -56,6 +56,7 @@ add_library(madeup
   ExpressionMesh.cpp 
   ExpressionMin.cpp
   ExpressionMove.cpp
+  ExpressionMoveX.cpp
   ExpressionMoveTo.cpp
   ExpressionMultiply.cpp
   ExpressionNegation.cpp
