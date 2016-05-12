@@ -44,6 +44,10 @@ class Camera {
     const QVector3<float>& GetTo() const;
     const QVector3<float>& GetUp() const;
 
+    QVector3<float> GetForward() const;
+    QVector3<float> GetRight() const;
+    QVector3<float> GetRealUp() const;
+
     /**
      Gets the transformation matrix that will transform to a system where the
      camera is at the origin, whose view direction is the positive z-axis, whose

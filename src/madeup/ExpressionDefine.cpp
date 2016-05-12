@@ -30,6 +30,24 @@ const std::string &FormalParameter::getName() const {
 
 /* ------------------------------------------------------------------------- */
 
+bool FormalParameter::isSplattable() const {
+  return splats.size() > 0;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void FormalParameter::splatTo(const std::vector<std::string> &splats) {
+  this->splats = splats; 
+}
+
+/* ------------------------------------------------------------------------- */
+
+const std::vector<std::string> &FormalParameter::getSplats() const {
+  return splats; 
+}
+
+/* ------------------------------------------------------------------------- */
+
 std::ostream &operator<<(std::ostream &out, const FormalParameter &parameter) {
   out << parameter.getName();
   return out;
@@ -146,6 +164,17 @@ set<string> ExpressionDefine::getFormalNames() const {
   }
 
   return identifiers;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void ExpressionDefine::splat(const std::string &fromID, const std::vector<std::string> &toIDs) {
+  for (std::vector<FormalParameter>::iterator formal = formals.begin(); formal != formals.end(); ++formal) {
+    if (formal->getName() == fromID) {
+      formal->splatTo(toIDs);
+      break;
+    } 
+  }
 }
 
 /* ------------------------------------------------------------------------- */

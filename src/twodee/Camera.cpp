@@ -327,4 +327,22 @@ const QVector3<float>& Camera::GetUp() const {
 
 /* ------------------------------------------------------------------------- */
 
+QVector3<float> Camera::GetForward() const {
+  return QVector3<float>(-view(2, 0), -view(2, 1), -view(2, 2)); 
+}
+
+/* ------------------------------------------------------------------------- */
+
+QVector3<float> Camera::GetRight() const {
+  return QVector3<float>(view(0, 0), view(0, 1), view(0, 2)); 
+}
+
+/* ------------------------------------------------------------------------- */
+
+QVector3<float> Camera::GetRealUp() const {
+  return QVector3<float>(view(1, 0), view(1, 1), view(1, 2)); 
+}
+
+/* ------------------------------------------------------------------------- */
+
 }

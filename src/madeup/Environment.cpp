@@ -106,6 +106,8 @@ Environment::Environment(const Environment &other) :
 /* ------------------------------------------------------------------------- */
 
 void Environment::prime() {
+  std::vector<string> xyz_splats {"x", "y", "z"};
+
   shapes = new Trimesh(0, 0);
   shapes->AllocateVertexColors();
 
@@ -219,6 +221,9 @@ void Environment::prime() {
   define_debug->addFormal("message");
 
   Co<ExpressionDefine> define_where(new ExpressionDefine("where", Co<Expression>(new ExpressionWhere())));
+  Co<ExpressionDefine> define_forward(new ExpressionDefine("forward", Co<Expression>(new ExpressionForward())));
+  Co<ExpressionDefine> define_right(new ExpressionDefine("right", Co<Expression>(new ExpressionRight())));
+  Co<ExpressionDefine> define_up(new ExpressionDefine("up", Co<Expression>(new ExpressionUp())));
 
   Co<ExpressionDefine> define_reframe(new ExpressionDefine("reframe", Co<Expression>(new ExpressionReframe())));
 
@@ -232,22 +237,26 @@ void Environment::prime() {
   define_moveto->addFormal("x");
   define_moveto->addFormal("y");
   define_moveto->addFormal("z");
+  define_moveto->splat("x", xyz_splats);
 
   Co<ExpressionDefine> define_scale(new ExpressionDefine("scale", Co<Expression>(new ExpressionScale())));
   define_scale->addFormal("x");
   define_scale->addFormal("y");
   define_scale->addFormal("z");
+  define_scale->splat("x", xyz_splats);
 
   Co<ExpressionDefine> define_translate(new ExpressionDefine("translate", Co<Expression>(new ExpressionTranslate())));
   define_translate->addFormal("x");
   define_translate->addFormal("y");
   define_translate->addFormal("z");
+  define_translate->splat("x", xyz_splats);
 
   Co<ExpressionDefine> define_rotate(new ExpressionDefine("rotate", Co<Expression>(new ExpressionRotate())));
   define_rotate->addFormal("x");
   define_rotate->addFormal("y");
   define_rotate->addFormal("z");
   define_rotate->addFormal("degrees");
+  define_rotate->splat("x", xyz_splats);
 
   Co<ExpressionDefine> define_identity(new ExpressionDefine("identity", Co<Expression>(new ExpressionIdentity())));
   Co<ExpressionDefine> define_home(new ExpressionDefine("home", Co<Expression>(new ExpressionHome())));
@@ -315,12 +324,14 @@ void Environment::prime() {
   define_revolve->addFormal("y");
   define_revolve->addFormal("z");
   define_revolve->addFormal("degrees");
+  define_revolve->splat("x", xyz_splats);
 
   Co<ExpressionDefine> define_extrude(new ExpressionDefine("extrude", Co<Expression>(new ExpressionExtrude())));
   define_extrude->addFormal("x");
   define_extrude->addFormal("y");
   define_extrude->addFormal("z");
   define_extrude->addFormal("length");
+  define_extrude->splat("x", xyz_splats);
 
   Co<ExpressionDefine> define_forget(new ExpressionDefine("forget", Co<Expression>(new ExpressionForget())));
 
@@ -344,6 +355,9 @@ void Environment::prime() {
   add("roll", Co<ExpressionClosure>(new ExpressionClosure(define_roll, globals)));
   add("debug", Co<ExpressionClosure>(new ExpressionClosure(define_debug, globals)));
   add("where", Co<ExpressionClosure>(new ExpressionClosure(define_where, globals)));
+  add("forward", Co<ExpressionClosure>(new ExpressionClosure(define_forward, globals)));
+  add("right", Co<ExpressionClosure>(new ExpressionClosure(define_right, globals)));
+  add("up", Co<ExpressionClosure>(new ExpressionClosure(define_up, globals)));
   add("reframe", Co<ExpressionClosure>(new ExpressionClosure(define_reframe, globals)));
   add("move", Co<ExpressionClosure>(new ExpressionClosure(define_move, globals)));
   add("movex", Co<ExpressionClosure>(new ExpressionClosure(define_movex, globals)));
@@ -434,6 +448,10 @@ void Environment::prime() {
   globals->add("extrude", (*this)["extrude"]);
   globals->add("forget", (*this)["forget"]);
   globals->add("path", (*this)["path"]);
+  globals->add("where", (*this)["where"]);
+  globals->add("forward", (*this)["forward"]);
+  globals->add("right", (*this)["right"]);
+  globals->add("up", (*this)["up"]);
 
   xforms.push(QMatrix4<float>(1.0f));
   paths.push_back(vector<Turtle>());

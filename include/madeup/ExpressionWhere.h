@@ -19,6 +19,42 @@ class ExpressionWhere : public Expression {
 
 /* ------------------------------------------------------------------------- */
 
+class ExpressionForward : public Expression {
+  public:
+    ExpressionForward();
+
+    Co<Expression> evaluate(Environment &env) const;
+    void write(ostream &out) const;
+
+  private:
+};
+
+/* ------------------------------------------------------------------------- */
+
+class ExpressionRight : public Expression {
+  public:
+    ExpressionRight();
+
+    Co<Expression> evaluate(Environment &env) const;
+    void write(ostream &out) const;
+
+  private:
+};
+
+/* ------------------------------------------------------------------------- */
+
+class ExpressionUp : public Expression {
+  public:
+    ExpressionUp();
+
+    Co<Expression> evaluate(Environment &env) const;
+    void write(ostream &out) const;
+
+  private:
+};
+
+/* ------------------------------------------------------------------------- */
+
 }
 
 #endif

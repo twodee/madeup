@@ -23,10 +23,14 @@ class FormalParameter {
 
     evaluation_mode_t getEvaluationMode() const;
     const std::string &getName() const;
+    bool isSplattable() const;
+    void splatTo(const std::vector<std::string> &splats);
+    const std::vector<std::string> &getSplats() const;
 
   private:
     std::string name;
     evaluation_mode_t evaluation_mode;
+    std::vector<std::string> splats;
 };
 
 /* ------------------------------------------------------------------------- */
@@ -50,6 +54,7 @@ class ExpressionDefine : public Expression {
     const std::string &getName() const { return name; }
     void predeclare(Environment &env) const;
     std::set<std::string> getFormalNames() const;
+    void splat(const std::string &fromID, const std::vector<std::string> &toIDs);
 
   private:
     std::string name;

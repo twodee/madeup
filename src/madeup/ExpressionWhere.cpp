@@ -33,4 +33,73 @@ void ExpressionWhere::write(ostream &out) const {
 
 /* ------------------------------------------------------------------------- */
 
+ExpressionForward::ExpressionForward() :
+  Expression() {
+}
+
+/* ------------------------------------------------------------------------- */
+
+Co<Expression> ExpressionForward::evaluate(Environment &env) const {
+  QVector3<float> axis = env.getTurtle().camera.GetForward();
+  Co<ExpressionArray> new_array(new ExpressionArray(3));
+  for (int i = 0; i < 3; ++i) {
+    new_array->setElement(i, Co<Expression>(new ExpressionReal(axis[i])));
+  }
+  return Co<Expression>(new ExpressionArrayReference(new_array));
+}
+
+/* ------------------------------------------------------------------------- */
+
+void ExpressionForward::write(ostream &out) const {
+  out << "(forward)";
+}
+
+/* ------------------------------------------------------------------------- */
+
+ExpressionRight::ExpressionRight() :
+  Expression() {
+}
+
+/* ------------------------------------------------------------------------- */
+
+Co<Expression> ExpressionRight::evaluate(Environment &env) const {
+  QVector3<float> axis = env.getTurtle().camera.GetRight();
+  Co<ExpressionArray> new_array(new ExpressionArray(3));
+  for (int i = 0; i < 3; ++i) {
+    new_array->setElement(i, Co<Expression>(new ExpressionReal(axis[i])));
+  }
+  return Co<Expression>(new ExpressionArrayReference(new_array));
+}
+
+/* ------------------------------------------------------------------------- */
+
+void ExpressionRight::write(ostream &out) const {
+  out << "(right)";
+}
+
+/* ------------------------------------------------------------------------- */
+
+ExpressionUp::ExpressionUp() :
+  Expression() {
+}
+
+/* ------------------------------------------------------------------------- */
+
+Co<Expression> ExpressionUp::evaluate(Environment &env) const {
+  QVector3<float> axis = env.getTurtle().camera.GetRealUp();
+  Co<ExpressionArray> new_array(new ExpressionArray(3));
+  for (int i = 0; i < 3; ++i) {
+    new_array->setElement(i, Co<Expression>(new ExpressionReal(axis[i])));
+  }
+  return Co<Expression>(new ExpressionArrayReference(new_array));
+}
+
+/* ------------------------------------------------------------------------- */
+
+void ExpressionUp::write(ostream &out) const {
+  out << "(up)";
+}
+
+/* ------------------------------------------------------------------------- */
+
 }
