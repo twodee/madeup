@@ -456,6 +456,10 @@ void Parser::atom() {
       ++i;
       e->setSource(getSubsource(location), location);
       expressions.push(e);
+    } else if (isUp(Token::COMMA)) {
+      std::stringstream ss;
+      ss << tokens[i].getLocation().toAnchor() << ": I found a comma where I did not expect one.";
+      throw MessagedException(ss.str());
     } else {
       std::stringstream ss;
       ss << e->getSourceLocation().toAnchor() << ": I didn't find a ')' where I expected it.";

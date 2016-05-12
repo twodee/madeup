@@ -1,0 +1,5 @@
+---
+Tim found a bug.
+Multiline comments with errors after them were located in the wrong place.
+---
+extrude (0, 0, 1, 10) -- This isn't correct. No parentheses can be used here.

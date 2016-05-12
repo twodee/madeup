@@ -223,7 +223,14 @@ Token Lexer::getTokenAfterMinusMinus() {
       } else {
         ndashes = 0;
       }
-      ++location.end_column;
+
+      if (c == '\n') {
+        ++location.end_row;
+        location.end_column = -1;
+      } else {
+        ++location.end_column;
+      }
+
       ++location.end_index;
     } while (c != EOF && ndashes < 3);
 
@@ -233,8 +240,10 @@ Token Lexer::getTokenAfterMinusMinus() {
       ss << location.toAnchor() << ": I was reading a multiline comment, but I couldn't find its ending ---.";
       throw MessagedException(ss.str());
     } else {
-      text_so_far += c;
+      text_so_far += c; // TODO: why?
     }
+
+    location.start_row = location.end_row;
   }
 
   // We only saw --, so this must be a one-line comment. Read to the end of
