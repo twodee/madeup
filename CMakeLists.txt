@@ -12,8 +12,17 @@ elseif(UNIX)
 endif()
 
 if(USE_DEBUG AND CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-  set(CMAKE_C_FLAGS "-g -pedantic -Wall -std=c99")
-  set(CMAKE_CXX_FLAGS "-g -pedantic -Wall -std=c++11 -frounding-math")
+  set(CMAKE_C_FLAGS "-pedantic -Wall -std=c99")
+  set(CMAKE_CXX_FLAGS "-pedantic -Wall -std=c++11")
+
+  if(USE_DEBUG)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+  endif()
+
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frounding-math")
+  endif()
 endif()
 
 # Libigl imposes a bunch of dependencies that aren't fun to sort through. Let's
@@ -39,6 +48,10 @@ add_subdirectory(src/twodee)
 add_subdirectory(src/madeup)
 add_subdirectory(src)
 add_subdirectory(test)
+option(BUILD_DESKTOP "Build desktop client" ON)
+if(BUILD_DESKTOP)
+  add_subdirectory(src/desktop)
+endif()
 
 add_custom_target(www
   COMMAND make WWW_ROOT=${WWW_ROOT} MADEUP=$<TARGET_FILE:madeup> TWODEE=$<TARGET_FILE:twodee> MERP=$<TARGET_FILE:merp>

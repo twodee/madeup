@@ -2,7 +2,7 @@
 
 #define EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
 #define IGL_NO_CORK
-#include <igl/copyleft/boolean/mesh_boolean.h>
+#include <igl/copyleft/cgal/mesh_boolean.h>
 #include <igl/per_corner_normals.h>
 
 #include <madeup/ExpressionArray.h>
@@ -71,16 +71,16 @@ Trimesh *construct(const Trimesh &a,
                    const Trimesh &b,
                    operation_t operation) {
 
-  igl::copyleft::boolean::MeshBooleanType igl_operation;
+  igl::MeshBooleanType boolean_operation;
   switch (operation) {
     case UNION:
-      igl_operation = igl::copyleft::boolean::MESH_BOOLEAN_TYPE_UNION;
+      boolean_operation = igl::MESH_BOOLEAN_TYPE_UNION;
       break;
     case DIFFERENCE:
-      igl_operation = igl::copyleft::boolean::MESH_BOOLEAN_TYPE_MINUS;
+      boolean_operation = igl::MESH_BOOLEAN_TYPE_MINUS;
       break;
     case INTERSECTION:
-      igl_operation = igl::copyleft::boolean::MESH_BOOLEAN_TYPE_INTERSECT;
+      boolean_operation = igl::MESH_BOOLEAN_TYPE_INTERSECT;
       break;
   }
 
@@ -91,7 +91,7 @@ Trimesh *construct(const Trimesh &a,
   TrimeshToEigen(b, vertices[1], faces[1]);
 
   Eigen::VectorXi J;
-  igl::copyleft::boolean::mesh_boolean(vertices[0], faces[0], vertices[1], faces[1], igl_operation, vertices[2], faces[2], J);
+  igl::copyleft::cgal::mesh_boolean(vertices[0], faces[0], vertices[1], faces[1], boolean_operation, vertices[2], faces[2], J);
 
   Eigen::MatrixXd N_corners;
   igl::per_corner_normals(vertices[2], faces[2], 20, N_corners);

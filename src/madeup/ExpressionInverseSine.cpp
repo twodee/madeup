@@ -6,6 +6,8 @@
 #include "madeup/ExpressionReal.h"
 #include "twodee/Utilities.h"
 
+using namespace td;
+
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */

@@ -11,16 +11,16 @@ namespace madeup {
 
 class ExpressionArray : public Expression {
   public:
-    ExpressionArray(int nelements, Co<Expression> fill = ExpressionUnit::getSingleton());
+    ExpressionArray(int nelements, td::Co<Expression> fill = ExpressionUnit::getSingleton());
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     int getSize() const;
-    Co<Expression> operator[](int i);
-    void setElement(int i, Co<Expression> expr);
+    td::Co<Expression> operator[](int i);
+    void setElement(int i, td::Co<Expression> expr);
     void write(ostream &out) const;
 
   private:
-    Co<Expression> *elements;
+    td::Co<Expression> *elements;
     int nelements;
 };
 
@@ -28,42 +28,42 @@ class ExpressionArray : public Expression {
 
 class ExpressionArrayReference : public Expression {
   public:
-    ExpressionArrayReference(Co<ExpressionArray> array_expression);
+    ExpressionArrayReference(td::Co<ExpressionArray> array_expression);
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
-    Co<ExpressionArray> getArray();
-    Co<const ExpressionArray> getArray() const;
+    td::Co<ExpressionArray> getArray();
+    td::Co<const ExpressionArray> getArray() const;
 
   private:
-    Co<ExpressionArray> array_expression;
+    td::Co<ExpressionArray> array_expression;
 };
 
 /* ------------------------------------------------------------------------- */
 
 class ExpressionArrayConstructor : public Expression {
   public:
-    ExpressionArrayConstructor(Co<Expression> fill_expression, Co<Expression> length_expression);
+    ExpressionArrayConstructor(td::Co<Expression> fill_expression, td::Co<Expression> length_expression);
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
 
   private:
-    Co<Expression> fill_expression;
-    Co<Expression> length_expression;
+    td::Co<Expression> fill_expression;
+    td::Co<Expression> length_expression;
 };
 
 /* ------------------------------------------------------------------------- */
 
 class ExpressionArrayLiteral : public Expression {
   public:
-    ExpressionArrayLiteral(const std::vector<Co<Expression> >& items);
+    ExpressionArrayLiteral(const std::vector<td::Co<Expression> >& items);
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
 
   private:
-    std::vector<Co<Expression> > items;
+    std::vector<td::Co<Expression> > items;
 };
 
 /* ------------------------------------------------------------------------- */

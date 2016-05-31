@@ -6,6 +6,7 @@
 #include "twodee/MessagedException.h"
 
 using namespace madeup;
+using namespace td;
 
 int main(int argc, char **argv) {
   std::ifstream in(argv[1]);

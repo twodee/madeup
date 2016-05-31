@@ -41,13 +41,13 @@ std::ostream &operator<<(std::ostream &out, const FormalParameter &parameter);
 
 class ExpressionDefine : public Expression {
   public:
-    ExpressionDefine(const std::string &name, Co<Expression> body);
-    ExpressionDefine(const std::string &name, Co<Expression> body, const std::vector<FormalParameter> &formals);
+    ExpressionDefine(const std::string &name, td::Co<Expression> body);
+    ExpressionDefine(const std::string &name, td::Co<Expression> body, const std::vector<FormalParameter> &formals);
     void addFormal(const std::string &name, FormalParameter::evaluation_mode_t evaluation_mode = FormalParameter::EAGER);
     const FormalParameter &getFormal(int i);
     unsigned int getArity() const;
-    Co<Expression> evaluate(Environment &env) const;
-    Co<Expression> getBody() const;
+    td::Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> getBody() const;
     void write(ostream &out) const;
     void isDynamicallyScoped(bool enable);
     bool isDynamicallyScoped() const;
@@ -58,7 +58,7 @@ class ExpressionDefine : public Expression {
 
   private:
     std::string name;
-    Co<Expression> body;
+    td::Co<Expression> body;
     std::vector<FormalParameter> formals;
     bool is_dynamically_scoped;
 };

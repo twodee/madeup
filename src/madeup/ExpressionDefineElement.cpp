@@ -4,6 +4,8 @@
 #include "madeup/ExpressionInteger.h"
 #include "madeup/ExpressionSubscript.h"
 
+using namespace td;
+
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */

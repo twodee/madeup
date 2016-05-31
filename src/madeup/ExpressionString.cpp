@@ -1,6 +1,7 @@
 #include "madeup/ExpressionString.h"
 
 using std::string;
+using namespace td;
 
 namespace madeup {
 

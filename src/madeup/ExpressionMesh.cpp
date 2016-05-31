@@ -1,5 +1,7 @@
 #include "madeup/ExpressionMesh.h"
 
+using namespace td;
+
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */

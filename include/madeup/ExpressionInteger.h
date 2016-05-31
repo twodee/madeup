@@ -11,7 +11,7 @@ class ExpressionInteger : public ExpressionNumber {
   public:
     ExpressionInteger(int value);
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     int toInteger() const;
     void setInteger(int i);
     float toReal() const;

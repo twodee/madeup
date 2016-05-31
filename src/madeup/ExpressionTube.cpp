@@ -5,6 +5,8 @@
 #include "madeup/ExpressionTube.h"
 #include "madeup/ExpressionUnit.h"
 
+using namespace td;
+
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */

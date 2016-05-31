@@ -20,7 +20,7 @@ td::Trimesh *construct(const td::Trimesh &a,
                        const td::Trimesh &b,
                        operation_t operation);
 
-Co<Expression> construct_and_color(ExpressionMesh *l_mesh,
+td::Co<Expression> construct_and_color(ExpressionMesh *l_mesh,
                                    ExpressionMesh *r_mesh,
                                    Environment &env,
                                    operation_t operation);

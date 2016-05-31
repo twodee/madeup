@@ -9,15 +9,15 @@ namespace madeup {
 
 class ExpressionRepeatwich : public Expression {
   public:
-    ExpressionRepeatwich(Co<Expression> nmores, Co<Expression> more, Co<Expression> less);
+    ExpressionRepeatwich(td::Co<Expression> nmores, td::Co<Expression> more, td::Co<Expression> less);
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
 
   private:
-    Co<Expression> nmores;
-    Co<Expression> more;
-    Co<Expression> less;
+    td::Co<Expression> nmores;
+    td::Co<Expression> more;
+    td::Co<Expression> less;
 };
 
 /* ------------------------------------------------------------------------- */

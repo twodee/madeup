@@ -1,5 +1,7 @@
 #include "madeup/ExpressionBoolean.h"
 
+using namespace td;
+
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */

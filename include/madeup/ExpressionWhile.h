@@ -9,14 +9,14 @@ namespace madeup {
 
 class ExpressionWhile : public Expression {
   public:
-    ExpressionWhile(Co<Expression> condition, Co<Expression> body);
+    ExpressionWhile(td::Co<Expression> condition, td::Co<Expression> body);
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
 
   private:
-    Co<Expression> condition;
-    Co<Expression> body;
+    td::Co<Expression> condition;
+    td::Co<Expression> body;
 };
 
 /* ------------------------------------------------------------------------- */

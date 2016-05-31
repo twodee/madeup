@@ -9,17 +9,17 @@ namespace madeup {
 
 class ExpressionFor : public Expression {
   public:
-    ExpressionFor(const string &id, Co<Expression> start, Co<Expression> end, Co<Expression> delta, Co<Expression> body, bool is_inclusive);
+    ExpressionFor(const string &id, td::Co<Expression> start, td::Co<Expression> end, td::Co<Expression> delta, td::Co<Expression> body, bool is_inclusive);
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
 
   private:
     string id;
-    Co<Expression> start;
-    Co<Expression> end;
-    Co<Expression> delta;
-    Co<Expression> body;
+    td::Co<Expression> start;
+    td::Co<Expression> end;
+    td::Co<Expression> delta;
+    td::Co<Expression> body;
     bool is_inclusive;
 };
 

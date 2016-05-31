@@ -7,8 +7,8 @@ namespace madeup {
 
 /* ------------------------------------------------------------------------- */
 
-typedef map<std::string, Co<Expression> > bindings_t;
-typedef pair<std::string, Co<Expression> > binding_t;
+typedef map<std::string, td::Co<Expression> > bindings_t;
+typedef pair<std::string, td::Co<Expression> > binding_t;
 
 /* ------------------------------------------------------------------------- */
 
@@ -16,8 +16,8 @@ class ExpressionCallWithNamedParameters : public Expression {
   public:
     ExpressionCallWithNamedParameters(const std::string &name);
 
-    void addParameter(const std::string &name, Co<Expression> parameter);
-    Co<Expression> evaluate(Environment &env) const;
+    void addParameter(const std::string &name, td::Co<Expression> parameter);
+    td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
 
   private:

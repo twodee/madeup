@@ -9,18 +9,18 @@ namespace madeup {
 
 class ExpressionNot : public Expression {
   public:
-    ExpressionNot(Co<Expression> left);
+    ExpressionNot(td::Co<Expression> left);
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
 
   private:
-    static Co<Expression> evaluate_helper(Co<Expression> e,
+    static td::Co<Expression> evaluate_helper(td::Co<Expression> e,
                                           const std::string &source,
                                           const SourceLocation &location,
                                           Environment &env);
 
-    Co<Expression> left;
+    td::Co<Expression> left;
 };
 
 /* ------------------------------------------------------------------------- */

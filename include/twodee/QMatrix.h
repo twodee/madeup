@@ -1,5 +1,5 @@
-#ifndef QMATRIX_H
-#define QMATRIX_H
+#ifndef TD_QMATRIX_H
+#define TD_QMATRIX_H
 
 #include <cassert>
 #include <iostream>

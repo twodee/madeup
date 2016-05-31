@@ -12,6 +12,7 @@
 #include "twodee/MessagedException.h"
 
 using namespace madeup;
+using namespace td;
 
 void usage(const std::string &message) {
   std::cerr << "Usage: merp [--shading (FLAT|SMOOTH)] [-q] [-r] [--timeout #] [--tree] -i in.mup [-o out.obj] [--geometry (SURFACE|PATH|NONE)]" << std::endl;

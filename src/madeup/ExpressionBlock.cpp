@@ -4,6 +4,7 @@
 #include "madeup/ExpressionUnit.h"
 
 using std::vector;
+using namespace td;
 
 namespace madeup {
 

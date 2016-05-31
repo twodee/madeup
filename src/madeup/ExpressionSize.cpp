@@ -3,6 +3,8 @@
 #include "madeup/ExpressionSize.h"
 #include "madeup/ExpressionString.h"
 
+using namespace td;
+
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */

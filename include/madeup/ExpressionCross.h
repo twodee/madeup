@@ -11,7 +11,7 @@ class ExpressionCross : public Expression {
   public:
     ExpressionCross();
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
 
   private:

@@ -11,12 +11,12 @@ class ExpressionLog : public Expression {
   public:
     ExpressionLog();
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
 
   private:
-    static Co<Expression> evaluate_helper(Co<Expression> base,
-                                          Co<Expression> x,
+    static td::Co<Expression> evaluate_helper(td::Co<Expression> base,
+                                          td::Co<Expression> x,
                                           const std::string &source,
                                           const SourceLocation &location,
                                           Environment &env);

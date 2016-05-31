@@ -1,6 +1,8 @@
 #include "madeup/ExpressionForget.h"
 #include "madeup/ExpressionUnit.h"
 
+using namespace td;
+
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */

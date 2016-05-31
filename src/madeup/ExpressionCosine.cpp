@@ -5,6 +5,8 @@
 #include "madeup/ExpressionNumber.h"
 #include "madeup/ExpressionReal.h"
 
+using namespace td;
+
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */

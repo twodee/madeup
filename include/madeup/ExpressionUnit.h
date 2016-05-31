@@ -9,15 +9,15 @@ namespace madeup {
 
 class ExpressionUnit : public Expression {
   public:
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
 
-    static Co<Expression> getSingleton();
+    static td::Co<Expression> getSingleton();
 
   private:
     ExpressionUnit();
 
-    static Co<Expression> singleton;
+    static td::Co<Expression> singleton;
 };
 
 /* ------------------------------------------------------------------------- */

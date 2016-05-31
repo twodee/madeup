@@ -14,7 +14,7 @@ class ExpressionString : public ExpressionPrimitive {
   public:
     ExpressionString(const std::string &value);
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     std::string getString() const;
     void write(ostream &out) const;
     std::string toString() const;

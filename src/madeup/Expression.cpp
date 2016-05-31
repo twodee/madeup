@@ -31,6 +31,7 @@
 #include "madeup/ExpressionWhile.h"
 
 using std::ostream;
+using namespace td;
 
 /* ------------------------------------------------------------------------- */
 

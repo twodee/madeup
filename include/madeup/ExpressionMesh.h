@@ -10,14 +10,14 @@ namespace madeup {
 
 class ExpressionMesh : public Expression {
   public:
-    ExpressionMesh(Co<Trimesh> mesh);
+    ExpressionMesh(td::Co<td::Trimesh> mesh);
 
-    Co<Expression> evaluate(Environment &env) const;
-    Co<Trimesh> toMesh() const;
+    td::Co<Expression> evaluate(Environment &env) const;
+    td::Co<td::Trimesh> toMesh() const;
     void write(ostream &out) const;
 
   private:
-    Co<Trimesh> mesh;
+    td::Co<td::Trimesh> mesh;
 };
 
 /* ------------------------------------------------------------------------- */

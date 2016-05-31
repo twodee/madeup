@@ -1,5 +1,7 @@
 #include "madeup/ExpressionNumber.h"
 
+using namespace td;
+
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */

@@ -2,6 +2,8 @@
 #include "madeup/ExpressionNumber.h"
 #include "madeup/ExpressionPitch.h"
 
+using namespace td;
+
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */

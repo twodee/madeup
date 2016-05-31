@@ -1,5 +1,7 @@
 #include "madeup/ExpressionInteger.h"
 
+using namespace td;
+
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */

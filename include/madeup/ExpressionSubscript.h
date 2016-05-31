@@ -11,22 +11,22 @@ namespace madeup {
 
 class ExpressionSubscript : public Expression {
   public:
-    ExpressionSubscript(Co<Expression> base_expression,
-                        Co<Expression> index_expression);
+    ExpressionSubscript(td::Co<Expression> base_expression,
+                        td::Co<Expression> index_expression);
 
-    Co<Expression> evaluate(Environment &env) const;
-    Co<Expression> evaluateBase(Environment &env) const;
-    Co<ExpressionInteger> evaluateIndex(Environment &env) const;
-    Co<ExpressionInteger> evaluateIndex(Environment &env, const ExpressionString *string_value) const;
-    Co<ExpressionInteger> evaluateIndex(Environment &env, const ExpressionArrayReference *array_value) const;
+    td::Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluateBase(Environment &env) const;
+    td::Co<ExpressionInteger> evaluateIndex(Environment &env) const;
+    td::Co<ExpressionInteger> evaluateIndex(Environment &env, const ExpressionString *string_value) const;
+    td::Co<ExpressionInteger> evaluateIndex(Environment &env, const ExpressionArrayReference *array_value) const;
     void write(ostream &out) const;
 
-    Co<Expression> getBase() const;
-    Co<Expression> getIndex() const;
+    td::Co<Expression> getBase() const;
+    td::Co<Expression> getIndex() const;
 
   private:
-    Co<Expression> base_expression;
-    Co<Expression> index_expression;
+    td::Co<Expression> base_expression;
+    td::Co<Expression> index_expression;
 };
 
 /* ------------------------------------------------------------------------- */

@@ -21,11 +21,10 @@ using std::pair;
 using std::stack;
 using std::string;
 using std::vector;
-using namespace td;
 
 struct Node {
-  QVector3<float> position;
-  QVector3<float> rgb;
+  td::QVector3<float> position;
+  td::QVector3<float> rgb;
   float outer_radius;
   float inner_radius;
   float energy;
@@ -33,8 +32,8 @@ struct Node {
 };
 
 struct Turtle {
-  QVector3<float> position;
-  Camera camera;
+  td::QVector3<float> position;
+  td::Camera camera;
 };
 
 namespace madeup {
@@ -49,11 +48,11 @@ class Environment {
     Environment();
     Environment(const Environment &other);
 
-    void add(const string &id, Co<ExpressionClosure> expression);
-    void replace(const string &id, Co<ExpressionClosure> expression);
+    void add(const string &id, td::Co<ExpressionClosure> expression);
+    void replace(const string &id, td::Co<ExpressionClosure> expression);
     bool isBound(const string &id) const;
 
-    Co<ExpressionClosure> operator[](const string &id);
+    td::Co<ExpressionClosure> operator[](const string &id);
 
     void prime();
     void recordVertex();
@@ -69,21 +68,21 @@ class Environment {
     int coalesce(float threshold);
     void home();
     void reverse();
-    void echo(Co<Trimesh> mesh);
+    void echo(td::Co<td::Trimesh> mesh);
     void echo(const std::vector<Node> &path);
-    void echoWithoutTransform(Co<Trimesh> mesh);
+    void echoWithoutTransform(td::Co<td::Trimesh> mesh);
     void yaw(float degrees);
     void pitch(float degrees);
     void roll(float degrees);
-    Co<Trimesh> dowel(float twist, float max_bend);
-    Co<Trimesh> tube(float twist, float max_bend);
-    Co<Trimesh> polygon(bool is_flipped);
-    Co<Trimesh> revolve();
-    Co<Trimesh> extrude(const QVector3<float> &axis, float length);
-    Co<Trimesh> spheres();
-    Co<Trimesh> boxes();
-    Co<Trimesh> blobs(float grain, float iso);
-    Co<Trimesh> surface(int width, int height);
+    td::Co<td::Trimesh> dowel(float twist, float max_bend);
+    td::Co<td::Trimesh> tube(float twist, float max_bend);
+    td::Co<td::Trimesh> polygon(bool is_flipped);
+    td::Co<td::Trimesh> revolve();
+    td::Co<td::Trimesh> extrude(const td::QVector3<float> &axis, float length);
+    td::Co<td::Trimesh> spheres();
+    td::Co<td::Trimesh> boxes();
+    td::Co<td::Trimesh> blobs(float grain, float iso);
+    td::Co<td::Trimesh> surface(int width, int height);
     void forget();
     void axis(float x, float y, float z);
     void reframe();
@@ -93,7 +92,7 @@ class Environment {
 
     void checkTimeout(const SourceLocation &location);
 
-    Trimesh *getMesh();
+    td::Trimesh *getMesh();
     std::string getPathsJSON() const;
     void setGeometryMode(GeometryMode::geometry_mode_t mode);
     GeometryMode::geometry_mode_t getGeometryMode() const;
@@ -106,16 +105,16 @@ class Environment {
   private:
     bool hasMoved() const;
 
-    map<string, Co<ExpressionClosure> > id_to_expression;
+    map<string, td::Co<ExpressionClosure> > id_to_expression;
     std::chrono::high_resolution_clock::time_point start_time;
     int max_seconds;
 
     static Turtle turtle;
     static stack<Turtle> previous_turtles;
     static vector<Node> run;
-    static Trimesh *shapes;
+    static td::Trimesh *shapes;
     static std::vector<std::vector<Turtle> > paths;
-    static std::stack<QMatrix4<float> > xforms;
+    static std::stack<td::QMatrix4<float> > xforms;
     static GeometryMode::geometry_mode_t geometry_mode;
 };
 

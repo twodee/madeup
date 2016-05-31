@@ -18,7 +18,7 @@ class Parser {
     Parser(const std::vector<Token> &tokens,
            const std::string &source = "");
 
-    Co<ExpressionBlock> program();
+    td::Co<ExpressionBlock> program();
     void block();
     void statement();
     void expressionLevel0();
@@ -37,8 +37,8 @@ class Parser {
   private:
     bool isUp(Token::token_t type, size_t k = 1) const;
     bool isInExpressionFirst(int k = 1) const;
-    Co<Expression> popExpression();
-    Co<ExpressionBlock> popBlock();
+    td::Co<Expression> popExpression();
+    td::Co<ExpressionBlock> popBlock();
     std::string getSubsource(const SourceLocation &location) const;
     void pushExpression(Expression *e,
                         const SourceLocation &from,
@@ -46,8 +46,8 @@ class Parser {
 
     const std::vector<Token> tokens;
     const std::string source;
-    std::stack<Co<Expression> > expressions;
-    std::stack<Co<ExpressionBlock> > blocks;
+    std::stack<td::Co<Expression> > expressions;
+    std::stack<td::Co<ExpressionBlock> > blocks;
     size_t i;
     bool is_in_loop_range;
     bool is_in_pipe;

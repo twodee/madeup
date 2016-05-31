@@ -10,16 +10,16 @@ namespace madeup {
 
 class ExpressionDefineElement : public Expression {
   public:
-    ExpressionDefineElement(Co<Expression> base,
-                            Co<Expression> index,
-                            Co<Expression> rhs);
-    Co<Expression> evaluate(Environment &env) const;
-    Co<Expression> getRightHandSide() const;
+    ExpressionDefineElement(td::Co<Expression> base,
+                            td::Co<Expression> index,
+                            td::Co<Expression> rhs);
+    td::Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> getRightHandSide() const;
     void write(ostream &out) const;
 
   private:
-    Co<ExpressionSubscript> subscript;
-    Co<Expression> rhs;
+    td::Co<ExpressionSubscript> subscript;
+    td::Co<Expression> rhs;
 };
 
 /* ------------------------------------------------------------------------- */

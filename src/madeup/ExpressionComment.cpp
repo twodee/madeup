@@ -2,6 +2,7 @@
 #include "madeup/ExpressionUnit.h"
 
 using std::string;
+using namespace td;
 
 namespace madeup {
 

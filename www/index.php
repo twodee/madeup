@@ -9,9 +9,9 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 
   <!-- JQuery dependencies -->
-  <link rel="stylesheet" href="jquery-ui/jquery-ui.css"/>
+  <link rel="stylesheet" href="jquery-ui-1.11.2/jquery-ui.css"/>
   <script src="jquery.js"></script>
-  <script src="jquery-ui/jquery-ui.js"></script>
+  <script src="jquery-ui-1.11.2/jquery-ui.js"></script>
   <script src="js-cookie/src/js.cookie.js"></script>
   <script src="jquery_ui_touch_punch/jquery.ui.touch-punch.min.js"></script>
 

@@ -11,7 +11,7 @@ class ExpressionYaw : public Expression {
   public:
     ExpressionYaw();
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
 
   private:

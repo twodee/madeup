@@ -11,7 +11,7 @@ class ExpressionReframe : public Expression {
   public:
     ExpressionReframe();
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
 
   private:

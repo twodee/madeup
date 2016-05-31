@@ -2,6 +2,8 @@
 
 #include "madeup/ExpressionReal.h"
 
+using namespace td;
+
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */

@@ -11,7 +11,7 @@ class ExpressionInverseTangent : public Expression {
   public:
     ExpressionInverseTangent();
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
 
   private:
@@ -23,7 +23,7 @@ class ExpressionInverseTangent2 : public Expression {
   public:
     ExpressionInverseTangent2();
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
 
   private:

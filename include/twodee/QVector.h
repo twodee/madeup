@@ -1,5 +1,5 @@
-#ifndef QVECTOR_H
-#define QVECTOR_H
+#ifndef TD_QVECTOR_H
+#define TD_QVECTOR_H
 
 #include <cassert>
 #include <cmath>

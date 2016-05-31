@@ -9,20 +9,20 @@ namespace madeup {
 
 class ExpressionLesser : public Expression {
   public:
-    ExpressionLesser(Co<Expression> left, Co<Expression> right);
+    ExpressionLesser(td::Co<Expression> left, td::Co<Expression> right);
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
 
   private:
-    static Co<Expression> evaluate_helper(Co<Expression> l,
-                                          Co<Expression> r,
+    static td::Co<Expression> evaluate_helper(td::Co<Expression> l,
+                                          td::Co<Expression> r,
                                           const std::string &source,
                                           const SourceLocation &location,
                                           Environment &env);
 
-    Co<Expression> left;
-    Co<Expression> right;
+    td::Co<Expression> left;
+    td::Co<Expression> right;
 };
 
 /* ------------------------------------------------------------------------- */

@@ -13,7 +13,7 @@ class ExpressionComment : public Expression {
   public:
     ExpressionComment(const std::string &text);
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     std::string toString() const;
 
   private:

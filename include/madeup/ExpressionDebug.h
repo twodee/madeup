@@ -12,9 +12,9 @@ class ExpressionDebug : public Expression {
     ExpressionDebug();
 
     static bool print(const std::string &label,
-                      const Co<Expression>& value);
+                      const td::Co<Expression>& value);
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
 
   private:

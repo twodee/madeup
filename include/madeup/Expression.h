@@ -5,7 +5,6 @@
 #include <string>
 
 #include "madeup/Environment.h"
-#include "madeup/Expression.h"
 #include "madeup/SourceLocation.h"
 
 using std::ostream;
@@ -28,14 +27,14 @@ class Expression {
     Expression();
     virtual ~Expression();
 
-    virtual Co<Expression> evaluate(Environment &env) const = 0;
+    virtual td::Co<Expression> evaluate(Environment &env) const = 0;
     virtual void write(ostream &out) const = 0;
     const std::string &getSource() const;
     const SourceLocation &getSourceLocation() const;
     void setSource(const std::string &source, const SourceLocation &location);
     virtual void predeclare(Environment &env) const;
 
-    static Co<Expression> parse(const std::string &s);
+    static td::Co<Expression> parse(const std::string &s);
 
   private:
     std::string source;
@@ -44,7 +43,7 @@ class Expression {
 
 /* ------------------------------------------------------------------------- */
 
-ostream &operator<<(ostream &out, const Co<Expression> e);
+ostream &operator<<(ostream &out, const td::Co<Expression> e);
 
 /* ------------------------------------------------------------------------- */
 

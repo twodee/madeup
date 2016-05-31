@@ -10,15 +10,15 @@ namespace madeup {
 
 class ExpressionIf : public Expression {
   public:
-    ExpressionIf(Co<Expression> condition, Co<ExpressionBlock> then_block, Co<ExpressionBlock> else_block);
+    ExpressionIf(td::Co<Expression> condition, td::Co<ExpressionBlock> then_block, td::Co<ExpressionBlock> else_block);
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
 
   private:
-    Co<Expression> condition;
-    Co<ExpressionBlock> then_block;
-    Co<ExpressionBlock> else_block;
+    td::Co<Expression> condition;
+    td::Co<ExpressionBlock> then_block;
+    td::Co<ExpressionBlock> else_block;
 };
 
 /* ------------------------------------------------------------------------- */

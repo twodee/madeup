@@ -1,6 +1,8 @@
 #include "madeup/ExpressionPath.h"
 #include "madeup/ExpressionNodes.h"
 
+using namespace td;
+
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */

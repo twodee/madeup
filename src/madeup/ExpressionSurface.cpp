@@ -5,6 +5,8 @@
 #include "madeup/ExpressionUnit.h"
 #include "twodee/MessagedException.h"
 
+using namespace td;
+
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */

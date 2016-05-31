@@ -6,6 +6,8 @@
 #include "madeup/ExpressionTangent.h"
 #include "twodee/Utilities.h"
 
+using namespace td;
+
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */

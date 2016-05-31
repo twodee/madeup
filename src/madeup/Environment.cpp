@@ -65,6 +65,8 @@
 #include "twodee/QMath.h"
 #include "twodee/Utilities.h"
 
+using namespace td;
+
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */

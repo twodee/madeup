@@ -13,14 +13,14 @@ class ExpressionBlock : public Expression {
   public:
     ExpressionBlock();
 
-    void append(Co<Expression> element);
-    Co<Expression> evaluate(Environment &env) const;
-    Co<Expression> operator[](size_t i);
+    void append(td::Co<Expression> element);
+    td::Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> operator[](size_t i);
     int getLength() const;
     void write(ostream &out) const;
 
   private:
-    std::vector<Co<Expression> > statements;
+    std::vector<td::Co<Expression> > statements;
 };
 
 /* ------------------------------------------------------------------------- */

@@ -2,6 +2,8 @@
 #include "madeup/ExpressionNumber.h"
 #include "madeup/ExpressionYaw.h"
 
+using namespace td;
+
 namespace madeup {
 
 /* ------------------------------------------------------------------------- */

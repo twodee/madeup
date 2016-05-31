@@ -12,7 +12,7 @@ class ExpressionBoolean : public ExpressionPrimitive {
   public:
     ExpressionBoolean(bool value);
 
-    Co<Expression> evaluate(Environment &env) const;
+    td::Co<Expression> evaluate(Environment &env) const;
     bool toBoolean() const;
     void write(ostream &out) const;
     std::string toString() const;

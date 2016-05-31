@@ -1,6 +1,7 @@
 #include "madeup/ExpressionClosure.h"
 
 using std::string;
+using namespace td;
 
 namespace madeup {
 

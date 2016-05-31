@@ -4,6 +4,7 @@
 using std::pair;
 using std::set;
 using std::string;
+using namespace td;
 
 namespace madeup {
 
