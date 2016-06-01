@@ -46,7 +46,7 @@ void Trackball::Start(int x, int y) {
 
 /* ------------------------------------------------------------------------- */
 
-void Trackball::Drag(int x, int y) {
+void Trackball::Drag(int x, int y, float factor) {
   mouse_delta[0] = x - mouse_at[0];
   mouse_delta[1] = y - mouse_at[1];
 
@@ -84,7 +84,7 @@ void Trackball::Drag(int x, int y) {
       dot = -1.0f;
     }
 
-    float angle = acos(dot) * 180.0f / PI;
+    float angle = acos(dot) * 180.0f / PI * factor;
     QVector3<float> axis = curr.Cross(prev);
     axis.Normalize();
 

@@ -226,7 +226,7 @@ void MadeupRenderer::LeftMouseDownAt(int x, int y) {
 /* ------------------------------------------------------------------------- */
 
 void MadeupRenderer::LeftMouseDraggedTo(int x, int y) {
-  trackball.Drag(x, y);
+  trackball.Drag(x, y, 3.0f);
   program->Bind();
   UpdateModelviewUniform();
   program->Unbind();

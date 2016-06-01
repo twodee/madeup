@@ -2,8 +2,8 @@
 #define MUPPER_WINDOW_H
 
 #include <QMainWindow>
+#include <QTextEdit>
 
-#include "ui_mupper_window.h"
 #include "MadeupCanvas.h"
 
 /* ------------------------------------------------------------------------- */
@@ -24,12 +24,13 @@ class MupperWindow : public QMainWindow {
   public slots:
     void onRun();
     void onTextChanged();
-    void setBackgroundColor();
+    void selectBackgroundColor();
+    void selectFont();
     void onFit();
 
   private:
-    Ui::MupperWindow *ui;
     QTextEdit *editor;
+    QTextEdit *console;
     MadeupCanvas *canvas;
 };
 

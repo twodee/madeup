@@ -18,7 +18,7 @@ class Trackball {
     void Autorotate();
     const QMatrix4<float>& GetMatrix() const;
     void Start(int x, int y);
-    void Drag(int x, int y);
+    void Drag(int x, int y, float factor = 1.0f);
     bool Stop();
     void SetViewport(int width, int height, int x = 0, int y = 0);
 

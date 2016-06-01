@@ -5,7 +5,7 @@ set(CMAKE_PREFIX_PATH "/Users/johnch/tarballs/Qt/5.6/clang_64")
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5OpenGL REQUIRED)
 
-qt5_wrap_ui(UI_HEADERS mupper_window.ui)
+# qt5_wrap_ui(UI_HEADERS mupper_window.ui)
 
 add_executable(mupper
   mupper.cpp
@@ -20,8 +20,8 @@ add_executable(mupper
   Utilities.cpp
   UtilitiesOpenGL.cpp
   VertexArray.cpp
-  VertexAttributes.cpp
-  ${UI_HEADERS})
+  VertexAttributes.cpp)
+  # ${UI_HEADERS})
 include_directories(mupper ${CMAKE_SOURCE_DIR}/include ${Qt5Widgets_INCLUDE_DIRS})
 target_link_libraries(mupper madeup twodee Qt5::Widgets Qt5::OpenGL ${Qt5Gui_OPENGL_LIBRARIES})
 set_target_properties(mupper PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
