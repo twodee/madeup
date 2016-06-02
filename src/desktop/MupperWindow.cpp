@@ -50,8 +50,15 @@ MupperWindow::MupperWindow(QWidget *parent) :
   editor = new QTextEdit(vertical_splitter);
   QFont font;
   font.setFamily(QStringLiteral("Courier New"));
+  font.setPointSize(18);
   editor->setFont(font);
   editor->setLineWrapMode(QTextEdit::NoWrap);
+
+  QPalette palette;
+  palette.setColor(QPalette::Window, Qt::black);
+  palette.setColor(QPalette::Base, Qt::black);
+  palette.setColor(QPalette::Text, Qt::white);
+  editor->setPalette(palette);
 
   // - Console
   console = new QTextEdit(vertical_splitter);
@@ -275,9 +282,13 @@ MupperWindow::MupperWindow(QWidget *parent) :
   this->setCentralWidget(horizontal_splitter);
 
   // Actions
-  QAction *action_run = new QAction(this);
-  action_run->setText("Run");
-  action_run->setShortcut(Qt::CTRL + Qt::Key_R);
+  QAction *action_solidify = new QAction(this);
+  action_solidify->setText("Solidify");
+  action_solidify->setShortcut(Qt::CTRL + Qt::Key_O);
+
+  QAction *action_pathify = new QAction(this);
+  action_pathify->setText("Pathify");
+  action_pathify->setShortcut(Qt::CTRL + Qt::Key_Slash);
 
   QAction *action_settings = new QAction(this);
   action_settings->setText("Show settings");
@@ -292,7 +303,8 @@ MupperWindow::MupperWindow(QWidget *parent) :
   QToolBar *toolbar = new QToolBar(this);
   toolbar->setMovable(false);
   addToolBar(Qt::TopToolBarArea, toolbar);
-  toolbar->addAction(action_run);
+  toolbar->addAction(action_solidify);
+  toolbar->addAction(action_pathify);
   toolbar->addAction(action_fit);
 
   // Status bar
@@ -320,7 +332,8 @@ MupperWindow::MupperWindow(QWidget *parent) :
 
   // Events
   connect(settings_picker, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), settings_pager, &QStackedWidget::setCurrentIndex);
-  connect(action_run, &QAction::triggered, this, &MupperWindow::onRun);
+  connect(action_solidify, &QAction::triggered, this, &MupperWindow::onRun);
+  connect(action_pathify, &QAction::triggered, this, &MupperWindow::onRun);
   connect(action_fit, &QAction::triggered, this, &MupperWindow::onFit);
   connect(background_color_button, &QPushButton::clicked, this, &MupperWindow::selectBackgroundColor);
   connect(select_font_button, &QPushButton::clicked, this, &MupperWindow::selectFont);
@@ -359,6 +372,7 @@ void MupperWindow::onRun() {
 
   std::stringstream in(source);
   Lexer lexer(in);
+  lexer.keepComments(true);
   try {
     const std::vector<Token> &tokens = lexer.lex();
     Parser parser(tokens, source);
@@ -403,6 +417,125 @@ void MupperWindow::onRun() {
 /* ------------------------------------------------------------------------- */
 
 void MupperWindow::onTextChanged() {
+  std::string source = editor->toPlainText().toStdString();
+
+  std::stringstream in(source);
+  Lexer lexer(in);
+  lexer.keepComments(true);
+
+  try {
+    lexer.lex();
+  } catch (td::MessagedException e) {
+    std::cerr << e.GetMessage() << std::endl;
+  }
+
+  const std::vector<Token> &tokens = lexer.getTokens();
+  
+  QTextCharFormat punctuation_format;
+  punctuation_format.setForeground(Qt::blue);
+
+  QTextCharFormat number_format;
+  number_format.setForeground(QColor("#CF6A4C"));
+
+  QTextCharFormat operator_format;
+  operator_format.setForeground(QColor("#CDA869"));
+
+  QTextCharFormat keyword_format;
+  keyword_format.setForeground(QColor("#CDA869"));
+
+  QTextCharFormat comment_format;
+  comment_format.setForeground(QColor("#5F5A60"));
+
+  QTextCharFormat identifier_format;
+  identifier_format.setForeground(QColor("#7587A6"));
+
+  QTextCharFormat string_format;
+  string_format.setForeground(QColor("#8F9D6A"));
+
+  QTextCharFormat comma_format;
+  comma_format.setForeground(QColor("#FFFFFF"));
+
+  editor->blockSignals(true);
+  QTextCursor cursor(editor->document());
+
+  // We skip the last two tokens (NEWLINE and END_OF_FILE) because they aren't
+  // really in the original source.
+  int ti = 0;
+  for (auto token = tokens.begin(); ti + 2 < tokens.size(); ++token, ++ti) {
+    SourceLocation location = token->getLocation();
+    cursor.setPosition(location.getStartIndex(), QTextCursor::MoveAnchor);
+    cursor.setPosition(location.getEndIndex() + 1, QTextCursor::KeepAnchor);
+
+    switch (token->getType()) {
+      case Token::COMMA:
+      case Token::LEFT_PARENTHESIS:
+      case Token::RIGHT_PARENTHESIS:
+      case Token::LEFT_CURLY_BRACE:
+      case Token::RIGHT_CURLY_BRACE:
+      case Token::LEFT_BRACKET:
+      case Token::RIGHT_BRACKET:
+        cursor.setCharFormat(comma_format);
+        break;
+      case Token::INTEGER:
+      case Token::REAL:
+      case Token::TRUE:
+      case Token::FALSE:
+      case Token::NOTHING:
+        cursor.setCharFormat(number_format);
+        break;
+      case Token::PLUS:
+      case Token::COLON:
+      case Token::MINUS:
+      case Token::TIMES:
+      case Token::DIVIDE:
+      case Token::REAL_DIVIDE:
+      case Token::CIRCUMFLEX:
+      case Token::LESS_THAN:
+      case Token::LESS_THAN_OR_EQUAL_TO:
+      case Token::GREATER_THAN:
+      case Token::GREATER_THAN_OR_EQUAL_TO:
+      case Token::EQUAL_TO:
+      case Token::NOT_EQUAL_TO:
+      case Token::REMAINDER:
+      case Token::ASSIGN:
+      case Token::PIPE:
+      case Token::RANGE:
+        cursor.setCharFormat(operator_format);
+        break;
+      case Token::AND:
+      case Token::IN:
+      case Token::AROUND:
+      case Token::THROUGH:
+      case Token::OR:
+      case Token::NOT:
+      case Token::FOR:
+      case Token::OF:
+      case Token::BY:
+      case Token::ELSE:
+      case Token::IF:
+      case Token::REPEAT:
+      case Token::END:
+      case Token::THEN:
+      case Token::WHILE:
+      case Token::TO:
+        cursor.setCharFormat(keyword_format);
+        break;
+      case Token::COMMENT:
+        cursor.setCharFormat(comment_format);
+        break;
+      case Token::ID:
+        cursor.setCharFormat(identifier_format);
+        break;
+      case Token::STRING:
+        cursor.setCharFormat(string_format);
+        break;
+      case Token::NEWLINE:
+      case Token::END_OF_FILE:
+        break;
+    }
+  }
+
+  editor->blockSignals(false);
 }
 
 /* ------------------------------------------------------------------------- */

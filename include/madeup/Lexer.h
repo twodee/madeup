@@ -16,6 +16,8 @@ class Lexer {
     const std::vector<Token> &getTokens() const;
     const std::vector<Token> &lex();
 
+    void keepComments(bool enabled);
+
   private:
     Token makeToken(Token::token_t type);
     Token getToken();
@@ -35,6 +37,7 @@ class Lexer {
     std::istream &in;
     SourceLocation location;
     std::string text_so_far;
+    bool keep_comments;
 };
 
 /* ------------------------------------------------------------------------- */

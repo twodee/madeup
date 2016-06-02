@@ -11,8 +11,10 @@ namespace madeup {
 /* ------------------------------------------------------------------------- */
 
 Lexer::Lexer(std::istream &in) :
+  tokens(),
   in(in),
-  location() {
+  location(),
+  keep_comments(false) {
   if (!in.good()) {
     throw MessagedException("bad input stream");
   }
@@ -258,8 +260,11 @@ Token Lexer::getTokenAfterMinusMinus() {
     in.putback(c);
   }
 
-  /* return Token(Token::COMMENT, text_so_far, location); */
-  return getToken();
+  if (keep_comments) {
+    return Token(Token::COMMENT, text_so_far, location);
+  } else {
+    return getToken();
+  }
 }
 
 /* ------------------------------------------------------------------------- */
@@ -465,6 +470,12 @@ Token Lexer::getTokenAfterBang() {
     ss << location.toAnchor() << ": I ran into " << text_so_far << " and I didn't know what to do with it. It's not part of the language I speak.";
     throw MessagedException(ss.str());
   }
+}
+
+/* ------------------------------------------------------------------------- */
+
+void Lexer::keepComments(bool enabled) {
+  keep_comments = enabled;
 }
 
 /* ------------------------------------------------------------------------- */
