@@ -9,7 +9,7 @@ using namespace td;
 /* ------------------------------------------------------------------------- */
 
 MadeupRenderer::MadeupRenderer() :
-  color(1.0f, 0.0f, 0.0f, 1.0f),
+  trimesh(NULL),
   background_color(100 / 255.0f, 149 / 255.0f, 237 / 255.0f, 1.0f),
   path_color(1.0f, 0.5f, 0.0f, 1.0f),
   vertex_color(0.0f, 0.0f, 0.0f, 1.0f),
@@ -31,6 +31,7 @@ MadeupRenderer::MadeupRenderer() :
 MadeupRenderer::~MadeupRenderer() {
   deletePaths();
   deleteTrimesh();
+
   delete program;
   delete heading_array;
   delete heading_attributes;
@@ -168,7 +169,8 @@ void MadeupRenderer::initializeGL() {
 
 void MadeupRenderer::setTrimesh(td::Trimesh *trimesh) {
   deletePaths();
-  delete this->trimesh;
+  deleteTrimesh();
+
   this->trimesh = trimesh;  
 
   // Create vertex attributes
@@ -290,10 +292,6 @@ void MadeupRenderer::updateShaderProgram() {
   std::cout << "fragment_src: " << fragment_src << std::endl;
 
   program = ShaderProgram::FromSource(vertex_src, fragment_src);
-
-  program->Bind();
-  program->SetUniform("color", color[0], color[1], color[2], color[3]);
-  program->Unbind();
 
   uniform_manager = new UniformManager();
   uniform_manager->SetProgram(program);
@@ -421,6 +419,9 @@ void MadeupRenderer::scroll(int nclicks) {
 
 void MadeupRenderer::setPaths(const std::vector<std::vector<madeup::Turtle> > &paths) {
   deletePaths();
+  deleteTrimesh();
+
+  setTrimesh(new Trimesh(0, 0));
 
   this->paths = paths;
   npaths = paths.size();

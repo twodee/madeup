@@ -48,7 +48,6 @@ class MadeupRenderer {
 
     td::Trimesh *trimesh;
     td::QVector2<int> window_dimensions;
-    td::QVector4<float> color;
     td::QVector4<float> background_color;
     td::QVector4<float> path_color;
     td::QVector4<float> vertex_color;

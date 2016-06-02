@@ -25,9 +25,6 @@ class MupperWindow : public QMainWindow {
     void onSolidify();
     void onPathify();
     void onTextChanged();
-    void selectBackgroundColor();
-    void selectPathColor();
-    void selectVertexColor();
     void selectFont();
     void onFit();
 
@@ -35,6 +32,8 @@ class MupperWindow : public QMainWindow {
     void selectColor(const td::QVector4<float> &initial_color,
                      std::function<void(const QColor &)> onSelect);
     void onRun(madeup::GeometryMode::geometry_mode_t mode);
+
+    static QColor toQColor(const td::QVector4<float> &color);
 
     QTextEdit *editor;
     QTextEdit *console;

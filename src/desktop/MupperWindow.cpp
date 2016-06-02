@@ -54,11 +54,12 @@ MupperWindow::MupperWindow(QWidget *parent) :
   editor->setFont(font);
   editor->setLineWrapMode(QTextEdit::NoWrap);
 
-  QPalette palette;
-  palette.setColor(QPalette::Window, Qt::black);
-  palette.setColor(QPalette::Base, Qt::black);
-  palette.setColor(QPalette::Text, Qt::white);
-  editor->setPalette(palette);
+  {
+    QPalette palette;
+    palette.setColor(QPalette::Base, Qt::black);
+    palette.setColor(QPalette::Text, Qt::white);
+    editor->setPalette(palette);
+  }
 
   // - Console
   console = new QTextEdit(vertical_splitter);
@@ -135,8 +136,18 @@ MupperWindow::MupperWindow(QWidget *parent) :
   QDoubleSpinBox *vertex_size_spinner = new QDoubleSpinBox();
   vertex_size_spinner->setValue(canvas->getRenderer()->getVertexSize());
 
-  QPushButton *path_color_button = new QPushButton("Set path color");
-  QPushButton *vertex_color_button = new QPushButton("Set vertex color");
+  /* QPushButton *path_color_button = new QPushButton("Set path color"); */
+  /* QPushButton *vertex_color_button = new QPushButton("Set vertex color"); */
+
+  QLabel *path_color_label = new QLabel("Path color");
+  QPushButton *path_color_button = new QPushButton();
+  path_color_button->setFlat(true);
+  path_color_button->setAutoFillBackground(true);
+
+  QLabel *vertex_color_label = new QLabel("Vertex color");
+  QPushButton *vertex_color_button = new QPushButton();
+  vertex_color_button->setFlat(true);
+  vertex_color_button->setAutoFillBackground(true);
 
   QLabel *face_label = new QLabel("Faces");
   QComboBox *face_picker = new QComboBox();
@@ -150,7 +161,10 @@ MupperWindow::MupperWindow(QWidget *parent) :
   style_picker->addItem("Wireframe shaded");
   style_picker->addItem("Wireframe unshaded");
 
-  QPushButton *background_color_button = new QPushButton("Set background color");
+  QLabel *background_color_label = new QLabel("Background color");
+  QPushButton *background_color_button = new QPushButton();
+  background_color_button->setFlat(true);
+  background_color_button->setAutoFillBackground(true);
 
   QSpacerItem *vertical_spacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
@@ -204,8 +218,10 @@ MupperWindow::MupperWindow(QWidget *parent) :
   path_group_layout->addWidget(path_stroke_width_spinner, 2, 1, 1, 1);
   path_group_layout->addWidget(vertex_size_label, 3, 0, 1, 1);
   path_group_layout->addWidget(vertex_size_spinner, 3, 1, 1, 1);
-  path_group_layout->addWidget(path_color_button, 4, 0, 1, 2);
-  path_group_layout->addWidget(vertex_color_button, 5, 0, 1, 2);
+  path_group_layout->addWidget(path_color_label, 4, 0, 1, 1);
+  path_group_layout->addWidget(path_color_button, 4, 1, 1, 1);
+  path_group_layout->addWidget(vertex_color_label, 5, 0, 1, 1);
+  path_group_layout->addWidget(vertex_color_button, 5, 1, 1, 1);
   path_group_layout->setColumnStretch(0, 0);
   path_group_layout->setColumnStretch(1, 1);
 
@@ -218,9 +234,10 @@ MupperWindow::MupperWindow(QWidget *parent) :
   display_page_layout->addWidget(face_picker, 2, 1, 1, 1);
   display_page_layout->addWidget(style_label, 3, 0, 1, 1);
   display_page_layout->addWidget(style_picker, 3, 1, 1, 1);
-  display_page_layout->addWidget(background_color_button, 4, 0, 1, 2);
+  display_page_layout->addWidget(background_color_label, 4, 0, 1, 1);
+  display_page_layout->addWidget(background_color_button, 4, 1, 1, 1);
   display_page_layout->addItem(vertical_spacer, 5, 0, 1, 2);
- 
+
   // Editor page
   QWidget *editor_page = new QWidget();
 
@@ -299,6 +316,17 @@ MupperWindow::MupperWindow(QWidget *parent) :
   horizontal_splitter->addWidget(settings_panel);
 
   // Overall
+ 
+  {
+    QPalette palette;
+    palette.setColor(QPalette::Button, toQColor(canvas->getRenderer()->getBackgroundColor()));
+    background_color_button->setPalette(palette);
+    palette.setColor(QPalette::Button, toQColor(canvas->getRenderer()->getPathColor()));
+    path_color_button->setPalette(palette);
+    palette.setColor(QPalette::Button, toQColor(canvas->getRenderer()->getVertexColor()));
+    vertex_color_button->setPalette(palette);
+  }
+
   this->setCentralWidget(horizontal_splitter);
 
   // Actions
@@ -355,9 +383,40 @@ MupperWindow::MupperWindow(QWidget *parent) :
   connect(action_solidify, &QAction::triggered, this, &MupperWindow::onSolidify);
   connect(action_pathify, &QAction::triggered, this, &MupperWindow::onPathify);
   connect(action_fit, &QAction::triggered, this, &MupperWindow::onFit);
-  connect(background_color_button, &QPushButton::clicked, this, &MupperWindow::selectBackgroundColor);
-  connect(path_color_button, &QPushButton::clicked, this, &MupperWindow::selectPathColor);
-  connect(vertex_color_button, &QPushButton::clicked, this, &MupperWindow::selectVertexColor);
+
+  connect(background_color_button, &QPushButton::clicked, [=](){
+    selectColor(canvas->getRenderer()->getBackgroundColor(), [=](const QColor &color) {
+      this->canvas->makeCurrent(); // no effect without this
+      this->canvas->getRenderer()->setBackgroundColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
+      this->canvas->update();
+      QPalette palette;
+      palette.setColor(QPalette::Button, color);
+      background_color_button->setPalette(palette);
+    });
+  });
+
+  connect(path_color_button, &QPushButton::clicked, [=](){
+    selectColor(canvas->getRenderer()->getPathColor(), [=](const QColor &color) {
+      this->canvas->makeCurrent(); // no effect without this
+      this->canvas->getRenderer()->setPathColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
+      this->canvas->update();
+      QPalette palette;
+      palette.setColor(QPalette::Button, color);
+      path_color_button->setPalette(palette);
+    });
+  });
+
+  connect(vertex_color_button, &QPushButton::clicked, [=](){
+    selectColor(canvas->getRenderer()->getVertexColor(), [=](const QColor &color) {
+      this->canvas->makeCurrent(); // no effect without this
+      this->canvas->getRenderer()->setVertexColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
+      this->canvas->update();
+      QPalette palette;
+      palette.setColor(QPalette::Button, color);
+      vertex_color_button->setPalette(palette);
+    });
+  });
+
   connect(select_font_button, &QPushButton::clicked, this, &MupperWindow::selectFont);
   connect(editor, &QTextEdit::textChanged, this, &MupperWindow::onTextChanged);
   connect(action_settings, &QAction::triggered, [=](bool is_checked) {
@@ -574,41 +633,9 @@ void MupperWindow::onTextChanged() {
 
 /* ------------------------------------------------------------------------- */
 
-void MupperWindow::selectBackgroundColor() {
-  selectColor(canvas->getRenderer()->getBackgroundColor(), [=](const QColor &color) {
-    this->canvas->makeCurrent(); // no effect without this
-    this->canvas->getRenderer()->setBackgroundColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
-    this->canvas->update();
-  });
-}
-
-/* ------------------------------------------------------------------------- */
-
-void MupperWindow::selectPathColor() {
-  selectColor(canvas->getRenderer()->getPathColor(), [=](const QColor &color) {
-    this->canvas->makeCurrent(); // no effect without this
-    this->canvas->getRenderer()->setPathColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
-    this->canvas->update();
-  });
-}
-
-/* ------------------------------------------------------------------------- */
-
-void MupperWindow::selectVertexColor() {
-  selectColor(canvas->getRenderer()->getVertexColor(), [=](const QColor &color) {
-    this->canvas->makeCurrent(); // no effect without this
-    this->canvas->getRenderer()->setVertexColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
-    this->canvas->update();
-  });
-}
-
-/* ------------------------------------------------------------------------- */
-
 void MupperWindow::selectColor(const td::QVector4<float> &initial_color,
                                std::function<void(const QColor &)> onSelect) {
-  td::QVector4<int> tcolor(initial_color * 255.0f);
-  QColor qcolor(tcolor[0], tcolor[1], tcolor[2], tcolor[3]);
-  QColorDialog *picker = new QColorDialog(qcolor, this); 
+  QColorDialog *picker = new QColorDialog(toQColor(initial_color), this); 
   picker->setOption(QColorDialog::ShowAlphaChannel);
   picker->setOption(QColorDialog::NoButtons);
   connect(picker, &QColorDialog::currentColorChanged, onSelect);
@@ -646,6 +673,13 @@ void MupperWindow::onSolidify() {
 
 void MupperWindow::onPathify() {
   onRun(GeometryMode::PATH);
+}
+
+/* ------------------------------------------------------------------------- */
+
+QColor MupperWindow::toQColor(const td::QVector4<float> &color) {
+  td::QVector4<int> tcolor(color * 255.0f);
+  return QColor(tcolor[0], tcolor[1], tcolor[2], tcolor[3]);
 }
 
 /* ------------------------------------------------------------------------- */
