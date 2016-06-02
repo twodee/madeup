@@ -10,6 +10,7 @@ if(APPLE)
 elseif(UNIX)
   set(WWW_ROOT "/var/www/madeup" CACHE STRING "Directory in which to install web resources")
 endif()
+set(WWW_ROOT_NEEDS_SUDO TRUE CACHE BOOL "Is sudo needed to install to www root?")
 
 if(USE_DEBUG AND CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   set(CMAKE_C_FLAGS "-pedantic -Wall -std=c99")
@@ -53,13 +54,19 @@ if(BUILD_DESKTOP)
   add_subdirectory(src/desktop)
 endif()
 
+if(WWW_ROOT_NEEDS_SUDO)
+	set(SUDO "sudo")
+else()
+	set(SUDO "")
+endif()
+
 add_custom_target(www
-  COMMAND make WWW_ROOT=${WWW_ROOT} MADEUP=$<TARGET_FILE:madeup> TWODEE=$<TARGET_FILE:twodee> MERP=$<TARGET_FILE:merp>
+  COMMAND make WWW_ROOT=${WWW_ROOT} SUDO=${SUDO} MADEUP=$<TARGET_FILE:madeup> TWODEE=$<TARGET_FILE:twodee> MERP=$<TARGET_FILE:merp>
   DEPENDS madeup twodee merp
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/www)
 
 add_custom_target(wwwdeps
-  COMMAND make WWW_ROOT=${WWW_ROOT} MADEUP=$<TARGET_FILE:madeup> TWODEE=$<TARGET_FILE:twodee> MERP=$<TARGET_FILE:merp> libdeps
+  COMMAND make WWW_ROOT=${WWW_ROOT} SUDO=${SUDO} MADEUP=$<TARGET_FILE:madeup> TWODEE=$<TARGET_FILE:twodee> MERP=$<TARGET_FILE:merp> libdeps
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/www)
 
 add_custom_target(docs
