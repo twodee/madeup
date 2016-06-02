@@ -10,6 +10,7 @@
 #include <QOpenGLFunctions_3_2_Core>
 
 #include "MadeupRenderer.h"
+#include "madeup/Environment.h"
 #include "twodee/Trimesh.h"
 
 class MadeupCanvas : public QOpenGLWidget, protected QOpenGLFunctions_3_2_Core {
@@ -19,7 +20,9 @@ class MadeupCanvas : public QOpenGLWidget, protected QOpenGLFunctions_3_2_Core {
     void initializeGL();
     void paintGL();
     void resizeGL(int width, int height);
-    void setTrimesh(td::Trimesh *trimesh);
+    /* void setTrimesh(td::Trimesh *trimesh); */
+    /* void setPaths(const std::vector<std::vector<madeup::Turtle> > &paths); */
+    /* void setPathStrokeWidth(float width); */
     MadeupRenderer *getRenderer();
 
     void mousePressEvent(QMouseEvent *event);

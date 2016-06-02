@@ -22,6 +22,8 @@ using std::stack;
 using std::string;
 using std::vector;
 
+namespace madeup {
+
 struct Node {
   td::QVector3<float> position;
   td::QVector3<float> rgb;
@@ -35,8 +37,6 @@ struct Turtle {
   td::QVector3<float> position;
   td::Camera camera;
 };
-
-namespace madeup {
 
 class ExpressionClosure;
 
@@ -101,6 +101,7 @@ class Environment {
     const Turtle &getTurtle() const;
     void setTimeout(int max_seconds);
     std::vector<Node> popPath();
+    static const std::vector<std::vector<Turtle> > getPaths();
 
   private:
     bool hasMoved() const;

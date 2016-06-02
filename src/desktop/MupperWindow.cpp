@@ -127,6 +127,17 @@ MupperWindow::MupperWindow(QWidget *parent) :
   QCheckBox *show_heading_checkbox = new QCheckBox("Show heading");
   QCheckBox *show_stops_checkbox = new QCheckBox("Show stops");
 
+  QLabel *path_stroke_width_label = new QLabel("Stroke width");
+  QDoubleSpinBox *path_stroke_width_spinner = new QDoubleSpinBox();
+  path_stroke_width_spinner->setValue(canvas->getRenderer()->getPathStrokeWidth());
+
+  QLabel *vertex_size_label = new QLabel("Vertex size");
+  QDoubleSpinBox *vertex_size_spinner = new QDoubleSpinBox();
+  vertex_size_spinner->setValue(canvas->getRenderer()->getVertexSize());
+
+  QPushButton *path_color_button = new QPushButton("Set path color");
+  QPushButton *vertex_color_button = new QPushButton("Set vertex color");
+
   QLabel *face_label = new QLabel("Faces");
   QComboBox *face_picker = new QComboBox();
   face_picker->addItem("Clockwise");
@@ -183,11 +194,20 @@ MupperWindow::MupperWindow(QWidget *parent) :
   cartesian_layout->setColumnStretch(3, 1);
   cartesian_layout->setColumnStretch(4, 1);
 
-  QVBoxLayout *path_group_layout = new QVBoxLayout(path_group);
-  path_group_layout->setSpacing(-1);
+  QGridLayout *path_group_layout = new QGridLayout(path_group);
+  path_group_layout->setHorizontalSpacing(3);
+  path_group_layout->setVerticalSpacing(4);
   path_group_layout->setContentsMargins(0, 0, 0, 0);
-  path_group_layout->addWidget(show_heading_checkbox);
-  path_group_layout->addWidget(show_stops_checkbox);
+  path_group_layout->addWidget(show_heading_checkbox, 0, 0, 1, 2);
+  path_group_layout->addWidget(show_stops_checkbox, 1, 0, 1, 2);
+  path_group_layout->addWidget(path_stroke_width_label, 2, 0, 1, 1);
+  path_group_layout->addWidget(path_stroke_width_spinner, 2, 1, 1, 1);
+  path_group_layout->addWidget(vertex_size_label, 3, 0, 1, 1);
+  path_group_layout->addWidget(vertex_size_spinner, 3, 1, 1, 1);
+  path_group_layout->addWidget(path_color_button, 4, 0, 1, 2);
+  path_group_layout->addWidget(vertex_color_button, 5, 0, 1, 2);
+  path_group_layout->setColumnStretch(0, 0);
+  path_group_layout->setColumnStretch(1, 1);
 
   QGridLayout *display_page_layout = new QGridLayout(display_page);
   display_page_layout->setSpacing(-1);
@@ -332,10 +352,12 @@ MupperWindow::MupperWindow(QWidget *parent) :
 
   // Events
   connect(settings_picker, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), settings_pager, &QStackedWidget::setCurrentIndex);
-  connect(action_solidify, &QAction::triggered, this, &MupperWindow::onRun);
-  connect(action_pathify, &QAction::triggered, this, &MupperWindow::onRun);
+  connect(action_solidify, &QAction::triggered, this, &MupperWindow::onSolidify);
+  connect(action_pathify, &QAction::triggered, this, &MupperWindow::onPathify);
   connect(action_fit, &QAction::triggered, this, &MupperWindow::onFit);
   connect(background_color_button, &QPushButton::clicked, this, &MupperWindow::selectBackgroundColor);
+  connect(path_color_button, &QPushButton::clicked, this, &MupperWindow::selectPathColor);
+  connect(vertex_color_button, &QPushButton::clicked, this, &MupperWindow::selectVertexColor);
   connect(select_font_button, &QPushButton::clicked, this, &MupperWindow::selectFont);
   connect(editor, &QTextEdit::textChanged, this, &MupperWindow::onTextChanged);
   connect(action_settings, &QAction::triggered, [=](bool is_checked) {
@@ -344,14 +366,24 @@ MupperWindow::MupperWindow(QWidget *parent) :
   connect(show_console_checkbox, &QCheckBox::stateChanged, [=](int state) {
     console->setVisible(state == Qt::Checked);
   });
+  connect(path_stroke_width_spinner, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=](double d) {
+    canvas->getRenderer()->setPathStrokeWidth((float) d);
+    canvas->update();
+  });
+  connect(vertex_size_spinner, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=](double d) {
+    canvas->getRenderer()->setVertexSize((float) d);
+    canvas->update();
+  });
 
   // Tweaks
+  editor->blockSignals(true);
   editor->setText("moveto 0, 0, 0\n"
                   "repeat 4\n"
                   "  move 10\n"
                   "  yaw 90\n"
                   "end\n"
                   "dowel\n");
+  editor->blockSignals(false);
   /* settings_panel->setVisible(false); */
 }
 
@@ -362,10 +394,14 @@ MupperWindow::~MupperWindow() {
 
 /* ------------------------------------------------------------------------- */
 
-void MupperWindow::onRun() {
+void MupperWindow::onRun(GeometryMode::geometry_mode_t geometry_mode) {
   std::string source = editor->toPlainText().toStdString();
 
-  td::Trimesh *trimesh = NULL;
+  // Clear out the old trimesh. It will be replaced with something, one way or
+  // another.
+  /* td::Trimesh *trimesh = new td::Trimesh(0, 0); */
+  /* canvas->getRenderer()->setTrimesh(trimesh); */
+
   std::stringstream cout_capturer;
   std::streambuf *old_cout_buffer = std::cout.rdbuf();
   std::cout.rdbuf(cout_capturer.rdbuf());
@@ -379,8 +415,6 @@ void MupperWindow::onRun() {
 
     td::Co<ExpressionBlock> program = parser.program();
 
-    GeometryMode::geometry_mode_t geometry_mode = GeometryMode::SURFACE;
-
     Environment env;
     env.prime();
     env.setGeometryMode(geometry_mode);
@@ -388,16 +422,16 @@ void MupperWindow::onRun() {
     rand();
 
     program->evaluate(env);
-    trimesh = env.getMesh();
 
     if (geometry_mode == GeometryMode::PATH) {
-      // TODO
+      canvas->getRenderer()->setPaths(env.getPaths());
     } else if (geometry_mode == GeometryMode::SURFACE) {
+      td::Trimesh *trimesh = env.getMesh();
       trimesh->DisconnectFaces();
-
       if (trimesh->GetVertexCount() == 0) {
         std::cout << "Uh oh. You either didn't visit any locations or didn't invoke a solidifier. I can't make any models without more information from you." << std::endl;
       }
+      canvas->getRenderer()->setTrimesh(trimesh);
     }
 
   } catch (std::bad_alloc e) {
@@ -408,10 +442,8 @@ void MupperWindow::onRun() {
 
   std::cout.rdbuf(old_cout_buffer);
   console->setText(cout_capturer.str().c_str());
-  if (!trimesh) {
-    trimesh = new td::Trimesh(0, 0);
-  }
-  canvas->setTrimesh(trimesh);
+
+  canvas->update();
 }
 
 /* ------------------------------------------------------------------------- */
@@ -536,21 +568,50 @@ void MupperWindow::onTextChanged() {
   }
 
   editor->blockSignals(false);
+
+  onRun(GeometryMode::PATH);
 }
 
 /* ------------------------------------------------------------------------- */
 
 void MupperWindow::selectBackgroundColor() {
-  td::QVector4<int> tcolor(canvas->getRenderer()->GetBackgroundColor() * 255.0f);
+  selectColor(canvas->getRenderer()->getBackgroundColor(), [=](const QColor &color) {
+    this->canvas->makeCurrent(); // no effect without this
+    this->canvas->getRenderer()->setBackgroundColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
+    this->canvas->update();
+  });
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MupperWindow::selectPathColor() {
+  selectColor(canvas->getRenderer()->getPathColor(), [=](const QColor &color) {
+    this->canvas->makeCurrent(); // no effect without this
+    this->canvas->getRenderer()->setPathColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
+    this->canvas->update();
+  });
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MupperWindow::selectVertexColor() {
+  selectColor(canvas->getRenderer()->getVertexColor(), [=](const QColor &color) {
+    this->canvas->makeCurrent(); // no effect without this
+    this->canvas->getRenderer()->setVertexColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
+    this->canvas->update();
+  });
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MupperWindow::selectColor(const td::QVector4<float> &initial_color,
+                               std::function<void(const QColor &)> onSelect) {
+  td::QVector4<int> tcolor(initial_color * 255.0f);
   QColor qcolor(tcolor[0], tcolor[1], tcolor[2], tcolor[3]);
   QColorDialog *picker = new QColorDialog(qcolor, this); 
   picker->setOption(QColorDialog::ShowAlphaChannel);
   picker->setOption(QColorDialog::NoButtons);
-  connect(picker, &QColorDialog::currentColorChanged, [=](const QColor &color) {
-    this->canvas->makeCurrent(); // no effect without this
-    this->canvas->getRenderer()->SetBackgroundColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
-    this->canvas->update();
-  });
+  connect(picker, &QColorDialog::currentColorChanged, onSelect);
   picker->setAttribute(Qt::WA_DeleteOnClose);
   picker->show();
 }
@@ -571,8 +632,20 @@ void MupperWindow::selectFont() {
 /* ------------------------------------------------------------------------- */
 
 void MupperWindow::onFit() {
-  canvas->getRenderer()->Fit();
+  canvas->getRenderer()->fit();
   canvas->update();
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MupperWindow::onSolidify() {
+  onRun(GeometryMode::SURFACE);
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MupperWindow::onPathify() {
+  onRun(GeometryMode::PATH);
 }
 
 /* ------------------------------------------------------------------------- */

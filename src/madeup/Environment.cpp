@@ -113,6 +113,15 @@ void Environment::prime() {
   shapes = new Trimesh(0, 0);
   shapes->AllocateVertexColors();
 
+  paths.clear();
+
+  turtle = {
+    QVector3<float>(0.0f),
+    Camera(QVector3<float>(0.0f, 0.0f, 0.0f),
+           QVector3<float>(0.0f, 1.0f, 0.0f),
+           QVector3<float>(0.0f, 0.0f, 1.0f))
+  };
+
   Co<Environment> globals(new Environment());;
 
   Co<ExpressionClosure> radius_closure(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine(".radius", Co<Expression>(new ExpressionReal(1.0f)))), Environment()));
@@ -1604,6 +1613,12 @@ void Environment::reframe() {
 
 GeometryMode::geometry_mode_t Environment::getGeometryMode() const {
   return geometry_mode; 
+}
+
+/* ------------------------------------------------------------------------- */
+
+const std::vector<std::vector<Turtle> > Environment::getPaths() {
+  return paths;
 }
 
 /* ------------------------------------------------------------------------- */

@@ -22,13 +22,20 @@ class MupperWindow : public QMainWindow {
     ~MupperWindow();
 
   public slots:
-    void onRun();
+    void onSolidify();
+    void onPathify();
     void onTextChanged();
     void selectBackgroundColor();
+    void selectPathColor();
+    void selectVertexColor();
     void selectFont();
     void onFit();
 
   private:
+    void selectColor(const td::QVector4<float> &initial_color,
+                     std::function<void(const QColor &)> onSelect);
+    void onRun(madeup::GeometryMode::geometry_mode_t mode);
+
     QTextEdit *editor;
     QTextEdit *console;
     MadeupCanvas *canvas;

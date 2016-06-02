@@ -18,27 +18,27 @@ MadeupCanvas::MadeupCanvas(QWidget *parent) :
 /* ------------------------------------------------------------------------- */
 
 void MadeupCanvas::paintGL() {
-  renderer->Render();
+  renderer->render();
 }
 
 /* ------------------------------------------------------------------------- */
 
 void MadeupCanvas::initializeGL() {
   initializeOpenGLFunctions();
-  renderer->InitializeGL();
+  renderer->initializeGL();
 }
 
 /* ------------------------------------------------------------------------- */
 
-void MadeupCanvas::setTrimesh(td::Trimesh *trimesh) {
-  renderer->SetTrimesh(trimesh);
-  update();
-}
+/* void MadeupCanvas::setTrimesh(td::Trimesh *trimesh) { */
+  /* renderer->setTrimesh(trimesh); */
+  /* update(); */
+/* } */
 
 /* ------------------------------------------------------------------------- */
 
 void MadeupCanvas::resizeGL(int width, int height) {
-  renderer->Resize(width, height);
+  renderer->resize(width, height);
   update();
 }
 
@@ -52,7 +52,7 @@ MadeupRenderer *MadeupCanvas::getRenderer() {
 
 void MadeupCanvas::mousePressEvent(QMouseEvent *event) {
   /* makeCurrent(); */
-  renderer->LeftMouseDownAt(event->x(), height() - event->y());
+  renderer->leftMouseDownAt(event->x(), height() - event->y());
   update();
 }
 
@@ -60,7 +60,7 @@ void MadeupCanvas::mousePressEvent(QMouseEvent *event) {
 
 void MadeupCanvas::mouseMoveEvent(QMouseEvent *event) {
   /* makeCurrent(); */
-  renderer->LeftMouseDraggedTo(event->x(), height() - event->y());
+  renderer->leftMouseDraggedTo(event->x(), height() - event->y());
   update();
 }
 
@@ -68,16 +68,30 @@ void MadeupCanvas::mouseMoveEvent(QMouseEvent *event) {
 
 void MadeupCanvas::mouseReleaseEvent(QMouseEvent *event) {
   /* makeCurrent(); */
-  renderer->LeftMouseUpAt(event->x(), height() - event->y());
+  renderer->leftMouseUpAt(event->x(), height() - event->y());
   update();
 }
 
 /* ------------------------------------------------------------------------- */
 
 void MadeupCanvas::wheelEvent(QWheelEvent *event) {
-  renderer->Scroll(event->angleDelta().y());
+  renderer->scroll(event->angleDelta().y());
   update();
 }
+
+/* ------------------------------------------------------------------------- */
+
+/* void MadeupCanvas::setPaths(const std::vector<std::vector<madeup::Turtle> > &paths) { */
+  /* renderer->setPaths(paths); */
+  /* update(); */
+/* } */
+
+/* ------------------------------------------------------------------------- */
+
+/* void MadeupCanvas::setPathStrokeWidth(float width) { */
+  /* renderer->setPathStrokeWidth(width); */
+  /* update(); */
+/* } */
 
 /* ------------------------------------------------------------------------- */
 
