@@ -22,6 +22,8 @@ class Trackball {
     bool Stop();
     void SetViewport(int width, int height, int x = 0, int y = 0);
 
+    const QVector2<int> &GetDelta() const;
+
   private:
     td::QMatrix4<float> to_rotation;
 

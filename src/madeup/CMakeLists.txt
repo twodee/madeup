@@ -95,6 +95,7 @@ add_library(madeup
   ExpressionSurface.cpp
   ExpressionTangent.cpp
   ExpressionTranslate.cpp
+  ExpressionTransform.cpp
   ExpressionTube.cpp
   ExpressionUnit.cpp
   ExpressionWhere.cpp

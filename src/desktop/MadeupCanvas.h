@@ -8,6 +8,7 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLFunctions_3_2_Core>
+#include <QTimer>
 
 #include "MadeupRenderer.h"
 #include "madeup/Environment.h"
@@ -20,10 +21,7 @@ class MadeupCanvas : public QOpenGLWidget, protected QOpenGLFunctions_3_2_Core {
     void initializeGL();
     void paintGL();
     void resizeGL(int width, int height);
-    /* void setTrimesh(td::Trimesh *trimesh); */
-    /* void setPaths(const std::vector<std::vector<madeup::Turtle> > &paths); */
-    /* void setPathStrokeWidth(float width); */
-    MadeupRenderer *getRenderer();
+    MadeupRenderer &getRenderer();
 
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
@@ -31,7 +29,8 @@ class MadeupCanvas : public QOpenGLWidget, protected QOpenGLFunctions_3_2_Core {
     void wheelEvent(QWheelEvent *event);
 
   private:
-    MadeupRenderer *renderer;
+    QTimer auto_rotate_timer;
+    MadeupRenderer renderer;
 };
 
 #endif // CANVAS_H

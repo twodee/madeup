@@ -117,4 +117,10 @@ void Trackball::SetViewport(int width, int height, int x, int y) {
 
 /* ------------------------------------------------------------------------- */
 
+const QVector2<int> &Trackball::GetDelta() const {
+  return mouse_delta;
+}
+
+/* ------------------------------------------------------------------------- */
+
 }

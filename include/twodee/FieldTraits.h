@@ -3,11 +3,11 @@
 
 #include <limits>
 
-/* #include "Configuration.h" */
+#include "twodee/Configuration.h"
 #include "FieldType.h"
 
 #ifdef USE_MAGICK
-#include <ImageMagick/Magick++.h>
+#include <Magick++.h>
 #endif
 
 namespace td {

@@ -102,6 +102,7 @@ class Environment {
     void setTimeout(int max_seconds);
     std::vector<Node> popPath();
     static const std::vector<std::vector<Turtle> > getPaths();
+    td::QMatrix4<float> getTransform() const;
 
   private:
     bool hasMoved() const;

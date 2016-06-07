@@ -2,7 +2,7 @@
 
 #include "Log.h"
 #include "ShaderProgram.h"
-#include "Utilities.h"
+#include "twodee/Utilities.h"
 
 namespace td {
 

@@ -56,6 +56,7 @@
 #include "madeup/ExpressionSize.h"
 #include "madeup/ExpressionSurface.h"
 #include "madeup/ExpressionTangent.h"
+#include "madeup/ExpressionTransform.h"
 #include "madeup/ExpressionTranslate.h"
 #include "madeup/ExpressionTube.h"
 #include "madeup/ExpressionWhere.h"
@@ -113,7 +114,13 @@ void Environment::prime() {
   shapes = new Trimesh(0, 0);
   shapes->AllocateVertexColors();
 
+  run.clear();
+
   paths.clear();
+  paths.push_back(vector<Turtle>());
+
+  xforms = std::stack<QMatrix4<float> >();
+  xforms.push(QMatrix4<float>(1.0f));
 
   turtle = {
     QVector3<float>(0.0f),
@@ -278,6 +285,9 @@ void Environment::prime() {
   Co<ExpressionDefine> define_echo(new ExpressionDefine("echo", Co<Expression>(new ExpressionEcho())));
   define_echo->addFormal("mesh");
 
+  Co<ExpressionDefine> define_transform(new ExpressionDefine("transform", Co<Expression>(new ExpressionTransform())));
+  define_transform->addFormal("mesh");
+
   Co<ExpressionDefine> define_coalesce(new ExpressionDefine("coalesce", Co<Expression>(new ExpressionCoalesce())));
   define_coalesce->addFormal("threshold");
 
@@ -381,6 +391,7 @@ void Environment::prime() {
   add("reverse", Co<ExpressionClosure>(new ExpressionClosure(define_reverse, globals)));
   add("center", Co<ExpressionClosure>(new ExpressionClosure(define_center, globals)));
   add("echo", Co<ExpressionClosure>(new ExpressionClosure(define_echo, globals)));
+  add("transform", Co<ExpressionClosure>(new ExpressionClosure(define_transform, globals)));
   add("coalesce", Co<ExpressionClosure>(new ExpressionClosure(define_coalesce, globals)));
   add("axis", Co<ExpressionClosure>(new ExpressionClosure(define_axis, globals)));
   add("blobs", Co<ExpressionClosure>(new ExpressionClosure(define_blobs, globals)));
@@ -437,6 +448,7 @@ void Environment::prime() {
   globals->add("reverse", (*this)["reverse"]);
   globals->add("center", (*this)["center"]);
   globals->add("echo", (*this)["echo"]);
+  globals->add("transform", (*this)["transform"]);
   globals->add("coalesce", (*this)["coalesce"]);
   globals->add("axis", (*this)["axis"]);
   globals->add("surface", (*this)["surface"]);
@@ -463,9 +475,6 @@ void Environment::prime() {
   globals->add("forward", (*this)["forward"]);
   globals->add("right", (*this)["right"]);
   globals->add("up", (*this)["up"]);
-
-  xforms.push(QMatrix4<float>(1.0f));
-  paths.push_back(vector<Turtle>());
 }
 
 /* ------------------------------------------------------------------------- */
@@ -658,7 +667,7 @@ void Environment::identity() {
 
 void Environment::home() {
   if (run.size() == 0) {
-    throw new MessagedException("No home to return to.");
+    throw MessagedException("No home to return to.");
   }
 
   turtle.position = (*run.begin()).position;
@@ -1619,6 +1628,12 @@ GeometryMode::geometry_mode_t Environment::getGeometryMode() const {
 
 const std::vector<std::vector<Turtle> > Environment::getPaths() {
   return paths;
+}
+
+/* ------------------------------------------------------------------------- */
+
+td::QMatrix4<float> Environment::getTransform() const {
+  return xforms.top();
 }
 
 /* ------------------------------------------------------------------------- */

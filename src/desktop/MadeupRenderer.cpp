@@ -10,7 +10,8 @@ using namespace td;
 
 MadeupRenderer::MadeupRenderer() :
   trimesh(NULL),
-  background_color(100 / 255.0f, 149 / 255.0f, 237 / 255.0f, 1.0f),
+  background_color(1.0f),
+  /* background_color(100 / 255.0f, 149 / 255.0f, 237 / 255.0f, 1.0f), */
   path_color(1.0f, 0.5f, 0.0f, 1.0f),
   vertex_color(0.0f, 0.0f, 0.0f, 1.0f),
   program(NULL),
@@ -23,7 +24,10 @@ MadeupRenderer::MadeupRenderer() :
   npaths(0),
   paths_bounding_box(td::QVector3<float>(0.0f), td::QVector3<float>(0.0f)),
   path_stroke_width(4.0f),
-  vertex_size(6.0f) {
+  vertex_size(6.0f),
+  show_heading(true),
+  show_stops(true),
+  face_orientation(FaceOrientation::COUNTERCLOCKWISE) {
 }
 
 /* ------------------------------------------------------------------------- */
@@ -54,22 +58,23 @@ void MadeupRenderer::render() {
   glLineWidth(path_stroke_width);
   glPointSize(vertex_size);
 
-  heading_program->Bind();
-  heading_program->SetUniform("projection", camera.GetProjectionMatrix());
-  heading_program->SetUniform("color", path_color[0], path_color[1], path_color[2], path_color[3]);
-  heading_array->Bind();
-  for (int i = 0; i < npaths; ++i) {
-    const vector<madeup::Turtle> &path = paths[i];
-    if (path.size() > 0) {
-      const td::QVector3<float> last = path[path.size() - 1].position;
-      td::QMatrix4<float> r = path[path.size() - 1].camera.GetViewMatrix().GetOrthonormalInverse();
-      heading_program->SetUniform("modelview", camera.GetViewMatrix() * trackball.GetMatrix() * to_center * td::QMatrix4<float>::GetTranslate(last[0], last[1], last[2]) * r);
-      heading_array->DrawIndexed(GL_TRIANGLES);
+  if (show_heading) {
+    heading_program->Bind();
+    heading_program->SetUniform("projection", camera.GetProjectionMatrix());
+    heading_program->SetUniform("color", path_color[0], path_color[1], path_color[2], path_color[3]);
+    heading_array->Bind();
+    for (int i = 0; i < npaths; ++i) {
+      const vector<madeup::Turtle> &path = paths[i];
+      if (path.size() > 0) {
+        const td::QVector3<float> last = path[path.size() - 1].position;
+        td::QMatrix4<float> r = path[path.size() - 1].camera.GetViewMatrix().GetOrthonormalInverse();
+        heading_program->SetUniform("modelview", camera.GetViewMatrix() * trackball.GetMatrix() * to_center * td::QMatrix4<float>::GetTranslate(last[0], last[1], last[2]) * r);
+        heading_array->DrawIndexed(GL_TRIANGLES);
+      }
     }
+    heading_array->Unbind();
+    heading_program->Unbind();
   }
-  heading_array->Unbind();
-
-  heading_program->Unbind();
 
   path_program->Bind();
 
@@ -84,10 +89,12 @@ void MadeupRenderer::render() {
     path_arrays[i]->Unbind();
     glDepthMask(GL_TRUE);
 
-    path_program->SetUniform("color", vertex_color[0], vertex_color[1], vertex_color[2], vertex_color[3]);
-    path_arrays[i]->Bind();
-    path_arrays[i]->DrawSequence(GL_POINTS);
-    path_arrays[i]->Unbind();
+    if (show_stops) {
+      path_program->SetUniform("color", vertex_color[0], vertex_color[1], vertex_color[2], vertex_color[3]);
+      path_arrays[i]->Bind();
+      path_arrays[i]->DrawSequence(GL_POINTS);
+      path_arrays[i]->Unbind();
+    }
   }
 
   glDisable(GL_DEPTH_TEST);
@@ -103,6 +110,7 @@ void MadeupRenderer::initializeGL() {
   glClearColor(background_color[0], background_color[1], background_color[2], background_color[3]);
   glClearDepth(1.0);
   glDepthFunc(GL_LESS);
+  setFaceOrientation(face_orientation);
 
   float positions[] = {
     -0.5f, 0.0f, 0.0f,
@@ -288,8 +296,8 @@ void MadeupRenderer::updateShaderProgram() {
     "  gl_FragColor = vec4(vec3(n_dot_l) * fcolor.rgb, fcolor.a);\n"
     "}\n";
 
-  std::cout << "vertex_src: " << vertex_src << std::endl;
-  std::cout << "fragment_src: " << fragment_src << std::endl;
+  std::cerr << "vertex_src: " << vertex_src << std::endl;
+  std::cerr << "fragment_src: " << fragment_src << std::endl;
 
   program = ShaderProgram::FromSource(vertex_src, fragment_src);
 
@@ -401,8 +409,11 @@ void MadeupRenderer::leftMouseDraggedTo(int x, int y) {
 
 /* ------------------------------------------------------------------------- */
 
-void MadeupRenderer::leftMouseUpAt(int x, int y) {
+float MadeupRenderer::leftMouseUpAt(int x, int y) {
   trackball.Stop();
+  const td::QVector2<int> &delta = trackball.GetDelta();
+  float magnitude = sqrtf(delta[0] * delta[0] + delta[1] * delta[1]);
+  return magnitude;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -426,16 +437,10 @@ void MadeupRenderer::setPaths(const std::vector<std::vector<madeup::Turtle> > &p
   this->paths = paths;
   npaths = paths.size();
 
-  for (int pi = 0; pi < npaths; ++pi) {
-    std::cout << "paths[" << pi << "].size(): " << paths[pi].size() << std::endl;
-  }
-
   if (npaths) {
-    std::cerr << "npaths: " << npaths << std::endl;
     path_arrays = new VertexArray*[npaths];
     path_attributes = new VertexAttributes*[npaths];
 
-    std::cerr << "paths[0].size(): " << paths[0].size() << std::endl;
     td::QVector3<float> min = paths[0].size() > 0 ? paths[0][0].position : td::QVector3<float>(0.0f);
     td::QVector3<float> max = min;
 
@@ -516,6 +521,104 @@ void MadeupRenderer::deleteTrimesh() {
   vertex_array = NULL;
   vertex_attributes = NULL;
   trimesh = NULL;
+}
+
+/* ------------------------------------------------------------------------- */
+
+bool MadeupRenderer::showHeading() const {
+  return show_heading;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::showHeading(bool show) {
+  show_heading = show;
+  // Effect will be seen next frame.
+}
+
+/* ------------------------------------------------------------------------- */
+
+bool MadeupRenderer::showStops() const {
+  return show_stops;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::showStops(bool show) {
+  show_stops = show;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::setFaceOrientation(int orientation) {
+  if (orientation == FaceOrientation::COUNTERCLOCKWISE) {
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+  } else if (orientation == FaceOrientation::CLOCKWISE) {
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+  } else if (orientation == FaceOrientation::BOTH) {
+    glDisable(GL_CULL_FACE);
+  } else if (orientation == FaceOrientation::NONE) {
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT_AND_BACK);
+  } else {
+    std::cerr << "bad face orientation: " << orientation << std::endl;
+    return;
+  }
+  face_orientation = orientation;
+}
+
+/* ------------------------------------------------------------------------- */
+
+int MadeupRenderer::getFaceOrientation() const {
+  return face_orientation;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::setFaceStyle(int style) {
+  if (style == FaceStyle::FILLED) {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  } else if (style == FaceStyle::WIREFRAME) {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  } else if (style == FaceStyle::VERTICES) {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+  } else {
+    std::cerr << "bad face style: " << style << std::endl;
+    return;
+  }
+  face_style = style;
+}
+
+/* ------------------------------------------------------------------------- */
+
+int MadeupRenderer::getFaceStyle() const {
+  return face_style; 
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::takeScreenshot(const std::string &path) {
+  NField<unsigned char, 2> image(window_dimensions, 4);
+  glPixelStorei(GL_PACK_ALIGNMENT, 1);
+  /* glPixelStorei(GL_PACK_ROW_LENGTH, window_dimensions[0]); */
+  /* glPixelStorei(GL_PACK_IMAGE_HEIGHT, window_dimensions[1]); */
+  glReadPixels(0, 0, window_dimensions[0], window_dimensions[1], GL_RGBA, GL_UNSIGNED_BYTE, image(0));
+  image.Write(path);
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::exportTrimesh(const std::string &path) {
+  trimesh->WriteObj(path);
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::autoRotate() {
+  trackball.Autorotate(); 
+  updateModelviewUniform();  
 }
 
 /* ------------------------------------------------------------------------- */

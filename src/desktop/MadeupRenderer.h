@@ -8,11 +8,34 @@
 #include "UniformManager.h"
 #include "Trackball.h"
 
+namespace FaceOrientation {
+  enum {
+    COUNTERCLOCKWISE,
+    CLOCKWISE,
+    BOTH,
+    NONE
+  };
+}
+
+namespace FaceStyle {
+  enum {
+    FILLED,
+    WIREFRAME,
+    VERTICES
+  };
+}
+
 class MadeupRenderer {
   public:
+
     MadeupRenderer();
     ~MadeupRenderer();
 
+    void setFaceOrientation(int orientation);
+    int getFaceOrientation() const;
+    void setFaceStyle(int style);
+    int getFaceStyle() const;
+    void exportTrimesh(const std::string &path);
     void setTrimesh(td::Trimesh *trimesh);
     void setPaths(const std::vector<std::vector<madeup::Turtle> > &paths);
     float getPathStrokeWidth() const;
@@ -29,11 +52,17 @@ class MadeupRenderer {
     void setBackgroundColor(const td::QVector4<float> &color);
     void setPathColor(const td::QVector4<float> &color);
     void setVertexColor(const td::QVector4<float> &color);
+    void showHeading(bool show);
+    bool showHeading() const;
+    void showStops(bool show);
+    bool showStops() const;
 
     void leftMouseDownAt(int x, int y);
     void leftMouseDraggedTo(int x, int y);
-    void leftMouseUpAt(int x, int y);
+    float leftMouseUpAt(int x, int y);
     void scroll(int nclicks);
+    void takeScreenshot(const std::string &path);
+    void autoRotate();
 
   private:
     void deletePaths();
@@ -78,6 +107,11 @@ class MadeupRenderer {
     float radius;
     float path_stroke_width;
     float vertex_size;
+
+    bool show_heading;
+    bool show_stops;
+    int face_orientation;
+    int face_style;
 };
 
 #endif

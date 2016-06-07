@@ -3,6 +3,10 @@ project(madeup)
 
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
 
+configure_file(${CMAKE_SOURCE_DIR}/include/twodee/Configuration.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/twodee/Configuration.h @ONLY)
+
+include_directories(${CMAKE_BINARY_DIR}/include)
+
 option(USE_DEBUG "Enable debug information" ON)
 
 if(APPLE)
@@ -11,6 +15,20 @@ elseif(UNIX)
   set(WWW_ROOT "/var/www/madeup" CACHE STRING "Directory in which to install web resources")
 endif()
 set(WWW_ROOT_NEEDS_SUDO TRUE CACHE BOOL "Is sudo needed to install to www root?")
+
+option(USE_MAGICK "Enable ImageMagick" ON)
+if(USE_MAGICK)
+  find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
+  # find_package(GraphicsMagick COMPONENTS Magick++) 
+  if(IMAGEMAGICK_FOUND)
+    add_definitions(-DMAGICKCORE_HDRI_ENABLE=0)
+    add_definitions(-DMAGICKCORE_QUANTUM_DEPTH=16)
+    # Why do I need explicitly add the following line?
+    include_directories(${ImageMagick_INCLUDE_DIRS} /usr/local/include)
+    message("ImageMagick Libraries ${ImageMagick_LIBRARIES}")
+    message("ImageMagick Libraries ${ImageMagick_INCLUDE_DIRS}")
+  endif(IMAGEMAGICK_FOUND)
+endif(USE_MAGICK)
 
 if(USE_DEBUG AND CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   set(CMAKE_C_FLAGS "-pedantic -Wall -std=c99")

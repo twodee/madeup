@@ -1,11 +1,16 @@
 #include <iostream>
 #include <sstream>
+
+#include <boost/property_tree/json_parser.hpp>
+
 #include <QApplication>
 #include <QColorDialog>
 #include <QComboBox>
+#include <QDesktopServices>
 #include <QDoubleSpinBox>
 #include <QGroupBox>
 #include <QCheckBox>
+#include <QFileDialog>
 #include <QFontDialog>
 #include <QFormLayout>
 #include <QLabel>
@@ -29,6 +34,7 @@
 #include "twodee/QVector3.h"
 
 using namespace madeup;
+namespace pt = boost::property_tree;
 
 /* ------------------------------------------------------------------------- */
 
@@ -36,6 +42,9 @@ MupperWindow::MupperWindow(QWidget *parent) :
   QMainWindow(parent),
   editor(nullptr),
   canvas(nullptr) {
+
+  config_path = (QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + QDir::separator() + "madeup_preferences.json").toStdString();
+  std::cout << "config_path: " << config_path << std::endl;
 
   resize(1200, 600);
 
@@ -54,16 +63,17 @@ MupperWindow::MupperWindow(QWidget *parent) :
   editor->setFont(font);
   editor->setLineWrapMode(QTextEdit::NoWrap);
 
+  // - Console
+  console = new QTextEdit(vertical_splitter);
+  console->setFont(font);
+
   {
     QPalette palette;
     palette.setColor(QPalette::Base, Qt::black);
     palette.setColor(QPalette::Text, Qt::white);
     editor->setPalette(palette);
+    console->setPalette(palette);
   }
-
-  // - Console
-  console = new QTextEdit(vertical_splitter);
-  console->setFont(font);
 
   QSizePolicy p1(QSizePolicy::Preferred, QSizePolicy::Preferred);
   p1.setHorizontalStretch(0);
@@ -126,15 +136,17 @@ MupperWindow::MupperWindow(QWidget *parent) :
 
   QGroupBox *path_group = new QGroupBox("Path");
   QCheckBox *show_heading_checkbox = new QCheckBox("Show heading");
+  show_heading_checkbox->setCheckState(canvas->getRenderer().showHeading() ? Qt::Checked : Qt::Unchecked);
   QCheckBox *show_stops_checkbox = new QCheckBox("Show stops");
+  show_stops_checkbox->setCheckState(canvas->getRenderer().showStops() ? Qt::Checked : Qt::Unchecked);
 
   QLabel *path_stroke_width_label = new QLabel("Stroke width");
-  QDoubleSpinBox *path_stroke_width_spinner = new QDoubleSpinBox();
-  path_stroke_width_spinner->setValue(canvas->getRenderer()->getPathStrokeWidth());
+  path_stroke_width_spinner = new QDoubleSpinBox();
+  path_stroke_width_spinner->setMinimum(1.0);
 
   QLabel *vertex_size_label = new QLabel("Vertex size");
-  QDoubleSpinBox *vertex_size_spinner = new QDoubleSpinBox();
-  vertex_size_spinner->setValue(canvas->getRenderer()->getVertexSize());
+  vertex_size_spinner = new QDoubleSpinBox();
+  vertex_size_spinner->setMinimum(1.0);
 
   /* QPushButton *path_color_button = new QPushButton("Set path color"); */
   /* QPushButton *vertex_color_button = new QPushButton("Set vertex color"); */
@@ -151,15 +163,18 @@ MupperWindow::MupperWindow(QWidget *parent) :
 
   QLabel *face_label = new QLabel("Faces");
   QComboBox *face_picker = new QComboBox();
-  face_picker->addItem("Clockwise");
   face_picker->addItem("Counterclockwise");
+  face_picker->addItem("Clockwise");
   face_picker->addItem("Both");
+  face_picker->addItem("None");
+  face_picker->setCurrentIndex(canvas->getRenderer().getFaceOrientation());
 
   QLabel *style_label = new QLabel("Style");
   QComboBox *style_picker = new QComboBox();
-  style_picker->addItem("Solid shaded");
-  style_picker->addItem("Wireframe shaded");
-  style_picker->addItem("Wireframe unshaded");
+  style_picker->addItem("Filled");
+  style_picker->addItem("Wireframe");
+  style_picker->addItem("Vertices");
+  style_picker->setCurrentIndex(canvas->getRenderer().getFaceStyle());
 
   QLabel *background_color_label = new QLabel("Background color");
   QPushButton *background_color_button = new QPushButton();
@@ -210,7 +225,7 @@ MupperWindow::MupperWindow(QWidget *parent) :
 
   QGridLayout *path_group_layout = new QGridLayout(path_group);
   path_group_layout->setHorizontalSpacing(3);
-  path_group_layout->setVerticalSpacing(4);
+  path_group_layout->setVerticalSpacing(5);
   path_group_layout->setContentsMargins(0, 0, 0, 0);
   path_group_layout->addWidget(show_heading_checkbox, 0, 0, 1, 2);
   path_group_layout->addWidget(show_stops_checkbox, 1, 0, 1, 2);
@@ -319,11 +334,11 @@ MupperWindow::MupperWindow(QWidget *parent) :
  
   {
     QPalette palette;
-    palette.setColor(QPalette::Button, toQColor(canvas->getRenderer()->getBackgroundColor()));
+    palette.setColor(QPalette::Button, toQColor(canvas->getRenderer().getBackgroundColor()));
     background_color_button->setPalette(palette);
-    palette.setColor(QPalette::Button, toQColor(canvas->getRenderer()->getPathColor()));
+    palette.setColor(QPalette::Button, toQColor(canvas->getRenderer().getPathColor()));
     path_color_button->setPalette(palette);
-    palette.setColor(QPalette::Button, toQColor(canvas->getRenderer()->getVertexColor()));
+    palette.setColor(QPalette::Button, toQColor(canvas->getRenderer().getVertexColor()));
     vertex_color_button->setPalette(palette);
   }
 
@@ -332,20 +347,50 @@ MupperWindow::MupperWindow(QWidget *parent) :
   // Actions
   QAction *action_solidify = new QAction(this);
   action_solidify->setText("Solidify");
-  action_solidify->setShortcut(Qt::CTRL + Qt::Key_O);
+  action_solidify->setShortcut(Qt::CTRL + Qt::Key_R);
 
   QAction *action_pathify = new QAction(this);
   action_pathify->setText("Pathify");
-  action_pathify->setShortcut(Qt::CTRL + Qt::Key_Slash);
+  action_pathify->setShortcut(Qt::CTRL + Qt::Key_E);
 
   QAction *action_settings = new QAction(this);
   action_settings->setText("Show settings");
   action_settings->setShortcut(Qt::CTRL + Qt::Key_P);
   action_settings->setCheckable(true);
 
+  QAction *action_documentation = new QAction(this);
+  action_documentation->setText("Documentation");
+
   QAction *action_fit = new QAction(this);
   action_fit->setText("Fit");
   action_fit->setShortcut(Qt::CTRL + Qt::Key_F);
+
+  QAction *action_screenshot = new QAction(this);
+  action_screenshot->setText("Take screenshot");
+  action_screenshot->setShortcut(Qt::CTRL + Qt::Key_T);
+
+  QAction *action_new = new QAction(this);
+  action_new->setText("New window");
+  action_new->setShortcut(Qt::CTRL + Qt::Key_N);
+
+  QAction *action_open = new QAction(this);
+  action_open->setText("Open");
+  action_open->setShortcut(Qt::CTRL + Qt::Key_O);
+
+  QAction *action_save = new QAction(this);
+  action_save->setText("Save");
+  action_save->setShortcut(Qt::CTRL + Qt::Key_S);
+
+  QAction *action_save_as = new QAction(this);
+  action_save_as->setText("Save as");
+  action_save_as->setShortcut(Qt::SHIFT + Qt::CTRL + Qt::Key_S);
+
+  QAction *action_close = new QAction(this);
+  action_close->setText("Close");
+  action_close->setShortcut(Qt::CTRL + Qt::Key_W);
+
+  QAction *action_export = new QAction(this);
+  action_export->setText("Export OBJ");
 
   // Toolbar
   QToolBar *toolbar = new QToolBar(this);
@@ -365,30 +410,114 @@ MupperWindow::MupperWindow(QWidget *parent) :
 
   QMenu *menuFile = new QMenu(menuBar);
   menuFile->setTitle("File");
-  menuFile->addAction(new QAction("&Open", this));
-  menuFile->addAction(new QAction("&Save", this));
+  menuFile->addAction(action_open);
+  menuFile->addAction(action_save);
+  menuFile->addAction(action_save_as);
+  menuFile->addAction(action_close);
+  menuFile->addAction(action_new);
+  menuFile->addSeparator();
+  menuFile->addAction(action_export);
 
   QMenu *menuView = new QMenu(menuBar);
   menuView->setTitle("View");
   menuView->addAction(action_settings);
+  menuView->addAction(action_screenshot);
+
+  QMenu *menuHelp = new QMenu(menuBar);
+  menuHelp->setTitle("Help");
+  menuHelp->addAction(action_documentation);
 
   setWindowTitle("Madeup");
   menuFile->setTitle("File");
   menuView->setTitle("View");
   menuBar->addAction(menuFile->menuAction());
   menuBar->addAction(menuView->menuAction());
+  menuBar->addAction(menuHelp->menuAction());
 
   // Events
   connect(settings_picker, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), settings_pager, &QStackedWidget::setCurrentIndex);
   connect(action_solidify, &QAction::triggered, this, &MupperWindow::onSolidify);
   connect(action_pathify, &QAction::triggered, this, &MupperWindow::onPathify);
   connect(action_fit, &QAction::triggered, this, &MupperWindow::onFit);
+  connect(select_font_button, &QPushButton::clicked, this, &MupperWindow::selectFont);
+  connect(editor, &QTextEdit::textChanged, this, &MupperWindow::onTextChanged);
+
+  connect(face_picker, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=](int i) {
+    canvas->makeCurrent(); // no effect without this
+    canvas->getRenderer().setFaceOrientation(i);
+    canvas->update();
+  });
+
+  connect(style_picker, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=](int i) {
+    canvas->makeCurrent(); // no effect without this
+    canvas->getRenderer().setFaceStyle(i);
+    canvas->update();
+  });
+
+  connect(action_documentation, &QAction::triggered, [=]() {
+    QDesktopServices::openUrl(QUrl("http://madeup.xyz/docs/introduction.html"));
+  });
+
+  connect(action_screenshot, &QAction::triggered, this, [=]() {
+    canvas->makeCurrent();
+    QString path = QFileDialog::getSaveFileName(this, "Save Screenshot", QDir::homePath(), "Images (*.png *.jpg *.gif)");
+    if (!path.isEmpty()) {
+      canvas->makeCurrent();
+      canvas->getRenderer().takeScreenshot(path.toStdString());
+    }
+  });
+
+  connect(action_open, &QAction::triggered, [=]() {
+    QString path = QFileDialog::getOpenFileName(this, "Open File", QDir::homePath(), "Madeup Programs (*.mup)");
+    if (!path.isEmpty()) {
+      mup_path = path;
+      std::string source = td::Utilities::Slurp(path.toStdString());
+      editor->setText(source.c_str());
+      this->setWindowTitle(("Madeup: " + mup_path.toStdString()).c_str());
+    }
+  });
+
+  connect(action_close, &QAction::triggered, [=]() {
+    close();
+  });
+
+  connect(action_save, &QAction::triggered, [=]() {
+    if (!mup_path.isEmpty()) {
+      saveAs(mup_path); 
+    } else {
+      QString path = QFileDialog::getSaveFileName(this, "Save File", QDir::homePath(), "Madeup Programs (*.mup)");
+      if (!path.isEmpty()) {
+        saveAs(path); 
+      }
+    }
+  });
+
+  connect(action_save_as, &QAction::triggered, [=]() {
+    QString path = QFileDialog::getSaveFileName(this, "Save File", QDir::homePath(), "Madeup Programs (*.mup)");
+    if (!path.isEmpty()) {
+      saveAs(path);
+    }
+  });
+
+  connect(action_new, &QAction::triggered, [=]() {
+    MupperWindow *new_window = new MupperWindow();
+    // This window has no parent, so who's gonna delete it? Itself.
+    new_window->setAttribute(Qt::WA_DeleteOnClose);
+    new_window->show();
+  });
+
+  connect(action_export, &QAction::triggered, [=]() {
+    QString path = QFileDialog::getSaveFileName(this, "Export File", QDir::homePath(), "Wavefront OBJ Files (*.obj)");
+    if (!path.isEmpty()) {
+      canvas->getRenderer().exportTrimesh(path.toStdString());
+    }
+  });
 
   connect(background_color_button, &QPushButton::clicked, [=](){
-    selectColor(canvas->getRenderer()->getBackgroundColor(), [=](const QColor &color) {
-      this->canvas->makeCurrent(); // no effect without this
-      this->canvas->getRenderer()->setBackgroundColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
-      this->canvas->update();
+    selectColor(canvas->getRenderer().getBackgroundColor(), [=](const QColor &color) {
+      canvas->makeCurrent(); // no effect without this
+      canvas->getRenderer().setBackgroundColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
+      canvas->update();
       QPalette palette;
       palette.setColor(QPalette::Button, color);
       background_color_button->setPalette(palette);
@@ -396,9 +525,9 @@ MupperWindow::MupperWindow(QWidget *parent) :
   });
 
   connect(path_color_button, &QPushButton::clicked, [=](){
-    selectColor(canvas->getRenderer()->getPathColor(), [=](const QColor &color) {
+    selectColor(canvas->getRenderer().getPathColor(), [=](const QColor &color) {
       this->canvas->makeCurrent(); // no effect without this
-      this->canvas->getRenderer()->setPathColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
+      this->canvas->getRenderer().setPathColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
       this->canvas->update();
       QPalette palette;
       palette.setColor(QPalette::Button, color);
@@ -407,9 +536,9 @@ MupperWindow::MupperWindow(QWidget *parent) :
   });
 
   connect(vertex_color_button, &QPushButton::clicked, [=](){
-    selectColor(canvas->getRenderer()->getVertexColor(), [=](const QColor &color) {
+    selectColor(canvas->getRenderer().getVertexColor(), [=](const QColor &color) {
       this->canvas->makeCurrent(); // no effect without this
-      this->canvas->getRenderer()->setVertexColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
+      this->canvas->getRenderer().setVertexColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
       this->canvas->update();
       QPalette palette;
       palette.setColor(QPalette::Button, color);
@@ -417,20 +546,31 @@ MupperWindow::MupperWindow(QWidget *parent) :
     });
   });
 
-  connect(select_font_button, &QPushButton::clicked, this, &MupperWindow::selectFont);
-  connect(editor, &QTextEdit::textChanged, this, &MupperWindow::onTextChanged);
   connect(action_settings, &QAction::triggered, [=](bool is_checked) {
     settings_panel->setVisible(is_checked);
   });
+
   connect(show_console_checkbox, &QCheckBox::stateChanged, [=](int state) {
     console->setVisible(state == Qt::Checked);
   });
-  connect(path_stroke_width_spinner, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=](double d) {
-    canvas->getRenderer()->setPathStrokeWidth((float) d);
+
+  connect(show_heading_checkbox, &QCheckBox::stateChanged, [=](int state) {
+    canvas->getRenderer().showHeading(state == Qt::Checked);
     canvas->update();
   });
+
+  connect(show_stops_checkbox, &QCheckBox::stateChanged, [=](int state) {
+    canvas->getRenderer().showStops(state == Qt::Checked);
+    canvas->update();
+  });
+
+  connect(path_stroke_width_spinner, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=](double d) {
+    canvas->getRenderer().setPathStrokeWidth((float) d);
+    canvas->update();
+  });
+
   connect(vertex_size_spinner, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=](double d) {
-    canvas->getRenderer()->setVertexSize((float) d);
+    canvas->getRenderer().setVertexSize((float) d);
     canvas->update();
   });
 
@@ -442,6 +582,8 @@ MupperWindow::MupperWindow(QWidget *parent) :
                   "  yaw 90\n"
                   "end\n"
                   "dowel\n");
+  onTextChanged();
+  setWindowTitle("Madeup");
   editor->blockSignals(false);
   /* settings_panel->setVisible(false); */
 }
@@ -456,18 +598,12 @@ MupperWindow::~MupperWindow() {
 void MupperWindow::onRun(GeometryMode::geometry_mode_t geometry_mode) {
   std::string source = editor->toPlainText().toStdString();
 
-  // Clear out the old trimesh. It will be replaced with something, one way or
-  // another.
-  /* td::Trimesh *trimesh = new td::Trimesh(0, 0); */
-  /* canvas->getRenderer()->setTrimesh(trimesh); */
-
   std::stringstream cout_capturer;
   std::streambuf *old_cout_buffer = std::cout.rdbuf();
   std::cout.rdbuf(cout_capturer.rdbuf());
 
   std::stringstream in(source);
   Lexer lexer(in);
-  lexer.keepComments(true);
   try {
     const std::vector<Token> &tokens = lexer.lex();
     Parser parser(tokens, source);
@@ -483,14 +619,14 @@ void MupperWindow::onRun(GeometryMode::geometry_mode_t geometry_mode) {
     program->evaluate(env);
 
     if (geometry_mode == GeometryMode::PATH) {
-      canvas->getRenderer()->setPaths(env.getPaths());
+      canvas->getRenderer().setPaths(env.getPaths());
     } else if (geometry_mode == GeometryMode::SURFACE) {
       td::Trimesh *trimesh = env.getMesh();
       trimesh->DisconnectFaces();
       if (trimesh->GetVertexCount() == 0) {
         std::cout << "Uh oh. You either didn't visit any locations or didn't invoke a solidifier. I can't make any models without more information from you." << std::endl;
       }
-      canvas->getRenderer()->setTrimesh(trimesh);
+      canvas->getRenderer().setTrimesh(trimesh);
     }
 
   } catch (std::bad_alloc e) {
@@ -509,6 +645,12 @@ void MupperWindow::onRun(GeometryMode::geometry_mode_t geometry_mode) {
 
 void MupperWindow::onTextChanged() {
   std::string source = editor->toPlainText().toStdString();
+
+  if (mup_path.isEmpty()) {
+    this->setWindowTitle("Madeup*");
+  } else {
+    this->setWindowTitle(("Madeup: " + mup_path.toStdString() + "*").c_str());
+  }
 
   std::stringstream in(source);
   Lexer lexer(in);
@@ -628,7 +770,9 @@ void MupperWindow::onTextChanged() {
 
   editor->blockSignals(false);
 
-  onRun(GeometryMode::PATH);
+  if (canvas->isValid()) {
+    onRun(GeometryMode::PATH);
+  }
 }
 
 /* ------------------------------------------------------------------------- */
@@ -659,7 +803,7 @@ void MupperWindow::selectFont() {
 /* ------------------------------------------------------------------------- */
 
 void MupperWindow::onFit() {
-  canvas->getRenderer()->fit();
+  canvas->getRenderer().fit();
   canvas->update();
 }
 
@@ -680,6 +824,90 @@ void MupperWindow::onPathify() {
 QColor MupperWindow::toQColor(const td::QVector4<float> &color) {
   td::QVector4<int> tcolor(color * 255.0f);
   return QColor(tcolor[0], tcolor[1], tcolor[2], tcolor[3]);
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MupperWindow::saveAs(const QString &path) {
+  mup_path = path;
+  std::string source = editor->toPlainText().toStdString();
+  std::ofstream out(path.toStdString());
+  out << source;
+  out.close();
+  setWindowTitle(("Madeup: " + mup_path.toStdString()).c_str());
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MupperWindow::loadPreferences() {
+  try {
+    pt::ptree tree;
+    pt::read_json(config_path, tree);
+    loadPreferences(tree);
+  } catch (boost::exception const &e) {
+    std::cerr << "Couldn't load prefs." << std::endl;
+  }
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MupperWindow::loadPreferences(const boost::property_tree::ptree &tree) {
+  canvas->makeCurrent();
+
+  float stroke_width = tree.get<float>("stroke_width", canvas->getRenderer().getPathStrokeWidth());
+  canvas->getRenderer().setPathStrokeWidth(stroke_width);
+
+  float vertex_size = tree.get<float>("vertex_size", canvas->getRenderer().getVertexSize());
+  canvas->getRenderer().setVertexSize(vertex_size);
+
+  string font_face = tree.get<string>("font.face", "Courier New");
+  int font_size = tree.get<int>("font.size", 18);
+
+  QFont font;
+  font.setFamily(font_face.c_str());
+  font.setPointSize(font_size);
+
+  editor->setFont(font);
+  console->setFont(font);
+
+  canvas->update();
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MupperWindow::savePreferences() {
+  try {
+    pt::ptree tree;
+    savePreferences(tree);
+    pt::write_json(config_path, tree);
+  } catch (boost::exception const &e) {
+    std::cerr << "Couldn't save prefs." << std::endl;
+  }
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MupperWindow::savePreferences(boost::property_tree::ptree &tree) {
+   tree.put("font.size", editor->font().pointSize());
+   tree.put("font.face", editor->font().family().toStdString());
+   tree.put("stroke_width", canvas->getRenderer().getPathStrokeWidth());
+   tree.put("vertex_size", canvas->getRenderer().getVertexSize());
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MupperWindow::showEvent(QShowEvent *event) {
+  std::cout << "show" << std::endl;
+  QMainWindow::showEvent(event);
+  loadPreferences();
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MupperWindow::closeEvent(QCloseEvent *event) {
+  std::cout << "close" << std::endl;
+  savePreferences();
+  QMainWindow::closeEvent(event);
 }
 
 /* ------------------------------------------------------------------------- */

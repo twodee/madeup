@@ -5,9 +5,7 @@ set(CMAKE_PREFIX_PATH "/Users/johnch/tarballs/Qt/5.6/clang_64")
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5OpenGL REQUIRED)
 
-# qt5_wrap_ui(UI_HEADERS mupper_window.ui)
-
-add_executable(mupper
+add_executable(Mupper
   mupper.cpp
   MupperWindow.cpp
   MadeupCanvas.cpp
@@ -17,15 +15,13 @@ add_executable(mupper
   Texture.cpp
   Trackball.cpp
   UniformManager.cpp
-  Utilities.cpp
   UtilitiesOpenGL.cpp
   VertexArray.cpp
   VertexAttributes.cpp)
-  # ${UI_HEADERS})
-include_directories(mupper ${CMAKE_SOURCE_DIR}/include ${Qt5Widgets_INCLUDE_DIRS})
-target_link_libraries(mupper madeup twodee Qt5::Widgets Qt5::OpenGL ${Qt5Gui_OPENGL_LIBRARIES})
-set_target_properties(mupper PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-set_target_properties(mupper PROPERTIES MACOSX_BUNDLE TRUE)
+include_directories(Mupper ${CMAKE_SOURCE_DIR}/include ${Qt5Widgets_INCLUDE_DIRS})
+target_link_libraries(Mupper madeup twodee Qt5::Widgets Qt5::OpenGL ${Qt5Gui_OPENGL_LIBRARIES})
+set_target_properties(Mupper PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set_target_properties(Mupper PROPERTIES MACOSX_BUNDLE TRUE)
 
 if(USE_IGL)
   set(IGL_INCLUDES
@@ -47,6 +43,10 @@ if(USE_IGL)
     ${MPFR_LIBRARIES}
   )
 
-  include_directories(mupper ${IGL_INCLUDES})
-  target_link_libraries(mupper ${IGL_LIBRARIES})
+  include_directories(Mupper ${IGL_INCLUDES})
+  target_link_libraries(Mupper ${IGL_LIBRARIES})
+endif()
+
+if(USE_MAGICK)
+  target_link_libraries(Mupper ${ImageMagick_LIBRARIES})
 endif()

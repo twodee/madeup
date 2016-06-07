@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "Log.h"
-#include "Utilities.h"
+#include "twodee/Utilities.h"
 #include "UtilitiesOpenGL.h"
 
 namespace td {
