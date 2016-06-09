@@ -237,14 +237,21 @@ void Camera::SwitchToPerspective() {
 
 /* ------------------------------------------------------------------------- */
 
-void Camera::SetFieldOfViewY(float fov_y) {
+void Camera::SetVerticalFieldOfView(float fov_y) {
   SetPerspective(fov_y, aspect_ratio, perspective_frustum[4], perspective_frustum[5]);
 }
 
 /* ------------------------------------------------------------------------- */
 
-float Camera::GetFieldOfViewY() const {
+float Camera::GetVerticalFieldOfView() const {
   return fov_y;
+}
+
+/* ------------------------------------------------------------------------- */
+
+float Camera::GetHorizontalFieldOfView(float aspect_ratio) const {
+  float fov_x = 2.0f * atan(tan(fov_y * PI / 180.0f * 0.5f) * aspect_ratio) * 180.0f / PI; 
+  return fov_x;
 }
 
 /* ------------------------------------------------------------------------- */

@@ -1,15 +1,12 @@
 #include <iostream>
 #include <sstream>
 
-#include <boost/property_tree/json_parser.hpp>
-
 #include <QApplication>
 #include <QColorDialog>
 #include <QComboBox>
 #include <QDesktopServices>
 #include <QDoubleSpinBox>
 #include <QGroupBox>
-#include <QCheckBox>
 #include <QFileDialog>
 #include <QFontDialog>
 #include <QFormLayout>
@@ -24,6 +21,7 @@
 
 #include "MupperWindow.h"
 
+#include "json/json.h"
 #include "madeup/ExpressionBlock.h"
 #include "madeup/ExpressionClosure.h"
 #include "madeup/GeometryMode.h"
@@ -34,25 +32,23 @@
 #include "twodee/QVector3.h"
 
 using namespace madeup;
-namespace pt = boost::property_tree;
 
 /* ------------------------------------------------------------------------- */
 
 MupperWindow::MupperWindow(QWidget *parent) :
   QMainWindow(parent),
+  autopathify_timer(new QTimer(this)),
   editor(nullptr),
   canvas(nullptr) {
 
+  autopathify_timer->setSingleShot(true);
   config_path = (QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + QDir::separator() + "madeup_preferences.json").toStdString();
-  std::cout << "config_path: " << config_path << std::endl;
 
-  resize(1200, 600);
-
-  QSplitter *horizontal_splitter = new QSplitter(this);
+  horizontal_splitter = new QSplitter(this);
   horizontal_splitter->setOrientation(Qt::Horizontal);
 
   // Left pane
-  QSplitter *vertical_splitter = new QSplitter(horizontal_splitter);
+  vertical_splitter = new QSplitter(horizontal_splitter);
   vertical_splitter->setOrientation(Qt::Vertical);
 
   // - Editor
@@ -90,12 +86,14 @@ MupperWindow::MupperWindow(QWidget *parent) :
 
   // Middle pane
   canvas = new MadeupCanvas(horizontal_splitter);
+  renderer = &canvas->getRenderer();
 
   // Right pane
   QWidget *settings_panel;
   settings_panel = new QWidget(horizontal_splitter);
+  settings_panel->setVisible(false);
 
-  QComboBox *settings_picker = new QComboBox();
+  settings_picker = new QComboBox();
   settings_picker->addItem("Display");
   settings_picker->addItem("Editor");
   settings_picker->addItem("Camera");
@@ -111,36 +109,33 @@ MupperWindow::MupperWindow(QWidget *parent) :
 
   QLabel *axis_label = new QLabel("Axis");
   QLabel *grid_label = new QLabel("Grid");
-  QLabel *size_label = new QLabel("Size");
+  QLabel *size_label = new QLabel("Extent");
   QLabel *spacing_label = new QLabel("Spacing");
 
   QLabel *x_label = new QLabel("X");
   QLabel *y_label = new QLabel("Y");
   QLabel *z_label = new QLabel("Z");
 
-  QCheckBox *x_axis_checkbox = new QCheckBox();
-  QCheckBox *y_axis_checkbox = new QCheckBox();
-  QCheckBox *z_axis_checkbox = new QCheckBox();
+  for (int d = 0; d < 3; ++d) {
+    show_axis_checkboxes[d] = new QCheckBox();
+    show_grid_checkboxes[d] = new QCheckBox();
+    grid_extent_spinners[d] = new QDoubleSpinBox();
+    grid_extent_spinners[d]->setMinimum(0.01);
+    grid_spacing_spinners[d] = new QDoubleSpinBox();
+    grid_spacing_spinners[d]->setMinimum(0.01);
+  }
 
-  QCheckBox *x_plane_checkbox = new QCheckBox();
-  QCheckBox *y_plane_checkbox = new QCheckBox();
-  QCheckBox *z_plane_checkbox = new QCheckBox();
+  axis_stroke_width_spinner = new QDoubleSpinBox();  
+  axis_stroke_width_spinner->setMinimum(1.0);
 
-  QDoubleSpinBox *x_size_spinner = new QDoubleSpinBox();
-  QDoubleSpinBox *y_size_spinner = new QDoubleSpinBox();
-  QDoubleSpinBox *z_size_spinner = new QDoubleSpinBox();
-
-  QDoubleSpinBox *x_space_spinner = new QDoubleSpinBox();
-  QDoubleSpinBox *y_space_spinner = new QDoubleSpinBox();
-  QDoubleSpinBox *z_space_spinner = new QDoubleSpinBox();
+  grid_stroke_width_spinner = new QDoubleSpinBox();  
+  grid_stroke_width_spinner->setMinimum(1.0);
 
   QGroupBox *path_group = new QGroupBox("Path");
-  QCheckBox *show_heading_checkbox = new QCheckBox("Show heading");
-  show_heading_checkbox->setCheckState(canvas->getRenderer().showHeading() ? Qt::Checked : Qt::Unchecked);
-  QCheckBox *show_stops_checkbox = new QCheckBox("Show stops");
-  show_stops_checkbox->setCheckState(canvas->getRenderer().showStops() ? Qt::Checked : Qt::Unchecked);
+  show_heading_checkbox = new QCheckBox("Show heading");
+  show_stops_checkbox = new QCheckBox("Show stops");
 
-  QLabel *path_stroke_width_label = new QLabel("Stroke width");
+  QLabel *path_stroke_width_label = new QLabel("Thickness");
   path_stroke_width_spinner = new QDoubleSpinBox();
   path_stroke_width_spinner->setMinimum(1.0);
 
@@ -148,36 +143,31 @@ MupperWindow::MupperWindow(QWidget *parent) :
   vertex_size_spinner = new QDoubleSpinBox();
   vertex_size_spinner->setMinimum(1.0);
 
-  /* QPushButton *path_color_button = new QPushButton("Set path color"); */
-  /* QPushButton *vertex_color_button = new QPushButton("Set vertex color"); */
-
   QLabel *path_color_label = new QLabel("Path color");
-  QPushButton *path_color_button = new QPushButton();
+  path_color_button = new QPushButton();
   path_color_button->setFlat(true);
   path_color_button->setAutoFillBackground(true);
 
   QLabel *vertex_color_label = new QLabel("Vertex color");
-  QPushButton *vertex_color_button = new QPushButton();
+  vertex_color_button = new QPushButton();
   vertex_color_button->setFlat(true);
   vertex_color_button->setAutoFillBackground(true);
 
   QLabel *face_label = new QLabel("Faces");
-  QComboBox *face_picker = new QComboBox();
-  face_picker->addItem("Counterclockwise");
-  face_picker->addItem("Clockwise");
-  face_picker->addItem("Both");
-  face_picker->addItem("None");
-  face_picker->setCurrentIndex(canvas->getRenderer().getFaceOrientation());
+  face_orientation_picker = new QComboBox();
+  face_orientation_picker->addItem("Counterclockwise");
+  face_orientation_picker->addItem("Clockwise");
+  face_orientation_picker->addItem("Both");
+  face_orientation_picker->addItem("None");
 
   QLabel *style_label = new QLabel("Style");
-  QComboBox *style_picker = new QComboBox();
-  style_picker->addItem("Filled");
-  style_picker->addItem("Wireframe");
-  style_picker->addItem("Vertices");
-  style_picker->setCurrentIndex(canvas->getRenderer().getFaceStyle());
+  face_style_picker = new QComboBox();
+  face_style_picker->addItem("Filled");
+  face_style_picker->addItem("Wireframe");
+  face_style_picker->addItem("Vertices");
 
   QLabel *background_color_label = new QLabel("Background color");
-  QPushButton *background_color_button = new QPushButton();
+  background_color_button = new QPushButton();
   background_color_button->setFlat(true);
   background_color_button->setAutoFillBackground(true);
 
@@ -197,24 +187,32 @@ MupperWindow::MupperWindow(QWidget *parent) :
   ++row;
 
   cartesian_layout->addWidget(x_label, row, 0);
-  cartesian_layout->addWidget(x_axis_checkbox, row, 1, Qt::AlignCenter);
-  cartesian_layout->addWidget(x_plane_checkbox, row, 2, Qt::AlignCenter);
-  cartesian_layout->addWidget(x_size_spinner, row, 3);
-  cartesian_layout->addWidget(x_space_spinner, row, 4);
+  cartesian_layout->addWidget(show_axis_checkboxes[0], row, 1, Qt::AlignCenter);
+  cartesian_layout->addWidget(show_grid_checkboxes[0], row, 2, Qt::AlignCenter);
+  cartesian_layout->addWidget(grid_extent_spinners[0], row, 3);
+  cartesian_layout->addWidget(grid_spacing_spinners[0], row, 4);
   ++row;
 
   cartesian_layout->addWidget(y_label, row, 0);
-  cartesian_layout->addWidget(y_axis_checkbox, row, 1, Qt::AlignCenter);
-  cartesian_layout->addWidget(y_plane_checkbox, row, 2, Qt::AlignCenter);
-  cartesian_layout->addWidget(y_size_spinner, row, 3);
-  cartesian_layout->addWidget(y_space_spinner, row, 4);
+  cartesian_layout->addWidget(show_axis_checkboxes[1], row, 1, Qt::AlignCenter);
+  cartesian_layout->addWidget(show_grid_checkboxes[1], row, 2, Qt::AlignCenter);
+  cartesian_layout->addWidget(grid_extent_spinners[1], row, 3);
+  cartesian_layout->addWidget(grid_spacing_spinners[1], row, 4);
   ++row;
 
   cartesian_layout->addWidget(z_label, row, 0);
-  cartesian_layout->addWidget(z_axis_checkbox, row, 1, Qt::AlignCenter);
-  cartesian_layout->addWidget(z_plane_checkbox, row, 2, Qt::AlignCenter);
-  cartesian_layout->addWidget(z_size_spinner, row, 3);
-  cartesian_layout->addWidget(z_space_spinner, row, 4);
+  cartesian_layout->addWidget(show_axis_checkboxes[2], row, 1, Qt::AlignCenter);
+  cartesian_layout->addWidget(show_grid_checkboxes[2], row, 2, Qt::AlignCenter);
+  cartesian_layout->addWidget(grid_extent_spinners[2], row, 3);
+  cartesian_layout->addWidget(grid_spacing_spinners[2], row, 4);
+  ++row;
+
+  cartesian_layout->addWidget(new QLabel("Axis thickness"), row, 0, 1, 3);
+  cartesian_layout->addWidget(axis_stroke_width_spinner, row, 3, 1, 2);
+  ++row;
+
+  cartesian_layout->addWidget(new QLabel("Grid thickness"), row, 0, 1, 3);
+  cartesian_layout->addWidget(grid_stroke_width_spinner, row, 3, 1, 2);
   ++row;
 
   cartesian_layout->setColumnStretch(0, 0);
@@ -246,9 +244,9 @@ MupperWindow::MupperWindow(QWidget *parent) :
   display_page_layout->addWidget(cartesian_group, 0, 0, 1, 2);
   display_page_layout->addWidget(path_group, 1, 0, 1, 2);
   display_page_layout->addWidget(face_label, 2, 0, 1, 1);
-  display_page_layout->addWidget(face_picker, 2, 1, 1, 1);
+  display_page_layout->addWidget(face_orientation_picker, 2, 1, 1, 1);
   display_page_layout->addWidget(style_label, 3, 0, 1, 1);
-  display_page_layout->addWidget(style_picker, 3, 1, 1, 1);
+  display_page_layout->addWidget(face_style_picker, 3, 1, 1, 1);
   display_page_layout->addWidget(background_color_label, 4, 0, 1, 1);
   display_page_layout->addWidget(background_color_button, 4, 1, 1, 1);
   display_page_layout->addItem(vertical_spacer, 5, 0, 1, 2);
@@ -256,10 +254,14 @@ MupperWindow::MupperWindow(QWidget *parent) :
   // Editor page
   QWidget *editor_page = new QWidget();
 
-  QCheckBox *autopathify_checkbox = new QCheckBox("Autopathify");
-  QCheckBox *show_console_checkbox = new QCheckBox("Show console");
-  show_console_checkbox->setCheckState(Qt::Checked);
-  QDoubleSpinBox *autopathify_delay_spinner = new QDoubleSpinBox();
+  autopathify_checkbox = new QCheckBox("Autopathify");
+  show_console_checkbox = new QCheckBox("Show console");
+
+  autopathify_delay_spinner = new QDoubleSpinBox();
+  autopathify_delay_spinner->setMinimum(0.0);
+  autopathify_delay_spinner->setMaximum(10.0);
+  autopathify_delay_spinner->setSingleStep(0.25);
+
   QPushButton *select_font_button = new QPushButton("Select Font");
 
   QSpacerItem *vertical_spacer3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
@@ -331,16 +333,6 @@ MupperWindow::MupperWindow(QWidget *parent) :
   horizontal_splitter->addWidget(settings_panel);
 
   // Overall
- 
-  {
-    QPalette palette;
-    palette.setColor(QPalette::Button, toQColor(canvas->getRenderer().getBackgroundColor()));
-    background_color_button->setPalette(palette);
-    palette.setColor(QPalette::Button, toQColor(canvas->getRenderer().getPathColor()));
-    path_color_button->setPalette(palette);
-    palette.setColor(QPalette::Button, toQColor(canvas->getRenderer().getVertexColor()));
-    vertex_color_button->setPalette(palette);
-  }
 
   this->setCentralWidget(horizontal_splitter);
 
@@ -353,7 +345,15 @@ MupperWindow::MupperWindow(QWidget *parent) :
   action_pathify->setText("Pathify");
   action_pathify->setShortcut(Qt::CTRL + Qt::Key_E);
 
-  QAction *action_settings = new QAction(this);
+  QAction *action_text_bigger = new QAction(this);
+  action_text_bigger->setText("Increase font size");
+  action_text_bigger->setShortcut(Qt::CTRL + Qt::Key_Plus);
+
+  QAction *action_text_smaller = new QAction(this);
+  action_text_smaller->setText("Decrease font size");
+  action_text_smaller->setShortcut(Qt::CTRL + Qt::Key_Minus);
+
+  action_settings = new QAction(this);
   action_settings->setText("Show settings");
   action_settings->setShortcut(Qt::CTRL + Qt::Key_P);
   action_settings->setCheckable(true);
@@ -422,14 +422,14 @@ MupperWindow::MupperWindow(QWidget *parent) :
   menuView->setTitle("View");
   menuView->addAction(action_settings);
   menuView->addAction(action_screenshot);
+  menuView->addAction(action_text_bigger);
+  menuView->addAction(action_text_smaller);
 
   QMenu *menuHelp = new QMenu(menuBar);
   menuHelp->setTitle("Help");
   menuHelp->addAction(action_documentation);
 
   setWindowTitle("Madeup");
-  menuFile->setTitle("File");
-  menuView->setTitle("View");
   menuBar->addAction(menuFile->menuAction());
   menuBar->addAction(menuView->menuAction());
   menuBar->addAction(menuHelp->menuAction());
@@ -442,15 +442,67 @@ MupperWindow::MupperWindow(QWidget *parent) :
   connect(select_font_button, &QPushButton::clicked, this, &MupperWindow::selectFont);
   connect(editor, &QTextEdit::textChanged, this, &MupperWindow::onTextChanged);
 
-  connect(face_picker, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=](int i) {
-    canvas->makeCurrent(); // no effect without this
-    canvas->getRenderer().setFaceOrientation(i);
+  connect(negative_x_button, &QPushButton::clicked, [=]() {
+    canvas->makeCurrent();
+    renderer->viewFromAxis(0, -1);
     canvas->update();
   });
 
-  connect(style_picker, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=](int i) {
+  connect(positive_x_button, &QPushButton::clicked, [=]() {
+    canvas->makeCurrent();
+    renderer->viewFromAxis(0, 1);
+    canvas->update();
+  });
+
+  connect(negative_y_button, &QPushButton::clicked, [=]() {
+    canvas->makeCurrent();
+    renderer->viewFromAxis(1, -1);
+    canvas->update();
+  });
+
+  connect(positive_y_button, &QPushButton::clicked, [=]() {
+    canvas->makeCurrent();
+    renderer->viewFromAxis(1, 1);
+    canvas->update();
+  });
+
+  connect(negative_z_button, &QPushButton::clicked, [=]() {
+    canvas->makeCurrent();
+    renderer->viewFromAxis(2, -1);
+    canvas->update();
+  });
+
+  connect(positive_z_button, &QPushButton::clicked, [=]() {
+    canvas->makeCurrent();
+    renderer->viewFromAxis(2, 1);
+    canvas->update();
+  });
+
+  connect(action_text_bigger, &QAction::triggered, [=]() {
+    QFont font = editor->font();
+    font.setPointSize(font.pointSize() + 2);
+    editor->setFont(font);
+  });
+
+  connect(action_text_smaller, &QAction::triggered, [=]() {
+    QFont font = editor->font();
+    font.setPointSize(font.pointSize() - 2);
+    editor->setFont(font);
+  });
+
+  connect(autopathify_timer, &QTimer::timeout, [=]() {
+    onPathify();
+  });
+
+  connect(face_orientation_picker, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=](int i) {
     canvas->makeCurrent(); // no effect without this
-    canvas->getRenderer().setFaceStyle(i);
+    renderer->setFaceOrientation(i);
+    canvas->update();
+  });
+
+  connect(face_style_picker, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=](int i) {
+    canvas->makeCurrent(); // no effect without this
+    renderer->setFaceStyle(i);
     canvas->update();
   });
 
@@ -463,7 +515,7 @@ MupperWindow::MupperWindow(QWidget *parent) :
     QString path = QFileDialog::getSaveFileName(this, "Save Screenshot", QDir::homePath(), "Images (*.png *.jpg *.gif)");
     if (!path.isEmpty()) {
       canvas->makeCurrent();
-      canvas->getRenderer().takeScreenshot(path.toStdString());
+      renderer->takeScreenshot(path.toStdString());
     }
   });
 
@@ -509,14 +561,14 @@ MupperWindow::MupperWindow(QWidget *parent) :
   connect(action_export, &QAction::triggered, [=]() {
     QString path = QFileDialog::getSaveFileName(this, "Export File", QDir::homePath(), "Wavefront OBJ Files (*.obj)");
     if (!path.isEmpty()) {
-      canvas->getRenderer().exportTrimesh(path.toStdString());
+      renderer->exportTrimesh(path.toStdString());
     }
   });
 
   connect(background_color_button, &QPushButton::clicked, [=](){
-    selectColor(canvas->getRenderer().getBackgroundColor(), [=](const QColor &color) {
+    selectColor(renderer->getBackgroundColor(), [=](const QColor &color) {
       canvas->makeCurrent(); // no effect without this
-      canvas->getRenderer().setBackgroundColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
+      renderer->setBackgroundColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
       canvas->update();
       QPalette palette;
       palette.setColor(QPalette::Button, color);
@@ -525,9 +577,9 @@ MupperWindow::MupperWindow(QWidget *parent) :
   });
 
   connect(path_color_button, &QPushButton::clicked, [=](){
-    selectColor(canvas->getRenderer().getPathColor(), [=](const QColor &color) {
+    selectColor(renderer->getPathColor(), [=](const QColor &color) {
       this->canvas->makeCurrent(); // no effect without this
-      this->canvas->getRenderer().setPathColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
+      this->renderer->setPathColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
       this->canvas->update();
       QPalette palette;
       palette.setColor(QPalette::Button, color);
@@ -536,9 +588,9 @@ MupperWindow::MupperWindow(QWidget *parent) :
   });
 
   connect(vertex_color_button, &QPushButton::clicked, [=](){
-    selectColor(canvas->getRenderer().getVertexColor(), [=](const QColor &color) {
+    selectColor(renderer->getVertexColor(), [=](const QColor &color) {
       this->canvas->makeCurrent(); // no effect without this
-      this->canvas->getRenderer().setVertexColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
+      this->renderer->setVertexColor(td::QVector4<float>(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, color.alpha() / 255.0f));
       this->canvas->update();
       QPalette palette;
       palette.setColor(QPalette::Button, color);
@@ -546,31 +598,82 @@ MupperWindow::MupperWindow(QWidget *parent) :
     });
   });
 
-  connect(action_settings, &QAction::triggered, [=](bool is_checked) {
+  connect(action_settings, &QAction::toggled, [=](bool is_checked) {
     settings_panel->setVisible(is_checked);
   });
 
-  connect(show_console_checkbox, &QCheckBox::stateChanged, [=](int state) {
-    console->setVisible(state == Qt::Checked);
+  connect(show_console_checkbox, &QCheckBox::toggled, [=](bool is_checked) {
+    console->setVisible(is_checked);
   });
 
-  connect(show_heading_checkbox, &QCheckBox::stateChanged, [=](int state) {
-    canvas->getRenderer().showHeading(state == Qt::Checked);
+  connect(show_heading_checkbox, &QCheckBox::toggled, [=](bool is_checked) {
+    canvas->makeCurrent();
+    renderer->showHeading(is_checked);
     canvas->update();
   });
 
-  connect(show_stops_checkbox, &QCheckBox::stateChanged, [=](int state) {
-    canvas->getRenderer().showStops(state == Qt::Checked);
+  connect(show_stops_checkbox, &QCheckBox::toggled, [=](bool is_checked) {
+    canvas->makeCurrent();
+    renderer->showStops(is_checked);
     canvas->update();
+  });
+
+  for (int d = 0; d < 3; ++d) {
+    // TODO need local?
+    int dd = d;
+
+    connect(show_axis_checkboxes[d], &QCheckBox::toggled, [=](bool is_checked) {
+      canvas->makeCurrent();
+      renderer->showAxis(dd, is_checked);
+      canvas->update();
+    });
+
+    connect(show_grid_checkboxes[d], &QCheckBox::toggled, [=](bool is_checked) {
+      canvas->makeCurrent();
+      renderer->showGrid(dd, is_checked);
+      canvas->update();
+    });
+
+    connect(grid_extent_spinners[d], static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=](double value) {
+      canvas->makeCurrent();
+      renderer->setGridExtent(dd, (float) value);
+      canvas->update();
+    });
+
+    connect(grid_spacing_spinners[d], static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=](double value) {
+      canvas->makeCurrent();
+      renderer->setGridSpacing(dd, (float) value);
+      canvas->update();
+    });
+  }
+
+  connect(axis_stroke_width_spinner, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=](double value) {
+    canvas->makeCurrent();
+    renderer->setAxisStrokeWidth(value);
+    canvas->update();
+  });
+
+  connect(grid_stroke_width_spinner, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=](double value) {
+    canvas->makeCurrent();
+    renderer->setGridStrokeWidth(value);
+    canvas->update();
+  });
+
+  connect(autopathify_checkbox, &QCheckBox::toggled, [=](bool is_checked) {
+    // We don't need to do much here. If a previous timer was started, cancel it.
+    if (!is_checked) {
+      autopathify_timer->stop(); 
+    }
   });
 
   connect(path_stroke_width_spinner, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=](double d) {
-    canvas->getRenderer().setPathStrokeWidth((float) d);
+    canvas->makeCurrent();
+    renderer->setPathStrokeWidth((float) d);
     canvas->update();
   });
 
   connect(vertex_size_spinner, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=](double d) {
-    canvas->getRenderer().setVertexSize((float) d);
+    renderer->setVertexSize((float) d);
     canvas->update();
   });
 
@@ -585,7 +688,6 @@ MupperWindow::MupperWindow(QWidget *parent) :
   onTextChanged();
   setWindowTitle("Madeup");
   editor->blockSignals(false);
-  /* settings_panel->setVisible(false); */
 }
 
 /* ------------------------------------------------------------------------- */
@@ -619,14 +721,14 @@ void MupperWindow::onRun(GeometryMode::geometry_mode_t geometry_mode) {
     program->evaluate(env);
 
     if (geometry_mode == GeometryMode::PATH) {
-      canvas->getRenderer().setPaths(env.getPaths());
+      renderer->setPaths(env.getPaths());
     } else if (geometry_mode == GeometryMode::SURFACE) {
       td::Trimesh *trimesh = env.getMesh();
       trimesh->DisconnectFaces();
       if (trimesh->GetVertexCount() == 0) {
         std::cout << "Uh oh. You either didn't visit any locations or didn't invoke a solidifier. I can't make any models without more information from you." << std::endl;
       }
-      canvas->getRenderer().setTrimesh(trimesh);
+      renderer->setTrimesh(trimesh);
     }
 
   } catch (std::bad_alloc e) {
@@ -644,6 +746,9 @@ void MupperWindow::onRun(GeometryMode::geometry_mode_t geometry_mode) {
 /* ------------------------------------------------------------------------- */
 
 void MupperWindow::onTextChanged() {
+  // Stop any scheduled pathify.
+  autopathify_timer->stop();
+
   std::string source = editor->toPlainText().toStdString();
 
   if (mup_path.isEmpty()) {
@@ -771,7 +876,9 @@ void MupperWindow::onTextChanged() {
   editor->blockSignals(false);
 
   if (canvas->isValid()) {
-    onRun(GeometryMode::PATH);
+    if (autopathify_checkbox->isChecked()) {
+      autopathify_timer->start(autopathify_delay_spinner->value() * 1000);
+    }
   }
 }
 
@@ -803,7 +910,7 @@ void MupperWindow::selectFont() {
 /* ------------------------------------------------------------------------- */
 
 void MupperWindow::onFit() {
-  canvas->getRenderer().fit();
+  renderer->fit();
   canvas->update();
 }
 
@@ -840,35 +947,168 @@ void MupperWindow::saveAs(const QString &path) {
 /* ------------------------------------------------------------------------- */
 
 void MupperWindow::loadPreferences() {
-  try {
-    pt::ptree tree;
-    pt::read_json(config_path, tree);
-    loadPreferences(tree);
-  } catch (boost::exception const &e) {
-    std::cerr << "Couldn't load prefs." << std::endl;
-  }
-}
-
-/* ------------------------------------------------------------------------- */
-
-void MupperWindow::loadPreferences(const boost::property_tree::ptree &tree) {
   canvas->makeCurrent();
 
-  float stroke_width = tree.get<float>("stroke_width", canvas->getRenderer().getPathStrokeWidth());
-  canvas->getRenderer().setPathStrokeWidth(stroke_width);
+  try {
+    std::ifstream in(config_path);
+    Json::Reader reader;
+    Json::Value prefs;
+    reader.parse(in, prefs);
 
-  float vertex_size = tree.get<float>("vertex_size", canvas->getRenderer().getVertexSize());
-  canvas->getRenderer().setVertexSize(vertex_size);
+    int width = prefs.get("window.width", 1200).asUInt();
+    int height = prefs.get("window.height", 600).asUInt();
+    resize(width, height);
 
-  string font_face = tree.get<string>("font.face", "Courier New");
-  int font_size = tree.get<int>("font.size", 18);
+    int x = prefs.get("window.x", -1).asInt();
+    int y = prefs.get("window.y", -1).asInt();
+    if (x >= 0 && y >= 0) {
+      move(x, y);
+    }
 
-  QFont font;
-  font.setFamily(font_face.c_str());
-  font.setPointSize(font_size);
+    float stroke_width = (float) prefs.get("path.stroke.width", renderer->getPathStrokeWidth()).asDouble();
+    renderer->setPathStrokeWidth(stroke_width);
+    path_stroke_width_spinner->setValue(stroke_width);
 
-  editor->setFont(font);
-  console->setFont(font);
+    float vertex_size = (float) prefs.get("vertex.size", renderer->getVertexSize()).asDouble();
+    renderer->setVertexSize(vertex_size);
+    vertex_size_spinner->setValue(vertex_size);
+
+    string font_face = prefs.get("font.face", "Courier New").asString();
+    int font_size = prefs.get("font.size", 18).asUInt();
+
+    QFont font;
+    font.setFamily(font_face.c_str());
+    font.setPointSize(font_size);
+
+    editor->setFont(font);
+    console->setFont(font);
+
+    renderer->showHeading(prefs.get("show.heading", renderer->showHeading()).asBool());
+    show_heading_checkbox->setChecked(renderer->showHeading());
+
+    renderer->showStops(prefs.get("show.stops", renderer->showStops()).asBool());
+    show_stops_checkbox->setChecked(renderer->showStops());
+
+    Json::Value show_axis_node = prefs.get("show.axis", Json::nullValue);
+    Json::Value show_grid_node = prefs.get("show.grid", Json::nullValue);
+    Json::Value grid_extent_node = prefs.get("grid.extent", Json::nullValue);
+    Json::Value grid_spacing_node = prefs.get("grid.spacing", Json::nullValue);
+
+    for (int d = 0; d < 3; ++d) {
+      bool show_axis = show_axis_node.get(Json::ArrayIndex(d), renderer->showAxis(d)).asBool();
+      renderer->showAxis(d, show_axis);
+      show_axis_checkboxes[d]->setChecked(renderer->showAxis(d));
+
+      bool show_grid = show_grid_node.get(Json::ArrayIndex(d), renderer->showGrid(d)).asBool();
+      renderer->showGrid(d, show_grid);
+      show_grid_checkboxes[d]->setChecked(renderer->showGrid(d));
+
+      float grid_extent = (float) grid_extent_node.get(Json::ArrayIndex(d), renderer->getGridExtent(d)).asDouble();
+      renderer->setGridExtent(d, grid_extent);
+      grid_extent_spinners[d]->setValue(renderer->getGridExtent(d));
+
+      float grid_spacing = (float) grid_spacing_node.get(Json::ArrayIndex(d), renderer->getGridSpacing(d)).asDouble();
+      renderer->setGridSpacing(d, grid_spacing);
+      grid_spacing_spinners[d]->setValue(renderer->getGridSpacing(d));
+    }
+
+    // Background color
+    Json::Value background_color_node = prefs.get("background.color", Json::nullValue);
+    if (!background_color_node.isNull()) {
+      td::QVector4<float> color = renderer->getBackgroundColor();
+      for (int i = 0; i < 4; ++i) {
+        color[i] = (float) background_color_node.get(i, 0.0).asDouble();
+      }
+      renderer->setBackgroundColor(color);
+    }
+
+    QPalette background_color_palette;
+    background_color_palette.setColor(QPalette::Button, toQColor(renderer->getBackgroundColor()));
+    background_color_button->setPalette(background_color_palette);
+
+    // Path color
+    Json::Value path_color_node = prefs.get("path.color", Json::nullValue);
+    if (!path_color_node.isNull()) {
+      td::QVector4<float> color = renderer->getPathColor();
+      for (int i = 0; i < 4; ++i) {
+        color[i] = (float) path_color_node.get(i, 0.0).asDouble();
+      }
+      renderer->setPathColor(color);
+    }
+
+    QPalette path_color_palette;
+    path_color_palette.setColor(QPalette::Button, toQColor(renderer->getPathColor()));
+    path_color_button->setPalette(path_color_palette);
+
+    // Vertex color
+    Json::Value vertex_color_node = prefs.get("vertex.color", Json::nullValue);
+    if (!vertex_color_node.isNull()) {
+      td::QVector4<float> color = renderer->getPathColor();
+      for (int i = 0; i < 4; ++i) {
+        color[i] = (float) vertex_color_node.get(i, 0.0).asDouble();
+      }
+      renderer->setVertexColor(color);
+    }
+
+    QPalette vertex_color_palette;
+    vertex_color_palette.setColor(QPalette::Button, toQColor(renderer->getVertexColor()));
+    vertex_color_button->setPalette(vertex_color_palette);
+
+    // Face style
+    int face_style = prefs.get("face.style", renderer->getFaceStyle()).asUInt();
+    renderer->setFaceStyle(face_style);
+    face_style_picker->setCurrentIndex(renderer->getFaceStyle());
+  
+    // Face orientation
+    int face_orientation = prefs.get("face.orientation", renderer->getFaceOrientation()).asUInt();
+    renderer->setFaceOrientation(face_orientation);
+    face_orientation_picker->setCurrentIndex(renderer->getFaceOrientation());
+
+    // Show preferences
+    bool show_settings = prefs.get("show.settings", false).asBool();
+    action_settings->setChecked(show_settings);
+
+    // Show console
+    bool show_console = prefs.get("show.console", true).asBool();
+    show_console_checkbox->setChecked(show_console);
+
+    int settings_page = prefs.get("settings.page", 0).asUInt();
+    settings_picker->setCurrentIndex(settings_page);
+
+    double autopathify_delay = prefs.get("autopathify.delay", 0.25).asDouble();
+    autopathify_delay_spinner->setValue(autopathify_delay);
+
+    float axis_stroke_width = (float) prefs.get("axis.stroke.width", renderer->getAxisStrokeWidth()).asDouble();
+    axis_stroke_width_spinner->setValue(axis_stroke_width);
+
+    float grid_stroke_width = (float) prefs.get("grid.stroke.width", renderer->getGridStrokeWidth()).asDouble();
+    grid_stroke_width_spinner->setValue(grid_stroke_width);
+
+    bool autopathify = prefs.get("autopathify", true).asBool();
+    autopathify_checkbox->setChecked(autopathify);
+    console->setVisible(show_console);
+
+    // Horizontal splitter
+    Json::Value horizontal_sizes_node = prefs.get("horizontal.splitter.sizes", Json::nullValue);
+    if (!horizontal_sizes_node.isNull()) {
+      QList<int> sizes;
+      sizes.push_back(horizontal_sizes_node.get(Json::ArrayIndex(0), -1).asUInt());
+      sizes.push_back(horizontal_sizes_node.get(Json::ArrayIndex(1), -1).asUInt());
+      sizes.push_back(horizontal_sizes_node.get(Json::ArrayIndex(2), -1).asUInt());
+      horizontal_splitter->setSizes(sizes);
+    }
+
+    // Vertical splitter
+    Json::Value vertical_sizes_node = prefs.get("vertical.splitter.sizes", Json::nullValue);
+    if (!vertical_sizes_node.isNull()) {
+      QList<int> sizes;
+      sizes.push_back(vertical_sizes_node.get(Json::ArrayIndex(0), -1).asUInt());
+      sizes.push_back(vertical_sizes_node.get(Json::ArrayIndex(1), -1).asUInt());
+      vertical_splitter->setSizes(sizes);
+    }
+
+  } catch (int i) {
+  }
 
   canvas->update();
 }
@@ -877,27 +1117,84 @@ void MupperWindow::loadPreferences(const boost::property_tree::ptree &tree) {
 
 void MupperWindow::savePreferences() {
   try {
-    pt::ptree tree;
-    savePreferences(tree);
-    pt::write_json(config_path, tree);
-  } catch (boost::exception const &e) {
-    std::cerr << "Couldn't save prefs." << std::endl;
+    Json::Value prefs;
+
+    prefs["font.size"] = editor->font().pointSize();
+    prefs["font.face"] = editor->font().family().toStdString();
+    prefs["path.stroke.width"] = renderer->getPathStrokeWidth();
+    prefs["vertex.size"] = renderer->getVertexSize();
+    prefs["show.heading"] = renderer->showHeading();
+    prefs["show.stops"] = renderer->showStops();
+    prefs["face.style"] = renderer->getFaceStyle();
+    prefs["face.orientation"] = renderer->getFaceOrientation();
+    prefs["show.settings"] = action_settings->isChecked();
+    prefs["show.console"] = show_console_checkbox->isChecked();
+    prefs["autopathify"] = autopathify_checkbox->isChecked();
+    prefs["autopathify.delay"] = autopathify_delay_spinner->value();
+    prefs["settings.page"] = settings_picker->currentIndex();
+
+    prefs["background.color"] = Json::Value(Json::arrayValue);
+    td::QVector4<float> background_color = renderer->getBackgroundColor();
+    for (int i = 0; i < 4; ++i) {
+      prefs["background.color"].append(background_color[i]);
+    }
+
+    prefs["path.color"] = Json::Value(Json::arrayValue);
+    td::QVector4<float> path_color = renderer->getPathColor();
+    for (int i = 0; i < 4; ++i) {
+      prefs["path.color"].append(path_color[i]);
+    }
+
+    prefs["vertex.color"] = Json::Value(Json::arrayValue);
+    td::QVector4<float> vertex_color = renderer->getVertexColor();
+    for (int i = 0; i < 4; ++i) {
+      prefs["vertex.color"].append(vertex_color[i]);
+    }
+
+    const QList<int> &hsizes = horizontal_splitter->sizes();
+    prefs["horizontal.splitter.sizes"] = Json::Value(Json::arrayValue);
+    prefs["horizontal.splitter.sizes"].append(hsizes[0]);
+    prefs["horizontal.splitter.sizes"].append(hsizes[1]);
+    prefs["horizontal.splitter.sizes"].append(hsizes[2]);
+
+    const QList<int> &vsizes = vertical_splitter->sizes();
+    prefs["vertical.splitter.sizes"] = Json::Value(Json::arrayValue);
+    prefs["vertical.splitter.sizes"].append(vsizes[0]);
+    prefs["vertical.splitter.sizes"].append(vsizes[1]);
+
+    prefs["window.height"] = height();
+    prefs["window.width"] = width();
+    prefs["window.x"] = x();
+    prefs["window.y"] = y();
+
+    prefs["show.axis"] = Json::Value(Json::arrayValue);
+    prefs["show.grid"] = Json::Value(Json::arrayValue);
+    prefs["grid.extent"] = Json::Value(Json::arrayValue);
+    prefs["grid.spacing"] = Json::Value(Json::arrayValue);
+
+    for (int d = 0; d < 3; ++d) {
+      prefs["show.axis"].append(show_axis_checkboxes[d]->isChecked());
+      prefs["show.grid"].append(show_grid_checkboxes[d]->isChecked());
+      prefs["grid.extent"].append(grid_extent_spinners[d]->value());
+      prefs["grid.spacing"].append(grid_spacing_spinners[d]->value());
+    }
+
+    prefs["axis.stroke.width"] = axis_stroke_width_spinner->value();
+    prefs["grid.stroke.width"] = grid_stroke_width_spinner->value();
+
+    Json::StyledWriter writer;
+    string json = writer.write(prefs);
+    std::ofstream out(config_path);
+    out << json;
+    out.close();
+
+  } catch (int i) {
   }
 }
 
 /* ------------------------------------------------------------------------- */
 
-void MupperWindow::savePreferences(boost::property_tree::ptree &tree) {
-   tree.put("font.size", editor->font().pointSize());
-   tree.put("font.face", editor->font().family().toStdString());
-   tree.put("stroke_width", canvas->getRenderer().getPathStrokeWidth());
-   tree.put("vertex_size", canvas->getRenderer().getVertexSize());
-}
-
-/* ------------------------------------------------------------------------- */
-
 void MupperWindow::showEvent(QShowEvent *event) {
-  std::cout << "show" << std::endl;
   QMainWindow::showEvent(event);
   loadPreferences();
 }
@@ -905,7 +1202,6 @@ void MupperWindow::showEvent(QShowEvent *event) {
 /* ------------------------------------------------------------------------- */
 
 void MupperWindow::closeEvent(QCloseEvent *event) {
-  std::cout << "close" << std::endl;
   savePreferences();
   QMainWindow::closeEvent(event);
 }

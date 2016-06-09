@@ -17,7 +17,8 @@ add_executable(Mupper
   UniformManager.cpp
   UtilitiesOpenGL.cpp
   VertexArray.cpp
-  VertexAttributes.cpp)
+  VertexAttributes.cpp
+  jsoncpp.cpp)
 include_directories(Mupper ${CMAKE_SOURCE_DIR}/include ${Qt5Widgets_INCLUDE_DIRS})
 target_link_libraries(Mupper madeup twodee Qt5::Widgets Qt5::OpenGL ${Qt5Gui_OPENGL_LIBRARIES})
 set_target_properties(Mupper PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})

@@ -195,8 +195,9 @@ class Camera {
     void SwitchToOrthographic();
     void SwitchToPerspective();
     
-    void SetFieldOfViewY(float fov_y);
-    float GetFieldOfViewY() const;
+    void SetVerticalFieldOfView(float fov_y);
+    float GetVerticalFieldOfView() const;
+    float GetHorizontalFieldOfView(float aspect_ratio) const;
 
     float GetPerspectiveNear() const;
     float GetPerspectiveFar() const;

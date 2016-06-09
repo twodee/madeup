@@ -11,28 +11,41 @@ using namespace td;
 MadeupRenderer::MadeupRenderer() :
   trimesh(NULL),
   background_color(1.0f),
-  /* background_color(100 / 255.0f, 149 / 255.0f, 237 / 255.0f, 1.0f), */
   path_color(1.0f, 0.5f, 0.0f, 1.0f),
   vertex_color(0.0f, 0.0f, 0.0f, 1.0f),
   program(NULL),
   vertex_array(NULL),
   vertex_attributes(NULL),
-  uniform_manager(NULL),
-  path_program(NULL),
+  line_program(NULL),
   path_arrays(NULL),
   path_attributes(NULL),
   npaths(0),
+  axes_array(NULL),
+  axes_attributes(NULL),
   paths_bounding_box(td::QVector3<float>(0.0f), td::QVector3<float>(0.0f)),
-  path_stroke_width(4.0f),
-  vertex_size(6.0f),
   show_heading(true),
   show_stops(true),
-  face_orientation(FaceOrientation::COUNTERCLOCKWISE) {
+  face_orientation(FaceOrientation::COUNTERCLOCKWISE),
+  face_style(FaceStyle::FILLED),
+  path_stroke_width(4.0f),
+  axis_stroke_width(3.0f),
+  grid_stroke_width(1.0f),
+  vertex_size(6.0f) {
+
+  show_axis[0] = show_axis[1] = show_axis[2] = true;
+  show_grid[0] = show_grid[1] = show_grid[2] = true;
+
+  grid_extents[0] = grid_extents[1] = grid_extents[2] = 10.0f;
+  grid_spacing[0] = grid_spacing[1] = grid_spacing[2] = 1.0f; 
+  grid_arrays[0] = grid_arrays[1] = grid_arrays[2] = NULL;
+  grid_attributes[0] = grid_attributes[1] = grid_attributes[2] = NULL;
 }
 
 /* ------------------------------------------------------------------------- */
 
 MadeupRenderer::~MadeupRenderer() {
+  deleteAxes();
+  deleteGrids();
   deletePaths();
   deleteTrimesh();
 
@@ -40,6 +53,7 @@ MadeupRenderer::~MadeupRenderer() {
   delete heading_array;
   delete heading_attributes;
   delete heading_program;
+  delete line_program;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -49,14 +63,14 @@ void MadeupRenderer::render() {
 
   glEnable(GL_DEPTH_TEST);
 
+  glLineWidth(path_stroke_width);
+  glPointSize(vertex_size);
+
   program->Bind();
   vertex_array->Bind();
   vertex_array->DrawIndexed(GL_TRIANGLES);
   vertex_array->Unbind();
   program->Unbind();
-
-  glLineWidth(path_stroke_width);
-  glPointSize(vertex_size);
 
   if (show_heading) {
     heading_program->Bind();
@@ -68,7 +82,7 @@ void MadeupRenderer::render() {
       if (path.size() > 0) {
         const td::QVector3<float> last = path[path.size() - 1].position;
         td::QMatrix4<float> r = path[path.size() - 1].camera.GetViewMatrix().GetOrthonormalInverse();
-        heading_program->SetUniform("modelview", camera.GetViewMatrix() * trackball.GetMatrix() * to_center * td::QMatrix4<float>::GetTranslate(last[0], last[1], last[2]) * r);
+        heading_program->SetUniform("modelview", camera.GetViewMatrix() * trackball.GetMatrix() * center_mesh_xform * td::QMatrix4<float>::GetTranslate(last[0], last[1], last[2]) * r);
         heading_array->DrawIndexed(GL_TRIANGLES);
       }
     }
@@ -76,11 +90,11 @@ void MadeupRenderer::render() {
     heading_program->Unbind();
   }
 
-  path_program->Bind();
+  line_program->Bind();
 
   // Paths
   for (int i = 0; i < npaths; ++i) {
-    path_program->SetUniform("color", path_color[0], path_color[1], path_color[2], path_color[3]);
+    line_program->SetUniform("color", path_color[0], path_color[1], path_color[2], path_color[3]);
 
     // Disable depth writes on line strip so that the points appear on top of it.
     glDepthMask(GL_FALSE);
@@ -90,16 +104,40 @@ void MadeupRenderer::render() {
     glDepthMask(GL_TRUE);
 
     if (show_stops) {
-      path_program->SetUniform("color", vertex_color[0], vertex_color[1], vertex_color[2], vertex_color[3]);
+      line_program->SetUniform("color", vertex_color[0], vertex_color[1], vertex_color[2], vertex_color[3]);
       path_arrays[i]->Bind();
       path_arrays[i]->DrawSequence(GL_POINTS);
       path_arrays[i]->Unbind();
     }
   }
 
+  glLineWidth(axis_stroke_width);
+  axes_array->Bind();
+  for (int d = 0; d < 3; ++d) {
+    if (show_axis[d]) {
+      QVector4<float> color(0.0f, 0.0f, 0.0f, 1.0f);
+      color[d] = 1.0f;
+      line_program->SetUniform("color", color[0], color[1], color[2], color[3]);
+      axes_array->DrawSequence(GL_LINES, d * 2, 2);
+    }
+  }
+  axes_array->Unbind();
+
+  glLineWidth(grid_stroke_width);
+  for (int d = 0; d < 3; ++d) {
+    if (show_grid[d]) {
+      grid_arrays[d]->Bind();
+      QVector4<float> color(0.0f, 0.0f, 0.0f, 1.0f);
+      color[d] = 1.0f;
+      line_program->SetUniform("color", color[0], color[1], color[2], color[3]);
+      grid_arrays[d]->DrawSequence(GL_LINES);
+      grid_arrays[d]->Unbind();
+    }
+  }
+
   glDisable(GL_DEPTH_TEST);
 
-  path_program->Unbind();
+  line_program->Unbind();
 
   OpenGL::CheckError("after on draw");
 }
@@ -165,6 +203,8 @@ void MadeupRenderer::initializeGL() {
   heading_array = new VertexArray(*heading_program, *heading_attributes);
 
   updateShaderProgram();
+  updateAxes();
+  updateGrids();
 
   Trimesh *trimesh = new Trimesh(0, 0);
   setTrimesh(trimesh);
@@ -194,6 +234,8 @@ void MadeupRenderer::setTrimesh(td::Trimesh *trimesh) {
 /* ------------------------------------------------------------------------- */
 
 void MadeupRenderer::fitCameraToMesh() {
+  // First we need to know the space we wish to keep in view. We find the
+  // bounding box that encloses the mesh, any paths, and any axes and grids.
   td::QVector3<float> min;
   td::QVector3<float> max;
 
@@ -202,35 +244,67 @@ void MadeupRenderer::fitCameraToMesh() {
   const QVector3<float> &tmax = trimesh_bounding_box.GetMaximum();
   const QVector3<float> &pmin = paths_bounding_box.GetMinimum();
   const QVector3<float> &pmax = paths_bounding_box.GetMaximum();
+
   for (int d = 0; d < 3; ++d) {
     min[d] = tmin[d] < pmin[d] ? tmin[d] : pmin[d];
     max[d] = tmax[d] > pmax[d] ? tmax[d] : pmax[d];
+
+    // Enclose grids and axes too, if shown.
+    if (show_axis[d] || show_grid[d]) {
+      if (-grid_extents[d] < min[d]) {
+        min[d] = -grid_extents[d];
+      }
+      if (grid_extents[d] > max[d]) {
+        max[d] = grid_extents[d];
+      }
+    }
   }
 
-  bounding_box = Box<float, 3>(max, min);
+  /* std::cout << "min: " << min << std::endl; */
+  /* std::cout << "max: " << max << std::endl; */
+
+  // Make it a cube, using the extrema as the bounds.
+  /* float minmin = min.GetMinimum(); */
+  /* float maxmax = max.GetMaximum(); */
+  /* min[0] = min[1] = min[2] = minmin; */
+  /* max[0] = max[1] = max[2] = maxmax; */
+
+  bbox = Box<float, 3>(max, min);
 
   // Set up transformations
-  center = bounding_box.GetCenter();
-  radius = bounding_box.GetDiagonalLength() * 0.5f;
-  float distance = radius / tan(45.0f * 0.5f * PI / 180.0f);
+  td::QVector3<float> bbox_center = bbox.GetCenter();
+  bbox_radius = bbox.GetDiagonalLength() * 0.5f;
 
-  to_center = td::QMatrix4<float>::GetTranslate(-center[0], -center[1], -center[2]);
-  camera.LookAt(QVector3<float>(0.0f, 0.0f, 1.0f * (distance + radius)),
+  float viewport_limit;
+  /* std::cout << "GetVerticalFieldOfView(): " << camera.GetVerticalFieldOfView() << std::endl; */
+  /* std::cout << "camera.GetHorizontalFieldOfView(getAspectRatio()): " << camera.GetHorizontalFieldOfView(getAspectRatio()) << std::endl; */
+  if (getAspectRatio() >= 1) {
+    viewport_limit = tan(camera.GetHorizontalFieldOfView(getAspectRatio()) * td::PI / 180.0f * 0.5f);
+  } else {
+    viewport_limit = tan(camera.GetVerticalFieldOfView() * td::PI / 180.0f * 0.5f);
+  }
+  /* std::cout << "viewport_limit: " << viewport_limit << std::endl; */
+
+  /* std::cout << "bbox.GetSize(): " << bbox.GetSize() << std::endl; */
+  /* std::cout << "bbox.GetSize().GetMaximum(): " << bbox.GetSize().GetMaximum() << std::endl; */
+  /* push = bbox.GetSize().GetMaximum() / viewport_limit; */
+  push = bbox_radius / viewport_limit;
+  /* float distance = bbox_radius / tan(45.0f * 0.5f * PI / 180.0f); */
+
+  center_mesh_xform = td::QMatrix4<float>::GetTranslate(-bbox_center[0], -bbox_center[1], -bbox_center[2]);
+  camera.LookAt(QVector3<float>(0.0f, 0.0f, bbox_radius + push + 0.1f),
                 QVector3<float>(0.0f, 0.0f, 0.0f),
                 QVector3<float>(0.0f, 1.0f, 0.0f));
 
   fitProjection();
-
   updateUniforms();
 }
 
 /* ------------------------------------------------------------------------- */
 
 void MadeupRenderer::fitProjection() {
-  float distance_to_center = (camera.GetTo() - camera.GetFrom()).GetLength();
-  camera.SetOrthographic(distance_to_center, distance_to_center, getAspectRatio(), distance_to_center - 2.01f * radius, distance_to_center + 1.01f * radius);
-  camera.SetPerspective(45.0f, getAspectRatio(), distance_to_center - 2.01f * radius, distance_to_center + 1.01f * radius);
-
+  /* camera.SetPerspective(45.0f, getAspectRatio(), 0.09f + push, push + bbox_radius * 2.0f + 0.1f); */
+  camera.SetPerspective(45.0f, getAspectRatio(), 0.01f, (push + bbox_radius * 2.0f + 0.1f) * 15);
   updateProjectionUniform();
 }
 
@@ -248,21 +322,21 @@ void MadeupRenderer::updateProjectionUniform() {
   program->SetUniform("projection", camera.GetProjectionMatrix());
   program->Unbind();
 
-  path_program->Bind();
-  path_program->SetUniform("projection", camera.GetProjectionMatrix());
-  path_program->Unbind();
+  line_program->Bind();
+  line_program->SetUniform("projection", camera.GetProjectionMatrix());
+  line_program->Unbind();
 }
 
 /* ------------------------------------------------------------------------- */
 
 void MadeupRenderer::updateModelviewUniform() {
   program->Bind();
-  program->SetUniform("modelview", camera.GetViewMatrix() * trackball.GetMatrix() * to_center);
+  program->SetUniform("modelview", camera.GetViewMatrix() * trackball.GetMatrix() * center_mesh_xform);
   program->Unbind();
 
-  path_program->Bind();
-  path_program->SetUniform("modelview", camera.GetViewMatrix() * trackball.GetMatrix() * to_center);
-  path_program->Unbind();
+  line_program->Bind();
+  line_program->SetUniform("modelview", camera.GetViewMatrix() * trackball.GetMatrix() * center_mesh_xform);
+  line_program->Unbind();
 }
 
 /* ------------------------------------------------------------------------- */
@@ -296,13 +370,7 @@ void MadeupRenderer::updateShaderProgram() {
     "  gl_FragColor = vec4(vec3(n_dot_l) * fcolor.rgb, fcolor.a);\n"
     "}\n";
 
-  std::cerr << "vertex_src: " << vertex_src << std::endl;
-  std::cerr << "fragment_src: " << fragment_src << std::endl;
-
   program = ShaderProgram::FromSource(vertex_src, fragment_src);
-
-  uniform_manager = new UniformManager();
-  uniform_manager->SetProgram(program);
 
   // Path program
   vertex_src =
@@ -324,7 +392,7 @@ void MadeupRenderer::updateShaderProgram() {
     "  gl_FragColor = color;\n"
     "}\n";
 
-  path_program = ShaderProgram::FromSource(vertex_src, fragment_src);
+  line_program = ShaderProgram::FromSource(vertex_src, fragment_src);
 
   updateUniforms();
 }
@@ -420,7 +488,7 @@ float MadeupRenderer::leftMouseUpAt(int x, int y) {
 
 void MadeupRenderer::scroll(int nclicks) {
   const float FACTOR = 0.05f;
-  camera.Advance(radius * FACTOR * nclicks);
+  camera.Advance(bbox_radius * FACTOR * nclicks);
   program->Bind();
   updateModelviewUniform();
   program->Unbind();
@@ -464,7 +532,7 @@ void MadeupRenderer::setPaths(const std::vector<std::vector<madeup::Turtle> > &p
       
       path_attributes[pi] = new VertexAttributes();
       path_attributes[pi]->AddAttribute("position", paths[pi].size(), 3, vertices);
-      path_arrays[pi] = new VertexArray(*path_program, *path_attributes[pi]);
+      path_arrays[pi] = new VertexArray(*line_program, *path_attributes[pi]);
     }
   }
 }
@@ -618,6 +686,228 @@ void MadeupRenderer::exportTrimesh(const std::string &path) {
 
 void MadeupRenderer::autoRotate() {
   trackball.Autorotate(); 
+  updateModelviewUniform();  
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::showAxis(int i, bool show) {
+  assert(i >= 0 && i < 3);
+  show_axis[i] = show;
+}
+
+/* ------------------------------------------------------------------------- */
+
+bool MadeupRenderer::showAxis(int i) const {
+  assert(i >= 0 && i < 3);
+  return show_axis[i]; 
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::showGrid(int i, bool show) {
+  assert(i >= 0 && i < 3);
+  show_grid[i] = show;
+}
+
+/* ------------------------------------------------------------------------- */
+
+bool MadeupRenderer::showGrid(int i) const {
+  assert(i >= 0 && i < 3);
+  return show_grid[i]; 
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::updateAxes() {
+  deleteAxes();
+
+  float positions[3 * 2 * 3];
+  float *position = positions;
+
+  for (int d = 0; d < 3; ++d) {
+    position[(d + 0) % 3] = -grid_extents[d];
+    position[(d + 1) % 3] = 0.0f;
+    position[(d + 2) % 3] = 0.0f;
+    position += 3;
+
+    position[(d + 0) % 3] = grid_extents[d];
+    position[(d + 1) % 3] = 0.0f;
+    position[(d + 2) % 3] = 0.0f;
+    position += 3;
+  }
+
+  axes_attributes = new VertexAttributes();
+  axes_attributes->AddAttribute("position", 6, 3, positions);
+
+  axes_array = new VertexArray(*line_program, *axes_attributes);
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::deleteAxes() {
+  delete axes_array;
+  delete axes_attributes;
+
+  axes_array = NULL;
+  axes_attributes = NULL;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::setGridExtent(int i, float extent) {
+  assert(i >= 0 && i < 3);
+  grid_extents[i] = extent;
+  updateAxes();
+  updateGrids();
+}
+
+/* ------------------------------------------------------------------------- */
+
+float MadeupRenderer::getGridExtent(int i) const {
+  assert(i >= 0 && i < 3);
+  return grid_extents[i];
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::setGridSpacing(int i, float spacing) {
+  assert(i >= 0 && i < 3);
+  grid_spacing[i] = spacing;
+  updateGrids();
+}
+
+/* ------------------------------------------------------------------------- */
+
+float MadeupRenderer::getGridSpacing(int i) const {
+  assert(i >= 0 && i < 3);
+  return grid_spacing[i];
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::updateGrids() {
+  deleteGrids();
+
+  for (int d = 0; d < 3; ++d) {
+    int d1 = (d + 1) % 3;
+    int d2 = (d + 2) % 3;
+
+    int nlines1 = ((int) grid_extents[d1] / grid_spacing[d1]);
+    int nlines2 = ((int) grid_extents[d2] / grid_spacing[d2]);
+    int nvertices = (nlines1 * 2 + nlines2 * 2) * 2;
+
+    float *positions = new float[nvertices * 3];
+    float *position = positions;
+
+    for (int i = 1; i <= nlines1; ++i) {
+      float f = i * grid_spacing[d1];
+
+      // Positive side
+      position[d] = 0.0f;
+      position[d1] = f;
+      position[d2] = -grid_extents[d2];
+      position += 3;
+
+      position[d] = 0.0f;
+      position[d1] = f;
+      position[d2] = grid_extents[d2];
+      position += 3;
+
+      // Negative side
+      position[d] = 0.0f;
+      position[d1] = -f;
+      position[d2] = -grid_extents[d2];
+      position += 3;
+
+      position[d] = 0.0f;
+      position[d1] = -f;
+      position[d2] = grid_extents[d2];
+      position += 3;
+    }
+
+    for (int i = 1; i <= nlines2; ++i) {
+      float f = i * grid_spacing[d2];
+
+      // Positive side
+      position[d] = 0.0f;
+      position[d1] = -grid_extents[d1];
+      position[d2] = f;
+      position += 3;
+
+      position[d] = 0.0f;
+      position[d1] = grid_extents[d1];
+      position[d2] = f;
+      position += 3;
+
+      // Negative side
+      position[d] = 0.0f;
+      position[d1] = -grid_extents[d1];
+      position[d2] = -f;
+      position += 3;
+
+      position[d] = 0.0f;
+      position[d1] = grid_extents[d1];
+      position[d2] = -f;
+      position += 3;
+    }
+
+    grid_attributes[d] = new VertexAttributes();
+    grid_attributes[d]->AddAttribute("position", nvertices, 3, positions);
+
+    grid_arrays[d] = new VertexArray(*line_program, *grid_attributes[d]);
+  }
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::deleteGrids() {
+  for (int d = 0; d < 3; ++d) {
+    delete grid_arrays[d];
+    grid_arrays[d] = NULL;
+
+    delete grid_attributes[d];
+    grid_attributes[d] = NULL;
+  }
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::setAxisStrokeWidth(float width) {
+  axis_stroke_width = width;
+}
+
+/* ------------------------------------------------------------------------- */
+
+float MadeupRenderer::getAxisStrokeWidth() const {
+  return axis_stroke_width;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::setGridStrokeWidth(float width) {
+  grid_stroke_width = width;
+}
+
+/* ------------------------------------------------------------------------- */
+
+float MadeupRenderer::getGridStrokeWidth() const {
+  return grid_stroke_width;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::viewFromAxis(int d, int sign) {
+  trackball.Reset();
+  fitCameraToMesh(); 
+  if (d == 0) {
+    trackball.Rotate(sign * -90.0f, td::QVector3<float>(0.0f, 1.0f, 0.0f));
+  } else if (d == 1) {
+    trackball.Rotate(sign * 90.0f, td::QVector3<float>(1.0f, 0.0f, 0.0f));
+  } else if (d == 2 && sign < 0) {
+    trackball.Rotate(180.0f, td::QVector3<float>(0.0f, 1.0f, 0.0f));
+  }
   updateModelviewUniform();  
 }
 

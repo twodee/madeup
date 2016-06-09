@@ -5,7 +5,6 @@
 #include "twodee/Trimesh.h"
 #include "twodee/Camera.h"
 #include "VertexArray.h"
-#include "UniformManager.h"
 #include "Trackball.h"
 
 namespace FaceOrientation {
@@ -64,7 +63,24 @@ class MadeupRenderer {
     void takeScreenshot(const std::string &path);
     void autoRotate();
 
+    void showAxis(int i, bool show);
+    bool showAxis(int i) const;
+    void showGrid(int i, bool show);
+    bool showGrid(int i) const;
+    void setGridExtent(int i, float extent);
+    float getGridExtent(int i) const;
+    void setGridSpacing(int i, float spacing);
+    float getGridSpacing(int i) const;
+
+    void setAxisStrokeWidth(float width);
+    float getAxisStrokeWidth() const;
+    void setGridStrokeWidth(float width);
+    float getGridStrokeWidth() const;
+    void viewFromAxis(int d, int sign);
+
   private:
+    void deleteAxes();
+    void deleteGrids();
     void deletePaths();
     void deleteTrimesh();
     void fitCameraToMesh();
@@ -73,6 +89,8 @@ class MadeupRenderer {
     void updateProjectionUniform();
     void updateModelviewUniform();
     void updateShaderProgram();
+    void updateAxes();
+    void updateGrids();
     float getAspectRatio();
 
     td::Trimesh *trimesh;
@@ -89,29 +107,41 @@ class MadeupRenderer {
     td::VertexArray *heading_array;
     td::VertexAttributes *heading_attributes;
 
-    td::UniformManager *uniform_manager;
-
-    td::ShaderProgram *path_program;
+    td::ShaderProgram *line_program;
     td::VertexArray **path_arrays;
     td::VertexAttributes **path_attributes;
     int npaths;
 
+    td::VertexArray *axes_array;
+    td::VertexAttributes *axes_attributes;
+
+    td::VertexArray *grid_arrays[3];
+    td::VertexAttributes *grid_attributes[3];
+
     std::vector<std::vector<madeup::Turtle> > paths;
 
-    td::Box<float, 3> bounding_box;
+    td::Box<float, 3> bbox;
     td::Box<float, 3> paths_bounding_box;
-    td::QVector3<float> center;
-    td::QMatrix4<float> to_center;
+    td::QMatrix4<float> center_mesh_xform;
     td::Camera camera;
     td::Trackball trackball;
-    float radius;
-    float path_stroke_width;
-    float vertex_size;
+    float bbox_radius;
+    float push;
 
     bool show_heading;
     bool show_stops;
     int face_orientation;
     int face_style;
+
+    float path_stroke_width;
+    float axis_stroke_width;
+    float grid_stroke_width;
+    float vertex_size;
+
+    bool show_axis[3];
+    bool show_grid[3];
+    float grid_extents[3];
+    float grid_spacing[3];
 };
 
 #endif

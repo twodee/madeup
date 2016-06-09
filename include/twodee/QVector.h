@@ -111,6 +111,9 @@ template<class T, int ndims> class QVector {
      */
     T SelfProduct() const;
 
+    T GetMinimum() const;
+    T GetMaximum() const;
+
     /**
      Adds another vector to this vector and gets the result.
      @param other Vector to add.
@@ -727,6 +730,32 @@ QVector<T, ndims> QVector<T, ndims>::GetReverse() const {
 template<class T, int ndims>
 T QVector<T, ndims>::GetDistanceTo(const QVector<T, ndims> &other) const {
   return (*this - other).GetLength(); 
+}
+
+/* ------------------------------------------------------------------------- */
+
+template<class T, int ndims>
+T QVector<T, ndims>::GetMaximum() const {
+  T max = (*this)[0];
+  for (int i = 1; i < ndims; ++i) {
+    if ((*this)[i] > max) {
+      max = (*this)[i];
+    }
+  }
+  return max;
+}
+
+/* ------------------------------------------------------------------------- */
+
+template<class T, int ndims>
+T QVector<T, ndims>::GetMinimum() const {
+  T min = (*this)[0];
+  for (int i = 1; i < ndims; ++i) {
+    if ((*this)[i] < min) {
+      min = (*this)[i];
+    }
+  }
+  return min;
 }
 
 /* ------------------------------------------------------------------------- */
