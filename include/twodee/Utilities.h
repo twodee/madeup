@@ -32,6 +32,8 @@ class Utilities {
     static char *FileToString(const std::string& path);
     static std::string Slurp(const std::string& path);
 
+    static int ToInt(const std::string &s);
+
     /**
      Convert array of one type to array of another. Assumes destination array
      has already been allocated.

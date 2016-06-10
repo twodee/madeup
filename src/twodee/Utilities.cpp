@@ -2,6 +2,7 @@
 #include "twodee/Utilities.h"
 
 #include <fstream>
+#include <sstream>
 
 namespace td {
 
@@ -86,6 +87,15 @@ bool Utilities::Replace(std::string& in,
     in.replace(i, replacee.length(), replacer);
     return true;
   }
+}
+
+/* ------------------------------------------------------------------------- */
+
+int Utilities::ToInt(const std::string &s) {
+  std::stringstream ss(s);
+  int i;
+  ss >> i;
+  return i;
 }
 
 /* ------------------------------------------------------------------------- */

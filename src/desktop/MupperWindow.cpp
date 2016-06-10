@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <regex>
 
 #include <QApplication>
 #include <QColorDialog>
@@ -52,16 +53,18 @@ MupperWindow::MupperWindow(QWidget *parent) :
   vertical_splitter->setOrientation(Qt::Vertical);
 
   // - Editor
-  editor = new QTextEdit(vertical_splitter);
+  editor = new QPlainTextEdit(vertical_splitter);
   QFont font;
   font.setFamily(QStringLiteral("Courier New"));
   font.setPointSize(18);
   editor->setFont(font);
-  editor->setLineWrapMode(QTextEdit::NoWrap);
+  editor->setLineWrapMode(QPlainTextEdit::NoWrap);
 
   // - Console
-  console = new QTextEdit(vertical_splitter);
+  console = new QTextBrowser(vertical_splitter);
   console->setFont(font);
+  /* console->setText("<a href=\"jump?start=3&end=7\">click here</a>"); */
+  console->setOpenLinks(false);
 
   {
     QPalette palette;
@@ -440,7 +443,28 @@ MupperWindow::MupperWindow(QWidget *parent) :
   connect(action_pathify, &QAction::triggered, this, &MupperWindow::onPathify);
   connect(action_fit, &QAction::triggered, this, &MupperWindow::onFit);
   connect(select_font_button, &QPushButton::clicked, this, &MupperWindow::selectFont);
-  connect(editor, &QTextEdit::textChanged, this, &MupperWindow::onTextChanged);
+  connect(editor, &QPlainTextEdit::textChanged, this, &MupperWindow::onTextChanged);
+
+  connect(console, &QTextBrowser::anchorClicked, [=](const QUrl &link) {
+    string command = link.toString().toStdString();
+
+    std::smatch groups;
+    if (std::regex_match(command, groups, std::regex("jump\\?start=(\\d+)&end=(\\d+)"))) {
+      auto group = groups.begin();
+      ++group;
+
+      int a = td::Utilities::ToInt(*group);
+      ++group;
+
+      int b = td::Utilities::ToInt(*group);
+      ++group;
+
+      QTextCursor cursor(editor->document());
+      cursor.setPosition(a, QTextCursor::MoveAnchor);
+      cursor.setPosition(b + 1, QTextCursor::KeepAnchor);
+      editor->setTextCursor(cursor);
+    }
+  });
 
   connect(negative_x_button, &QPushButton::clicked, [=]() {
     canvas->makeCurrent();
@@ -524,7 +548,7 @@ MupperWindow::MupperWindow(QWidget *parent) :
     if (!path.isEmpty()) {
       mup_path = path;
       std::string source = td::Utilities::Slurp(path.toStdString());
-      editor->setText(source.c_str());
+      editor->setPlainText(source.c_str());
       this->setWindowTitle(("Madeup: " + mup_path.toStdString()).c_str());
     }
   });
@@ -679,7 +703,7 @@ MupperWindow::MupperWindow(QWidget *parent) :
 
   // Tweaks
   editor->blockSignals(true);
-  editor->setText("moveto 0, 0, 0\n"
+  editor->setPlainText("moveto 0, 0, 0\n"
                   "repeat 4\n"
                   "  move 10\n"
                   "  yaw 90\n"
@@ -738,7 +762,11 @@ void MupperWindow::onRun(GeometryMode::geometry_mode_t geometry_mode) {
   }
 
   std::cout.rdbuf(old_cout_buffer);
-  console->setText(cout_capturer.str().c_str());
+  string output = cout_capturer.str();
+
+  output = std::regex_replace(output, std::regex("^(\\d+)\\((\\d+)-(\\d+)\\):\\s*"), "<a href=\"jump?start=$2&end=$3\">Error on line $1</a>: ");
+
+  console->setText(output.c_str());
 
   canvas->update();
 }
@@ -897,7 +925,7 @@ void MupperWindow::selectColor(const td::QVector4<float> &initial_color,
 /* ------------------------------------------------------------------------- */
 
 void MupperWindow::selectFont() {
-  QFontDialog *picker = new QFontDialog(editor->currentFont(), this); 
+  QFontDialog *picker = new QFontDialog(editor->font(), this); 
   picker->setOption(QFontDialog::NoButtons);
   connect(picker, &QFontDialog::currentFontChanged, [=](const QFont &font) {
     editor->setFont(font);

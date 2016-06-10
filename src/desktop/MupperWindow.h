@@ -8,7 +8,8 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QSplitter>
-#include <QTextEdit>
+#include <QTextBrowser>
+#include <QPlainTextEdit>
 
 #include "MadeupCanvas.h"
 
@@ -48,8 +49,8 @@ class MupperWindow : public QMainWindow {
     static QColor toQColor(const td::QVector4<float> &color);
 
     QTimer *autopathify_timer;
-    QTextEdit *editor;
-    QTextEdit *console;
+    QPlainTextEdit *editor;
+    QTextBrowser *console;
     MadeupCanvas *canvas;
     MadeupRenderer *renderer;
     QString mup_path;
