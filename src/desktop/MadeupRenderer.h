@@ -159,6 +159,9 @@ class MadeupRenderer {
     float elevation_angle;
     float shininess;
     float light_distance_factor;
+
+    td::VertexAttributes *debug_attributes;
+    td::VertexArray *debug_array;
 };
 
 #endif

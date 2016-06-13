@@ -67,10 +67,38 @@ void MadeupRenderer::render() {
 
   glEnable(GL_DEPTH_TEST);
 
+  float azimuth_angle_radians = azimuth_angle * td::PI / 180.0f;
+  float elevation_angle_radians = elevation_angle * td::PI / 180.0f;
+  td::QVector4<float> light_position_world;
+  light_position_world[0] = cos(elevation_angle_radians) * cos(azimuth_angle_radians);
+  light_position_world[1] = sin(elevation_angle_radians);
+  light_position_world[2] = cos(elevation_angle_radians) * sin(azimuth_angle_radians);
+  light_position_world[3] = 1.0f;
+
+  {
+    light_position_world *= light_distance_factor * bbox_radius;
+    light_position_world[3] = 1.0f;
+    VertexAttribute *attr = debug_attributes->GetAttribute("position");
+    float positions[] = {
+      0.0f, 0.0f, 0.0f,
+      light_position_world[0], light_position_world[1], light_position_world[2]
+    };
+    attr->Update(positions);
+  }
+
   glLineWidth(path_stroke_width);
   glPointSize(vertex_size);
 
+  line_program->Bind();
+  debug_array->Bind();
+  debug_array->DrawSequence(GL_LINES);
+  debug_array->Unbind();
+  line_program->Unbind();
+
   program->Bind();
+  td::QVector4<float> light_position_eye = camera.GetViewMatrix() * light_position_world;
+  program->SetUniform("light_position_eye", light_position_eye[0], light_position_eye[1], light_position_eye[2]);
+  program->SetUniform("shininess", shininess);
   vertex_array->Bind();
   vertex_array->DrawIndexed(GL_TRIANGLES);
   vertex_array->Unbind();
@@ -186,29 +214,45 @@ void MadeupRenderer::initializeGL() {
     "attribute vec3 position;\n"
     "attribute vec3 normal;\n"
     "varying vec3 fnormal;\n"
+    "varying vec4 fposition;\n"
     "\n"
     "void main() {\n"
-    "  gl_Position = projection * modelview * vec4(position, 1.0);\n"
+    "  fposition = modelview * vec4(position, 1.0);\n"
+    "  gl_Position = projection * fposition;\n"
     "  fnormal = normalize(vec3(modelview * vec4(normal, 0.0)));\n"
     "}\n";
 
   string fragment_src =
     "#version 120\n"
     "uniform vec4 color;\n"
+    "uniform vec3 light_position_eye;\n"
     "varying vec3 fnormal;\n"
+    "varying vec4 fposition;\n"
     "\n"
     "void main() {\n"
-    "  float n_dot_l = max(0.0, dot(normalize(fnormal), vec3(0.0, 0.0, 1.0)));\n"
+    "  vec3 to_light = normalize(light_position_eye - fposition.xyz);\n"
+    "  float n_dot_l = max(0.0, dot(normalize(fnormal), to_light));\n"
     "  gl_FragColor = vec4(vec3(n_dot_l) * color.rgb, color.a);\n"
     "}\n";
 
   heading_program = ShaderProgram::FromSource(vertex_src, fragment_src);
-
   heading_array = new VertexArray(*heading_program, *heading_attributes);
 
   updateShaderProgram();
   updateAxes();
   updateGrids();
+
+  debug_attributes = new VertexAttributes();
+  {
+    float positions[] = {
+      0.0f, 0.0f, 0.0f,
+      20.0f, 20.0f, 20.0f,
+    };
+
+    debug_attributes->AddAttribute("position", 2, 3, positions);
+  }
+  debug_array = new VertexArray(*line_program, *debug_attributes);
+
 
   Trimesh *trimesh = new Trimesh(0, 0);
   setTrimesh(trimesh);
@@ -357,21 +401,30 @@ void MadeupRenderer::updateShaderProgram() {
     "attribute vec3 color;\n"
     "varying vec3 fnormal;\n"
     "varying vec4 fcolor;\n"
+    "varying vec4 fposition;\n"
     "\n"
     "void main() {\n"
-    "  gl_Position = projection * modelview * vec4(position, 1.0);\n"
+    "  fposition = modelview * vec4(position, 1.0);\n"
+    "  gl_Position = projection * fposition;\n"
     "  fnormal = normalize(vec3(modelview * vec4(normal, 0.0)));\n"
     "  fcolor = vec4(color, 1.0);\n"
     "}\n";
 
   string fragment_src =
     "#version 120\n"
+    "uniform vec3 light_position_eye;\n"
+    "uniform float shininess;\n"
     "varying vec3 fnormal;\n"
     "varying vec4 fcolor;\n"
+    "varying vec4 fposition;\n"
     "\n"
     "void main() {\n"
-    "  float n_dot_l = max(0.0, dot(normalize(fnormal), vec3(0.0, 0.0, 1.0)));\n"
-    "  gl_FragColor = vec4(vec3(n_dot_l) * fcolor.rgb, fcolor.a);\n"
+    "  vec3 to_light = normalize(light_position_eye - fposition.xyz);\n"
+    "  vec3 normal = normalize(fnormal);\n"
+    "  vec3 halfway = normalize(to_light - fposition.xyz);\n"
+    "  float n_dot_l = max(0.0, dot(normal, to_light));\n"
+    "  float n_dot_h = max(0.0f, dot(normal, halfway));\n"
+    "  gl_FragColor = vec4(fcolor.rgb * n_dot_l + vec3(1.0) * pow(n_dot_h, shininess), fcolor.a);\n"
     "}\n";
 
   program = ShaderProgram::FromSource(vertex_src, fragment_src);

@@ -337,6 +337,8 @@ MupperWindow::MupperWindow(QWidget *parent) :
   light_distance_factor_spinner->setMaximum(100.0);
   light_distance_factor_spinner->setSingleStep(0.1);
 
+  faceted_checkbox = new QCheckBox("Faceted");
+
   QGridLayout *lighting_page_layout = new QGridLayout(lighting_page);
   lighting_page_layout->setSpacing(-1);
   lighting_page_layout->setContentsMargins(0, 0, 0, 0);
@@ -353,8 +355,10 @@ MupperWindow::MupperWindow(QWidget *parent) :
   lighting_page_layout->addWidget(new QLabel("Distance factor"), 3, 0);
   lighting_page_layout->addWidget(light_distance_factor_spinner, 3, 1);
 
+  lighting_page_layout->addWidget(faceted_checkbox, 4, 0, 1, 2);
+
   QSpacerItem *vertical_spacer4 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-  lighting_page_layout->addItem(vertical_spacer4, 4, 0, 1, 2);
+  lighting_page_layout->addItem(vertical_spacer4, 5, 0, 1, 2);
 
   lighting_page_layout->setColumnStretch(0, 0);
   lighting_page_layout->setColumnStretch(1, 1);
@@ -676,6 +680,10 @@ MupperWindow::MupperWindow(QWidget *parent) :
     console->setVisible(is_checked);
   });
 
+  connect(faceted_checkbox, &QCheckBox::toggled, [=](bool is_checked) {
+    onRun(GeometryMode::SURFACE);
+  });
+
   connect(show_heading_checkbox, &QCheckBox::toggled, [=](bool is_checked) {
     canvas->makeCurrent();
     renderer->showHeading(is_checked);
@@ -818,7 +826,9 @@ void MupperWindow::onRun(GeometryMode::geometry_mode_t geometry_mode) {
       renderer->setPaths(env.getPaths());
     } else if (geometry_mode == GeometryMode::SURFACE) {
       td::Trimesh *trimesh = env.getMesh();
-      trimesh->DisconnectFaces();
+      if (faceted_checkbox->isChecked()) {
+        trimesh->DisconnectFaces();
+      }
       if (trimesh->GetVertexCount() == 0) {
         std::cout << "Uh oh. You either didn't visit any locations or didn't invoke a solidifier. I can't make any models without more information from you." << std::endl;
       }
@@ -1186,6 +1196,9 @@ void MupperWindow::loadPreferences() {
     autopathify_checkbox->setChecked(autopathify);
     console->setVisible(show_console);
 
+    bool faceted = prefs.get("show.faceted", true).asBool();
+    faceted_checkbox->setChecked(faceted);
+
     double azimuth_angle = prefs.get("light.azimuth.angle", renderer->getAzimuthAngle()).asDouble();
     azimuth_angle_spinner->setValue(azimuth_angle);
 
@@ -1296,6 +1309,8 @@ void MupperWindow::savePreferences() {
     prefs["light.elevation.angle"] = elevation_angle_spinner->value();
     prefs["light.shininess"] = shininess_spinner->value();
     prefs["light.distance.factor"] = light_distance_factor_spinner->value();
+
+    prefs["show.faceted"] = faceted_checkbox->isChecked();
 
     Json::StyledWriter writer;
     string json = writer.write(prefs);

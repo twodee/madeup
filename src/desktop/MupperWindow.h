@@ -72,6 +72,7 @@ class MupperWindow : public QMainWindow {
     QCheckBox *show_stops_checkbox;
     QCheckBox *show_console_checkbox;
     QCheckBox *autopathify_checkbox;
+    QCheckBox *faceted_checkbox;
     QCheckBox *show_axis_checkboxes[3];
     QCheckBox *show_grid_checkboxes[3];
 
