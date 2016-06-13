@@ -33,7 +33,8 @@ MadeupRenderer::MadeupRenderer() :
   vertex_size(6.0f),
   azimuth_angle(45.0f),
   elevation_angle(70.0f),
-  shininess(0.0f) {
+  shininess(0.0f),
+  light_distance_factor(2.0f) {
 
   show_axis[0] = show_axis[1] = show_axis[2] = true;
   show_grid[0] = show_grid[1] = show_grid[2] = true;
@@ -948,6 +949,18 @@ float MadeupRenderer::getShininess() const {
 
 void MadeupRenderer::setShininess(float shininess) {
   this->shininess = shininess;
+}
+
+/* ------------------------------------------------------------------------- */
+
+float MadeupRenderer::getLightDistanceFactor() const {
+  return light_distance_factor;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::setLightDistanceFactor(float factor) {
+  light_distance_factor = factor;
 }
 
 /* ------------------------------------------------------------------------- */

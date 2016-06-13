@@ -87,6 +87,9 @@ class MadeupRenderer {
     float getShininess() const;
     void setShininess(float shininess);
 
+    float getLightDistanceFactor() const;
+    void setLightDistanceFactor(float factor);
+
   private:
     void deleteAxes();
     void deleteGrids();
@@ -155,6 +158,7 @@ class MadeupRenderer {
     float azimuth_angle;
     float elevation_angle;
     float shininess;
+    float light_distance_factor;
 };
 
 #endif

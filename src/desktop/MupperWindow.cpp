@@ -314,7 +314,7 @@ MupperWindow::MupperWindow(QWidget *parent) :
   QSpacerItem *vertical_spacer2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
   camera_page_layout->addItem(vertical_spacer2);
 
-  // Display page
+  // Lighting page
   QWidget *lighting_page = new QWidget();
 
   azimuth_angle_spinner = new QDoubleSpinBox();
@@ -332,6 +332,11 @@ MupperWindow::MupperWindow(QWidget *parent) :
   shininess_spinner->setMaximum(1000.0);
   shininess_spinner->setSingleStep(10.0);
 
+  light_distance_factor_spinner = new QDoubleSpinBox();
+  light_distance_factor_spinner->setMinimum(0.0);
+  light_distance_factor_spinner->setMaximum(100.0);
+  light_distance_factor_spinner->setSingleStep(0.1);
+
   QGridLayout *lighting_page_layout = new QGridLayout(lighting_page);
   lighting_page_layout->setSpacing(-1);
   lighting_page_layout->setContentsMargins(0, 0, 0, 0);
@@ -345,8 +350,11 @@ MupperWindow::MupperWindow(QWidget *parent) :
   lighting_page_layout->addWidget(new QLabel("Shininess"), 2, 0);
   lighting_page_layout->addWidget(shininess_spinner, 2, 1);
 
+  lighting_page_layout->addWidget(new QLabel("Distance factor"), 3, 0);
+  lighting_page_layout->addWidget(light_distance_factor_spinner, 3, 1);
+
   QSpacerItem *vertical_spacer4 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-  lighting_page_layout->addItem(vertical_spacer4, 3, 0, 1, 2);
+  lighting_page_layout->addItem(vertical_spacer4, 4, 0, 1, 2);
 
   lighting_page_layout->setColumnStretch(0, 0);
   lighting_page_layout->setColumnStretch(1, 1);
@@ -724,6 +732,12 @@ MupperWindow::MupperWindow(QWidget *parent) :
   connect(shininess_spinner, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=](double value) {
     canvas->makeCurrent();
     renderer->setShininess(value);
+    canvas->update();
+  });
+
+  connect(light_distance_factor_spinner, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=](double value) {
+    canvas->makeCurrent();
+    renderer->setLightDistanceFactor(value);
     canvas->update();
   });
 
@@ -1181,6 +1195,9 @@ void MupperWindow::loadPreferences() {
     double shininess = prefs.get("light.shininess", renderer->getShininess()).asDouble();
     shininess_spinner->setValue(shininess);
 
+    double light_distance_factor = prefs.get("light.distance.factor", renderer->getLightDistanceFactor()).asDouble();
+    light_distance_factor_spinner->setValue(light_distance_factor);
+
     // Horizontal splitter
     Json::Value horizontal_sizes_node = prefs.get("horizontal.splitter.sizes", Json::nullValue);
     if (!horizontal_sizes_node.isNull()) {
@@ -1278,6 +1295,7 @@ void MupperWindow::savePreferences() {
     prefs["light.azimuth.angle"] = azimuth_angle_spinner->value();
     prefs["light.elevation.angle"] = elevation_angle_spinner->value();
     prefs["light.shininess"] = shininess_spinner->value();
+    prefs["light.distance.factor"] = light_distance_factor_spinner->value();
 
     Json::StyledWriter writer;
     string json = writer.write(prefs);

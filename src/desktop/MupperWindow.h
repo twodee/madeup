@@ -66,6 +66,7 @@ class MupperWindow : public QMainWindow {
     QDoubleSpinBox *azimuth_angle_spinner;
     QDoubleSpinBox *elevation_angle_spinner;
     QDoubleSpinBox *shininess_spinner;
+    QDoubleSpinBox *light_distance_factor_spinner;
 
     QCheckBox *show_heading_checkbox;
     QCheckBox *show_stops_checkbox;
