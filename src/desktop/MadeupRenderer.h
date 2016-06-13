@@ -78,6 +78,15 @@ class MadeupRenderer {
     float getGridStrokeWidth() const;
     void viewFromAxis(int d, int sign);
 
+    float getAzimuthAngle() const;
+    void setAzimuthAngle(float angle);
+
+    float getElevationAngle() const;
+    void setElevationAngle(float angle);
+
+    float getShininess() const;
+    void setShininess(float shininess);
+
   private:
     void deleteAxes();
     void deleteGrids();
@@ -142,6 +151,10 @@ class MadeupRenderer {
     bool show_grid[3];
     float grid_extents[3];
     float grid_spacing[3];
+
+    float azimuth_angle;
+    float elevation_angle;
+    float shininess;
 };
 
 #endif

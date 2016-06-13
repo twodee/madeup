@@ -314,10 +314,48 @@ MupperWindow::MupperWindow(QWidget *parent) :
   QSpacerItem *vertical_spacer2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
   camera_page_layout->addItem(vertical_spacer2);
 
+  // Display page
+  QWidget *lighting_page = new QWidget();
+
+  azimuth_angle_spinner = new QDoubleSpinBox();
+  azimuth_angle_spinner->setMinimum(0.0);
+  azimuth_angle_spinner->setMaximum(360.0);
+  azimuth_angle_spinner->setSingleStep(5.0);
+
+  elevation_angle_spinner = new QDoubleSpinBox();
+  elevation_angle_spinner->setMinimum(-90.0);
+  elevation_angle_spinner->setMaximum(90.0);
+  elevation_angle_spinner->setSingleStep(5.0);
+
+  shininess_spinner = new QDoubleSpinBox();
+  shininess_spinner->setMinimum(0.0);
+  shininess_spinner->setMaximum(1000.0);
+  shininess_spinner->setSingleStep(10.0);
+
+  QGridLayout *lighting_page_layout = new QGridLayout(lighting_page);
+  lighting_page_layout->setSpacing(-1);
+  lighting_page_layout->setContentsMargins(0, 0, 0, 0);
+
+  lighting_page_layout->addWidget(new QLabel("Azimuth angle"), 0, 0);
+  lighting_page_layout->addWidget(azimuth_angle_spinner, 0, 1);
+
+  lighting_page_layout->addWidget(new QLabel("Elevation angle"), 1, 0);
+  lighting_page_layout->addWidget(elevation_angle_spinner, 1, 1);
+
+  lighting_page_layout->addWidget(new QLabel("Shininess"), 2, 0);
+  lighting_page_layout->addWidget(shininess_spinner, 2, 1);
+
+  QSpacerItem *vertical_spacer4 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+  lighting_page_layout->addItem(vertical_spacer4, 3, 0, 1, 2);
+
+  lighting_page_layout->setColumnStretch(0, 0);
+  lighting_page_layout->setColumnStretch(1, 1);
+
   // Add pages
   settings_pager->addWidget(display_page);
   settings_pager->addWidget(editor_page);
   settings_pager->addWidget(camera_page);
+  settings_pager->addWidget(lighting_page);
 
   // Layout
   QSizePolicy horizontal_stretch(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -670,6 +708,24 @@ MupperWindow::MupperWindow(QWidget *parent) :
       canvas->update();
     });
   }
+
+  connect(azimuth_angle_spinner, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=](double value) {
+    canvas->makeCurrent();
+    renderer->setAzimuthAngle(value);
+    canvas->update();
+  });
+
+  connect(elevation_angle_spinner, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=](double value) {
+    canvas->makeCurrent();
+    renderer->setElevationAngle(value);
+    canvas->update();
+  });
+
+  connect(shininess_spinner, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=](double value) {
+    canvas->makeCurrent();
+    renderer->setShininess(value);
+    canvas->update();
+  });
 
   connect(axis_stroke_width_spinner, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=](double value) {
     canvas->makeCurrent();
@@ -1116,6 +1172,15 @@ void MupperWindow::loadPreferences() {
     autopathify_checkbox->setChecked(autopathify);
     console->setVisible(show_console);
 
+    double azimuth_angle = prefs.get("light.azimuth.angle", renderer->getAzimuthAngle()).asDouble();
+    azimuth_angle_spinner->setValue(azimuth_angle);
+
+    double elevation_angle = prefs.get("light.elevation.angle", renderer->getElevationAngle()).asDouble();
+    elevation_angle_spinner->setValue(elevation_angle);
+
+    double shininess = prefs.get("light.shininess", renderer->getShininess()).asDouble();
+    shininess_spinner->setValue(shininess);
+
     // Horizontal splitter
     Json::Value horizontal_sizes_node = prefs.get("horizontal.splitter.sizes", Json::nullValue);
     if (!horizontal_sizes_node.isNull()) {
@@ -1209,6 +1274,10 @@ void MupperWindow::savePreferences() {
 
     prefs["axis.stroke.width"] = axis_stroke_width_spinner->value();
     prefs["grid.stroke.width"] = grid_stroke_width_spinner->value();
+
+    prefs["light.azimuth.angle"] = azimuth_angle_spinner->value();
+    prefs["light.elevation.angle"] = elevation_angle_spinner->value();
+    prefs["light.shininess"] = shininess_spinner->value();
 
     Json::StyledWriter writer;
     string json = writer.write(prefs);

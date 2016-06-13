@@ -30,7 +30,10 @@ MadeupRenderer::MadeupRenderer() :
   path_stroke_width(4.0f),
   axis_stroke_width(3.0f),
   grid_stroke_width(1.0f),
-  vertex_size(6.0f) {
+  vertex_size(6.0f),
+  azimuth_angle(45.0f),
+  elevation_angle(70.0f),
+  shininess(0.0f) {
 
   show_axis[0] = show_axis[1] = show_axis[2] = true;
   show_grid[0] = show_grid[1] = show_grid[2] = true;
@@ -909,6 +912,42 @@ void MadeupRenderer::viewFromAxis(int d, int sign) {
     trackball.Rotate(180.0f, td::QVector3<float>(0.0f, 1.0f, 0.0f));
   }
   updateModelviewUniform();  
+}
+
+/* ------------------------------------------------------------------------- */
+
+float MadeupRenderer::getAzimuthAngle() const {
+  return azimuth_angle;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::setAzimuthAngle(float angle) {
+  azimuth_angle = angle;
+}
+
+/* ------------------------------------------------------------------------- */
+
+float MadeupRenderer::getElevationAngle() const {
+  return elevation_angle;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::setElevationAngle(float angle) {
+  elevation_angle = angle;
+}
+
+/* ------------------------------------------------------------------------- */
+
+float MadeupRenderer::getShininess() const {
+  return shininess;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::setShininess(float shininess) {
+  this->shininess = shininess;
 }
 
 /* ------------------------------------------------------------------------- */
