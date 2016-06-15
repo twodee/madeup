@@ -69,31 +69,33 @@ void MadeupRenderer::render() {
 
   float azimuth_angle_radians = azimuth_angle * td::PI / 180.0f;
   float elevation_angle_radians = elevation_angle * td::PI / 180.0f;
+
   td::QVector4<float> light_position_world;
   light_position_world[0] = cos(elevation_angle_radians) * cos(azimuth_angle_radians);
   light_position_world[1] = sin(elevation_angle_radians);
   light_position_world[2] = cos(elevation_angle_radians) * sin(azimuth_angle_radians);
+  light_position_world *= light_distance_factor * bbox_radius;
   light_position_world[3] = 1.0f;
 
-  {
-    light_position_world *= light_distance_factor * bbox_radius;
-    light_position_world[3] = 1.0f;
-    VertexAttribute *attr = debug_attributes->GetAttribute("position");
-    float positions[] = {
-      0.0f, 0.0f, 0.0f,
-      light_position_world[0], light_position_world[1], light_position_world[2]
-    };
-    attr->Update(positions);
-  }
+  /* { */
+    /* VertexAttribute *attr = debug_attributes->GetAttribute("position"); */
+    /* float positions[] = { */
+      /* 0.0f, 0.0f, 0.0f, */
+      /* light_position_world[0], light_position_world[1], light_position_world[2] */
+    /* }; */
+    /* attr->Update(positions); */
+  /* } */
 
   glLineWidth(path_stroke_width);
   glPointSize(vertex_size);
 
+#if 0
   line_program->Bind();
   debug_array->Bind();
   debug_array->DrawSequence(GL_LINES);
   debug_array->Unbind();
   line_program->Unbind();
+#endif
 
   program->Bind();
   td::QVector4<float> light_position_eye = camera.GetViewMatrix() * light_position_world;

@@ -86,8 +86,8 @@ if (!(strcmp($in['extension'], 'json') == 0 || strcmp($in['extension'], 'obj') =
   // Execute the interpreter and collect its output. Forn requires 
   // Process.spawn, which isn't available in older Rubies.
   $lines = array();
-  /* $command = sprintf("bash --login -c \"rvm use 2.1 2>/dev/null >/dev/null; ./forn $forn_timeout ./merp --timeout $timeout --shading %s -o %s --geometry %s %s\" 2>&1", */
-  $command = sprintf("./merp --timeout $timeout --shading %s -o %s --geometry %s %s",
+  /* $command = sprintf("./merp --timeout $timeout --shading %s -o %s --geometry %s %s 2>&1", */
+  $command = sprintf("bash --login -c \"rvm use 2.1 2>/dev/null >/dev/null; ./forn $forn_timeout ./merp --timeout $timeout --shading %s -o %s --geometry %s %s\" 2>&1",
                      escapeshellarg($in['shading_mode']),
                      $out_path,
                      escapeshellarg($in['geometry_mode']),
