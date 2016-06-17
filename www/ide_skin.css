@@ -105,13 +105,21 @@ body {
   border: 0px;
   margin-left: 4px;
   margin-right: 4px;
-  margin-top: 4px;
-  margin-bottom: 4px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+
+  /* We use padding instead of margin, because we want the background color to stretch up and down to the menu. */
+  padding-top: 4px;
+  padding-bottom: 4px;
+
   font-size: 10pt;
   outline: none;
   pointer-events: auto;
   z-index: 10;
+
+  /* iOS wants to pretty up the buttons. No. */
   -webkit-appearance: none;
+  -webkit-border-radius: 0;
 }
 
 #menu input[type="button"]:active {
