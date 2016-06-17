@@ -105,12 +105,13 @@ body {
   border: 0px;
   margin-left: 4px;
   margin-right: 4px;
-  margin-top: 0px;
-  margin-bottom: 0px;
+  margin-top: 4px;
+  margin-bottom: 4px;
   font-size: 10pt;
   outline: none;
   pointer-events: auto;
   z-index: 10;
+  -webkit-appearance: none;
 }
 
 #menu input[type="button"]:active {
