@@ -82,7 +82,6 @@ module Scanners
             elsif match = scan(/".*?"/)
               encoder.text_token match, :string
             elsif in_group && match = scan(/\*\*/)
-              puts "ending in initial"
               encoder.end_group :bold
               in_group = false
             elsif match = scan(/\*\*/)
