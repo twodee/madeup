@@ -67,6 +67,55 @@ Trimesh *EigenToTrimesh(const Eigen::MatrixXd &vertices,
 
 /* ------------------------------------------------------------------------- */
 
+Trimesh *EigenToTrimesh(const float *vertex_colors,
+                        const Eigen::MatrixXd &vertices,
+                        const Eigen::MatrixXi &faces,
+                        const Eigen::MatrixXd &normals) {
+  Trimesh *join = new Trimesh(faces.rows() * 3, faces.rows());
+
+  int *face = join->GetFaces();
+  float *position = join->GetPositions();
+  float *normal = join->AllocateNormals();
+  float *color = join->AllocateVertexColors();
+
+  for (int fi = 0; fi < faces.rows(); ++fi) {
+    for (int ti = 0; ti < 3; ++ti) {
+      int vi = faces(fi, ti);
+
+      position[0] = vertices(vi, 0);
+      position[1] = vertices(vi, 1);
+      position[2] = vertices(vi, 2);
+      position += 3;
+
+      color[0] = vertex_colors[vi * 3 + 0];
+      color[1] = vertex_colors[vi * 3 + 1];
+      color[2] = vertex_colors[vi * 3 + 2];
+      color += 3;
+
+      normal[0] = normals(fi * 3 + ti, 0);
+      normal[1] = normals(fi * 3 + ti, 1);
+      normal[2] = normals(fi * 3 + ti, 2);
+      normal += 3;
+    }
+
+    face[0] = fi * 3 + 0;
+    face[1] = fi * 3 + 1;
+    face[2] = fi * 3 + 2;
+    face += 3;
+  }
+
+  /* for (int i = 0; i < faces.rows(); ++i) { */
+    /* face[0] = faces(i, 0); */
+    /* face[1] = faces(i, 1); */
+    /* face[2] = faces(i, 2); */
+    /* face += 3; */
+  /* } */
+
+  return join;
+}
+
+/* ------------------------------------------------------------------------- */
+
 Trimesh *construct(const Trimesh &a,
                    const Trimesh &b,
                    operation_t operation) {
@@ -93,8 +142,8 @@ Trimesh *construct(const Trimesh &a,
   Eigen::VectorXi J;
   igl::copyleft::cgal::mesh_boolean(vertices[0], faces[0], vertices[1], faces[1], boolean_operation, vertices[2], faces[2], J);
 
-  Eigen::MatrixXd N_corners;
-  igl::per_corner_normals(vertices[2], faces[2], 20, N_corners);
+  /* Eigen::MatrixXd N_corners; */
+  /* igl::per_corner_normals(vertices[2], faces[2], 20, N_corners); */
 
   return EigenToTrimesh(vertices[2], faces[2]);
 }
@@ -146,6 +195,23 @@ Co<Expression> construct_and_color(ExpressionMesh *l_mesh,
 }
 
 /* ------------------------------------------------------------------------ */
+
+td::Trimesh *compute_normals(const td::Trimesh &mesh, float sharp_degrees) {
+  // First prep the mesh to be used by IGL.
+  Eigen::MatrixXd vertices;
+  Eigen::MatrixXi faces;
+  TrimeshToEigen(mesh, vertices, faces);
+
+  // Generate new normals.
+  Eigen::MatrixXd normals;
+  igl::per_corner_normals(vertices, faces, sharp_degrees, normals);
+
+  td::Trimesh *mesh_with_normals = EigenToTrimesh(mesh.GetColors(), vertices, faces, normals);
+
+  return mesh_with_normals;
+}
+
+/* ------------------------------------------------------------------------- */
 
 }
 }

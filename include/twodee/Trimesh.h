@@ -97,6 +97,7 @@ class Trimesh {
      @return Positions buffer
      */
     const float *GetNormals() const;
+    float *GetNormals();
 
     /**
      Gets the per-vertex colors buffer.
@@ -302,6 +303,7 @@ class Trimesh {
                                   bool generate_texcoords = false);
 
     QVector3<float> *GetFaceNormals();
+    float *AllocateNormals();
 
     void DisconnectFaces();
 

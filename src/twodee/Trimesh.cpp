@@ -400,6 +400,12 @@ const float *Trimesh::GetNormals() const {
 
 /* ------------------------------------------------------------------------- */
 
+float *Trimesh::GetNormals() {
+  return normals;
+}
+
+/* ------------------------------------------------------------------------- */
+
 const float *Trimesh::GetColors() const {
   return colors;
 }
@@ -1145,7 +1151,7 @@ void Trimesh::WriteJSON(const std::string& path) {
   f << "    \"generatedBy\": \"libtwodee\", " << std::endl;
   f << "    \"vertices\": " << GetVertexCount() << "," << std::endl;
   f << "    \"faces\": " << GetFaceCount() << "," << std::endl;
-  f << "    \"normals\": " << 0 << "," << std::endl;
+  f << "    \"normals\": " << GetVertexCount() << "," << std::endl;
   f << "    \"colors\": " << (has_vertex_colors ? GetVertexCount() : 0) << "," << std::endl;
   f << "    \"uvs\": " << 0 << "," << std::endl;
   f << "    \"materials\": " << 0 << "," << std::endl;
@@ -1161,6 +1167,18 @@ void Trimesh::WriteJSON(const std::string& path) {
     position += 3;
     for (int i = 1; i < nvertices; ++i, position += 3) {
       f << "," << position[0] << "," << position[1] << "," << position[2];
+    }
+  }
+  f << "]," << std::endl;
+ 
+  // write normals
+  f << "  \"normals\": [";
+  if (GetVertexCount() > 0) {
+    float *normal = normals;
+    f << normal[0] << "," << normal[1] << "," << normal[2];
+    normal += 3;
+    for (int i = 1; i < nvertices; ++i, normal += 3) {
+      f << "," << normal[0] << "," << normal[1] << "," << normal[2];
     }
   }
   f << "]," << std::endl;
@@ -1190,22 +1208,27 @@ void Trimesh::WriteJSON(const std::string& path) {
     f << "]," << std::endl;
   }
 
-  int face_type = has_vertex_colors ? 128 : 0;
+  int face_type = has_vertex_colors ? 128 + 32 : 0 + 32;
 
   // write face indices
   f << "  \"faces\": [";
   if (GetFaceCount() > 0) {
     int *face = faces;
+
     f << face_type << "," << face[0] << "," << face[1] << "," << face[2];
     if (has_vertex_colors) {
       f << "," << face[0] << "," << face[1] << "," << face[2];
     }
+    f << "," << face[0] << "," << face[1] << "," << face[2]; // normals
     face += 3;
-    for (int i = 1; i < GetFaceCount(); ++i, face += 3) {
+
+    for (int i = 1; i < GetFaceCount(); ++i) {
       f << ", " << face_type << "," << face[0] << "," << face[1] << "," << face[2];
       if (has_vertex_colors) {
         f << "," << face[0] << "," << face[1] << "," << face[2];
       }
+      f << "," << face[0] << "," << face[1] << "," << face[2]; // normals
+      face += 3;
     }
   }
   f << "]" << std::endl;
@@ -1366,7 +1389,7 @@ Trimesh *Trimesh::GetParametric(const NField<float, 2>& quadric_map, bool wrap_x
       tex2D_coord += 2;
     }
   }
-  mesh->ComputeMeta();
+  /* mesh->ComputeMeta(); */
 
   return mesh;
 }
@@ -1876,7 +1899,7 @@ Trimesh& Trimesh::operator+=(const Trimesh& other) {
 
   // TODO copy normals, texcoords, etc.
 
-  ComputeMeta();
+  /* ComputeMeta(); */
   return *this;
 }
 
@@ -2058,6 +2081,13 @@ void Trimesh::MigrateVertexMetasToColors(int r, int g, int b) {
     color += 3;
     vertex_meta += nvertex_metas;
   }
+}
+
+/* ------------------------------------------------------------------------- */
+
+float *Trimesh::AllocateNormals() {
+  normals = new float[nvertices * 3];
+  return normals;
 }
 
 /* ------------------------------------------------------------------------- */

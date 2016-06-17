@@ -27,6 +27,7 @@
 #include "madeup/ExpressionClosure.h"
 #include "madeup/GeometryMode.h"
 #include "madeup/Lexer.h"
+#include "madeup/MeshBoolean.h"
 #include "madeup/Parser.h"
 #include "twodee/Co.h"
 #include "twodee/MessagedException.h"
@@ -156,14 +157,7 @@ MupperWindow::MupperWindow(QWidget *parent) :
   vertex_color_button->setFlat(true);
   vertex_color_button->setAutoFillBackground(true);
 
-  QLabel *face_label = new QLabel("Faces");
-  face_orientation_picker = new QComboBox();
-  face_orientation_picker->addItem("Counterclockwise");
-  face_orientation_picker->addItem("Clockwise");
-  face_orientation_picker->addItem("Both");
-  face_orientation_picker->addItem("None");
-
-  QLabel *style_label = new QLabel("Style");
+  QLabel *style_label = new QLabel("Render style");
   face_style_picker = new QComboBox();
   face_style_picker->addItem("Filled");
   face_style_picker->addItem("Wireframe");
@@ -246,13 +240,11 @@ MupperWindow::MupperWindow(QWidget *parent) :
   display_page_layout->setContentsMargins(0, 0, 0, 0);
   display_page_layout->addWidget(cartesian_group, 0, 0, 1, 2);
   display_page_layout->addWidget(path_group, 1, 0, 1, 2);
-  display_page_layout->addWidget(face_label, 2, 0, 1, 1);
-  display_page_layout->addWidget(face_orientation_picker, 2, 1, 1, 1);
-  display_page_layout->addWidget(style_label, 3, 0, 1, 1);
-  display_page_layout->addWidget(face_style_picker, 3, 1, 1, 1);
-  display_page_layout->addWidget(background_color_label, 4, 0, 1, 1);
-  display_page_layout->addWidget(background_color_button, 4, 1, 1, 1);
-  display_page_layout->addItem(vertical_spacer, 5, 0, 1, 2);
+  display_page_layout->addWidget(style_label, 2, 0, 1, 1);
+  display_page_layout->addWidget(face_style_picker, 2, 1, 1, 1);
+  display_page_layout->addWidget(background_color_label, 3, 0, 1, 1);
+  display_page_layout->addWidget(background_color_button, 3, 1, 1, 1);
+  display_page_layout->addItem(vertical_spacer, 4, 0, 1, 2);
 
   // Editor page
   QWidget *editor_page = new QWidget();
@@ -339,6 +331,8 @@ MupperWindow::MupperWindow(QWidget *parent) :
 
   faceted_checkbox = new QCheckBox("Faceted");
 
+  is_two_sided_checkbox = new QCheckBox("Two-sided");
+
   QGridLayout *lighting_page_layout = new QGridLayout(lighting_page);
   lighting_page_layout->setSpacing(-1);
   lighting_page_layout->setContentsMargins(0, 0, 0, 0);
@@ -357,8 +351,10 @@ MupperWindow::MupperWindow(QWidget *parent) :
 
   lighting_page_layout->addWidget(faceted_checkbox, 4, 0, 1, 2);
 
+  lighting_page_layout->addWidget(is_two_sided_checkbox, 5, 0, 1, 2);
+
   QSpacerItem *vertical_spacer4 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-  lighting_page_layout->addItem(vertical_spacer4, 5, 0, 1, 2);
+  lighting_page_layout->addItem(vertical_spacer4, 6, 0, 1, 2);
 
   lighting_page_layout->setColumnStretch(0, 0);
   lighting_page_layout->setColumnStretch(1, 1);
@@ -568,15 +564,9 @@ MupperWindow::MupperWindow(QWidget *parent) :
     onPathify();
   });
 
-  connect(face_orientation_picker, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=](int i) {
-    canvas->makeCurrent(); // no effect without this
-    renderer->setFaceOrientation(i);
-    canvas->update();
-  });
-
   connect(face_style_picker, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=](int i) {
     canvas->makeCurrent(); // no effect without this
-    renderer->setFaceStyle(i);
+    renderer->setRenderStyle(i);
     canvas->update();
   });
 
@@ -682,6 +672,12 @@ MupperWindow::MupperWindow(QWidget *parent) :
 
   connect(faceted_checkbox, &QCheckBox::toggled, [=](bool is_checked) {
     onRun(GeometryMode::SURFACE);
+  });
+
+  connect(is_two_sided_checkbox, &QCheckBox::toggled, [=](bool is_checked) {
+    canvas->makeCurrent();
+    renderer->isTwoSided(is_checked);
+    canvas->update();
   });
 
   connect(show_heading_checkbox, &QCheckBox::toggled, [=](bool is_checked) {
@@ -828,6 +824,12 @@ void MupperWindow::onRun(GeometryMode::geometry_mode_t geometry_mode) {
       td::Trimesh *trimesh = env.getMesh();
       if (faceted_checkbox->isChecked()) {
         trimesh->DisconnectFaces();
+        trimesh->ComputeMeta(true);
+      } else {
+        td::Trimesh *sharped = madeup::MeshBoolean::compute_normals(*trimesh, 20);
+        delete trimesh;
+        trimesh = sharped;
+        trimesh->ComputeMeta(false);
       }
       if (trimesh->GetVertexCount() == 0) {
         std::cout << "Uh oh. You either didn't visit any locations or didn't invoke a solidifier. I can't make any models without more information from you." << std::endl;
@@ -1163,15 +1165,10 @@ void MupperWindow::loadPreferences() {
     vertex_color_button->setPalette(vertex_color_palette);
 
     // Face style
-    int face_style = prefs.get("face.style", renderer->getFaceStyle()).asUInt();
-    renderer->setFaceStyle(face_style);
-    face_style_picker->setCurrentIndex(renderer->getFaceStyle());
+    int face_style = prefs.get("render.style", renderer->getRenderStyle()).asUInt();
+    renderer->setRenderStyle(face_style);
+    face_style_picker->setCurrentIndex(renderer->getRenderStyle());
   
-    // Face orientation
-    int face_orientation = prefs.get("face.orientation", renderer->getFaceOrientation()).asUInt();
-    renderer->setFaceOrientation(face_orientation);
-    face_orientation_picker->setCurrentIndex(renderer->getFaceOrientation());
-
     // Show preferences
     bool show_settings = prefs.get("show.settings", false).asBool();
     action_settings->setChecked(show_settings);
@@ -1198,6 +1195,9 @@ void MupperWindow::loadPreferences() {
 
     bool faceted = prefs.get("show.faceted", true).asBool();
     faceted_checkbox->setChecked(faceted);
+
+    bool is_two_sided = prefs.get("light.two.sided", renderer->isTwoSided()).asBool();
+    is_two_sided_checkbox->setChecked(is_two_sided);
 
     double azimuth_angle = prefs.get("light.azimuth.angle", renderer->getAzimuthAngle()).asDouble();
     azimuth_angle_spinner->setValue(azimuth_angle);
@@ -1248,8 +1248,7 @@ void MupperWindow::savePreferences() {
     prefs["vertex.size"] = renderer->getVertexSize();
     prefs["show.heading"] = renderer->showHeading();
     prefs["show.stops"] = renderer->showStops();
-    prefs["face.style"] = renderer->getFaceStyle();
-    prefs["face.orientation"] = renderer->getFaceOrientation();
+    prefs["render.style"] = renderer->getRenderStyle();
     prefs["show.settings"] = action_settings->isChecked();
     prefs["show.console"] = show_console_checkbox->isChecked();
     prefs["autopathify"] = autopathify_checkbox->isChecked();
@@ -1309,6 +1308,7 @@ void MupperWindow::savePreferences() {
     prefs["light.elevation.angle"] = elevation_angle_spinner->value();
     prefs["light.shininess"] = shininess_spinner->value();
     prefs["light.distance.factor"] = light_distance_factor_spinner->value();
+    prefs["light.two.sided"] = is_two_sided_checkbox->isChecked();
 
     prefs["show.faceted"] = faceted_checkbox->isChecked();
 

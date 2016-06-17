@@ -15,7 +15,7 @@ Build on Ubuntu following these steps:
     $ cd madeup
     $ mkdir build
     $ cd build
-    $ sudo apt-get install libeigen3-dev libcgal-dev
+    $ sudo apt-get install cmake libeigen3-dev libcgal-dev libmagick++-dev
     $ git clone https://github.com/libigl/libigl.git
     $ cmake ..
     $ make

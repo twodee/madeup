@@ -27,6 +27,8 @@ td::Co<Expression> construct_and_color(ExpressionMesh *l_mesh,
 
 /* ------------------------------------------------------------------------- */
 
+td::Trimesh *compute_normals(const td::Trimesh &mesh, float angle);
+
 }
 }
 

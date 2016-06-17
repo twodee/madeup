@@ -672,7 +672,7 @@ Trimesh *Polyline<T>::Dowel(int nstops, T radius, bool is_capped, T twist, float
     }
   }
 
-  mesh->WriteJSON("boo.json");
+  /* mesh->WriteJSON("boo.json"); */
 
   return mesh;
 }

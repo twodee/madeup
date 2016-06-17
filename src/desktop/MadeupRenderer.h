@@ -7,16 +7,7 @@
 #include "VertexArray.h"
 #include "Trackball.h"
 
-namespace FaceOrientation {
-  enum {
-    COUNTERCLOCKWISE,
-    CLOCKWISE,
-    BOTH,
-    NONE
-  };
-}
-
-namespace FaceStyle {
+namespace RenderStyle {
   enum {
     FILLED,
     WIREFRAME,
@@ -30,10 +21,8 @@ class MadeupRenderer {
     MadeupRenderer();
     ~MadeupRenderer();
 
-    void setFaceOrientation(int orientation);
-    int getFaceOrientation() const;
-    void setFaceStyle(int style);
-    int getFaceStyle() const;
+    void setRenderStyle(int style);
+    int getRenderStyle() const;
     void exportTrimesh(const std::string &path);
     void setTrimesh(td::Trimesh *trimesh);
     void setPaths(const std::vector<std::vector<madeup::Turtle> > &paths);
@@ -55,6 +44,8 @@ class MadeupRenderer {
     bool showHeading() const;
     void showStops(bool show);
     bool showStops() const;
+    void isTwoSided(bool enabled);
+    bool isTwoSided() const;
 
     void leftMouseDownAt(int x, int y);
     void leftMouseDraggedTo(int x, int y);
@@ -142,8 +133,8 @@ class MadeupRenderer {
 
     bool show_heading;
     bool show_stops;
-    int face_orientation;
-    int face_style;
+    bool is_two_sided;
+    int render_style;
 
     float path_stroke_width;
     float axis_stroke_width;

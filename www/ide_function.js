@@ -187,8 +187,7 @@ var isAutopathify = true;
 var nSecondsTillAutopathify = 1.0;
 var showMode = 'solid';
 var showHeadings = true;
-var showCounterclockwise = true;
-var showClockwise = false;
+var lightBothSides = true;
 var blocklyWorkspace = null;
 var fontSize = 14;
 var gridSpacing = 1.0;
@@ -212,8 +211,7 @@ var isShowHeadingsChanged = false;
 var isFontSizeChanged = false;
 var isGridSpacingChanged = false;
 var isGridExtentChanged = false;
-var isShowCounterclockwiseChanged = false;
-var isShowClockwiseChanged = false;
+var isLightBothSidesChanged = false;
 var isFlatShadedChanged = false;
 var isAutorotateChanged = false;
 var isShowPointsChanged = false;
@@ -229,8 +227,7 @@ function saveInCookies() {
   // these, then updates to the default value would not be seen by users, as
   // the old defaults persisted in the cookies would override the new ones.
   if (isShowHeadingsChanged) Cookies.set('showHeadings', showHeadings ? 1 : 0);
-  if (isShowCounterclockwiseChanged) Cookies.set('showCounterclockwise', showCounterclockwise ? 1 : 0);
-  if (isShowClockwiseChanged) Cookies.set('showClockwise', showClockwise ? 1 : 0);
+  if (isLightBothSidesChanged) Cookies.set('lightBothSides', lightBothSides ? 1 : 0);
   if (isShowModeChanged) Cookies.set('showMode', showMode);
   if (isFlatShadedChanged) Cookies.set('isFlatShaded', isFlatShaded ? 1 : 0);
   if (isAutorotateChanged) Cookies.set('isAutorotate', isAutorotate ? 1 : 0);
@@ -264,7 +261,7 @@ function saveInCookies() {
   // Changes have been committed, so let's reset the dirty flags.
   isFontSizeChanged = false;
   isShowHeadingsChanged = false;
-  isShowCounterclockwiseChanged = false;
+  isLightBothSidesChanged = false;
   isShowClockwiseChanged = false;
   isFlatShadedChanged = false;
   isAutorotateChanged = false;
@@ -327,15 +324,10 @@ $(document).ready(function() {
     $('#isAutorotate').prop('checked', isAutorotate);
     enableAutorotate(isAutorotate);
 
-    if (Cookies.get('showCounterclockwise')) {
-      showCounterclockwise = parseInt(Cookies.get('showCounterclockwise')) != 0;
+    if (Cookies.get('lightBothSides')) {
+      lightBothSides = parseInt(Cookies.get('lightBothSides')) != 0;
     }
-    $('#showCounterclockwise').prop('checked', showCounterclockwise);
-
-    if (Cookies.get('showClockwise')) {
-      showClockwise = parseInt(Cookies.get('showClockwise')) != 0;
-    }
-    $('#showClockwise').prop('checked', showClockwise);
+    $('#lightBothSides').prop('checked', lightBothSides);
 
     if (Cookies.get('showMode')) {
       showMode = Cookies.get('showMode');
@@ -403,8 +395,6 @@ $(document).ready(function() {
     if (!hasWebGL()) {
       log('No WebGL.');
     } else {
-      updateCulling();
-
       if (Cookies.get('axisX')) {
         if (parseInt(Cookies.get('axisX')) != 0) {
           $('#axisX').prop('checked', true);
@@ -529,16 +519,9 @@ $(document).ready(function() {
     enableAutorotate(this.checked);
   });
 
-  $('#showCounterclockwise').click(function() {
-    isShowCounterclockwiseChanged = true;
-    showCounterclockwise = this.checked;
-    updateCulling();
-  });
-
-  $('#showClockwise').click(function() {
-    isShowClockwiseChanged = true;
-    showClockwise = this.checked;
-    updateCulling();
+  $('#lightBothSides').click(function() {
+    isLightBothSidesChanged = true;
+    lightBothSides = this.checked;
   });
 
   function enableAutorotate(isEnabled) {
@@ -1199,22 +1182,24 @@ function run(source, mode, pingback) {
               } else {
                 solidMaterial = new THREE.MeshBasicMaterial({color: 0xcccccc});
               }
+              solidMaterial.side = THREE.DoubleSide;
               var wireframeMaterial = new THREE.MeshBasicMaterial({color: 0x333333, wireframe: true, transparent: true, wireframeLinewidth: 3}); 
+              wireframeMaterial.side = THREE.DoubleSide;
               var material = [solidMaterial, wireframeMaterial];
+              material.side = THREE.DoubleSide;
               meshes[0] = THREE.SceneUtils.createMultiMaterialObject(model.geometry, material);
-            // } else if (true) {
-              // var diffuseMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: showMode == 'wireframe', wireframeLinewidth: 5});
-              // var specularMaterial = new THREE.MeshPhongMaterial({color: 0x0, specular: 0xFFFFFF, wireframe: showMode == 'wireframe', wireframeLinewidth: 5});
-              // var material = [diffuseMaterial, specularMaterial];
-              // meshes[0] = THREE.SceneUtils.createMultiMaterialObject(model.geometry, material);
             } else {
-              var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: showMode == 'wireframe', wireframeLinewidth: 5});
-              // var material = new THREE.MeshPhongMaterial({vertexColors: THREE.VertexColors, specular: 0x999999, shininess: 20, wireframe: showMode == 'wireframe', wireframeLinewidth: 5});
-              meshes[0] = new THREE.Mesh(model.geometry, material);
+              var frontMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: showMode == 'wireframe', wireframeLinewidth: 5, side: THREE.FrontSide});
+              var backMaterial;
+              if (lightBothSides) {
+                backMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: showMode == 'wireframe', wireframeLinewidth: 5, side: THREE.BackSide});
+              } else {
+                backMaterial = new THREE.MeshBasicMaterial({color: 0x000000, wireframe: showMode == 'wireframe', wireframeLinewidth: 5, side: THREE.BackSide});
+              }
+              var material = [frontMaterial, backMaterial];
+              meshes[0] = THREE.SceneUtils.createMultiMaterialObject(model.geometry, material);
             }
 
-            model.geometry.computeFaceNormals();
-            model.geometry.computeVertexNormals();
             allGeometry = model.geometry;
             enableDownload(true);
           } catch (err) {
@@ -1295,12 +1280,9 @@ function run(source, mode, pingback) {
         }
 
         for (var mi = 0; mi < meshes.length; ++mi) {
-          /* meshes[mi].geometry.mergeVertices(); */
-          /* meshes[mi].geometry.computeFaceNormals(); */
-          /* meshes[mi].geometry.computeVertexNormals(); */
           modelScene.add(meshes[mi]);
         }
-        updateCulling();
+
         render();
         if (pingback) {
           pingback();
@@ -1473,21 +1455,6 @@ function highlight(startIndex, stopIndex) {
   textEditor.centerSelection();
 }
 
-function updateCulling() {
-  var mode;
-  if (showClockwise && showCounterclockwise) {
-    mode = THREE.CullFaceNone;
-  } else if (showCounterclockwise) {
-    mode = THREE.CullFaceBack;
-  } else if (showClockwise) {
-    mode = THREE.CullFaceFront;
-  } else {
-    mode = THREE.CullFaceFrontBack;
-  }
-  renderer.setFaceCulling(mode, THREE.FrontFaceDirectionCCW);
-  render();
-}
-
 function init() {
   camera = new THREE.PerspectiveCamera(45.0, 1.0, 0.1, 10000.0);
   // camera = new THREE.OrthographicCamera(-50, 50, 50, -50, -100, 100);
@@ -1498,7 +1465,9 @@ function init() {
 
   // Scratch out upstream implementation, which affects global culling state
   // that I rely on.
-  renderer.setMaterialFaces = function(material) {}
+  // renderer.setMaterialFaces = function(material) {
+    // console.log('dummy'); 
+  // }
 
   renderer.setClearColor(0xFFFFFF, 1);
   // renderer.setClearColor(0xCCCCCC, 1);
@@ -1548,8 +1517,6 @@ function init() {
 
   // add to the scene
   camera.add(pointLight);
-
-  updateCulling();
 
   window.addEventListener('resize', resize);
   initialized = true;

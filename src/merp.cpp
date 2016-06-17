@@ -7,6 +7,7 @@
 #include "madeup/ExpressionClosure.h"
 #include "madeup/GeometryMode.h"
 #include "madeup/Lexer.h"
+#include "madeup/MeshBoolean.h"
 #include "madeup/Parser.h"
 #include "twodee/Co.h"
 #include "twodee/MessagedException.h"
@@ -173,8 +174,15 @@ int main(int argc, char **argv) {
           out << env.getPathsJSON();
           out.close();
         } else if (geometry_mode == GeometryMode::SURFACE) {
+
           if (is_flat) {
             trimesh->DisconnectFaces();
+            trimesh->ComputeMeta(true);
+          } else {
+            td::Trimesh *sharped = madeup::MeshBoolean::compute_normals(*trimesh, 20);
+            delete trimesh;
+            trimesh = sharped;
+            trimesh->ComputeMeta(false);
           }
 
           if (out_path.find_first_of('.') == std::string::npos ||

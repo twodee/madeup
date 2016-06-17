@@ -235,8 +235,7 @@ if (array_key_exists('movie', $_REQUEST)) {
       </select><br/>
       <input type="checkbox" id="showHeadings"/>Show heading<br/>
       <input type="checkbox" id="showPoints"/>Show points<br/>
-      <input type="checkbox" id="showCounterclockwise"/>Show counterclockwise faces<br/>
-      <input type="checkbox" id="showClockwise"/>Show clockwise faces<br/>
+      <input type="checkbox" id="lightBothSides"/>Two-sided lighting<br/>
       <input type="checkbox" id="isFlatShaded"/>Flat shading<br/>
       <input type="checkbox" id="isAutorotate"/>Autorotate<br/>
       <hr>

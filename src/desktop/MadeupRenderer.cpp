@@ -25,8 +25,7 @@ MadeupRenderer::MadeupRenderer() :
   paths_bounding_box(td::QVector3<float>(0.0f), td::QVector3<float>(0.0f)),
   show_heading(true),
   show_stops(true),
-  face_orientation(FaceOrientation::COUNTERCLOCKWISE),
-  face_style(FaceStyle::FILLED),
+  render_style(RenderStyle::FILLED),
   path_stroke_width(4.0f),
   axis_stroke_width(3.0f),
   grid_stroke_width(1.0f),
@@ -182,7 +181,7 @@ void MadeupRenderer::initializeGL() {
   glClearColor(background_color[0], background_color[1], background_color[2], background_color[3]);
   glClearDepth(1.0);
   glDepthFunc(GL_LESS);
-  setFaceOrientation(face_orientation);
+  glDisable(GL_CULL_FACE);
 
   float positions[] = {
     -0.5f, 0.0f, 0.0f,
@@ -423,6 +422,13 @@ void MadeupRenderer::updateShaderProgram() {
     "void main() {\n"
     "  vec3 to_light = normalize(light_position_eye - fposition.xyz);\n"
     "  vec3 normal = normalize(fnormal);\n"
+    ;
+
+  if (is_two_sided) {
+    fragment_src += "  normal = gl_FrontFacing ? normal : -normal;\n";
+  }
+
+  fragment_src +=
     "  vec3 halfway = normalize(to_light - fposition.xyz);\n"
     "  float n_dot_l = max(0.0, dot(normal, to_light));\n"
     "  float n_dot_h = max(0.0f, dot(normal, halfway));\n"
@@ -677,51 +683,24 @@ void MadeupRenderer::showStops(bool show) {
 
 /* ------------------------------------------------------------------------- */
 
-void MadeupRenderer::setFaceOrientation(int orientation) {
-  if (orientation == FaceOrientation::COUNTERCLOCKWISE) {
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-  } else if (orientation == FaceOrientation::CLOCKWISE) {
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
-  } else if (orientation == FaceOrientation::BOTH) {
-    glDisable(GL_CULL_FACE);
-  } else if (orientation == FaceOrientation::NONE) {
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT_AND_BACK);
-  } else {
-    std::cerr << "bad face orientation: " << orientation << std::endl;
-    return;
-  }
-  face_orientation = orientation;
-}
-
-/* ------------------------------------------------------------------------- */
-
-int MadeupRenderer::getFaceOrientation() const {
-  return face_orientation;
-}
-
-/* ------------------------------------------------------------------------- */
-
-void MadeupRenderer::setFaceStyle(int style) {
-  if (style == FaceStyle::FILLED) {
+void MadeupRenderer::setRenderStyle(int style) {
+  if (style == RenderStyle::FILLED) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  } else if (style == FaceStyle::WIREFRAME) {
+  } else if (style == RenderStyle::WIREFRAME) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  } else if (style == FaceStyle::VERTICES) {
+  } else if (style == RenderStyle::VERTICES) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
   } else {
     std::cerr << "bad face style: " << style << std::endl;
     return;
   }
-  face_style = style;
+  render_style = style;
 }
 
 /* ------------------------------------------------------------------------- */
 
-int MadeupRenderer::getFaceStyle() const {
-  return face_style; 
+int MadeupRenderer::getRenderStyle() const {
+  return render_style; 
 }
 
 /* ------------------------------------------------------------------------- */
@@ -1016,6 +995,19 @@ float MadeupRenderer::getLightDistanceFactor() const {
 
 void MadeupRenderer::setLightDistanceFactor(float factor) {
   light_distance_factor = factor;
+}
+
+/* ------------------------------------------------------------------------- */
+
+bool MadeupRenderer::isTwoSided() const {
+  return is_two_sided;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::isTwoSided(bool enabled) {
+  is_two_sided = enabled;
+  updateShaderProgram();
 }
 
 /* ------------------------------------------------------------------------- */
