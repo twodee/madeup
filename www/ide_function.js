@@ -1472,6 +1472,9 @@ function init() {
   renderer.setClearColor(0xFFFFFF, 1);
   // renderer.setClearColor(0xCCCCCC, 1);
   document.getElementById("glcanvas").appendChild(renderer.domElement);
+  renderer.domElement.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+  }, false);
 
   // controls = new THREE.OrbitControls(camera, renderer.domElement);  
   controls = new THREE.TrackballControls(camera, renderer.domElement);
