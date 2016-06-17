@@ -193,6 +193,8 @@ Trimesh *Polyline<T>::Revolve(const QVector3<T>& axis, int nstops, float degrees
     }
   }
 
+  base->CoalesceVertices(3);
+
   return base;
 }
 

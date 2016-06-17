@@ -1203,6 +1203,8 @@ function run(source, mode, pingback) {
             allGeometry = model.geometry;
             enableDownload(true);
           } catch (err) {
+            console.log(err);
+            console.log(data['model']);
             log('The geometry I got back had some funny stuff in it that I didn\'t know how to read.');
           }
         } else {
