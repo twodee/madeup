@@ -333,6 +333,7 @@ MupperWindow::MupperWindow(QWidget *parent) :
   light_distance_factor_spinner->setSingleStep(0.1);
 
   has_specular_checkbox = new QCheckBox("Show specular highlights");
+  has_specular_checkbox->setChecked(true);
   faceted_checkbox = new QCheckBox("Faceted");
   is_two_sided_checkbox = new QCheckBox("Two-sided");
 
@@ -669,6 +670,17 @@ MupperWindow::MupperWindow(QWidget *parent) :
 
   connect(action_settings, &QAction::toggled, [=](bool is_checked) {
     settings_panel->setVisible(is_checked);
+      
+    // If a collapsed settings panel is being made visible again, we'll have to
+    // make it bigger. Otherwise only the handle will appear.
+    if (is_checked && settings_panel->width() == 0) {
+      // Let's resize the views. The editor and canvas can retain their current
+      // sizes. The panel can be made its minimum size. We guess 1; Qt will take
+      // max(1, minimum size).
+      QList<int> sizes = horizontal_splitter->sizes();
+      sizes[2] = 1;
+      horizontal_splitter->setSizes(sizes);
+    }
   });
 
   connect(show_console_checkbox, &QCheckBox::toggled, [=](bool is_checked) {
@@ -691,7 +703,7 @@ MupperWindow::MupperWindow(QWidget *parent) :
     canvas->update();
   });
 
-  connect(has_specular_checkbox, &QCheckBox::toggled, [=](bool is_checked) {
+  connect(has_specular_checkbox, &QCheckBox::clicked, [=](bool is_checked) {
     canvas->makeCurrent();
     renderer->hasSpecular(is_checked);
     canvas->update();
@@ -1217,7 +1229,9 @@ void MupperWindow::loadPreferences() {
     has_autorotate_checkbox->setChecked(autorotate);
     
     bool has_specular = prefs.get("light.has.specular", renderer->hasSpecular()).asBool();
-    has_specular_checkbox->setChecked(has_specular);
+    // TODO
+    renderer->hasSpecular(has_specular);
+    has_specular_checkbox->setChecked(renderer->hasSpecular());
 
     bool is_two_sided = prefs.get("light.two.sided", renderer->isTwoSided()).asBool();
     is_two_sided_checkbox->setChecked(is_two_sided);
