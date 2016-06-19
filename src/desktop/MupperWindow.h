@@ -74,6 +74,8 @@ class MupperWindow : public QMainWindow {
     QCheckBox *autopathify_checkbox;
     QCheckBox *faceted_checkbox;
     QCheckBox *is_two_sided_checkbox;
+    QCheckBox *has_autorotate_checkbox;
+    QCheckBox *has_specular_checkbox;
     QCheckBox *show_axis_checkboxes[3];
     QCheckBox *show_grid_checkboxes[3];
 

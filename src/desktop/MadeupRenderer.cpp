@@ -25,6 +25,9 @@ MadeupRenderer::MadeupRenderer() :
   paths_bounding_box(td::QVector3<float>(0.0f), td::QVector3<float>(0.0f)),
   show_heading(true),
   show_stops(true),
+  is_two_sided(true),
+  has_specular(true),
+  has_autorotate(true),
   render_style(RenderStyle::FILLED),
   path_stroke_width(4.0f),
   axis_stroke_width(3.0f),
@@ -431,8 +434,16 @@ void MadeupRenderer::updateShaderProgram() {
   fragment_src +=
     "  vec3 halfway = normalize(to_light - fposition.xyz);\n"
     "  float n_dot_l = max(0.0, dot(normal, to_light));\n"
-    "  float n_dot_h = max(0.0f, dot(normal, halfway));\n"
-    "  gl_FragColor = vec4(fcolor.rgb * n_dot_l + vec3(1.0) * pow(n_dot_h, shininess), fcolor.a);\n"
+    "  vec3 rgb = fcolor.rgb * n_dot_l;\n";
+
+  if (has_specular) {
+    fragment_src +=
+      "  float n_dot_h = max(0.0f, dot(normal, halfway));\n"
+      "  rgb += vec3(1.0) * pow(n_dot_h, shininess);\n";
+  }
+
+  fragment_src +=
+    "  gl_FragColor = vec4(rgb, fcolor.a);\n"
     "}\n";
 
   program = ShaderProgram::FromSource(vertex_src, fragment_src);
@@ -544,9 +555,13 @@ void MadeupRenderer::leftMouseDraggedTo(int x, int y) {
 
 float MadeupRenderer::leftMouseUpAt(int x, int y) {
   trackball.Stop();
-  const td::QVector2<int> &delta = trackball.GetDelta();
-  float magnitude = sqrtf(delta[0] * delta[0] + delta[1] * delta[1]);
-  return magnitude;
+  if (has_autorotate) {
+    const td::QVector2<int> &delta = trackball.GetDelta();
+    float magnitude = sqrtf(delta[0] * delta[0] + delta[1] * delta[1]);
+    return magnitude;
+  } else {
+    return 0.0f;
+  }
 }
 
 /* ------------------------------------------------------------------------- */
@@ -1008,6 +1023,31 @@ bool MadeupRenderer::isTwoSided() const {
 void MadeupRenderer::isTwoSided(bool enabled) {
   is_two_sided = enabled;
   updateShaderProgram();
+}
+
+/* ------------------------------------------------------------------------- */
+
+bool MadeupRenderer::hasSpecular() const {
+  return has_specular; 
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::hasSpecular(bool enabled) {
+  has_specular = enabled;
+  updateShaderProgram();
+}
+
+/* ------------------------------------------------------------------------- */
+
+bool MadeupRenderer::hasAutorotate() const {
+  return has_autorotate;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::hasAutorotate(bool enabled) {
+  has_autorotate = enabled;
 }
 
 /* ------------------------------------------------------------------------- */

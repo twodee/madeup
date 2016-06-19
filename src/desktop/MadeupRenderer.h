@@ -46,6 +46,10 @@ class MadeupRenderer {
     bool showStops() const;
     void isTwoSided(bool enabled);
     bool isTwoSided() const;
+    bool hasSpecular() const;
+    void hasSpecular(bool enabled);
+    bool hasAutorotate() const;
+    void hasAutorotate(bool enabled);
 
     void leftMouseDownAt(int x, int y);
     void leftMouseDraggedTo(int x, int y);
@@ -134,6 +138,8 @@ class MadeupRenderer {
     bool show_heading;
     bool show_stops;
     bool is_two_sided;
+    bool has_specular;
+    bool has_autorotate;
     int render_style;
 
     float path_stroke_width;

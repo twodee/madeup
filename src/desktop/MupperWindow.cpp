@@ -299,10 +299,13 @@ MupperWindow::MupperWindow(QWidget *parent) :
   view_from_group_layout->addWidget(negative_z_button, 2, 0);
   view_from_group_layout->addWidget(positive_z_button, 2, 1);
 
+  has_autorotate_checkbox = new QCheckBox("Autorotate");
+
   QVBoxLayout *camera_page_layout = new QVBoxLayout(camera_page);
   camera_page_layout->setSpacing(-1);
   camera_page_layout->setContentsMargins(0, 0, 0, 0);
   camera_page_layout->addWidget(view_from_group);
+  camera_page_layout->addWidget(has_autorotate_checkbox);
   QSpacerItem *vertical_spacer2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
   camera_page_layout->addItem(vertical_spacer2);
 
@@ -320,7 +323,7 @@ MupperWindow::MupperWindow(QWidget *parent) :
   elevation_angle_spinner->setSingleStep(5.0);
 
   shininess_spinner = new QDoubleSpinBox();
-  shininess_spinner->setMinimum(0.0);
+  shininess_spinner->setMinimum(0.1);
   shininess_spinner->setMaximum(1000.0);
   shininess_spinner->setSingleStep(10.0);
 
@@ -329,8 +332,8 @@ MupperWindow::MupperWindow(QWidget *parent) :
   light_distance_factor_spinner->setMaximum(100.0);
   light_distance_factor_spinner->setSingleStep(0.1);
 
+  has_specular_checkbox = new QCheckBox("Show specular highlights");
   faceted_checkbox = new QCheckBox("Faceted");
-
   is_two_sided_checkbox = new QCheckBox("Two-sided");
 
   QGridLayout *lighting_page_layout = new QGridLayout(lighting_page);
@@ -349,12 +352,14 @@ MupperWindow::MupperWindow(QWidget *parent) :
   lighting_page_layout->addWidget(new QLabel("Distance factor"), 3, 0);
   lighting_page_layout->addWidget(light_distance_factor_spinner, 3, 1);
 
-  lighting_page_layout->addWidget(faceted_checkbox, 4, 0, 1, 2);
+  lighting_page_layout->addWidget(has_specular_checkbox, 4, 0, 1, 2);
 
-  lighting_page_layout->addWidget(is_two_sided_checkbox, 5, 0, 1, 2);
+  lighting_page_layout->addWidget(faceted_checkbox, 5, 0, 1, 2);
+
+  lighting_page_layout->addWidget(is_two_sided_checkbox, 6, 0, 1, 2);
 
   QSpacerItem *vertical_spacer4 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-  lighting_page_layout->addItem(vertical_spacer4, 6, 0, 1, 2);
+  lighting_page_layout->addItem(vertical_spacer4, 7, 0, 1, 2);
 
   lighting_page_layout->setColumnStretch(0, 0);
   lighting_page_layout->setColumnStretch(1, 1);
@@ -677,6 +682,18 @@ MupperWindow::MupperWindow(QWidget *parent) :
   connect(is_two_sided_checkbox, &QCheckBox::toggled, [=](bool is_checked) {
     canvas->makeCurrent();
     renderer->isTwoSided(is_checked);
+    canvas->update();
+  });
+
+  connect(has_autorotate_checkbox, &QCheckBox::toggled, [=](bool is_checked) {
+    canvas->makeCurrent();
+    renderer->hasAutorotate(is_checked);
+    canvas->update();
+  });
+
+  connect(has_specular_checkbox, &QCheckBox::toggled, [=](bool is_checked) {
+    canvas->makeCurrent();
+    renderer->hasSpecular(is_checked);
     canvas->update();
   });
 
@@ -1196,6 +1213,12 @@ void MupperWindow::loadPreferences() {
     bool faceted = prefs.get("show.faceted", true).asBool();
     faceted_checkbox->setChecked(faceted);
 
+    bool autorotate = prefs.get("autorotate", renderer->hasAutorotate()).asBool();
+    has_autorotate_checkbox->setChecked(autorotate);
+    
+    bool has_specular = prefs.get("light.has.specular", renderer->hasSpecular()).asBool();
+    has_specular_checkbox->setChecked(has_specular);
+
     bool is_two_sided = prefs.get("light.two.sided", renderer->isTwoSided()).asBool();
     is_two_sided_checkbox->setChecked(is_two_sided);
 
@@ -1309,8 +1332,10 @@ void MupperWindow::savePreferences() {
     prefs["light.shininess"] = shininess_spinner->value();
     prefs["light.distance.factor"] = light_distance_factor_spinner->value();
     prefs["light.two.sided"] = is_two_sided_checkbox->isChecked();
+    prefs["light.has.specular"] = has_specular_checkbox->isChecked();
 
     prefs["show.faceted"] = faceted_checkbox->isChecked();
+    prefs["autorotate"] = has_autorotate_checkbox->isChecked();
 
     Json::StyledWriter writer;
     string json = writer.write(prefs);
