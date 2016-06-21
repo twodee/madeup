@@ -198,6 +198,7 @@ if (array_key_exists('movie', $_REQUEST)) {
     <div id="filePopup" class="popup">
       <a href="#" id="fileSave" class="fileLink">Save</a><br/>
       <a href="#" id="fileSaveAs" class="fileLink">Save As</a><br/>
+      <p></p>
       <a href="#" id="fileClose" class="fileLink">Close</a><br/>
       <p></p>
       <a href="#" id="magic" class="fileLink">Send to Chris</a><br/>

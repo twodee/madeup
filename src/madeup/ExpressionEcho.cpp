@@ -20,7 +20,8 @@ ExpressionEcho::ExpressionEcho() :
 Co<Expression> ExpressionEcho::evaluate(Environment &env) const {
   Co<ExpressionClosure> mesh_closure = env["mesh"];
   if (mesh_closure.IsNull()) {
-    throw MessagedException(getSourceLocation().toAnchor() + ": I expect function echo to be given a value named mesh, but no mesh was given.");
+    // TODO: make sure all functions use Unlocated for non-parameter-specific errors.
+    throw UnlocatedException("I expect function echo to be given a value named mesh, but no mesh was given.");
   }
 
   Co<Expression> value = mesh_closure->evaluate(env);
@@ -37,7 +38,7 @@ Co<Expression> ExpressionEcho::evaluate(Environment &env) const {
     return ExpressionUnit::getSingleton();
   }
 
-  throw MessagedException(getSourceLocation().toAnchor() + ": I expect function echo to be given a mesh, but that's not what you gave it.");
+  throw MessagedException(mesh_closure->getSourceLocation().toAnchor() + ": I expect function echo to be given a mesh, but that's not what you gave it.");
 }
 
 /* ------------------------------------------------------------------------- */

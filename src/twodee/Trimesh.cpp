@@ -1867,6 +1867,8 @@ Trimesh& Trimesh::operator+=(const Trimesh& other) {
     new_vertex_metas = new float[new_nvertices * nvertex_metas];
     memcpy(new_vertex_metas, vertex_metas, sizeof(float) * GetVertexCount() * nvertex_metas);
     memcpy(new_vertex_metas + GetVertexCount() * nvertex_metas, other.vertex_metas, sizeof(float) * other.GetVertexCount() * nvertex_metas);
+  } else {
+    nvertex_metas = 0;
   }
 
   // Copy faces
