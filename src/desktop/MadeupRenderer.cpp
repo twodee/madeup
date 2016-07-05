@@ -312,15 +312,6 @@ void MadeupRenderer::fitCameraToMesh() {
     }
   }
 
-  /* std::cout << "min: " << min << std::endl; */
-  /* std::cout << "max: " << max << std::endl; */
-
-  // Make it a cube, using the extrema as the bounds.
-  /* float minmin = min.GetMinimum(); */
-  /* float maxmax = max.GetMaximum(); */
-  /* min[0] = min[1] = min[2] = minmin; */
-  /* max[0] = max[1] = max[2] = maxmax; */
-
   bbox = Box<float, 3>(max, min);
 
   // Set up transformations
@@ -328,20 +319,13 @@ void MadeupRenderer::fitCameraToMesh() {
   bbox_radius = bbox.GetDiagonalLength() * 0.5f;
 
   float viewport_limit;
-  /* std::cout << "GetVerticalFieldOfView(): " << camera.GetVerticalFieldOfView() << std::endl; */
-  /* std::cout << "camera.GetHorizontalFieldOfView(getAspectRatio()): " << camera.GetHorizontalFieldOfView(getAspectRatio()) << std::endl; */
   if (getAspectRatio() >= 1) {
     viewport_limit = tan(camera.GetHorizontalFieldOfView(getAspectRatio()) * td::PI / 180.0f * 0.5f);
   } else {
     viewport_limit = tan(camera.GetVerticalFieldOfView() * td::PI / 180.0f * 0.5f);
   }
-  /* std::cout << "viewport_limit: " << viewport_limit << std::endl; */
 
-  /* std::cout << "bbox.GetSize(): " << bbox.GetSize() << std::endl; */
-  /* std::cout << "bbox.GetSize().GetMaximum(): " << bbox.GetSize().GetMaximum() << std::endl; */
-  /* push = bbox.GetSize().GetMaximum() / viewport_limit; */
   push = bbox_radius / viewport_limit;
-  /* float distance = bbox_radius / tan(45.0f * 0.5f * PI / 180.0f); */
 
   center_mesh_xform = td::QMatrix4<float>::GetTranslate(-bbox_center[0], -bbox_center[1], -bbox_center[2]);
   camera.LookAt(QVector3<float>(0.0f, 0.0f, bbox_radius + push + 0.1f),

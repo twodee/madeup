@@ -419,6 +419,13 @@ QVector<T, ndims> operator-(T scalar,
 
 /* ------------------------------------------------------------------------- */
 
+template<class T, int ndims>
+QVector<T, ndims> operator-(const QVector<T, ndims>& a) {
+  return a * (T) -1;
+}
+
+/* ------------------------------------------------------------------------- */
+
 /**
  Gets the vector which representing this vector with the specified scalar value
  multiplied by each component.

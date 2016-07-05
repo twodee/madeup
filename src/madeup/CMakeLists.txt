@@ -30,6 +30,7 @@ add_library(madeup
   ExpressionDefine.cpp
   ExpressionDefineElement.cpp
   ExpressionDefineVariable.cpp
+  ExpressionDilate.cpp
   ExpressionDivide.cpp
   ExpressionDot.cpp
   ExpressionSpheres.cpp
