@@ -47,13 +47,13 @@ Co<Expression> ExpressionDilate::evaluate(Environment &env) const {
     return ExpressionUnit::getSingleton();
   }
 
-  /* env.dilate(turtles_value->getPath()); */
   // TODO: handle open paths
   // assumes closed
  
   const std::vector<Node> &path = turtles_value->getPath();
   int nnodes = path.size() - 1;
   std::vector<Line<float, 3> > lines;
+  std::vector<bool> is_collinear;
   QVector3<float> first_normal;
 
   for (int i = 0; i < nnodes; ++i) {
@@ -62,6 +62,20 @@ Co<Expression> ExpressionDilate::evaluate(Environment &env) const {
     int inext = (i + 1) % nnodes;
     QVector3<float> to_prev = path[iprev].position - path[i].position;
     QVector3<float> to_next = path[inext].position - path[i].position;
+    is_collinear.push_back(false);
+
+    to_prev.Normalize();
+    to_next.Normalize();
+    
+    std::cout << "to_prev.Dot(to_next): " << to_prev.Dot(to_next) << std::endl;
+    while (1.0f - fabs(to_prev.Dot(to_next)) < 0.01f) {
+      is_collinear[i] = true;
+      ++inext; 
+      to_next = path[inext].position - path[(inext + nnodes - 1) % nnodes].position;
+      to_next.Normalize();
+      std::cout << "inext: " << inext << std::endl;
+    }
+
     QVector3<float> normal = to_prev.Cross(to_next);
 
     if (i == 0) {
@@ -93,7 +107,11 @@ Co<Expression> ExpressionDilate::evaluate(Environment &env) const {
 
     // intersect previous line and this one
     Node node = path[i];
-    node.position = lines[i].ClosestPointTo(lines[iprev]);
+    if (is_collinear[i]) {
+      node.position = lines[i].GetPoint();
+    } else {
+      node.position = lines[i].ClosestPointTo(lines[iprev]);
+    }
 
     // node.position = intersection;
     dilated_path.push_back(node);
