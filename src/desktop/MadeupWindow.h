@@ -16,17 +16,19 @@
 /* ------------------------------------------------------------------------- */
 
 namespace Ui {
-  class MupperWindow;
+  class MadeupWindow;
 }
 
 /* ------------------------------------------------------------------------- */
 
-class MupperWindow : public QMainWindow {
+class MadeupWindow : public QMainWindow {
   Q_OBJECT
 
   public:
-    explicit MupperWindow(QWidget *parent = 0);
-    ~MupperWindow();
+    explicit MadeupWindow(QWidget *parent = 0);
+    ~MadeupWindow();
+
+    void open(const std::string &path);
 
   public slots:
     void onSolidify();
@@ -34,7 +36,7 @@ class MupperWindow : public QMainWindow {
     void onTextChanged();
     void selectFont();
     void onFit();
-    void saveAs(const QString &path);
+    void saveAs(const std::string &path);
     void showEvent(QShowEvent *event);
     void closeEvent(QCloseEvent *event);
 
@@ -53,7 +55,7 @@ class MupperWindow : public QMainWindow {
     QTextBrowser *console;
     MadeupCanvas *canvas;
     MadeupRenderer *renderer;
-    QString mup_path;
+    std::string mup_path;
     std::string config_path;
 
     QDoubleSpinBox *path_stroke_width_spinner;

@@ -5,9 +5,9 @@ set(CMAKE_PREFIX_PATH "/Users/johnch/tarballs/Qt/5.6/clang_64")
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5OpenGL REQUIRED)
 
-add_executable(Mupper
-  mupper.cpp
-  MupperWindow.cpp
+add_executable(Madeup
+  madeup.cpp
+  MadeupWindow.cpp
   MadeupCanvas.cpp
   MadeupRenderer.cpp
   Log.cpp
@@ -19,10 +19,10 @@ add_executable(Mupper
   VertexArray.cpp
   VertexAttributes.cpp
   jsoncpp.cpp)
-include_directories(Mupper ${CMAKE_SOURCE_DIR}/include ${Qt5Widgets_INCLUDE_DIRS})
-target_link_libraries(Mupper madeup twodee Qt5::Widgets Qt5::OpenGL ${Qt5Gui_OPENGL_LIBRARIES})
-set_target_properties(Mupper PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-set_target_properties(Mupper PROPERTIES MACOSX_BUNDLE TRUE)
+include_directories(Madeup ${CMAKE_SOURCE_DIR}/include ${Qt5Widgets_INCLUDE_DIRS})
+target_link_libraries(Madeup madeup twodee Qt5::Widgets Qt5::OpenGL ${Qt5Gui_OPENGL_LIBRARIES})
+set_target_properties(Madeup PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set_target_properties(Madeup PROPERTIES MACOSX_BUNDLE TRUE)
 
 if(USE_IGL)
   set(IGL_INCLUDES
@@ -44,10 +44,10 @@ if(USE_IGL)
     ${MPFR_LIBRARIES}
   )
 
-  include_directories(Mupper ${IGL_INCLUDES})
-  target_link_libraries(Mupper ${IGL_LIBRARIES})
+  include_directories(Madeup ${IGL_INCLUDES})
+  target_link_libraries(Madeup ${IGL_LIBRARIES})
 endif()
 
 if(USE_MAGICK)
-  target_link_libraries(Mupper ${ImageMagick_LIBRARIES})
+  target_link_libraries(Madeup ${ImageMagick_LIBRARIES})
 endif()
