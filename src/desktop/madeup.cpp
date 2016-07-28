@@ -14,8 +14,8 @@ int main(int argc, char **argv) {
   const QStringList args = parser.positionalArguments();
 
   if (args.size() == 0) {
-    MadeupWindow w;
-    w.show();
+    MadeupWindow *w = new MadeupWindow();
+    w->show();
   } else {
     for (auto i = args.begin(); i != args.end(); ++i) {
       MadeupWindow *w = new MadeupWindow();
