@@ -68,6 +68,9 @@ template<class T, int ndims> class Box {
 
     bool Contains(const QVector<T, ndims>& point) const;
 
+    int GetMinimumDimension() const;
+    int GetMaximumDimension() const;
+
   private:
     /** Maximum corner */
     QVector<T, ndims> max;
@@ -160,6 +163,32 @@ bool Box<T, ndims>::Contains(const QVector<T, ndims>& point) const {
   }
 
   return true;
+}
+
+/* ------------------------------------------------------------------------- */
+
+template<class T, int ndims>
+int Box<T, ndims>::GetMaximumDimension() const {
+  int dmin = 0;
+  for (int d = 1; d < ndims; ++d) {
+    if (size[d] > size[dmin]) {
+      dmin = d;
+    }
+  }
+  return dmin;
+}
+
+/* ------------------------------------------------------------------------- */
+
+template<class T, int ndims>
+int Box<T, ndims>::GetMinimumDimension() const {
+  int dmin = 0;
+  for (int d = 1; d < ndims; ++d) {
+    if (size[d] < size[dmin]) {
+      dmin = d;
+    }
+  }
+  return dmin;
 }
 
 /* ------------------------------------------------------------------------- */

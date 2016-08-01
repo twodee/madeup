@@ -100,6 +100,8 @@ template<class T, int ndims> class QVector {
      */
     T Dot(const QVector<T, ndims>& other) const;
 
+    bool IsParallel(const QVector<T, ndims>& other, T epsilon = 1.0e-6) const;
+
     /**
      Makes this vector have length 1, while maintaining its direction.
      */
@@ -763,6 +765,31 @@ T QVector<T, ndims>::GetMinimum() const {
     }
   }
   return min;
+}
+
+/* ------------------------------------------------------------------------- */
+
+template<class T, int ndims>
+bool QVector<T, ndims>::IsParallel(const QVector<T, ndims>& that, T epsilon) const {
+  // The two vectors are parallel if the dot product of their normalized selves
+  // is near 1 or -1.
+
+  // First, let's normalize.
+  QVector<T, ndims> this_normalized(*this);
+  this_normalized.Normalize();
+
+  QVector<T, ndims> that_normalized(that);
+  that_normalized.Normalize();
+ 
+  // Then let's compare the dot product.
+  float dot = this_normalized.Dot(that_normalized);
+
+  // [-1 1] - domain
+  // [0 1] - abs
+  // [1 0] - 1 -
+  // [false true] < epsilon
+
+  return 1 - fabs(dot) < epsilon;
 }
 
 /* ------------------------------------------------------------------------- */
