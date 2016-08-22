@@ -13,6 +13,9 @@ MadeupCanvas::MadeupCanvas(QWidget *parent) :
   format.setProfile(QSurfaceFormat::CoreProfile);
   format.setDepthBufferSize(24);
 
+  // Really need QSurfaceFormat::setDefaultFormat(format)?
+  // https://forum.qt.io/topic/67280/create-a-core-profile-opengl-app/3
+ 
   // Multisampling seems to mess up glReadPixels. TODO: fix this by blitting
   // the FBO to a non-multisampled FBO and reading from that.
   /* format.setSamples(4); */
