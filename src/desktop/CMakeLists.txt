@@ -2,10 +2,18 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # For ease of development, I'm guessing a shortcut to Qt is installed.
-set(CMAKE_PREFIX_PATH "$ENV{HOME}/tarballs/qt")
+set(CMAKE_PREFIX_PATH "$ENV{HOME}/tarballs/qtroot")
 
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5OpenGL REQUIRED)
+
+# On my Macintosh, CGAL wants to interpose its FindOpenGL, which fails
+# because it doesn't include its own macros file. Let's route around
+# it entirely.
+set(ORIGINAL_MODULE_PATH ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH "")
+find_package(OpenGL REQUIRED)
+set(CMAKE_MODULE_PATH ${ORIGINAL_MODULE_PATH})
 
 set(MADEUP_EXECUTABLE "Madeup")
 add_executable(${MADEUP_EXECUTABLE}
@@ -23,7 +31,7 @@ add_executable(${MADEUP_EXECUTABLE}
   VertexAttributes.cpp
   jsoncpp.cpp)
 include_directories(${MADEUP_EXECUTABLE} ${CMAKE_SOURCE_DIR}/include ${Qt5Widgets_INCLUDE_DIRS})
-target_link_libraries(${MADEUP_EXECUTABLE} madeup twodee Qt5::Widgets Qt5::OpenGL GL)
+target_link_libraries(${MADEUP_EXECUTABLE} madeup twodee Qt5::Widgets Qt5::OpenGL ${OPENGL_LIBRARIES})
 set_target_properties(${MADEUP_EXECUTABLE} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set_target_properties(${MADEUP_EXECUTABLE} PROPERTIES MACOSX_BUNDLE TRUE)
 
