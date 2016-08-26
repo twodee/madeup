@@ -65,6 +65,7 @@ MadeupRenderer::~MadeupRenderer() {
 /* ------------------------------------------------------------------------- */
 
 void MadeupRenderer::render() {
+  OpenGL::CheckError("before render");
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glEnable(GL_DEPTH_TEST);
@@ -88,8 +89,10 @@ void MadeupRenderer::render() {
     /* attr->Update(positions); */
   /* } */
 
+  OpenGL::CheckError("before sizing");
   glLineWidth(path_stroke_width);
   glPointSize(vertex_size);
+  OpenGL::CheckError("after sizing");
 
 #if 0
   line_program->Bind();
@@ -107,6 +110,7 @@ void MadeupRenderer::render() {
   vertex_array->DrawIndexed(GL_TRIANGLES);
   vertex_array->Unbind();
   program->Unbind();
+  OpenGL::CheckError("after program");
 
   if (show_heading) {
     heading_program->Bind();
@@ -125,6 +129,7 @@ void MadeupRenderer::render() {
     heading_array->Unbind();
     heading_program->Unbind();
   }
+  OpenGL::CheckError("after heading");
 
   line_program->Bind();
 
@@ -158,6 +163,7 @@ void MadeupRenderer::render() {
     }
   }
   axes_array->Unbind();
+  OpenGL::CheckError("after paths");
 
   glLineWidth(grid_stroke_width);
   for (int d = 0; d < 3; ++d) {
@@ -170,6 +176,7 @@ void MadeupRenderer::render() {
       grid_arrays[d]->Unbind();
     }
   }
+  OpenGL::CheckError("after grid");
 
   glDisable(GL_DEPTH_TEST);
 
@@ -580,7 +587,7 @@ void MadeupRenderer::setPaths(const std::vector<std::vector<madeup::Turtle> > &p
       float *vertices = new float[paths[pi].size() * 3];
 
       float *vertex = vertices;
-      for (int vi = 0; vi < paths[pi].size(); ++vi, vertex += 3) {
+      for (unsigned int vi = 0; vi < paths[pi].size(); ++vi, vertex += 3) {
         td::QVector3<float> v = paths[pi][vi].position;
         for (int d = 0; d < 3; ++d) {
           vertex[d] = v[d];

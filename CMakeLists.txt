@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 project(madeup)
 
+# set(CMAKE_PREFIX_PATH "$ENV{HOME}/tarballs/Qt5.7.0/5.7/gcc_64" CACHE PATH "Paths in which to find dependencies")
+
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
 
 configure_file(${CMAKE_SOURCE_DIR}/include/twodee/Configuration.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/twodee/Configuration.h @ONLY)
@@ -25,8 +27,6 @@ if(USE_MAGICK)
     add_definitions(-DMAGICKCORE_QUANTUM_DEPTH=16)
     # Why do I need explicitly add the following line?
     include_directories(${ImageMagick_INCLUDE_DIRS} /usr/local/include)
-    message("ImageMagick Libraries ${ImageMagick_LIBRARIES}")
-    message("ImageMagick Libraries ${ImageMagick_INCLUDE_DIRS}")
   endif(IMAGEMAGICK_FOUND)
 endif(USE_MAGICK)
 
@@ -55,7 +55,6 @@ if(USE_IGL)
   if(NOT DEFINED EIGEN3_INCLUDE_DIR)
     find_package(Eigen3 REQUIRED)
   endif()
-  message(${EIGEN3_INCLUDE_DIR})
 
   find_package(CGAL REQUIRED)
   LIST(APPEND CMAKE_MODULE_PATH ${CGAL_DIR})

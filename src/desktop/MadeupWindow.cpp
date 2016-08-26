@@ -943,7 +943,7 @@ void MadeupWindow::onTextChanged() {
 
   // We skip the last two tokens (NEWLINE and END_OF_FILE) because they aren't
   // really in the original source.
-  int ti = 0;
+  unsigned int ti = 0;
   for (auto token = tokens.begin(); ti + 2 < tokens.size(); ++token, ++ti) {
     SourceLocation location = token->getLocation();
     cursor.setPosition(location.getStartIndex(), QTextCursor::MoveAnchor);

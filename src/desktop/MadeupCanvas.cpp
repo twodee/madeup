@@ -9,8 +9,8 @@ MadeupCanvas::MadeupCanvas(QWidget *parent) :
   QOpenGLWidget(parent),
   auto_rotate_timer(this) {
   QSurfaceFormat format;
-  format.setVersion(3, 1);
-  format.setProfile(QSurfaceFormat::CoreProfile);
+  format.setVersion(3, 2);
+  /* format.setProfile(QSurfaceFormat::CoreProfile); */
   format.setDepthBufferSize(24);
 
   // Really need QSurfaceFormat::setDefaultFormat(format)?

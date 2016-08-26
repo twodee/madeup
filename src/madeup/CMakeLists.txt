@@ -114,8 +114,9 @@ include_directories(madeup ${CMAKE_SOURCE_DIR}/include)
 if(USE_IGL)
   include_directories(
     madeup
-    ${CMAKE_BINARY_DIR}/libigl/include
+    ${CMAKE_SOURCE_DIR}/libigl/include
     ${EIGEN3_INCLUDE_DIR}
     /usr/local/include
   )
+  target_link_libraries(madeup pthread)
 endif()

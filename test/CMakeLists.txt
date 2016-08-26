@@ -1,9 +1,7 @@
 configure_file(test_mups ${CMAKE_BINARY_DIR}/test_mups @ONLY)
 
 set(GTEST_ROOT "" CACHE PATH "The installation directory for Google Test")
-find_package(GTest REQUIRED)
-
-message("GTest: ${GTEST_BOTH_LIBRARIES}")
+find_package(GTest)
 
 if (GTEST_FOUND)
   include_directories(${GTEST_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/include)

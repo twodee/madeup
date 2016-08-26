@@ -15,7 +15,7 @@ set_target_properties(merp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DI
 
 if(USE_IGL)
   set(IGL_INCLUDES
-    ${CMAKE_BINARY_DIR}/libigl/include
+    ${CMAKE_SOURCE_DIR}/libigl/include
     ${EIGEN3_INCLUDE_DIR}
     /usr/local/include
   )

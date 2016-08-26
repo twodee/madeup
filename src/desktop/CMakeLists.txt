@@ -1,11 +1,14 @@
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(CMAKE_PREFIX_PATH "/Users/johnch/tarballs/Qt/5.6/clang_64")
+# For ease of development, I'm guessing a shortcut to Qt is installed.
+set(CMAKE_PREFIX_PATH "$ENV{HOME}/tarballs/qt")
+
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5OpenGL REQUIRED)
 
-add_executable(Madeup
+set(MADEUP_EXECUTABLE "Madeup")
+add_executable(${MADEUP_EXECUTABLE}
   madeup.cpp
   MadeupWindow.cpp
   MadeupCanvas.cpp
@@ -19,19 +22,23 @@ add_executable(Madeup
   VertexArray.cpp
   VertexAttributes.cpp
   jsoncpp.cpp)
-include_directories(Madeup ${CMAKE_SOURCE_DIR}/include ${Qt5Widgets_INCLUDE_DIRS})
-target_link_libraries(Madeup madeup twodee Qt5::Widgets Qt5::OpenGL ${Qt5Gui_OPENGL_LIBRARIES})
-set_target_properties(Madeup PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-set_target_properties(Madeup PROPERTIES MACOSX_BUNDLE TRUE)
+include_directories(${MADEUP_EXECUTABLE} ${CMAKE_SOURCE_DIR}/include ${Qt5Widgets_INCLUDE_DIRS})
+target_link_libraries(${MADEUP_EXECUTABLE} madeup twodee Qt5::Widgets Qt5::OpenGL GL)
+set_target_properties(${MADEUP_EXECUTABLE} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set_target_properties(${MADEUP_EXECUTABLE} PROPERTIES MACOSX_BUNDLE TRUE)
+
+if(NOT APPLE)
+  set_target_properties(${MADEUP_EXECUTABLE} PROPERTIES OUTPUT_NAME madeup)
+endif()
 
 if(USE_IGL)
   set(IGL_INCLUDES
-    ${CMAKE_BINARY_DIR}/libigl/include
+    ${CMAKE_SOURCE_DIR}/libigl/include
     ${EIGEN3_INCLUDE_DIR}
     /usr/local/include
   )
 
-  set(IGL_LIBRARIES 
+  set(IGL_LIBRARIES
     ${Boost_LOG_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
@@ -44,10 +51,10 @@ if(USE_IGL)
     ${MPFR_LIBRARIES}
   )
 
-  include_directories(Madeup ${IGL_INCLUDES})
-  target_link_libraries(Madeup ${IGL_LIBRARIES})
+  include_directories(${MADEUP_EXECUTABLE} ${IGL_INCLUDES})
+  target_link_libraries(${MADEUP_EXECUTABLE} ${IGL_LIBRARIES})
 endif()
 
 if(USE_MAGICK)
-  target_link_libraries(Madeup ${ImageMagick_LIBRARIES})
+  target_link_libraries(${MADEUP_EXECUTABLE} ${ImageMagick_LIBRARIES})
 endif()

@@ -7,14 +7,14 @@
 #include <QWheelEvent>
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
-#include <QOpenGLFunctions_3_2_Core>
+#include <QOpenGLFunctions_3_2_Compatibility>
 #include <QTimer>
 
 #include "MadeupRenderer.h"
 #include "madeup/Environment.h"
 #include "twodee/Trimesh.h"
 
-class MadeupCanvas : public QOpenGLWidget, protected QOpenGLFunctions_3_2_Core {
+class MadeupCanvas : public QOpenGLWidget, protected QOpenGLFunctions_3_2_Compatibility {
   public:
     explicit MadeupCanvas(QWidget *parent = nullptr);
 
