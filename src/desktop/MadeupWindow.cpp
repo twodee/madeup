@@ -9,6 +9,7 @@
 #include <QDoubleSpinBox>
 #include <QGroupBox>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QFontDialog>
 #include <QFormLayout>
 #include <QLabel>
@@ -41,10 +42,12 @@ MadeupWindow::MadeupWindow(QWidget *parent) :
   QMainWindow(parent),
   autopathify_timer(new QTimer(this)),
   editor(nullptr),
-  canvas(nullptr) {
+  canvas(nullptr),
+  last_directory(QDir::homePath()) {
 
   autopathify_timer->setSingleShot(true);
   config_path = (QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + QDir::separator() + "org.twodee.madeup.json").toStdString();
+  std::cout << "config_path: " << config_path << std::endl;
 
   horizontal_splitter = new QSplitter(this);
   horizontal_splitter->setOrientation(Qt::Horizontal);
@@ -582,16 +585,19 @@ MadeupWindow::MadeupWindow(QWidget *parent) :
 
   connect(action_screenshot, &QAction::triggered, this, [=]() {
     canvas->makeCurrent();
-    QString path = QFileDialog::getSaveFileName(this, "Save Screenshot", QDir::homePath(), "Images (*.png *.jpg *.gif)");
+    QString path = QFileDialog::getSaveFileName(this, "Save Screenshot", last_directory, "Images (*.png *.jpg *.gif)");
     if (path.length() != 0) {
+      last_directory = QFileInfo(path).absolutePath();
       canvas->makeCurrent();
       renderer->takeScreenshot(path.toStdString());
     }
   });
 
   connect(action_open, &QAction::triggered, [=]() {
-    QString path = QFileDialog::getOpenFileName(this, "Open File", QDir::homePath(), "Madeup Programs (*.mup)");
+    QString path = QFileDialog::getOpenFileName(this, "Open File", last_directory, "Madeup Programs (*.mup)");
     if (path.length() != 0) {
+      last_directory = QFileInfo(path).absolutePath();
+      std::cout << "last_directory: " << last_directory.toStdString() << std::endl;
       open(path.toStdString());
     }
   });
@@ -604,17 +610,19 @@ MadeupWindow::MadeupWindow(QWidget *parent) :
     if (mup_path.length() != 0) {
       saveAs(mup_path); 
     } else {
-      std::string path = QFileDialog::getSaveFileName(this, "Save File", QDir::homePath(), "Madeup Programs (*.mup)").toStdString();
+      QString path = QFileDialog::getSaveFileName(this, "Save File", last_directory, "Madeup Programs (*.mup)");
       if (path.length() != 0) {
-        saveAs(path); 
+        last_directory = QFileInfo(path).absolutePath();
+        saveAs(path.toStdString()); 
       }
     }
   });
 
   connect(action_save_as, &QAction::triggered, [=]() {
-    std::string path = QFileDialog::getSaveFileName(this, "Save File", QDir::homePath(), "Madeup Programs (*.mup)").toStdString();
+    QString path = QFileDialog::getSaveFileName(this, "Save File", last_directory, "Madeup Programs (*.mup)");
     if (path.length() != 0) {
-      saveAs(path);
+      last_directory = QFileInfo(path).absolutePath();
+      saveAs(path.toStdString());
     }
   });
 
@@ -626,8 +634,9 @@ MadeupWindow::MadeupWindow(QWidget *parent) :
   });
 
   connect(action_export, &QAction::triggered, [=]() {
-    QString path = QFileDialog::getSaveFileName(this, "Export File", QDir::homePath(), "Wavefront OBJ Files (*.obj)");
+    QString path = QFileDialog::getSaveFileName(this, "Export File", last_directory, "Wavefront OBJ Files (*.obj)");
     if (path.length() != 0) {
+      last_directory = QFileInfo(path).absolutePath();
       renderer->exportTrimesh(path.toStdString());
     }
   });
@@ -1273,6 +1282,8 @@ void MadeupWindow::loadPreferences() {
       vertical_splitter->setSizes(sizes);
     }
 
+    last_directory = QString(prefs.get("last.directory", last_directory.toStdString()).asString().c_str());
+
   } catch (int i) {
   }
 
@@ -1356,6 +1367,8 @@ void MadeupWindow::savePreferences() {
 
     prefs["show.faceted"] = faceted_checkbox->isChecked();
     prefs["autorotate"] = has_autorotate_checkbox->isChecked();
+
+    prefs["last.directory"] = last_directory.toStdString();
 
     Json::StyledWriter writer;
     string json = writer.write(prefs);

@@ -93,6 +93,8 @@ class MadeupWindow : public QMainWindow {
 
     QSplitter *horizontal_splitter;
     QSplitter *vertical_splitter;
+
+    QString last_directory;
 };
 
 /* ------------------------------------------------------------------------- */
