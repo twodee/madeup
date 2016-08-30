@@ -296,9 +296,10 @@ $(document).ready(function() {
         resize();
       }
 
-      if (!isEmbedded) {
-        load('untitled');
-      }
+      load('untitled');
+    } else {
+      $('#left').width(250);
+      resize();
     }
 
     if (!isEmbedded && Cookies.get('fontSize')) {
