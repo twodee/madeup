@@ -3,7 +3,7 @@ project(madeup)
 
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
 
-include_directories(${CMAKE_BINARY_DIR}/include)
+include_directories(${CMAKE_BINARY_DIR}/include twodee/include)
 
 option(USE_DEBUG "Enable debug information" ON)
 
