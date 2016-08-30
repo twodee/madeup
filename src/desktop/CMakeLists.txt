@@ -21,14 +21,6 @@ add_executable(${MADEUP_EXECUTABLE}
   MadeupWindow.cpp
   MadeupCanvas.cpp
   MadeupRenderer.cpp
-  Log.cpp
-  ShaderProgram.cpp
-  Texture.cpp
-  Trackball.cpp
-  UniformManager.cpp
-  UtilitiesOpenGL.cpp
-  VertexArray.cpp
-  VertexAttributes.cpp
   jsoncpp.cpp)
 include_directories(${MADEUP_EXECUTABLE} ${CMAKE_SOURCE_DIR}/include ${Qt5Widgets_INCLUDE_DIRS})
 target_link_libraries(${MADEUP_EXECUTABLE} madeup twodee Qt5::Widgets Qt5::OpenGL ${OPENGL_LIBRARIES})

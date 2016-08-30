@@ -4,8 +4,8 @@
 #include "madeup/Environment.h"
 #include "twodee/Trimesh.h"
 #include "twodee/Camera.h"
-#include "VertexArray.h"
-#include "Trackball.h"
+#include "twodee/VertexArray.h"
+#include "twodee/Trackball.h"
 
 namespace RenderStyle {
   enum {
