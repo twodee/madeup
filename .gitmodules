@@ -1,3 +1,6 @@
 [submodule "libigl"]
 	path = libigl
 	url = https://github.com/libigl/libigl.git
+[submodule "twodee"]
+	path = twodee
+	url = git@github.com:twodee/twodee.git

@@ -65,6 +65,7 @@ MadeupRenderer::~MadeupRenderer() {
 /* ------------------------------------------------------------------------- */
 
 void MadeupRenderer::render() {
+  OpenGL::CheckError("before render");
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glEnable(GL_DEPTH_TEST);
@@ -88,8 +89,10 @@ void MadeupRenderer::render() {
     /* attr->Update(positions); */
   /* } */
 
+  OpenGL::CheckError("before sizing");
   glLineWidth(path_stroke_width);
   glPointSize(vertex_size);
+  OpenGL::CheckError("after sizing");
 
 #if 0
   line_program->Bind();
@@ -107,6 +110,7 @@ void MadeupRenderer::render() {
   vertex_array->DrawIndexed(GL_TRIANGLES);
   vertex_array->Unbind();
   program->Unbind();
+  OpenGL::CheckError("after program");
 
   if (show_heading) {
     heading_program->Bind();
@@ -125,6 +129,7 @@ void MadeupRenderer::render() {
     heading_array->Unbind();
     heading_program->Unbind();
   }
+  OpenGL::CheckError("after heading");
 
   line_program->Bind();
 
@@ -158,6 +163,7 @@ void MadeupRenderer::render() {
     }
   }
   axes_array->Unbind();
+  OpenGL::CheckError("after paths");
 
   glLineWidth(grid_stroke_width);
   for (int d = 0; d < 3; ++d) {
@@ -170,6 +176,7 @@ void MadeupRenderer::render() {
       grid_arrays[d]->Unbind();
     }
   }
+  OpenGL::CheckError("after grid");
 
   glDisable(GL_DEPTH_TEST);
 
@@ -312,15 +319,6 @@ void MadeupRenderer::fitCameraToMesh() {
     }
   }
 
-  /* std::cout << "min: " << min << std::endl; */
-  /* std::cout << "max: " << max << std::endl; */
-
-  // Make it a cube, using the extrema as the bounds.
-  /* float minmin = min.GetMinimum(); */
-  /* float maxmax = max.GetMaximum(); */
-  /* min[0] = min[1] = min[2] = minmin; */
-  /* max[0] = max[1] = max[2] = maxmax; */
-
   bbox = Box<float, 3>(max, min);
 
   // Set up transformations
@@ -328,20 +326,13 @@ void MadeupRenderer::fitCameraToMesh() {
   bbox_radius = bbox.GetDiagonalLength() * 0.5f;
 
   float viewport_limit;
-  /* std::cout << "GetVerticalFieldOfView(): " << camera.GetVerticalFieldOfView() << std::endl; */
-  /* std::cout << "camera.GetHorizontalFieldOfView(getAspectRatio()): " << camera.GetHorizontalFieldOfView(getAspectRatio()) << std::endl; */
   if (getAspectRatio() >= 1) {
     viewport_limit = tan(camera.GetHorizontalFieldOfView(getAspectRatio()) * td::PI / 180.0f * 0.5f);
   } else {
     viewport_limit = tan(camera.GetVerticalFieldOfView() * td::PI / 180.0f * 0.5f);
   }
-  /* std::cout << "viewport_limit: " << viewport_limit << std::endl; */
 
-  /* std::cout << "bbox.GetSize(): " << bbox.GetSize() << std::endl; */
-  /* std::cout << "bbox.GetSize().GetMaximum(): " << bbox.GetSize().GetMaximum() << std::endl; */
-  /* push = bbox.GetSize().GetMaximum() / viewport_limit; */
   push = bbox_radius / viewport_limit;
-  /* float distance = bbox_radius / tan(45.0f * 0.5f * PI / 180.0f); */
 
   center_mesh_xform = td::QMatrix4<float>::GetTranslate(-bbox_center[0], -bbox_center[1], -bbox_center[2]);
   camera.LookAt(QVector3<float>(0.0f, 0.0f, bbox_radius + push + 0.1f),
@@ -596,7 +587,7 @@ void MadeupRenderer::setPaths(const std::vector<std::vector<madeup::Turtle> > &p
       float *vertices = new float[paths[pi].size() * 3];
 
       float *vertex = vertices;
-      for (int vi = 0; vi < paths[pi].size(); ++vi, vertex += 3) {
+      for (unsigned int vi = 0; vi < paths[pi].size(); ++vi, vertex += 3) {
         td::QVector3<float> v = paths[pi][vi].position;
         for (int d = 0; d < 3; ++d) {
           vertex[d] = v[d];

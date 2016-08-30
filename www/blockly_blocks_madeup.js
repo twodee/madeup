@@ -1184,11 +1184,11 @@ Blockly.Blocks['madeup_array_literal'] = {
    */
   decompose: function(workspace) {
     var containerBlock =
-        Blockly.Block.obtain(workspace, 'madeup_array_create_with_container');
+        workspace.newBlock('madeup_array_create_with_container');
     containerBlock.initSvg();
     var connection = containerBlock.getInput('STACK').connection;
     for (var i = 0; i < this.itemCount_; i++) {
-      var itemBlock = Blockly.Block.obtain(workspace, 'madeup_array_element');
+      var itemBlock = workspace.newBlock('madeup_array_element');
       itemBlock.initSvg();
       connection.connect(itemBlock.previousConnection);
       connection = itemBlock.nextConnection;

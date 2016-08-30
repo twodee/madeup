@@ -579,7 +579,7 @@ $(document).ready(function() {
     axes[d] = new THREE.Line(geometry, new THREE.LineBasicMaterial({
       color: colors[d],
       linewidth: 5
-    }), THREE.LinePieces);
+    }), THREE.LineSegments);
     glyphScene.add(axes[d]);
     render();
   }
@@ -633,7 +633,7 @@ $(document).ready(function() {
       geometry.vertices.push(b);
     }
 
-    grids[d] = new THREE.Line(geometry, new THREE.LineBasicMaterial({color: colors[d], linewidth: 1}), THREE.LinePieces);
+    grids[d] = new THREE.Line(geometry, new THREE.LineBasicMaterial({color: colors[d], linewidth: 1}), THREE.LineSegments);
     glyphScene.add(grids[d]);
     render();
   }
@@ -884,7 +884,7 @@ $(document).ready(function() {
     handles: "e",
     resize: function(event, ui) {
       resize();
-      Blockly.fireUiEvent(window, 'resize');
+      window.dispatchEvent(new Event('resize'))
       render();
     } 
   });
@@ -893,7 +893,7 @@ $(document).ready(function() {
     handles: "n",
     resize: function(event, ui) {
       resize();
-      Blockly.fireUiEvent(window, 'resize');
+      window.dispatchEvent(new Event('resize'))
       // Need this because console is relatively positioned.
       $('#console').css('top', '0px');
     } 
@@ -1024,7 +1024,7 @@ function setEditor(isText) {
   }
 
   resize();
-  Blockly.fireUiEvent(window, 'resize');
+  window.dispatchEvent(new Event('resize'))
 
   if (!isEditorText && blocklyWorkspace) {
     blocklyWorkspace.addChangeListener(onBlocksChanged);
@@ -1274,7 +1274,7 @@ function run(source, mode, pingback) {
           }
 
           if (showPoints) {
-            meshes[meshes.length] = new THREE.PointCloud(dotsGeometry, new THREE.PointCloudMaterial({
+            meshes[meshes.length] = new THREE.Points(dotsGeometry, new THREE.PointsMaterial({
               color: 0x000000,
               size: 8,
               sizeAttenuation: false

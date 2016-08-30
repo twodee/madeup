@@ -1,6 +1,0 @@
-#ifndef CONFIGURATION_H
-#define CONFIGURATION_H
-
-#cmakedefine USE_MAGICK
-
-#endif

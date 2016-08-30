@@ -11,14 +11,30 @@ If you'd like to build the Madeup interpreter on your local machine, you'll need
 
 Build on Ubuntu following these steps:
 
-    $ git clone git@github.com:twodee/madeup.git
+    $ git clone --recursive git@github.com:twodee/madeup.git
     $ cd madeup
     $ mkdir build
     $ cd build
     $ sudo apt-get install cmake libeigen3-dev libcgal-dev libmagick++-dev
-    $ git clone https://github.com/libigl/libigl.git
     $ cmake ..
     $ make
+
+If you accidentally omitted the `--recursive` option when cloning, follow these steps to get the submodules cloned:
+
+    $ git submodule init
+    $ git submodule update
+
+## Building the Tests
+
+First you'll need the Google Test library. These instructions install it for a single user:
+
+    $ git clone https://github.com/google/googletest.git
+    $ cd googletest
+    $ mkdir build
+    $ cd build
+    $ cmake -DCMAKE_INSTALL_PREFIX=. ..
+    $ make
+    $ make install
 
 ## Building the Web Client
 To build and run the web client locally, you'll also need PHP and Ruby installed.
@@ -38,7 +54,7 @@ Finally, you can copy the actual web client into the web server directory:
     $ make www
 
 ## Building the Documentation
-Copying the prebuilt documentation doesn't require anything but `make wwwdocs` from the build directory. If you want to make changes the documentation and rebuild the HTML pages, you'll need Ruby and a couple of gems:
+Copying the prebuilt documentation doesn't require anything but `make wwwdocs` from the build directory. If you want to make changes to the documentation and rebuild the HTML pages, you'll need Ruby and a couple of gems:
 
     $ gem install coderay kramdown
 

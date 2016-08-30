@@ -9,6 +9,7 @@
 #include <QDoubleSpinBox>
 #include <QGroupBox>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QFontDialog>
 #include <QFormLayout>
 #include <QLabel>
@@ -20,7 +21,7 @@
 #include <QStatusBar>
 #include <QToolBar>
 
-#include "MupperWindow.h"
+#include "MadeupWindow.h"
 
 #include "json/json.h"
 #include "madeup/ExpressionBlock.h"
@@ -37,14 +38,16 @@ using namespace madeup;
 
 /* ------------------------------------------------------------------------- */
 
-MupperWindow::MupperWindow(QWidget *parent) :
+MadeupWindow::MadeupWindow(QWidget *parent) :
   QMainWindow(parent),
   autopathify_timer(new QTimer(this)),
   editor(nullptr),
-  canvas(nullptr) {
+  canvas(nullptr),
+  last_directory(QDir::homePath()) {
 
   autopathify_timer->setSingleShot(true);
-  config_path = (QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + QDir::separator() + "madeup_preferences.json").toStdString();
+  config_path = (QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + QDir::separator() + "org.twodee.madeup.json").toStdString();
+  std::cout << "config_path: " << config_path << std::endl;
 
   horizontal_splitter = new QSplitter(this);
   horizontal_splitter->setOrientation(Qt::Horizontal);
@@ -491,11 +494,11 @@ MupperWindow::MupperWindow(QWidget *parent) :
 
   // Events
   connect(settings_picker, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), settings_pager, &QStackedWidget::setCurrentIndex);
-  connect(action_solidify, &QAction::triggered, this, &MupperWindow::onSolidify);
-  connect(action_pathify, &QAction::triggered, this, &MupperWindow::onPathify);
-  connect(action_fit, &QAction::triggered, this, &MupperWindow::onFit);
-  connect(select_font_button, &QPushButton::clicked, this, &MupperWindow::selectFont);
-  connect(editor, &QPlainTextEdit::textChanged, this, &MupperWindow::onTextChanged);
+  connect(action_solidify, &QAction::triggered, this, &MadeupWindow::onSolidify);
+  connect(action_pathify, &QAction::triggered, this, &MadeupWindow::onPathify);
+  connect(action_fit, &QAction::triggered, this, &MadeupWindow::onFit);
+  connect(select_font_button, &QPushButton::clicked, this, &MadeupWindow::selectFont);
+  connect(editor, &QPlainTextEdit::textChanged, this, &MadeupWindow::onTextChanged);
 
   connect(console, &QTextBrowser::anchorClicked, [=](const QUrl &link) {
     string command = link.toString().toStdString();
@@ -582,20 +585,20 @@ MupperWindow::MupperWindow(QWidget *parent) :
 
   connect(action_screenshot, &QAction::triggered, this, [=]() {
     canvas->makeCurrent();
-    QString path = QFileDialog::getSaveFileName(this, "Save Screenshot", QDir::homePath(), "Images (*.png *.jpg *.gif)");
-    if (!path.isEmpty()) {
+    QString path = QFileDialog::getSaveFileName(this, "Save Screenshot", last_directory, "Images (*.png *.jpg *.gif)");
+    if (path.length() != 0) {
+      last_directory = QFileInfo(path).absolutePath();
       canvas->makeCurrent();
       renderer->takeScreenshot(path.toStdString());
     }
   });
 
   connect(action_open, &QAction::triggered, [=]() {
-    QString path = QFileDialog::getOpenFileName(this, "Open File", QDir::homePath(), "Madeup Programs (*.mup)");
-    if (!path.isEmpty()) {
-      mup_path = path;
-      std::string source = td::Utilities::Slurp(path.toStdString());
-      editor->setPlainText(source.c_str());
-      this->setWindowTitle(("Madeup: " + mup_path.toStdString()).c_str());
+    QString path = QFileDialog::getOpenFileName(this, "Open File", last_directory, "Madeup Programs (*.mup)");
+    if (path.length() != 0) {
+      last_directory = QFileInfo(path).absolutePath();
+      std::cout << "last_directory: " << last_directory.toStdString() << std::endl;
+      open(path.toStdString());
     }
   });
 
@@ -604,33 +607,36 @@ MupperWindow::MupperWindow(QWidget *parent) :
   });
 
   connect(action_save, &QAction::triggered, [=]() {
-    if (!mup_path.isEmpty()) {
+    if (mup_path.length() != 0) {
       saveAs(mup_path); 
     } else {
-      QString path = QFileDialog::getSaveFileName(this, "Save File", QDir::homePath(), "Madeup Programs (*.mup)");
-      if (!path.isEmpty()) {
-        saveAs(path); 
+      QString path = QFileDialog::getSaveFileName(this, "Save File", last_directory, "Madeup Programs (*.mup)");
+      if (path.length() != 0) {
+        last_directory = QFileInfo(path).absolutePath();
+        saveAs(path.toStdString()); 
       }
     }
   });
 
   connect(action_save_as, &QAction::triggered, [=]() {
-    QString path = QFileDialog::getSaveFileName(this, "Save File", QDir::homePath(), "Madeup Programs (*.mup)");
-    if (!path.isEmpty()) {
-      saveAs(path);
+    QString path = QFileDialog::getSaveFileName(this, "Save File", last_directory, "Madeup Programs (*.mup)");
+    if (path.length() != 0) {
+      last_directory = QFileInfo(path).absolutePath();
+      saveAs(path.toStdString());
     }
   });
 
   connect(action_new, &QAction::triggered, [=]() {
-    MupperWindow *new_window = new MupperWindow();
+    MadeupWindow *new_window = new MadeupWindow();
     // This window has no parent, so who's gonna delete it? Itself.
     new_window->setAttribute(Qt::WA_DeleteOnClose);
     new_window->show();
   });
 
   connect(action_export, &QAction::triggered, [=]() {
-    QString path = QFileDialog::getSaveFileName(this, "Export File", QDir::homePath(), "Wavefront OBJ Files (*.obj)");
-    if (!path.isEmpty()) {
+    QString path = QFileDialog::getSaveFileName(this, "Export File", last_directory, "Wavefront OBJ Files (*.obj)");
+    if (path.length() != 0) {
+      last_directory = QFileInfo(path).absolutePath();
       renderer->exportTrimesh(path.toStdString());
     }
   });
@@ -819,12 +825,21 @@ MupperWindow::MupperWindow(QWidget *parent) :
 
 /* ------------------------------------------------------------------------- */
 
-MupperWindow::~MupperWindow() {
+void MadeupWindow::open(const std::string &path) {
+  std::string source = td::Utilities::Slurp(path);
+  editor->setPlainText(source.c_str());
+  this->setWindowTitle(("Madeup: " + path).c_str());
+  mup_path = path;
 }
 
 /* ------------------------------------------------------------------------- */
 
-void MupperWindow::onRun(GeometryMode::geometry_mode_t geometry_mode) {
+MadeupWindow::~MadeupWindow() {
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupWindow::onRun(GeometryMode::geometry_mode_t geometry_mode) {
   std::string source = editor->toPlainText().toStdString();
 
   std::stringstream cout_capturer;
@@ -884,16 +899,16 @@ void MupperWindow::onRun(GeometryMode::geometry_mode_t geometry_mode) {
 
 /* ------------------------------------------------------------------------- */
 
-void MupperWindow::onTextChanged() {
+void MadeupWindow::onTextChanged() {
   // Stop any scheduled pathify.
   autopathify_timer->stop();
 
   std::string source = editor->toPlainText().toStdString();
 
-  if (mup_path.isEmpty()) {
+  if (mup_path.length() == 0) {
     this->setWindowTitle("Madeup*");
   } else {
-    this->setWindowTitle(("Madeup: " + mup_path.toStdString() + "*").c_str());
+    this->setWindowTitle(("Madeup: " + mup_path + "*").c_str());
   }
 
   std::stringstream in(source);
@@ -937,7 +952,7 @@ void MupperWindow::onTextChanged() {
 
   // We skip the last two tokens (NEWLINE and END_OF_FILE) because they aren't
   // really in the original source.
-  int ti = 0;
+  unsigned int ti = 0;
   for (auto token = tokens.begin(); ti + 2 < tokens.size(); ++token, ++ti) {
     SourceLocation location = token->getLocation();
     cursor.setPosition(location.getStartIndex(), QTextCursor::MoveAnchor);
@@ -1023,7 +1038,7 @@ void MupperWindow::onTextChanged() {
 
 /* ------------------------------------------------------------------------- */
 
-void MupperWindow::selectColor(const td::QVector4<float> &initial_color,
+void MadeupWindow::selectColor(const td::QVector4<float> &initial_color,
                                std::function<void(const QColor &)> onSelect) {
   QColorDialog *picker = new QColorDialog(toQColor(initial_color), this); 
   picker->setOption(QColorDialog::ShowAlphaChannel);
@@ -1035,7 +1050,7 @@ void MupperWindow::selectColor(const td::QVector4<float> &initial_color,
 
 /* ------------------------------------------------------------------------- */
 
-void MupperWindow::selectFont() {
+void MadeupWindow::selectFont() {
   QFontDialog *picker = new QFontDialog(editor->font(), this); 
   picker->setOption(QFontDialog::NoButtons);
   connect(picker, &QFontDialog::currentFontChanged, [=](const QFont &font) {
@@ -1048,44 +1063,44 @@ void MupperWindow::selectFont() {
 
 /* ------------------------------------------------------------------------- */
 
-void MupperWindow::onFit() {
+void MadeupWindow::onFit() {
   renderer->fit();
   canvas->update();
 }
 
 /* ------------------------------------------------------------------------- */
 
-void MupperWindow::onSolidify() {
+void MadeupWindow::onSolidify() {
   onRun(GeometryMode::SURFACE);
 }
 
 /* ------------------------------------------------------------------------- */
 
-void MupperWindow::onPathify() {
+void MadeupWindow::onPathify() {
   onRun(GeometryMode::PATH);
 }
 
 /* ------------------------------------------------------------------------- */
 
-QColor MupperWindow::toQColor(const td::QVector4<float> &color) {
+QColor MadeupWindow::toQColor(const td::QVector4<float> &color) {
   td::QVector4<int> tcolor(color * 255.0f);
   return QColor(tcolor[0], tcolor[1], tcolor[2], tcolor[3]);
 }
 
 /* ------------------------------------------------------------------------- */
 
-void MupperWindow::saveAs(const QString &path) {
+void MadeupWindow::saveAs(const std::string &path) {
   mup_path = path;
   std::string source = editor->toPlainText().toStdString();
-  std::ofstream out(path.toStdString());
+  std::ofstream out(path);
   out << source;
   out.close();
-  setWindowTitle(("Madeup: " + mup_path.toStdString()).c_str());
+  setWindowTitle(("Madeup: " + path).c_str());
 }
 
 /* ------------------------------------------------------------------------- */
 
-void MupperWindow::loadPreferences() {
+void MadeupWindow::loadPreferences() {
   canvas->makeCurrent();
 
   try {
@@ -1267,6 +1282,8 @@ void MupperWindow::loadPreferences() {
       vertical_splitter->setSizes(sizes);
     }
 
+    last_directory = QString(prefs.get("last.directory", last_directory.toStdString()).asString().c_str());
+
   } catch (int i) {
   }
 
@@ -1275,7 +1292,7 @@ void MupperWindow::loadPreferences() {
 
 /* ------------------------------------------------------------------------- */
 
-void MupperWindow::savePreferences() {
+void MadeupWindow::savePreferences() {
   try {
     Json::Value prefs;
 
@@ -1351,6 +1368,8 @@ void MupperWindow::savePreferences() {
     prefs["show.faceted"] = faceted_checkbox->isChecked();
     prefs["autorotate"] = has_autorotate_checkbox->isChecked();
 
+    prefs["last.directory"] = last_directory.toStdString();
+
     Json::StyledWriter writer;
     string json = writer.write(prefs);
     std::ofstream out(config_path);
@@ -1363,14 +1382,14 @@ void MupperWindow::savePreferences() {
 
 /* ------------------------------------------------------------------------- */
 
-void MupperWindow::showEvent(QShowEvent *event) {
+void MadeupWindow::showEvent(QShowEvent *event) {
   QMainWindow::showEvent(event);
   loadPreferences();
 }
 
 /* ------------------------------------------------------------------------- */
 
-void MupperWindow::closeEvent(QCloseEvent *event) {
+void MadeupWindow::closeEvent(QCloseEvent *event) {
   savePreferences();
   QMainWindow::closeEvent(event);
 }

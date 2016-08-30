@@ -9,10 +9,13 @@ MadeupCanvas::MadeupCanvas(QWidget *parent) :
   QOpenGLWidget(parent),
   auto_rotate_timer(this) {
   QSurfaceFormat format;
-  format.setVersion(3, 1);
-  format.setProfile(QSurfaceFormat::CoreProfile);
+  format.setVersion(3, 2);
+  /* format.setProfile(QSurfaceFormat::CoreProfile); */
   format.setDepthBufferSize(24);
 
+  // Really need QSurfaceFormat::setDefaultFormat(format)?
+  // https://forum.qt.io/topic/67280/create-a-core-profile-opengl-app/3
+ 
   // Multisampling seems to mess up glReadPixels. TODO: fix this by blitting
   // the FBO to a non-multisampled FBO and reading from that.
   /* format.setSamples(4); */

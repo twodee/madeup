@@ -35,6 +35,8 @@ Co<Expression> ExpressionCall::evaluate(Environment &env) const {
   }
 
   Co<ExpressionDefine> define = closure->getDefine();
+  /* std::cout << "name: " << name << std::endl; */
+  /* std::cout << "define->getArity(): " << define->getArity() << std::endl; */
 
   // If the expression takes no parameters, it might be an array and we'll need
   // to look for a subscript. Even if its not, we can skip over a bunch of
@@ -62,8 +64,11 @@ Co<Expression> ExpressionCall::evaluate(Environment &env) const {
   /* } else { */
 
   unsigned int nactuals = 0;
+ 
   Co<Environment> closure_env(new Environment(*closure->getEnvironment()));
-  for (unsigned int ai = 0, fi = 0; ai < parameters.size(); ++ai, ++fi) {
+  unsigned int ai;
+  unsigned int fi;
+  for (ai = 0, fi = 0; ai < parameters.size() && fi < define->getArity(); ++ai, ++fi) {
     const FormalParameter &formal = define->getFormal(fi);
 
     bool is_lazy = formal.getEvaluationMode() == FormalParameter::LAZY;
@@ -112,8 +117,10 @@ Co<Expression> ExpressionCall::evaluate(Environment &env) const {
     }
   }
 
-  // Make sure there are the correct number of parameters!
-  if (nactuals != define->getArity()) {
+  // Make sure there are the correct number of parameters! If ai is short of
+  // parameter.size, that means the loop got cut off by the number of formal
+  // parameters. The user supplied more than was specified.
+  if (nactuals != define->getArity() || ai < parameters.size()) {
     std::stringstream ss;
     ss << getSourceLocation().toAnchor() << ": I expect function " << define->getName() << " to be given " << define->getArity() << " parameter";
     if (define->getArity() != 1) {
@@ -127,7 +134,7 @@ Co<Expression> ExpressionCall::evaluate(Environment &env) const {
       }
     }
 
-    ss << ". But " << nactuals << (nactuals == 1 ? " was" : " were") << " given.";
+    ss << ". But " << parameters.size() << (parameters.size() == 1 ? " was" : " were") << " given.";
 
     throw MessagedException(ss.str());
   }

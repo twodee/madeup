@@ -16,6 +16,7 @@
 #include "madeup/ExpressionCosine.h"
 #include "madeup/ExpressionCross.h"
 #include "madeup/ExpressionDebug.h"
+#include "madeup/ExpressionDilate.h"
 #include "madeup/ExpressionDot.h"
 #include "madeup/ExpressionSpheres.h"
 #include "madeup/ExpressionDowel.h"
@@ -291,6 +292,10 @@ void Environment::prime() {
   Co<ExpressionDefine> define_coalesce(new ExpressionDefine("coalesce", Co<Expression>(new ExpressionCoalesce())));
   define_coalesce->addFormal("threshold");
 
+  Co<ExpressionDefine> define_dilate(new ExpressionDefine("dilate", Co<Expression>(new ExpressionDilate())));
+  define_dilate->addFormal("path");
+  define_dilate->addFormal("length");
+
   Co<ExpressionDefine> define_axis(new ExpressionDefine("axis", Co<Expression>(new ExpressionAxis())));
   define_axis->addFormal("x");
   define_axis->addFormal("y");
@@ -393,6 +398,7 @@ void Environment::prime() {
   add("echo", Co<ExpressionClosure>(new ExpressionClosure(define_echo, globals)));
   add("transform", Co<ExpressionClosure>(new ExpressionClosure(define_transform, globals)));
   add("coalesce", Co<ExpressionClosure>(new ExpressionClosure(define_coalesce, globals)));
+  add("dilate", Co<ExpressionClosure>(new ExpressionClosure(define_dilate, globals)));
   add("axis", Co<ExpressionClosure>(new ExpressionClosure(define_axis, globals)));
   add("blobs", Co<ExpressionClosure>(new ExpressionClosure(define_blobs, globals)));
   add("surface", Co<ExpressionClosure>(new ExpressionClosure(define_surface, globals)));
@@ -450,6 +456,7 @@ void Environment::prime() {
   globals->add("echo", (*this)["echo"]);
   globals->add("transform", (*this)["transform"]);
   globals->add("coalesce", (*this)["coalesce"]);
+  globals->add("dilate", (*this)["dilate"]);
   globals->add("axis", (*this)["axis"]);
   globals->add("surface", (*this)["surface"]);
   globals->add("random", (*this)["random"]);
