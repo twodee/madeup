@@ -1,11 +1,7 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 project(madeup)
 
-# set(CMAKE_PREFIX_PATH "$ENV{HOME}/tarballs/Qt5.7.0/5.7/gcc_64" CACHE PATH "Paths in which to find dependencies")
-
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
-
-configure_file(${CMAKE_SOURCE_DIR}/include/twodee/Configuration.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/twodee/Configuration.h @ONLY)
 
 include_directories(${CMAKE_BINARY_DIR}/include)
 
@@ -62,7 +58,7 @@ if(USE_IGL)
   find_package(MPFR REQUIRED)
 endif()
 
-add_subdirectory(src/twodee)
+add_subdirectory(twodee)
 add_subdirectory(src/madeup)
 add_subdirectory(src)
 add_subdirectory(test)
