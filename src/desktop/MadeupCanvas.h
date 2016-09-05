@@ -1,7 +1,7 @@
 #ifndef MADEUPCANVAS_H
 #define MADEUPCANVAS_H
 
-#define GL_GLEXT_PROTOTYPES
+/* #define GL_GLEXT_PROTOTYPES */
 #include <QWidget>
 #include <QMouseEvent>
 #include <QWheelEvent>
