@@ -279,6 +279,14 @@ function saveInCookies() {
 }
 
 $(document).ready(function() {
+  // When we are embedded in an iframe, the wheel event will cause the
+  // embedding context to scroll. That's not what we want, so we capture and
+  // squelch any wheel events.
+  document.body.addEventListener('wheel', function (e) {
+    e.preventDefault();
+  });
+
+  console.log('cccc');
   $(window).load(function() {
     $('#textEditor textarea').addClass('mousetrap');
     Cookies.defaults = {
