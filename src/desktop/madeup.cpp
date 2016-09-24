@@ -4,6 +4,15 @@
 #include "MadeupWindow.h"
 
 int main(int argc, char **argv) {
+  QSurfaceFormat format;
+  format.setVersion(3, 2);
+  format.setRedBufferSize(8);
+  format.setGreenBufferSize(8);
+  format.setBlueBufferSize(8);
+  format.setAlphaBufferSize(8);
+  format.setProfile(QSurfaceFormat::CompatibilityProfile);
+  QSurfaceFormat::setDefaultFormat(format);
+
   QApplication app(argc, argv);
 
   QCommandLineParser parser;

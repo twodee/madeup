@@ -2,6 +2,8 @@
 
 #include "MadeupRenderer.h"
 #include "madeup/Environment.h"
+#include "twodee/FramebufferObject.h"
+#include "twodee/Texture.h"
 
 using std::string;
 using namespace td;
@@ -10,7 +12,7 @@ using namespace td;
 
 MadeupRenderer::MadeupRenderer() :
   trimesh(NULL),
-  background_color(1.0f),
+  background_color(1.0f, 0.0f),
   path_color(1.0f, 0.5f, 0.0f, 1.0f),
   vertex_color(0.0f, 0.0f, 0.0f, 1.0f),
   program(NULL),
@@ -189,6 +191,7 @@ void MadeupRenderer::render() {
 
 void MadeupRenderer::initializeGL() {
   glClearColor(background_color[0], background_color[1], background_color[2], background_color[3]);
+  std::cout << "background_color: " << background_color << std::endl;
   glClearDepth(1.0);
   glDepthFunc(GL_LESS);
   glDisable(GL_CULL_FACE);
@@ -712,12 +715,32 @@ int MadeupRenderer::getRenderStyle() const {
 /* ------------------------------------------------------------------------- */
 
 void MadeupRenderer::takeScreenshot(const std::string &path) {
+  // Qt seems to lose alpha when I try to read back the pixel data, so I'm
+  // going to have to roll my own FBO here. I want alpha!
+
+  // Create backing texture. Probably this should be a renderbuffer instead.
+  Texture *texture = new Texture();
+  texture->Channels(Texture::RGBA);
+  texture->Allocate(window_dimensions[0], window_dimensions[1]);
+
+  // Create FBO.
+  FramebufferObject *fbo = new FramebufferObject(texture);
+  fbo->Bind();
+
+  // Render onto transparent background.
+  glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+  render();
+
+  // Grab image data and save it.
   NField<unsigned char, 2> image(window_dimensions, 4);
   glPixelStorei(GL_PACK_ALIGNMENT, 1);
-  /* glPixelStorei(GL_PACK_ROW_LENGTH, window_dimensions[0]); */
-  /* glPixelStorei(GL_PACK_IMAGE_HEIGHT, window_dimensions[1]); */
   glReadPixels(0, 0, window_dimensions[0], window_dimensions[1], GL_RGBA, GL_UNSIGNED_BYTE, image(0));
   image.Write(path);
+
+  // Clean up and restore.
+  delete fbo;
+  delete texture;
+  glClearColor(background_color[0], background_color[1], background_color[2], background_color[3]);
 }
 
 /* ------------------------------------------------------------------------- */

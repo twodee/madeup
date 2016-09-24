@@ -8,10 +8,12 @@ using std::string;
 MadeupCanvas::MadeupCanvas(QWidget *parent) :
   QOpenGLWidget(parent),
   auto_rotate_timer(this) {
-  QSurfaceFormat format;
-  format.setVersion(3, 2);
+  /* setAttribute(Qt::WA_TranslucentBackground); */
+  /* setAttribute(Qt::WA_NoSystemBackground, false); */
+  /* QSurfaceFormat format; */
+  /* format.setVersion(3, 2); */
   /* format.setProfile(QSurfaceFormat::CoreProfile); */
-  format.setDepthBufferSize(24);
+  /* format.setDepthBufferSize(24); */
 
   // Really need QSurfaceFormat::setDefaultFormat(format)?
   // https://forum.qt.io/topic/67280/create-a-core-profile-opengl-app/3
@@ -26,7 +28,9 @@ MadeupCanvas::MadeupCanvas(QWidget *parent) :
   /* format.setBlueBufferSize(8); */
   /* format.setAlphaBufferSize(8); */
 
-  setFormat(format);
+  /* setFormat(format); */
+
+  std::cout << "format().hasAlpha(): " << format().hasAlpha() << std::endl;
 
   connect(&auto_rotate_timer, &QTimer::timeout, [=]() {
     makeCurrent();
