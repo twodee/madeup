@@ -269,7 +269,7 @@ var block_definitions = {
           { "type": "input_value", "name": "ELSE" }
         ],
         "inputsInline": true,
-        "output": ["Boolean"],
+        "output": null,
         "colour": EXPRESSION_HUE,
         "tooltip": "",
         "helpUrl": "http://www.example.com/"
@@ -1164,7 +1164,7 @@ var block_definitions = {
       function(block) {
         var value_stop = Blockly.Madeup.valueToCode(block, 'STOP', Blockly.Madeup.ORDER_NONE);
         var iterator = Blockly.Madeup.valueToCode(block, 'ITERATOR', Blockly.Madeup.ORDER_NONE);
-        var clusivity = block.getFieldValue('CLUSIVITY');
+        var clusivity = block.getFieldValue('CLUSIVITY').toLowerCase();
         var statements_body = Blockly.Madeup.statementToCode(block, 'BODY');
         var code = 'for ' + iterator + ' ' + clusivity + ' ' + value_stop + '\n' + statements_body + 'end';
         return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
@@ -1200,13 +1200,13 @@ var block_definitions = {
         var value_stop = Blockly.Madeup.valueToCode(block, 'STOP', Blockly.Madeup.ORDER_NONE);
         var iterator = Blockly.Madeup.valueToCode(block, 'ITERATOR', Blockly.Madeup.ORDER_NONE);
         var value_by = Blockly.Madeup.valueToCode(block, 'BY', Blockly.Madeup.ORDER_NONE);
-        var clusivity = block.getFieldValue('CLUSIVITY');
+        var clusivity = block.getFieldValue('CLUSIVITY').toLowerCase();
         var statements_body = Blockly.Madeup.statementToCode(block, 'BODY');
         var code = 'for ' + iterator + ' ' + clusivity + ' ' + value_stop + ' by ' + value_by + '\n' + statements_body + 'end';
         return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
       }
   },
-  'madeup_for_upper': {
+  'madeup_for_in': {
     config: 
       {
         "message0": "for %1 in %2 .. %3 %4",
@@ -1233,7 +1233,7 @@ var block_definitions = {
         return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
       }
   },
-  'madeup_for_upper_by': {
+  'madeup_for_in_by': {
     config: 
       {
         "message0": "for %1 in %2 .. %3 by %4 %5",

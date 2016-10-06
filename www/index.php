@@ -137,6 +137,8 @@ if (array_key_exists('movie', $_REQUEST)) {
       <block type="madeup_while"></block>
       <block type="madeup_for_upper"></block>
       <block type="madeup_for_upper_by"></block>
+      <block type="madeup_for_in"></block>
+      <block type="madeup_for_in_by"></block>
       <block type="madeup_repeat_around"></block>
     </category>
     <category name="I/O">
