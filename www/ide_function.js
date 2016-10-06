@@ -286,7 +286,6 @@ $(document).ready(function() {
     e.preventDefault();
   });
 
-  console.log('cccc');
   $(window).load(function() {
     $('#textEditor textarea').addClass('mousetrap');
     Cookies.defaults = {
@@ -1008,7 +1007,9 @@ function setEditor(isText) {
   else {
     if (!blocklyWorkspace) {
       blocklyWorkspace = Blockly.inject('blocksCanvas', {
+        comments: false,
         toolbox: document.getElementById('toolbox'),
+        // trashcan: true,
         zoom: {
           controls: true,
           wheel: false,
@@ -1065,7 +1066,7 @@ function load(mup) {
     } else {
       blocklyWorkspace.clear();
       var xml = Blockly.Xml.textToDom(file.source);
-      Blockly.Xml.domToWorkspace(blocklyWorkspace, xml);
+      Blockly.Xml.domToWorkspace(xml, blocklyWorkspace);
       xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
       lastBlocks = Blockly.Xml.domToText(xml);
     }

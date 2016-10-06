@@ -119,7 +119,7 @@ function parse(peeker) {
     } else if (id == 'sign') {
       peeker.get(); // eat space
       var x = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_math_sign');
+      block = blocklyWorkspace.newBlock('madeup_sign');
       connectExpression(block, 'X', x);
     } else if (id == 'moveto') {
       peeker.get(); // eat space

@@ -1,7 +1,10 @@
 'use strict';
 
 goog.provide('Blockly.Blocks.madeup');
+goog.provide('Blockly.Madeup');
 goog.require('Blockly.Blocks');
+goog.require('Blockly.Generator');
+
 
 function setStatementExpression(block, isExpression) {
   var isExpressionAlready = !!block.outputConnection;
@@ -49,1007 +52,179 @@ function domModeToMutation(element) {
   setStatementExpression(this, isExpression); 
 }
 
-Blockly.Blocks.madeup.STATEMENT_HUE = 210;
-Blockly.Blocks.madeup.INTEGER_HUE = 45;
-Blockly.Blocks.madeup.ARRAY_HUE = 90;
-Blockly.Blocks.madeup.STRING_HUE = 260;
-Blockly.Blocks.madeup.REAL_HUE = 160;
-Blockly.Blocks.madeup.NUMBER_HUE = 180;
-Blockly.Blocks.madeup.BOOLEAN_HUE = 20;
-Blockly.Blocks.madeup.STRING_HUE = 180;
-Blockly.Blocks.madeup.LOOP_HUE = 330;
-Blockly.Blocks.madeup.UNKNOWN_TYPE_HUE = 330;
+Blockly.Blocks.madeup.INTEGER_HUE = 0;
+Blockly.Blocks.madeup.ARRAY_HUE = 0;
+Blockly.Blocks.madeup.STRING_HUE = 0;
+Blockly.Blocks.madeup.REAL_HUE = 0;
+Blockly.Blocks.madeup.NUMBER_HUE = 0;
+Blockly.Blocks.madeup.BOOLEAN_HUE = 0;
+Blockly.Blocks.madeup.STRING_HUE = 0;
+Blockly.Blocks.madeup.LOOP_HUE = 0;
+Blockly.Blocks.madeup.UNKNOWN_TYPE_HUE = 0;
 
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#23r8y7
-Blockly.Blocks['madeup_math_sign'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.NUMBER_HUE);
-    this.appendValueInput("X").appendField("sign");
-    this.setInputsInline(true);
-    this.setOutput(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
+Blockly.Blocks.madeup.EXPRESSION_HUE = 210;
+Blockly.Blocks.madeup.LITERAL_HUE = 315;
+Blockly.Blocks.madeup.STATEMENT_HUE = 180;
 
-Blockly.Blocks['madeup_math_abs'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.NUMBER_HUE);
-    this.appendValueInput("X").appendField("abs");
-    this.setInputsInline(true);
-    this.setOutput(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
+Blockly.Madeup = new Blockly.Generator('Madeup');
+Blockly.Madeup.INDENT = '  ';            // 0 "" ...
+Blockly.Madeup.ORDER_ATOMIC = 0;            // 0 "" ...
+Blockly.Madeup.ORDER_ARRAY_OF = 2;
+Blockly.Madeup.ORDER_ARRAY_BY = 3;
+Blockly.Madeup.ORDER_EXPONENTIATION = 4;    // **
+Blockly.Madeup.ORDER_MULTIPLICATIVE = 6;    // * / // %
+Blockly.Madeup.ORDER_ADDITIVE = 7;          // + -
+Blockly.Madeup.ORDER_RELATIONAL = 11;       // in, not in, is, is not,
+Blockly.Madeup.ORDER_EQUALITY = 12;
+Blockly.Madeup.ORDER_LOGICAL_NOT = 13;      // not
+Blockly.Madeup.ORDER_LOGICAL_AND = 14;      // and
+Blockly.Madeup.ORDER_LOGICAL_OR = 15;       // or
+Blockly.Madeup.ORDER_CONDITIONAL = 16;      // if else
+Blockly.Madeup.ORDER_FUNCTION_CALL_FIRST_PARAMETER = 30;     // ()
+Blockly.Madeup.ORDER_FUNCTION_CALL_ONLY_PARAMETER = 30;     // ()
+Blockly.Madeup.ORDER_UNARY_NEGATION = 31;        // + -
+Blockly.Madeup.ORDER_FUNCTION_CALL_NOT_FIRST_PARAMETER = 32;     // ()
+Blockly.Madeup.ORDER_NONE = 99;             // (...)
+Blockly.Madeup.ORDER_FUNCTION_CALL = 33;     // ()
+Blockly.Madeup.PROCEDURES_DEFRETURN_COMMENT = null;
+Blockly.Madeup.PROCEDURES_DEFNORETURN_COMMENT = null;
+Blockly.Madeup.addReservedWords('');
 
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#4fn5wu
-Blockly.Blocks['madeup_io_print'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    // this.appendValueInput("MESSAGE").setCheck(["Boolean", "Integer", "String", "Real"]).appendField("print"); 
-    this.appendValueInput("MESSAGE").setCheck(null).appendField("print");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
+// Unary negation has lower precedence than first parameter. Meaning a unary
+// negation in a first parameter slot will be parenthesized. Unary negation has
+// higher precedence than non-first parameter, meaning in a non-first parameter
+// slot it will not be parenthesized.
+//
+// I'd like to avoid parenthesizing parameters when the function only has one
+// parameter. But I can't do this if the operation is unary negation.
+//
+// lower numbers - higher precedence
 
-Blockly.Blocks['madeup_io_debug'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendValueInput("MESSAGE")
-        .setCheck(["Boolean", "Integer", "String", "Real"])
-        .appendField("debug");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
+/**
+ * Initialise the database of variable names.
+ * @param {!Blockly.Workspace} workspace Workspace to generate code from.
+ */
+Blockly.Madeup.init = function(workspace) {
+  // Create a dictionary of definitions to be printed before the code.
+  // Blockly.Madeup.definitions_ = Object.create(null);
+  // Create a dictionary mapping desired function names in definitions_
+  // to actual function names (to avoid collisions with user functions).
+  // Blockly.Madeup.functionNames_ = Object.create(null);
 
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#t9hp6h
-Blockly.Blocks['madeup_math_integer'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.INTEGER_HUE);
-    this.appendDummyInput().appendField(new Blockly.FieldTextInput("0"), "INTEGER");
-    this.setOutput(true, "Integer");
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-Blockly.Blocks['madeup_math_real'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.REAL_HUE);
-    this.appendDummyInput().appendField(new Blockly.FieldTextInput("0.0"), "REAL");
-    this.setOutput(true, "Real");
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-Blockly.Blocks['madeup_nothing'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(30);
-    this.appendDummyInput().appendField("nothing");
-    this.setOutput(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#y9urpv
-Blockly.Blocks['madeup_logic_boolean'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BOOLEAN_HUE);
-    this.appendDummyInput().appendField(new Blockly.FieldDropdown([["true", "TRUE"], ["false", "FALSE"]]), "BOOLEAN");
-    this.setOutput(true, "Boolean");
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#bcrxzp
-Blockly.Blocks['madeup_movement_moveto'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendValueInput("X")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("moveto x");
-    this.appendValueInput("Y")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("y");
-    this.appendValueInput("Z")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("z");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#sq5jy6
-Blockly.Blocks['madeup_movement_move'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendValueInput("DISTANCE")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("move");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#wbikby
-Blockly.Blocks['madeup_loop_repeat'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.LOOP_HUE);
-    this.appendValueInput("COUNT")
-        .setCheck("Integer")
-        .appendField("repeat");
-    this.appendDummyInput().appendField("times");
-    this.appendStatementInput("BLOCK");
-    this.setInputsInline(true);
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#qau5xu
-Blockly.Blocks['madeup_loop_repeatwich'] = {
-  init: function() {
-    this.appendValueInput("COUNT")
-        .appendField("repeat");
-    this.appendDummyInput()
-        .appendField("times");
-    this.appendStatementInput("SURROUNDER");
-    this.appendStatementInput("SURROUNDEE")
-        .appendField("around");
-    this.setInputsInline(true);
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setColour(330);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#uc9f7i
-Blockly.Blocks['madeup_movement_turn'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendValueInput("DEGREES")
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField(new Blockly.FieldDropdown([["yaw", "YAW"], ["pitch", "PITCH"], ["roll", "ROLL"]]), "TYPE");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#v6t7gt
-Blockly.Blocks['madeup_math_sincostan'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.REAL_HUE);
-    this.appendValueInput("DEGREES")
-        .appendField(new Blockly.FieldDropdown([["sin", "SIN"], ["cos", "COS"], ["tan", "TAN"]]), "F");
-    this.setInputsInline(true);
-    this.setOutput(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-Blockly.Blocks['madeup_math_inverse_sincostan'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.REAL_HUE);
-    this.appendValueInput("RATIO")
-        .appendField(new Blockly.FieldDropdown([["asin", "ASIN"], ["acos", "ACOS"], ["atan", "ATAN"]]), "F");
-    this.setInputsInline(true);
-    this.setOutput(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#xxgqk9
-Blockly.Blocks['madeup_logic_junction'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BOOLEAN_HUE);
-    this.appendValueInput("A");
-    this.appendValueInput("B")
-        .appendField(new Blockly.FieldDropdown([["and", "AND"], ["or", "OR"]]), "F");
-    this.setInputsInline(true);
-    this.setOutput(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#nzh2h5
-Blockly.Blocks['madeup_logic_not'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BOOLEAN_HUE);
-    this.appendValueInput("A").appendField("not");
-    this.setInputsInline(true);
-    this.setOutput(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#3xq2c7
-Blockly.Blocks['madeup_movement_center'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendDummyInput().appendField("center");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-Blockly.Blocks['madeup_movement_where'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendDummyInput().appendField("where");
-    this.setOutput(true);
-    this.setTooltip('');
+  if (!Blockly.Madeup.variableDB_) {
+    Blockly.Madeup.variableDB_ = new Blockly.Names(Blockly.Madeup.RESERVED_WORDS_);
+  } else {
+    Blockly.Madeup.variableDB_.reset();
   }
+
+  // var defvars = [];
+  // var variables = Blockly.Variables.allVariables(workspace);
+  // for (var x = 0; x < variables.length; x++) {
+   // defvars[x] = Blockly.Madeup.variableDB_.getName(variables[x],
+       // Blockly.Variables.NAME_TYPE) + ' = None';
+  // }
+  // Blockly.Madeup.definitions_['variables'] = defvars.join('\n');
 };
 
-Blockly.Blocks['madeup_movement_identity'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendDummyInput().appendField("identity");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
+/**
+ * Prepend the generated code with the variable definitions.
+ * @param {string} code Generated code.
+ * @return {string} Completed code.
+ */
+Blockly.Madeup.finish = function(code) {
+  // Convert the definitions dictionary into a list.
+  // var imports = [];
+  // var definitions = [];
+  // for (var name in Blockly.Madeup.definitions_) {
+    // var def = Blockly.Madeup.definitions_[name];
+    // if (def.match(/^(from\s+\S+\s+)?import\s+\S+/)) {
+      // imports.push(def);
+    // } else {
+      // definitions.push(def);
+    // }
+  // }
+  // var allDefs = imports.join('\n') + '\n\n' + definitions.join('\n\n');
+  // return allDefs.replace(/\n\n+/g, '\n\n').replace(/\n*$/, '\n\n\n') + code;
+  return code;
 };
 
-Blockly.Blocks['madeup_movement_reframe'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendDummyInput().appendField("reframe");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
+/**
+ * Naked values are top-level blocks with outputs that aren't plugged into
+ * anything.
+ * @param {string} line Line of generated code.
+ * @return {string} Legal line of code.
+ */
+Blockly.Madeup.scrubNakedValue = function(line) {
+  return line + '\n';
 };
 
-Blockly.Blocks['madeup_movement_push'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendDummyInput().appendField("push");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
+/**
+ * Common tasks for generating Python from blocks.
+ * Handles comments for the specified block and any connected value blocks.
+ * Calls any statements following this block.
+ * @param {!Blockly.Block} block The current block.
+ * @param {string} code The Python code created for this block.
+ * @return {string} Python code with comments and subsequent blocks added.
+ * @private
+ */
+Blockly.Madeup.scrub_ = function(block, code) {
+  var commentCode = '';
+  // Only collect comments for blocks that aren't inline.
+  if (!block.outputConnection || !block.outputConnection.targetConnection) {
+    // Collect comment for this block.
+    var comment = block.getCommentText();
+    if (comment) {
+      commentCode += Blockly.Madeup.prefixLines(comment, '-- ') + '\n';
+    }
+    // Collect comments for all value arguments.
+    // Don't collect comments for nested statements.
+    for (var x = 0; x < block.inputList.length; x++) {
+      if (block.inputList[x].type == Blockly.INPUT_VALUE) {
+        var childBlock = block.inputList[x].connection.targetBlock();
+        if (childBlock) {
+          var comment = Blockly.Madeup.allNestedComments(childBlock);
+          if (comment) {
+            commentCode += Blockly.Madeup.prefixLines(comment, '-- ');
+          }
+        }
+      }
+    }
+  }
+  var nextBlock = block.nextConnection && block.nextConnection.targetBlock();
+  var nextCode = Blockly.Madeup.blockToCode(nextBlock);
+  return commentCode + code + nextCode;
 };
 
-Blockly.Blocks['madeup_movement_pop'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendDummyInput().appendField("pop");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
+/*
+ * Statements return their source code. Expressions yield their code plus their lowest precedence.
+ */
 
-Blockly.Blocks['madeup_movement_reverse'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendDummyInput().appendField("reverse");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
+function generateInMode(block, code, precedence) {
+  if (block.outputConnection) {
+    return [code, precedence];
+  } else {
+    return code + '\n';
+  }
+}
 
-Blockly.Blocks['madeup_path_coalesce'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendValueInput("THRESHOLD")
-              .setCheck(["Integer", "Real"])
-              .appendField("coalesce");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
+// --------------------------------------------------------------------------- 
 
-Blockly.Blocks['madeup_generate_dowel'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendValueInput("MAXBEND")
-              .setCheck(["Integer", "Real"])
-              .appendField("dowel")
-              .appendField("maxBend");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
+for (var block_type in block_definitions) {
+  if (block_definitions.hasOwnProperty(block_type)) {
+    (function (config) {
+      Blockly.Blocks[block_type] = {
+        init: function() {
+          this.jsonInit(config);
+        },
+        customContextMenu: toggleStatementExpression,
+        mutationToDom: mutationToDom,
+        domToMutation: domModeToMutation
+      };
+    })(block_definitions[block_type].config);
 
-Blockly.Blocks['madeup_generate_echo'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendValueInput("MESH")
-              .setCheck(null)
-              .appendField("echo");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-Blockly.Blocks['madeup_generate_tube'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendValueInput("MAXBEND")
-              .setCheck(["Integer", "Real"])
-              .appendField("tube")
-              .appendField("maxBend");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-Blockly.Blocks['madeup_generate_spheres'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendDummyInput().appendField("spheres");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-Blockly.Blocks['madeup_generate_forget'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendDummyInput().appendField("forget");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-Blockly.Blocks['madeup_generate_polygon'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendDummyInput().appendField('polygon');
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-Blockly.Blocks['madeup_generate_boxes'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendDummyInput().appendField("boxes");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#auj6x8
-Blockly.Blocks['madeup_generate_extrude'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendValueInput("X")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("extrude x");
-    this.appendValueInput("Y")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("y");
-    this.appendValueInput("Z")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("z");
-    this.appendValueInput("LENGTH")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("length");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-Blockly.Blocks['madeup_generate_revolve'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendValueInput("X")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("revolve x");
-    this.appendValueInput("Y")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("y");
-    this.appendValueInput("Z")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("z");
-    this.appendValueInput("DEGREES")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("degrees");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#r6an6p
-Blockly.Blocks['madeup_generate_surface'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendValueInput("COLUMNS")
-        .setCheck("Integer")
-        .appendField("surface columns");
-    this.appendValueInput("ROWS")
-        .setCheck("Integer")
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("rows");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#jijkvq
-Blockly.Blocks['madeup_math_binary_arithmetic_operator'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.NUMBER_HUE);
-    this.appendValueInput("A")
-        .setCheck(["Integer", "Real"]);
-    this.appendDummyInput()
-        .appendField(new Blockly.FieldDropdown([["+", "+"], ["-", "-"], ["*", "*"], ["/", "/"], ["//", "//"], ["%", "%"], ["^", "^"]]), "OPERATOR");
-    this.appendValueInput("B")
-        .setCheck(["Integer", "Real"]);
-    this.setInputsInline(true);
-    this.setOutput(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#z4b83u
-Blockly.Blocks['madeup_math_relational_operator'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.BOOLEAN_HUE);
-    this.appendValueInput("A").setCheck(["Integer", "Real"]);
-    this.appendDummyInput().appendField(new Blockly.FieldDropdown([[">", ">"], [">=", ">="], ["<", "<"], ["<=", "<="], ["==", "=="], ["!=", "!="]]), "OPERATOR");
-    this.appendValueInput("B").setCheck(["Integer", "Real"]);
-    this.setInputsInline(true);
-    this.setOutput(true, "Boolean");
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#9gcbbm
-Blockly.Blocks['madeup_math_unary_operator'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.NUMBER_HUE);
-    this.appendValueInput("A")
-        .setCheck(["Integer", "Real"])
-        .appendField("-");
-    this.setInputsInline(true);
-    this.setOutput(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#ggzags
-Blockly.Blocks['madeup_math_minmax'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.NUMBER_HUE);
-    this.appendValueInput("A")
-        .setCheck(["Integer", "Real"])
-        .appendField(new Blockly.FieldDropdown([["min", "MIN"], ["max", "MAX"]]), "F");
-    this.appendValueInput("B");
-    this.setOutput(true, ["Integer", "Real"]);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#xpfdgx
-Blockly.Blocks['madeup_math_random'] = {
-  init: function() {
-    this.appendValueInput("MIN")
-        .setCheck("Integer")
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("random")
-        .appendField("min");
-    this.appendValueInput("MAX")
-        .setCheck("Integer")
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("max");
-    this.setInputsInline(false);
-    this.setOutput(true, "Integer");
-    this.setColour(Blockly.Blocks.madeup.NUMBER_HUE);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-Blockly.Blocks['madeup_math_atan2'] = {
-  init: function() {
-    this.appendValueInput("OPPOSITE")
-        .setCheck(['Integer', 'Real'])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("atan2")
-        .appendField("opposite");
-    this.appendValueInput("ADJACENT")
-        .setCheck(['Integer', 'Real'])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("adjacent");
-    this.setInputsInline(false);
-    this.setOutput(true, "Real");
-    this.setColour(Blockly.Blocks.madeup.NUMBER_HUE);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#a6zzhx
-Blockly.Blocks['madeup_math_log'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.REAL_HUE);
-    this.appendValueInput("BASE")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("log")
-        .appendField("base");
-    this.appendValueInput("X")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("x");
-    this.setInputsInline(false);
-    this.setOutput(true, "Real");
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#3a3bw8
-Blockly.Blocks['madeup_logic_if_expr'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.UNKNOWN_TYPE_HUE);
-    this.appendValueInput("CONDITION")
-        .setCheck("Boolean")
-        .appendField("if");
-    this.appendValueInput("THEN")
-        .appendField("then");
-    this.appendValueInput("ELSE")
-        .appendField("else");
-    this.setInputsInline(true);
-    this.setOutput(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#ns4a7v
-Blockly.Blocks['madeup_logic_if_statement'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.UNKNOWN_TYPE_HUE);
-    this.appendValueInput("CONDITION")
-        .setCheck("Boolean")
-        .appendField("if");
-    this.appendStatementInput("THEN")
-        .appendField("then");
-    this.setInputsInline(true);
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-Blockly.Blocks['madeup_logic_if_else_statement'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.UNKNOWN_TYPE_HUE);
-    this.appendValueInput("CONDITION")
-        .setCheck("Boolean")
-        .appendField("if");
-    this.appendStatementInput("THEN")
-        .appendField("then");
-    this.appendStatementInput("ELSE")
-        .appendField("else");
-    this.setInputsInline(true);
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#rixzgc
-Blockly.Blocks['madeup_movement_rotate'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendValueInput("X")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("rotate x");
-    this.appendValueInput("Y")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("y");
-    this.appendValueInput("Z")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("z");
-    this.appendValueInput("DEGREES")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("degrees");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-Blockly.Blocks['madeup_movement_scale'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendValueInput("X")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("scale x");
-    this.appendValueInput("Y")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("y");
-    this.appendValueInput("Z")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("z");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-Blockly.Blocks['madeup_movement_translate'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    this.appendValueInput("X")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("translate x");
-    this.appendValueInput("Y")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("y");
-    this.appendValueInput("Z")
-        .setCheck(["Integer", "Real"])
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("z");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#6fi4ac
-Blockly.Blocks['madeup_loop_while'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.LOOP_HUE);
-    this.appendValueInput("CONDITION")
-        .setCheck("Boolean")
-        .appendField("while");
-    this.appendStatementInput("BODY");
-    this.setInputsInline(true);
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#sc7hwf
-Blockly.Blocks['madeup_loop_for_to'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.LOOP_HUE);
-    this.appendValueInput("STOP")
-        .setCheck("Integer")
-        .appendField("for")
-        .appendField(new Blockly.FieldVariable("i"), "ITERATOR")
-        .appendField("to");
-    this.appendStatementInput("BODY");
-    this.setInputsInline(true);
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-Blockly.Blocks['madeup_loop_for_to_by'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.LOOP_HUE);
-    this.appendValueInput("STOP")
-        .setCheck("Integer")
-        .appendField("for")
-        .appendField(new Blockly.FieldVariable("i"), "ITERATOR")
-        .appendField("to");
-    this.appendValueInput("BY")
-        .setCheck("Integer")
-        .appendField("by");
-    this.appendStatementInput("BODY");
-    this.setInputsInline(true);
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-Blockly.Blocks['madeup_loop_for_through'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.LOOP_HUE);
-    this.appendValueInput("STOP")
-        .setCheck("Integer")
-        .appendField("for")
-        .appendField(new Blockly.FieldVariable("i"), "ITERATOR")
-        .appendField("through");
-    this.appendStatementInput("BODY");
-    this.setInputsInline(true);
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
-
-Blockly.Blocks['madeup_loop_for_through_by'] = {
-  init: function() {
-    this.setHelpUrl('http://www.example.com/');
-    this.setColour(Blockly.Blocks.madeup.LOOP_HUE);
-    this.appendValueInput("STOP")
-        .setCheck("Integer")
-        .appendField("for")
-        .appendField(new Blockly.FieldVariable("i"), "ITERATOR")
-        .appendField("through");
-    this.appendValueInput("BY")
-        .setCheck("Integer")
-        .appendField("by");
-    this.appendStatementInput("BODY");
-    this.setInputsInline(true);
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
+    Blockly.Madeup[block_type] = block_definitions[block_type].generator;
+  }
+}
 
 // ----------------------------------------------------------------------------
 // https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#5nv8s2
@@ -1109,35 +284,7 @@ Blockly.Blocks['madeup_loop_for_in_by'] = {
 };
 
 // ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#34x6ss
-Blockly.Blocks['madeup_string'] = {
-  init: function() {
-    this.setColour(Blockly.Blocks.madeup.STRING_HUE);
-    this.appendDummyInput().appendField(new Blockly.FieldTextInput("text"), "STRING");
-    this.setOutput(true);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
-  },
-  customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
-};
 
-// ----------------------------------------------------------------------------
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#c8vgu2
-// Blockly.Blocks['madeup_eval'] = {
-  // init: function() {
-    // this.setColour(Blockly.Blocks.madeup.STATEMENT_HUE);
-    // this.appendValueInput("EXPR").appendField("eval");
-    // this.setPreviousStatement(true);
-    // this.setNextStatement(true);
-    // this.setTooltip('');
-    // this.setHelpUrl('http://www.example.com/');
-  // },
-  // customContextMenu: toggleStatementExpression,
-  // mutationToDom: mutationToDom,
-  // domToMutation: domModeToMutation
-// };
 
 // ----------------------------------------------------------------------------
 
@@ -1459,9 +606,12 @@ Blockly.Blocks['madeup_subrange'] = {
 Blockly.Blocks['procedures_ifreturn'] = null;
 Blockly.Blocks['procedures_defreturn'] = null;
 
+// When you create a new variable, Blockly wants to create a setter, an rvalue,
+// and a changer. We don't want to the changer.
+Blockly.Blocks['math_change'] = null;
+
 // Blockly makes the function definition blocks for us. Let's tweak them
 // so they can change betweeen statements and expressions.
-
 function extendBuiltin(id) {
   var oldContextMenu = Blockly.Blocks[id].customContextMenu;
   Blockly.Blocks[id].customContextMenu = function(options) {
@@ -1490,3 +640,6 @@ extendBuiltin('procedures_defnoreturn');
 extendBuiltin('procedures_callnoreturn');
 extendBuiltin('variables_get');
 extendBuiltin('variables_set');
+
+Blockly.Blocks.variables.GET_HUE = LITERAL_HUE;
+Blockly.Blocks.variables.SET_HUE = STATEMENT_HUE;
