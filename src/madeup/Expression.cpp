@@ -161,7 +161,7 @@ Co<Expression> parse(stringstream &ss) {
     Co<Expression> delta = parse(ss);
     ss.get(); // eat space
     Co<ExpressionBlock> block = parse(ss);
-    expr = Co<Expression>(new ExpressionFor(iterator, start, end, delta, block, false));
+    expr = Co<Expression>(new ExpressionFor(Co<Expression>(new ExpressionCall(iterator)), start, end, delta, block, false));
   }
   
 #define BINOP(op, clazz) \
@@ -264,6 +264,12 @@ Co<Expression> parse(stringstream &ss) {
 Co<Expression> Expression::parse(const std::string &s) {
   stringstream ss(s);
   return madeup::parse(ss);
+}
+
+/* ------------------------------------------------------------------------- */
+
+void Expression::assign(Environment &env, Co<Expression> value) const {
+  throw MessagedException("Assignment not supported."); 
 }
 
 /* ------------------------------------------------------------------------- */

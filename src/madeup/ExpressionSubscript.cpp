@@ -133,4 +133,27 @@ void ExpressionSubscript::write(ostream &out) const {
 
 /* ------------------------------------------------------------------------- */
 
+void ExpressionSubscript::assign(Environment &env, td::Co<Expression> value) const {
+  Co<Expression> base_value = evaluateBase(env);
+
+  // Try as an array.
+  ExpressionArrayReference *array_value = dynamic_cast<ExpressionArrayReference *>(base_value.GetPointer());
+  if (array_value) {
+    Co<ExpressionInteger> index_value = evaluateIndex(env, array_value);
+    array_value->getArray()->setElement(index_value->toInteger(), value);
+    return;
+  }
+
+  // Try as a string.
+  ExpressionString *string_value = dynamic_cast<ExpressionString *>(base_value.GetPointer());
+  if (string_value) {
+    Expression::assign(env, value);
+    return;
+  }
+
+  throw MessagedException(base_expression->getSourceLocation().toAnchor() + ": I expect operator []= to be applied to an array or a string. " + base_expression->getSource() + " is neither.");
+}
+
+/* ------------------------------------------------------------------------- */
+
 }

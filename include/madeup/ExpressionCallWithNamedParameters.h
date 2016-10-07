@@ -19,6 +19,7 @@ class ExpressionCallWithNamedParameters : public Expression {
     void addParameter(const std::string &name, td::Co<Expression> parameter);
     td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;
+    void assign(Environment &env, td::Co<Expression> value) const;
 
   private:
     std::string name;

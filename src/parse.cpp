@@ -20,7 +20,8 @@ int main(int argc, char **argv) {
 
     std::string source = Utilities::Slurp(argv[1]);
     Parser parser(tokens, source);
-    parser.program();
+    Co<ExpressionBlock> block = parser.program();
+    std::cout << *block << std::endl;
   } catch (td::MessagedException e) {
     std::cerr << e.GetMessage() << std::endl;
   }

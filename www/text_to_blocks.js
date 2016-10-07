@@ -369,21 +369,21 @@ function parse(peeker) {
 
   else if (token == 'for-through') {
     peeker.get(); // eat space
-    var id = peeker.getToken();
+    var iterator = parse(peeker);
     peeker.get(); // eat space
     var stop = parse(peeker);
     peeker.get(); // eat space
     var body = parse(peeker);
     block = blocklyWorkspace.newBlock('madeup_for_upper');
-    block.setFieldValue(id, 'ITERATOR');
     block.setFieldValue('through', 'CLUSIVITY');
+    connectExpression(block, 'ITERATOR', iterator);
     connectExpression(block, 'STOP', stop);
     connectStatement(block, 'BODY', body);
   }
 
   else if (token == 'for-through-by') {
     peeker.get(); // eat space
-    var id = peeker.getToken();
+    var iterator = parse(peeker);
     peeker.get(); // eat space
     var stop = parse(peeker);
     peeker.get(); // eat space
@@ -391,7 +391,8 @@ function parse(peeker) {
     peeker.get(); // eat space
     var body = parse(peeker);
     block = blocklyWorkspace.newBlock('madeup_for_upper_by');
-    block.setFieldValue(id, 'ITERATOR');
+    block.setFieldValue('through', 'CLUSIVITY');
+    connectExpression(block, 'ITERATOR', iterator);
     connectExpression(block, 'STOP', stop);
     connectExpression(block, 'BY', by);
     connectStatement(block, 'BODY', body);
@@ -399,21 +400,21 @@ function parse(peeker) {
 
   else if (token == 'for-to') {
     peeker.get(); // eat space
-    var id = peeker.getToken();
+    var iterator = parse(peeker);
     peeker.get(); // eat space
     var stop = parse(peeker);
     peeker.get(); // eat space
     var body = parse(peeker);
     block = blocklyWorkspace.newBlock('madeup_for_upper');
-    block.setFieldValue(id, 'ITERATOR');
-    // connectExpression(block, 
+    block.setFieldValue('to', 'CLUSIVITY');
+    connectExpression(block, 'ITERATOR', iterator);
     connectExpression(block, 'STOP', stop);
     connectStatement(block, 'BODY', body);
   }
 
   else if (token == 'for-to-by') {
     peeker.get(); // eat space
-    var id = peeker.getToken();
+    var iterator = parse(peeker);
     peeker.get(); // eat space
     var stop = parse(peeker);
     peeker.get(); // eat space
@@ -421,7 +422,8 @@ function parse(peeker) {
     peeker.get(); // eat space
     var body = parse(peeker);
     block = blocklyWorkspace.newBlock('madeup_for_upper_by');
-    block.setFieldValue(id, 'ITERATOR');
+    block.setFieldValue('to', 'CLUSIVITY');
+    connectExpression(block, 'ITERATOR', iterator);
     connectExpression(block, 'STOP', stop);
     connectExpression(block, 'BY', by);
     connectStatement(block, 'BODY', body);
@@ -429,7 +431,7 @@ function parse(peeker) {
 
   else if (token == 'for-in') {
     peeker.get(); // eat space
-    var id = peeker.getToken();
+    var iterator = parse(peeker);
     peeker.get(); // eat space
     var start = parse(peeker);
     peeker.get(); // eat space
@@ -437,7 +439,7 @@ function parse(peeker) {
     peeker.get(); // eat space
     var body = parse(peeker);
     block = blocklyWorkspace.newBlock('madeup_for_in');
-    block.setFieldValue(id, 'ITERATOR');
+    connectExpression(block, 'ITERATOR', iterator);
     connectExpression(block, 'START', start);
     connectExpression(block, 'STOP', stop);
     connectStatement(block, 'BODY', body);
@@ -445,7 +447,7 @@ function parse(peeker) {
 
   else if (token == 'for-in-by') {
     peeker.get(); // eat space
-    var id = peeker.getToken();
+    var iterator = parse(peeker);
     peeker.get(); // eat space
     var start = parse(peeker);
     peeker.get(); // eat space
@@ -455,7 +457,7 @@ function parse(peeker) {
     peeker.get(); // eat space
     var body = parse(peeker);
     block = blocklyWorkspace.newBlock('madeup_for_in_by');
-    block.setFieldValue(id, 'ITERATOR');
+    connectExpression(block, 'ITERATOR', iterator);
     connectExpression(block, 'START', start);
     connectExpression(block, 'STOP', stop);
     connectExpression(block, 'BY', by);

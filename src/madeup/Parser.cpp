@@ -74,6 +74,7 @@ bool Parser::isUp(Token::token_t type, size_t k) const {
 bool Parser::isInExpressionFirst(int k) const {
   return isUp(Token::LEFT_PARENTHESIS, k) ||
          (!is_in_pipe && isUp(Token::PIPE, k)) ||
+         (!is_in_loop_range && isUp(Token::TO, k)) ||
          isUp(Token::INTEGER, k) ||
          isUp(Token::REAL, k) ||
          isUp(Token::STRING, k) ||
@@ -84,7 +85,6 @@ bool Parser::isInExpressionFirst(int k) const {
          isUp(Token::REPEAT, k) ||
          isUp(Token::WHILE, k) ||
          isUp(Token::NOT, k) ||
-         isUp(Token::TO, k) ||
          isUp(Token::NOTHING, k) ||
          isUp(Token::MINUS, k) ||
          isUp(Token::LEFT_CURLY_BRACE, k) ||
@@ -729,7 +729,7 @@ void Parser::atom() {
     }
   } else if (isUp(Token::ID)) {
     Token id_token = tokens[i];
-    SourceLocation end_location = id_token.getLocation();;
+    SourceLocation end_location = id_token.getLocation();
     std::string name = tokens[i].getText();
     ++i;
     if (!isInExpressionFirst() || (isUp(Token::ID) && isUp(Token::COLON, 2))) {
@@ -801,9 +801,14 @@ void Parser::atom() {
     Token for_token = tokens[i];
     ++i;
 
-    if (isUp(Token::ID)) {
-      std::string iterator_id = tokens[i].getText();
-      ++i;
+    /* if (isUp(Token::ID)) { */
+      /* std::string iterator_id = tokens[i].getText(); */
+
+      is_in_loop_range = true;
+      expressionLevel0();
+      is_in_loop_range = false;
+
+      Co<Expression> iterator = popExpression();
 
       Co<Expression> start;
       Co<Expression> stop;
@@ -887,7 +892,7 @@ void Parser::atom() {
         block();
         body = popBlock();
         if (isUp(Token::END)) {
-          pushExpression(new ExpressionFor(iterator_id, start, stop, by, body, is_inclusive), for_token.getLocation(), tokens[i].getLocation());
+          pushExpression(new ExpressionFor(iterator, start, stop, by, body, is_inclusive), for_token.getLocation(), tokens[i].getLocation());
           ++i;
         } else {
           std::stringstream ss;
@@ -897,13 +902,13 @@ void Parser::atom() {
       } else {
         expressionLevel0();
         Co<Expression> body = popExpression();
-        pushExpression(new ExpressionFor(iterator_id, start, stop, by, body, is_inclusive), for_token.getLocation(), body->getSourceLocation());
+        pushExpression(new ExpressionFor(iterator, start, stop, by, body, is_inclusive), for_token.getLocation(), body->getSourceLocation());
       }
-    } else {
-      std::stringstream ss;
-      ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected a name.";
-      throw MessagedException(ss.str());
-    }
+    /* } else { */
+      /* std::stringstream ss; */
+      /* ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected a name."; */
+      /* throw MessagedException(ss.str()); */
+    /* } */
 
   } else if (isUp(Token::LEFT_CURLY_BRACE)) {
     std::vector<Co<Expression> > items;

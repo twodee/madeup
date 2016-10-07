@@ -94,6 +94,17 @@ Co<Expression> ExpressionCallWithNamedParameters::evaluate(Environment &env) con
 
 /* ------------------------------------------------------------------------- */
 
+void ExpressionCallWithNamedParameters::assign(Environment &env, Co<Expression> value) const {
+  if (bindings.size() > 0) {
+    Expression::assign(env, value);
+  } else {
+    Co<ExpressionDefine> define = Co<ExpressionDefine>(new ExpressionDefine(name, value));
+    env.add(name, Co<ExpressionClosure>(new ExpressionClosure(define, env)));
+  }
+}
+
+/* ------------------------------------------------------------------------- */
+
 void ExpressionCallWithNamedParameters::write(ostream &out) const {
   out << "(call-with-names " << name;
   for (bindings_t::const_iterator i = bindings.begin(); i != bindings.end(); ++i) {

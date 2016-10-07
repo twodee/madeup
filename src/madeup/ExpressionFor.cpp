@@ -12,8 +12,8 @@ namespace madeup {
 
 /* ------------------------------------------------------------------------- */
 
-ExpressionFor::ExpressionFor(const string &id, Co<Expression> start, Co<Expression> end, Co<Expression> delta, Co<Expression> body, bool is_inclusive) :
-  id(id),
+ExpressionFor::ExpressionFor(Co<Expression> iterator, Co<Expression> start, Co<Expression> end, Co<Expression> delta, Co<Expression> body, bool is_inclusive) :
+  iterator(iterator),
   start(start),
   end(end),
   delta(delta),
@@ -57,8 +57,7 @@ Co<Expression> ExpressionFor::evaluate(Environment &env) const {
 
     for (int i = a; i < b; i += idelta) {
       env.checkTimeout(getSourceLocation());
-      Co<ExpressionDefine> define = Co<ExpressionDefine>(new ExpressionDefine(id, Co<Expression>(new ExpressionInteger(i))));
-      env.add(id, Co<ExpressionClosure>(new ExpressionClosure(define, env)));
+      iterator->assign(env, Co<Expression>(new ExpressionInteger(i)));
       value = body->evaluate(env);
     }
   } else {
@@ -68,8 +67,7 @@ Co<Expression> ExpressionFor::evaluate(Environment &env) const {
     
     for (int i = a; i > b; i += idelta) {
       env.checkTimeout(getSourceLocation());
-      Co<ExpressionDefine> define = Co<ExpressionDefine>(new ExpressionDefine(id, Co<Expression>(new ExpressionInteger(i))));
-      env.add(id, Co<ExpressionClosure>(new ExpressionClosure(define, env)));
+      iterator->assign(env, Co<Expression>(new ExpressionInteger(i)));
       value = body->evaluate(env);
     }
   }
@@ -87,13 +85,17 @@ void ExpressionFor::write(ostream &out) const {
     // through
     if (is_inclusive) {
       if (delta_integer && delta_integer->toInteger() == 1) {
-        out << "(for-through " << id << " ";
+        out << "(for-through ";
+        iterator->write(out);
+        out << " ";
         end->write(out);
         out << " ";
         body->write(out);
         out << ")";
       } else {
-        out << "(for-through-by " << id << " ";
+        out << "(for-through-by ";
+        iterator->write(out);
+        out << " ";
         end->write(out);
         out << " ";
         delta->write(out);
@@ -106,13 +108,17 @@ void ExpressionFor::write(ostream &out) const {
     // to
     else {
       if (delta_integer && delta_integer->toInteger() == 1) {
-        out << "(for-to " << id << " ";
+        out << "(for-to ";
+        iterator->write(out);
+        out << " ";
         end->write(out);
         out << " ";
         body->write(out);
         out << ")";
       } else {
-        out << "(for-to-by " << id << " ";
+        out << "(for-to-by "; 
+        iterator->write(out);
+        out << " ";
         end->write(out);
         out << " ";
         delta->write(out);
@@ -123,7 +129,9 @@ void ExpressionFor::write(ostream &out) const {
     }
   } else {
     if (delta_integer && delta_integer->toInteger() == 1) {
-      out << "(for-in " << id << " ";
+      out << "(for-in ";
+      iterator->write(out);
+      out << " ";
       start->write(out);
       out << " ";
       end->write(out);
@@ -131,7 +139,9 @@ void ExpressionFor::write(ostream &out) const {
       body->write(out);
       out << ")";
     } else {
-      out << "(for-in-by " << id << " ";
+      out << "(for-in-by ";
+      iterator->write(out);
+      out << " ";
       start->write(out);
       out << " ";
       end->write(out);

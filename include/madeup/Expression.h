@@ -33,6 +33,7 @@ class Expression {
     const SourceLocation &getSourceLocation() const;
     void setSource(const std::string &source, const SourceLocation &location);
     virtual void predeclare(Environment &env) const;
+    virtual void assign(Environment &env, td::Co<Expression> value) const;
 
     static td::Co<Expression> parse(const std::string &s);
 

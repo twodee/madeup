@@ -20,6 +20,7 @@ class ExpressionSubscript : public Expression {
     td::Co<ExpressionInteger> evaluateIndex(Environment &env, const ExpressionString *string_value) const;
     td::Co<ExpressionInteger> evaluateIndex(Environment &env, const ExpressionArrayReference *array_value) const;
     void write(ostream &out) const;
+    void assign(Environment &env, td::Co<Expression> value) const;
 
     td::Co<Expression> getBase() const;
     td::Co<Expression> getIndex() const;
