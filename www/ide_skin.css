@@ -192,3 +192,7 @@ audio::-webkit-media-controls-enclosure {
   color: #ffffff;
   -webkit-appearance: none;
 }
+
+.blocklyText {
+  font-family: 'Hammersmith One', sans-serif !important;
+}
