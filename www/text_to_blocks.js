@@ -5,6 +5,10 @@ function connectExpression(block, connectionName, expressionBlock) {
 
 function connectStatement(block, connectionName, expressionBlock) {
   setStatementExpression(expressionBlock, false);
+  // console.log(block);
+  console.log(connectionName);
+  console.log(block.getInput(connectionName));
+  // console.log(expressionBlock);
   block.getInput(connectionName).connection.connect(expressionBlock.previousConnection);
 }
 
@@ -104,17 +108,17 @@ function parse(peeker) {
     if (id == 'print') {
       peeker.get(); // eat space
       var msg = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_io_print');
+      block = blocklyWorkspace.newBlock('madeup_print');
       connectExpression(block, 'MESSAGE', msg);
     } else if (id == 'echo') {
       peeker.get(); // eat space
       var mesh = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_generate_echo');
+      block = blocklyWorkspace.newBlock('madeup_echo');
       connectExpression(block, 'MESH', mesh);
     } else if (id == 'debug') {
       peeker.get(); // eat space
       var msg = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_io_debug');
+      block = blocklyWorkspace.newBlock('madeup_debug');
       connectExpression(block, 'MESSAGE', msg);
     } else if (id == 'sign') {
       peeker.get(); // eat space
@@ -128,21 +132,21 @@ function parse(peeker) {
       var y = parse(peeker);
       peeker.get(); // eat space
       var z = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_movement_moveto');
+      block = blocklyWorkspace.newBlock('madeup_moveto');
       connectExpression(block, 'X', x);
       connectExpression(block, 'Y', y);
       connectExpression(block, 'Z', z);
     } else if (id == 'move') {
       peeker.get(); // eat space
       var x = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_movement_move');
+      block = blocklyWorkspace.newBlock('madeup_move');
       connectExpression(block, 'DISTANCE', x);
     } else if (id == 'random') {
       peeker.get(); // eat space
       var min = parse(peeker);
       peeker.get(); // eat space
       var max = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_math_random');
+      block = blocklyWorkspace.newBlock('madeup_random');
       connectExpression(block, 'MIN', min);
       connectExpression(block, 'MAX', max);
     } else if (id == 'atan2') {
@@ -150,19 +154,19 @@ function parse(peeker) {
       var opposite = parse(peeker);
       peeker.get(); // eat space
       var adjacent = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_math_atan2');
+      block = blocklyWorkspace.newBlock('madeup_atan2');
       connectExpression(block, 'OPPOSITE', opposite);
       connectExpression(block, 'ADJACENT', adjacent);
     } else if (id == 'yaw' || id == 'roll' || id == 'pitch') {
       peeker.get(); // eat space
       var degrees = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_movement_turn');
+      block = blocklyWorkspace.newBlock('madeup_turn');
       block.setFieldValue(id, 'TYPE');
       connectExpression(block, 'DEGREES', degrees);
     } else if (id == 'coalesce') {
       peeker.get(); // eat space
       var threshold = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_path_coalesce');
+      block = blocklyWorkspace.newBlock('madeup_coalesce');
       connectExpression(block, 'THRESHOLD', threshold);
     } else if (id == 'translate' || id == 'scale') {
       peeker.get(); // eat space
@@ -171,12 +175,12 @@ function parse(peeker) {
       var y = parse(peeker);
       peeker.get(); // eat space
       var z = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_movement_' + id);
+      block = blocklyWorkspace.newBlock('madeup_' + id);
       connectExpression(block, 'X', x);
       connectExpression(block, 'Y', y);
       connectExpression(block, 'Z', z);
     } else if (id == 'spheres' || id == 'forget' || id == 'boxes' || id == 'polygon') {
-      block = blocklyWorkspace.newBlock('madeup_generate_' + id);
+      block = blocklyWorkspace.newBlock('madeup_' + id);
     } else if (id == 'revolve') {
       peeker.get(); // eat space
       var x = parse(peeker);
@@ -186,7 +190,7 @@ function parse(peeker) {
       var z = parse(peeker);
       peeker.get(); // eat space
       var degrees = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_generate_revolve');
+      block = blocklyWorkspace.newBlock('madeup_revolve');
       connectExpression(block, 'X', x);
       connectExpression(block, 'Y', y);
       connectExpression(block, 'Z', z);
@@ -200,7 +204,7 @@ function parse(peeker) {
       var z = parse(peeker);
       peeker.get(); // eat space
       var length = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_generate_extrude');
+      block = blocklyWorkspace.newBlock('madeup_extrude');
       connectExpression(block, 'X', x);
       connectExpression(block, 'Y', y);
       connectExpression(block, 'Z', z);
@@ -210,7 +214,7 @@ function parse(peeker) {
       var columns = parse(peeker);
       peeker.get(); // eat space
       var rows = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_generate_surface');
+      block = blocklyWorkspace.newBlock('madeup_surface');
       connectExpression(block, 'COLUMNS', columns);
       connectExpression(block, 'ROWS', rows);
     } else if (id == 'dowel' || id == 'tube') {
@@ -221,12 +225,12 @@ function parse(peeker) {
         peeker.get(); // eat space
         maxBend = parse(peeker);
       } else {
-        maxBend = blocklyWorkspace.newBlock('madeup_math_integer');
+        maxBend = blocklyWorkspace.newBlock('madeup_integer');
         maxBend.setFieldValue(360, 'INTEGER');
         maxBend.initSvg();
         maxBend.render();
       }
-      block = blocklyWorkspace.newBlock('madeup_generate_' + id);
+      block = blocklyWorkspace.newBlock('madeup_' + id);
       connectExpression(block, 'MAXBEND', maxBend);
     } else if (id == 'rotate') {
       peeker.get(); // eat space
@@ -237,7 +241,7 @@ function parse(peeker) {
       var z = parse(peeker);
       peeker.get(); // eat space
       var degrees = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_movement_' + id);
+      block = blocklyWorkspace.newBlock('madeup_' + id);
       connectExpression(block, 'X', x);
       connectExpression(block, 'Y', y);
       connectExpression(block, 'Z', z);
@@ -245,25 +249,25 @@ function parse(peeker) {
     } else if (id == 'sin' || id == 'cos' || id == 'tan') {
       peeker.get(); // eat space
       var degrees = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_math_sincostan');
-      block.setFieldValue(id, 'F');
+      block = blocklyWorkspace.newBlock('madeup_sincostan');
+      block.setFieldValue(id, 'FUNCTION');
       connectExpression(block, 'DEGREES', degrees);
     } else if (id == 'asin' || id == 'acos' || id == 'atan') {
       peeker.get(); // eat space
       var ratio = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_math_inverse_sincostan');
-      block.setFieldValue(id, 'F');
+      block = blocklyWorkspace.newBlock('madeup_inverse_sincostan');
+      block.setFieldValue(id, 'FUNCTION');
       connectExpression(block, 'RATIO', ratio);
     } else if (id == 'center' || id == 'identity' || id == 'reframe' || id == 'push' || id == 'pop' || id == 'reverse') {
-      block = blocklyWorkspace.newBlock('madeup_movement_' + id);
+      block = blocklyWorkspace.newBlock('madeup_' + id);
     } else if (id == 'where') {
-      block = blocklyWorkspace.newBlock('madeup_movement_where');
+      block = blocklyWorkspace.newBlock('madeup_where');
     } else if (id == 'log') {
       peeker.get(); // eat space
       var base = parse(peeker);
       peeker.get(); // eat space
       var x = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_math_log');
+      block = blocklyWorkspace.newBlock('madeup_log');
       connectExpression(block, 'BASE', base);
       connectExpression(block, 'X', x);
     } else if (id == 'min' || id == 'max') {
@@ -271,8 +275,8 @@ function parse(peeker) {
       var a = parse(peeker);
       peeker.get(); // eat space
       var b = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_math_minmax');
-      block.setFieldValue(id, 'F');
+      block = blocklyWorkspace.newBlock('madeup_minmax');
+      block.setFieldValue(id, 'FUNCTION');
       connectExpression(block, 'A', a);
       connectExpression(block, 'B', b);
     } else if (id == 'normalize' || id == 'magnitude') {
@@ -290,7 +294,7 @@ function parse(peeker) {
       connectExpression(block, 'B', b);
     } else {
       // is it a variable or a function?
-      if (!Blockly.Procedures.isLegalName(id, blocklyWorkspace)) {
+      if (!Blockly.Procedures.isLegalName_(id, blocklyWorkspace)) {
         block = blocklyWorkspace.newBlock('procedures_callnoreturn');
         block.setFieldValue(id, 'NAME');
         var formals = getBlocklyProcedureFormals(id);
@@ -315,9 +319,9 @@ function parse(peeker) {
     peeker.get(); // eat space
     var body = parse(peeker);
 
-    block = blocklyWorkspace.newBlock('madeup_loop_repeat');
+    block = blocklyWorkspace.newBlock('madeup_repeat');
     connectExpression(block, 'COUNT', count);
-    connectStatement(block, 'BLOCK', body);
+    connectStatement(block, 'BODY', body);
   }
 
   else if (token == 'repeatwich') {
@@ -328,7 +332,7 @@ function parse(peeker) {
     peeker.get(); // eat space
     var surroundee = parse(peeker);
 
-    block = blocklyWorkspace.newBlock('madeup_loop_repeatwich');
+    block = blocklyWorkspace.newBlock('madeup_repeat_around');
     connectExpression(block, 'COUNT', count);
     connectStatement(block, 'SURROUNDER', surrounder);
     connectStatement(block, 'SURROUNDEE', surroundee);
@@ -339,7 +343,7 @@ function parse(peeker) {
     var condition = parse(peeker);
     peeker.get(); // eat space
     var body = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_loop_while');
+    block = blocklyWorkspace.newBlock('madeup_while');
     connectExpression(block, 'CONDITION', condition);
     connectStatement(block, 'BODY', body);
   }
@@ -351,10 +355,16 @@ function parse(peeker) {
     var thenBlock = parse(peeker);
     peeker.get(); // eat space
     var elseBlock = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_logic_if_else_statement');
-    connectExpression(block, 'CONDITION', condition);
-    connectStatement(block, 'THEN', thenBlock);
-    connectStatement(block, 'ELSE', elseBlock);
+    if (elseBlock) {
+      block = blocklyWorkspace.newBlock('madeup_if_else_statement');
+      connectExpression(block, 'CONDITION', condition);
+      connectStatement(block, 'THEN', thenBlock);
+      connectStatement(block, 'ELSE', elseBlock);
+    } else {
+      block = blocklyWorkspace.newBlock('madeup_if_statement');
+      connectExpression(block, 'CONDITION', condition);
+      connectStatement(block, 'THEN', thenBlock);
+    }
   }
 
   else if (token == 'for-through') {
@@ -364,8 +374,9 @@ function parse(peeker) {
     var stop = parse(peeker);
     peeker.get(); // eat space
     var body = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_loop_for_through');
+    block = blocklyWorkspace.newBlock('madeup_for_upper');
     block.setFieldValue(id, 'ITERATOR');
+    block.setFieldValue('through', 'CLUSIVITY');
     connectExpression(block, 'STOP', stop);
     connectStatement(block, 'BODY', body);
   }
@@ -379,7 +390,7 @@ function parse(peeker) {
     var by = parse(peeker);
     peeker.get(); // eat space
     var body = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_loop_for_through_by');
+    block = blocklyWorkspace.newBlock('madeup_for_upper_by');
     block.setFieldValue(id, 'ITERATOR');
     connectExpression(block, 'STOP', stop);
     connectExpression(block, 'BY', by);
@@ -393,8 +404,9 @@ function parse(peeker) {
     var stop = parse(peeker);
     peeker.get(); // eat space
     var body = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_loop_for_to');
+    block = blocklyWorkspace.newBlock('madeup_for_upper');
     block.setFieldValue(id, 'ITERATOR');
+    // connectExpression(block, 
     connectExpression(block, 'STOP', stop);
     connectStatement(block, 'BODY', body);
   }
@@ -408,7 +420,7 @@ function parse(peeker) {
     var by = parse(peeker);
     peeker.get(); // eat space
     var body = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_loop_for_to_by');
+    block = blocklyWorkspace.newBlock('madeup_for_upper_by');
     block.setFieldValue(id, 'ITERATOR');
     connectExpression(block, 'STOP', stop);
     connectExpression(block, 'BY', by);
@@ -424,7 +436,7 @@ function parse(peeker) {
     var stop = parse(peeker);
     peeker.get(); // eat space
     var body = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_loop_for_in');
+    block = blocklyWorkspace.newBlock('madeup_for_in');
     block.setFieldValue(id, 'ITERATOR');
     connectExpression(block, 'START', start);
     connectExpression(block, 'STOP', stop);
@@ -442,7 +454,7 @@ function parse(peeker) {
     var by = parse(peeker);
     peeker.get(); // eat space
     var body = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_loop_for_in_by');
+    block = blocklyWorkspace.newBlock('madeup_for_in_by');
     block.setFieldValue(id, 'ITERATOR');
     connectExpression(block, 'START', start);
     connectExpression(block, 'STOP', stop);
@@ -455,7 +467,7 @@ function parse(peeker) {
     var a = parse(peeker);
     peeker.get(); // eat space
     var b = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_math_binary_arithmetic_operator');
+    block = blocklyWorkspace.newBlock('madeup_binary_arithmetic_operator');
     block.setFieldValue(token, 'OPERATOR');
     connectExpression(block, 'A', a);
     connectExpression(block, 'B', b);
@@ -464,7 +476,7 @@ function parse(peeker) {
   else if (token == 'negate') {
     peeker.get(); // eat space
     var a = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_math_unary_operator');
+    block = blocklyWorkspace.newBlock('madeup_unary_operator');
     connectExpression(block, 'A', a);
   }
 
@@ -521,7 +533,7 @@ function parse(peeker) {
     var a = parse(peeker);
     peeker.get(); // eat space
     var b = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_math_relational_operator');
+    block = blocklyWorkspace.newBlock('madeup_relational_operator');
     block.setFieldValue(token, 'OPERATOR');
     connectExpression(block, 'A', a);
     connectExpression(block, 'B', b);
@@ -532,8 +544,8 @@ function parse(peeker) {
     var a = parse(peeker);
     peeker.get(); // eat space
     var b = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_logic_junction');
-    block.setFieldValue(token, 'F');
+    block = blocklyWorkspace.newBlock('madeup_binary_logic_operator');
+    block.setFieldValue(token, 'FUNCTION');
     connectExpression(block, 'A', a);
     connectExpression(block, 'B', b);
   }
@@ -541,14 +553,14 @@ function parse(peeker) {
   else if (token == 'not') {
     peeker.get(); // eat space
     var a = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_logic_not');
+    block = blocklyWorkspace.newBlock('madeup_not');
     connectExpression(block, 'A', a);
   }
 
   else if (token == 'abs') {
     peeker.get(); // eat space
     var x = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_math_abs');
+    block = blocklyWorkspace.newBlock('madeup_abs');
     connectExpression(block, 'X', x);
   }
 
@@ -559,21 +571,21 @@ function parse(peeker) {
   else if (token == 'INTEGER') {
     peeker.get(); // eat space
     var i = peeker.getInteger();
-    block = blocklyWorkspace.newBlock('madeup_math_integer');
+    block = blocklyWorkspace.newBlock('madeup_integer');
     block.setFieldValue('' + i, 'INTEGER');
   }
 
   else if (token == 'BOOLEAN') {
     peeker.get(); // eat space
     var literal = peeker.getToken();
-    block = blocklyWorkspace.newBlock('madeup_logic_boolean');
+    block = blocklyWorkspace.newBlock('madeup_boolean');
     block.setFieldValue(literal, 'BOOLEAN');
   }
 
   else if (token == 'REAL') {
     peeker.get(); // eat space
     var i = peeker.getReal();
-    block = blocklyWorkspace.newBlock('madeup_math_real');
+    block = blocklyWorkspace.newBlock('madeup_real');
     block.setFieldValue('' + i, 'REAL');
   }
 
