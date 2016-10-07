@@ -890,7 +890,7 @@ void MadeupWindow::onRun(GeometryMode::geometry_mode_t geometry_mode) {
   std::cout.rdbuf(old_cout_buffer);
   string output = cout_capturer.str();
 
-  output = std::regex_replace(output, std::regex("^(\\d+)\\((\\d+)-(\\d+)\\):\\s*"), "<a href=\"jump?start=$2&end=$3\">Error on line $1</a>: ");
+  output = std::regex_replace(output, std::regex("^(\\d+)\\((\\d+)-(\\d+)\\):\\s*"), std::string("<a href=\"jump?start=$2&end=$3\">Error on line $1</a>: "));
 
   console->setText(output.c_str());
 

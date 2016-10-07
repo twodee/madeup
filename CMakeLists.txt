@@ -40,6 +40,8 @@ if (USE_DEBUG AND CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID
   endif()
 endif()
 
+message("FLAGS: ${CMAKE_CXX_FLAGS}")
+
 # Libigl imposes a bunch of dependencies that aren't fun to sort through. Let's
 # allow for it to be disabled.
 option(USE_IGL "Enable libigl" ON)

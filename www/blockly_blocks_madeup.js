@@ -14,10 +14,12 @@ function setStatementExpression(block, isExpression) {
       block.setPreviousStatement(false);
       block.setNextStatement(false);
       block.setOutput(true);
+      block.setColour(EXPRESSION_HUE);
     } else {
       block.setOutput(false);
       block.setPreviousStatement(true);
       block.setNextStatement(true);
+      block.setColour(STATEMENT_HUE);
     }
   }
 }

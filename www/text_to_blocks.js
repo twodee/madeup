@@ -114,7 +114,7 @@ function parse(peeker) {
       peeker.get(); // eat space
       var mesh = parse(peeker);
       block = blocklyWorkspace.newBlock('madeup_echo');
-      connectExpression(block, 'MESH', mesh);
+      connectExpression(block, 'OBJECT', mesh);
     } else if (id == 'debug') {
       peeker.get(); // eat space
       var msg = parse(peeker);
