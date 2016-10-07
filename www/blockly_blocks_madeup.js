@@ -217,6 +217,7 @@ for (var block_type in block_definitions) {
       Blockly.Blocks[block_type] = {
         init: function() {
           this.jsonInit(config);
+          Blockly.addClass_(this.svgGroup_, 'wippo');
         },
         customContextMenu: toggleStatementExpression,
         mutationToDom: mutationToDom,
