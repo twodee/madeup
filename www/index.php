@@ -123,8 +123,20 @@ if (array_key_exists('movie', $_REQUEST)) {
     <category name="Solidifiers">
       <block type="madeup_spheres"></block>
       <block type="madeup_boxes"></block>
-      <block type="madeup_dowel"></block>
-      <block type="madeup_tube"></block>
+      <block type="madeup_dowel">
+        <value name="MAXBEND">
+          <shadow type="madeup_real">
+            <field name="REAL">360</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="madeup_tube">
+        <value name="MAXBEND">
+          <shadow type="madeup_real">
+            <field name="REAL">360</field>
+          </shadow>
+        </value>
+      </block>
       <block type="madeup_extrude"></block>
       <block type="madeup_revolve"></block>
       <block type="madeup_polygon"></block>
