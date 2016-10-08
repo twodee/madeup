@@ -1009,12 +1009,12 @@ function setEditor(isText) {
       blocklyWorkspace = Blockly.inject('blocksCanvas', {
         comments: false,
         toolbox: document.getElementById('toolbox'),
-        // trashcan: true,
+        trashcan: true,
         zoom: {
           controls: true,
           wheel: false,
-          startScale: 1.0,
-          maxScale: 3,
+          startScale: 1.5,
+          maxScale: 5,
           minScale: 0.3,
           scaleSpeed: 1.2
         }
@@ -1066,6 +1066,7 @@ function load(mup) {
     } else {
       blocklyWorkspace.clear();
       var xml = Blockly.Xml.textToDom(file.source);
+      console.log(xml);
       Blockly.Xml.domToWorkspace(xml, blocklyWorkspace);
       xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
       lastBlocks = Blockly.Xml.domToText(xml);
@@ -1319,7 +1320,7 @@ function fit() {
   allGeometry.computeBoundingBox();
 
   var bounds = allGeometry.boundingBox;
-  var centroid = bounds.center();
+  var centroid = bounds.getCenter();
 
   var xform = new THREE.Matrix4().makeTranslation(-centroid.x, -centroid.y, -centroid.z);
   modelScene.matrix = xform;
@@ -1332,7 +1333,7 @@ function fit() {
     constraint = Math.tan(camera.fov * Math.PI / 180.0 * 0.5);
   }
 
-  var dimensions = bounds.size();
+  var dimensions = bounds.getSize();
   var maxSpan = Math.max(dimensions.x, Math.max(dimensions.y, dimensions.z));
   var fit = maxSpan / constraint;
 
@@ -1349,7 +1350,7 @@ function viewFrom(dim, sign) {
   allGeometry.computeBoundingBox();
 
   var bounds = allGeometry.boundingBox;
-  var centroid = bounds.center();
+  var centroid = bounds.getCenter();
 
   var xform = new THREE.Matrix4().makeTranslation(-centroid.x, -centroid.y, -centroid.z);
   modelScene.matrix = xform;
@@ -1362,7 +1363,7 @@ function viewFrom(dim, sign) {
     constraint = Math.tan(camera.fov * Math.PI / 180.0 * 0.5);
   }
 
-  var dimensions = bounds.size();
+  var dimensions = bounds.getSize();
   var maxSpan = Math.max(dimensions.x, Math.max(dimensions.y, dimensions.z));
   var fit = maxSpan / constraint;
 
@@ -1517,10 +1518,6 @@ function init() {
   overallScene = new THREE.Scene();
   overallScene.add(modelScene);
   overallScene.add(camera);
-
-  var radius = 50,
-      segments = 16,
-      rings = 16;
 
   // create a point light
   var pointLight = new THREE.PointLight(0xFFFFFF);

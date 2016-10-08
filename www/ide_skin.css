@@ -193,6 +193,15 @@ audio::-webkit-media-controls-enclosure {
   -webkit-appearance: none;
 }
 
-.blocklyText {
-  font-family: 'Hammersmith One', sans-serif !important;
+.blocklyText, .blocklyHtmlInput, .blocklyTreeLabel {
+  font-family: 'Kanit', sans-serif !important;
+}
+
+.blocklyTreeLabel {
+  font-size: 24px !important;
+}
+
+.blocklyTreeRow {
+  height: 28px !important;
+  margin-top: 5px !important;
 }

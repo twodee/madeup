@@ -7,7 +7,7 @@
 
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link href="https://fonts.googleapis.com/css?family=Hammersmith+One" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Kanit" rel="stylesheet">
 
   <!-- JQuery dependencies -->
   <link rel="stylesheet" href="jquery-ui-1.11.2/jquery-ui.css"/>
@@ -39,9 +39,6 @@
   <script src="blockly/blocks/procedures.js"></script>
 
   <script src="blockly/msg/js/en.js"></script>
-  <script src="block_definitions.js"></script>
-  <script src="blockly_blocks_madeup.js"></script>
-  <script src="blockly_generator_madeup.js"></script>
 
   <script>
     var isEmbedded = false;
@@ -79,6 +76,9 @@ if (array_key_exists('movie', $_REQUEST)) {
   <link rel="stylesheet" href="ide_skin_dark.css" title="theme"/>
   <script src="text_to_blocks.js"></script>
   <script src="ide_function.js"></script>
+  <script src="block_definitions.js"></script>
+  <script src="blockly_blocks_madeup.js"></script>
+  <script src="blockly_generator_madeup.js"></script>
 </head>
 
 <body>
@@ -171,8 +171,8 @@ if (array_key_exists('movie', $_REQUEST)) {
       <block type="madeup_array_by"></block>
       <block type="madeup_array_of"></block>
       <block type="madeup_subscript"></block>
-      <block type="madeup_subscript_set"></block>
       <block type="madeup_subrange"></block>
+      <block type="madeup_subscript_set"></block>
       <block type="madeup_normalize"></block>
       <block type="madeup_magnitude"></block>
       <block type="madeup_cross"></block>

@@ -1262,4 +1262,223 @@ var block_definitions = {
         return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
       }
   },
+  'madeup_array_by': {
+    config:
+      {
+        "message0": "%1 by %2",
+        "args0": [
+          { "type": "input_value", "align": "RIGHT", "name": "N", "check": ["Integer"] },
+          { "type": "input_value", "align": "RIGHT", "name": "ITEM" }
+        ],
+        "inputsInline": true,
+        "output": "Array",
+        "colour": EXPRESSION_HUE,
+        "tooltip": "",
+        "helpUrl": "http://www.example.com/"
+      },
+    generator:
+      function(block) {
+        var value_outer = Blockly.Madeup.valueToCode(block, 'N', Blockly.Madeup.ORDER_ARRAY_BY);
+        var value_inner = Blockly.Madeup.valueToCode(block, 'ITEM', Blockly.Madeup.ORDER_ARRAY_BY);
+        var code = value_outer + ' by ' + value_inner;
+        return generateInMode(block, code, Blockly.Madeup.ORDER_ARRAY_BY);
+      }
+  },
+  'madeup_array_of': {
+    config:
+      {
+        "message0": "%1 of %2",
+        "args0": [
+          { "type": "input_value", "align": "RIGHT", "name": "N", "check": ["Integer"] },
+          { "type": "input_value", "align": "RIGHT", "name": "ITEM" }
+        ],
+        "inputsInline": true,
+        "output": "Array",
+        "colour": EXPRESSION_HUE,
+        "tooltip": "",
+        "helpUrl": "http://www.example.com/"
+      },
+    generator:
+      function(block) {
+        var value_outer = Blockly.Madeup.valueToCode(block, 'N', Blockly.Madeup.ORDER_ARRAY_BY);
+        var value_inner = Blockly.Madeup.valueToCode(block, 'ITEM', Blockly.Madeup.ORDER_ARRAY_BY);
+        var code = value_outer + ' of ' + value_inner;
+        return generateInMode(block, code, Blockly.Madeup.ORDER_ARRAY_OF);
+      }
+  },
+  'madeup_cross': {
+    config:
+      {
+        "message0": "%1 cross %2",
+        "args0": [
+          { "type": "input_value", "align": "RIGHT", "name": "A", "check": "Array" },
+          { "type": "input_value", "align": "RIGHT", "name": "B", "check": "Array" }
+        ],
+        "inputsInline": true,
+        "output": "Array",
+        "colour": EXPRESSION_HUE,
+        "tooltip": "",
+        "helpUrl": "http://www.example.com/"
+      },
+    generator:
+      function(block) {
+        var value_a = Blockly.Madeup.valueToCode(block, 'A', Blockly.Madeup.ORDER_ATOMIC);
+        var value_b = Blockly.Madeup.valueToCode(block, 'B', Blockly.Madeup.ORDER_ATOMIC);
+        var code = 'cross ' + a + ', ' + b;
+        return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+      }
+  },
+  'madeup_dot': {
+    config:
+      {
+        "message0": "%1 dot %2",
+        "args0": [
+          { "type": "input_value", "align": "RIGHT", "name": "A", "check": "Array" },
+          { "type": "input_value", "align": "RIGHT", "name": "B", "check": "Array" }
+        ],
+        "inputsInline": true,
+        "output": "Array",
+        "colour": EXPRESSION_HUE,
+        "tooltip": "",
+        "helpUrl": "http://www.example.com/"
+      },
+    generator:
+      function(block) {
+        var value_a = Blockly.Madeup.valueToCode(block, 'A', Blockly.Madeup.ORDER_ATOMIC);
+        var value_b = Blockly.Madeup.valueToCode(block, 'B', Blockly.Madeup.ORDER_ATOMIC);
+        var code = 'dot ' + a + ', ' + b;
+        return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+      }
+  },
+  'madeup_size': {
+    config:
+      {
+        "message0": "size %1",
+        "args0": [
+          { "type": "input_value", "align": "RIGHT", "name": "A", "check": ["Array", "String"] },
+        ],
+        "inputsInline": true,
+        "output": "Integer",
+        "colour": EXPRESSION_HUE,
+        "tooltip": "",
+        "helpUrl": "http://www.example.com/"
+      },
+    generator:
+      function(block) {
+        var value_a = Blockly.Madeup.valueToCode(block, 'A', Blockly.Madeup.ORDER_ATOMIC);
+        var code = 'size ' + a;
+        return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+      }
+  },
+  'madeup_magnitude': {
+    config:
+      {
+        "message0": "magnitude %1",
+        "args0": [
+          { "type": "input_value", "align": "RIGHT", "name": "A", "check": "Array" },
+        ],
+        "inputsInline": true,
+        "output": "Real",
+        "colour": EXPRESSION_HUE,
+        "tooltip": "",
+        "helpUrl": "http://www.example.com/"
+      },
+    generator:
+      function(block) {
+        var value_a = Blockly.Madeup.valueToCode(block, 'A', Blockly.Madeup.ORDER_ATOMIC);
+        var code = 'magnitude ' + a;
+        return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+      }
+  },
+  'madeup_normalize': {
+    config:
+      {
+        "message0": "normalize %1",
+        "args0": [
+          { "type": "input_value", "align": "RIGHT", "name": "A", "check": "Array" },
+        ],
+        "inputsInline": true,
+        "output": "Array",
+        "colour": EXPRESSION_HUE,
+        "tooltip": "",
+        "helpUrl": "http://www.example.com/"
+      },
+    generator:
+      function(block) {
+        var value_a = Blockly.Madeup.valueToCode(block, 'A', Blockly.Madeup.ORDER_ATOMIC);
+        var code = 'normalize ' + a;
+        return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+      }
+  },
+  'madeup_subscript': {
+    config:
+      {
+        "message0": "item %1 of %2",
+        "args0": [
+          { "type": "input_value", "align": "RIGHT", "name": "I", "check": "Integer" },
+          { "type": "input_value", "align": "RIGHT", "name": "COLLECTION", "check": "Array" },
+        ],
+        "inputsInline": true,
+        "output": null,
+        "colour": EXPRESSION_HUE,
+        "tooltip": "",
+        "helpUrl": "http://www.example.com/"
+      },
+    generator:
+      function(block) {
+        var value_i = Blockly.Madeup.valueToCode(block, 'I', Blockly.Madeup.ORDER_ATOMIC);
+        var value_collection = Blockly.Madeup.valueToCode(block, 'COLLECTION', Blockly.Madeup.ORDER_ATOMIC);
+        var code = value_collection + '[' + value_i + ']';
+        return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+      }
+  },
+  'madeup_subscript_set': {
+    config:
+      {
+        "message0": "set item %1 of %2 to %3",
+        "args0": [
+          { "type": "input_value", "align": "RIGHT", "name": "I", "check": "Integer" },
+          { "type": "input_value", "align": "RIGHT", "name": "COLLECTION", "check": "Array" },
+          { "type": "input_value", "align": "RIGHT", "name": "RHS" },
+        ],
+        "inputsInline": true,
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": STATEMENT_HUE,
+        "tooltip": "",
+        "helpUrl": "http://www.example.com/"
+      },
+    generator:
+      function(block) {
+        var value_i = Blockly.Madeup.valueToCode(block, 'I', Blockly.Madeup.ORDER_ATOMIC);
+        var value_collection = Blockly.Madeup.valueToCode(block, 'COLLECTION', Blockly.Madeup.ORDER_ATOMIC);
+        var value_rhs = Blockly.Madeup.valueToCode(block, 'RHS', Blockly.Madeup.ORDER_ATOMIC);
+        var code = value_collection + '[' + value_i + '] = ' + value_rhs;
+        return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+      }
+  },
+  'madeup_subrange': {
+    config:
+      {
+        "message0": "items %1 through %2 of %3",
+        "args0": [
+          { "type": "input_value", "align": "RIGHT", "name": "I", "check": "Integer" },
+          { "type": "input_value", "align": "RIGHT", "name": "J", "check": "Integer" },
+          { "type": "input_value", "align": "RIGHT", "name": "COLLECTION", "check": "Array" },
+        ],
+        "inputsInline": true,
+        "output": "Array",
+        "colour": EXPRESSION_HUE,
+        "tooltip": "",
+        "helpUrl": "http://www.example.com/"
+      },
+    generator:
+      function(block) {
+        var value_i = Blockly.Madeup.valueToCode(block, 'I', Blockly.Madeup.ORDER_ATOMIC);
+        var value_j = Blockly.Madeup.valueToCode(block, 'J', Blockly.Madeup.ORDER_ATOMIC);
+        var value_collection = Blockly.Madeup.valueToCode(block, 'COLLECTION', Blockly.Madeup.ORDER_ATOMIC);
+        var code = value_collection + '[' + value_i + '..' + value_j + ']';
+        return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+      }
+  },
 }
