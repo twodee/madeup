@@ -251,9 +251,9 @@ Blockly.Blocks['madeup_array_literal'] = {
    * @this Blockly.Block
    */
   domToMutation: function(xmlElement) {
-    domModeToMutation(xmlElement);
     this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
     this.updateShape_();
+    domModeToMutation.call(this, xmlElement);
   },
   /**
    * Populate the mutator's dialog with this block's components.
@@ -262,8 +262,7 @@ Blockly.Blocks['madeup_array_literal'] = {
    * @this Blockly.Block
    */
   decompose: function(workspace) {
-    var containerBlock =
-        workspace.newBlock('madeup_array_create_with_container');
+    var containerBlock = workspace.newBlock('madeup_array_create_with_container');
     containerBlock.initSvg();
     var connection = containerBlock.getInput('STACK').connection;
     for (var i = 0; i < this.itemCount_; i++) {
@@ -287,13 +286,18 @@ Blockly.Blocks['madeup_array_literal'] = {
       connections.push(itemBlock.valueConnection_);
       itemBlock = itemBlock.nextConnection && itemBlock.nextConnection.targetBlock();
     }
+    // Disconnect any children that don't belong.
+    for (var i = 0; i < this.itemCount_; i++) {
+      var connection = this.getInput('ELEMENT' + i).connection.targetConnection;
+      if (connection && connections.indexOf(connection) == -1) {
+        connection.disconnect();
+      }
+    }
     this.itemCount_ = connections.length;
     this.updateShape_();
     // Reconnect any child blocks.
     for (var i = 0; i < this.itemCount_; i++) {
-      if (connections[i]) {
-        this.getInput('ELEMENT' + i).connection.connect(connections[i]);
-      }
+      Blockly.Mutator.reconnect(connections[i], this, 'ELEMENT' + i);
     }
   },
   /**
@@ -317,32 +321,30 @@ Blockly.Blocks['madeup_array_literal'] = {
    * @this Blockly.Block
    */
   updateShape_: function() {
-    // Delete everything.
-    if (this.getInput('EMPTY')) {
+    if (this.itemCount_ && this.getInput('EMPTY')) {
       this.removeInput('EMPTY');
-    } else {
-      var i = 0;
-      while (this.getInput('ELEMENT' + i)) {
-        this.removeInput('ELEMENT' + i);
-        i++;
-      }
-    }
-    // Rebuild block.
-    if (this.itemCount_ == 0) {
+    } else if (!this.itemCount_ && !this.getInput('EMPTY')) {
       this.appendDummyInput('EMPTY')
-          .appendField('empty');
-    } else {
-      for (var i = 0; i < this.itemCount_; i++) {
+          .appendField(Blockly.Msg.LISTS_CREATE_EMPTY_TITLE);
+    }
+    // ELEMENT new inputs.
+    for (var i = 0; i < this.itemCount_; i++) {
+      if (!this.getInput('ELEMENT' + i)) {
         var input = this.appendValueInput('ELEMENT' + i);
         if (i == 0) {
           input.appendField('array');
         }
       }
     }
+    // Remove deleted inputs.
+    while (this.getInput('ELEMENT' + i)) {
+      this.removeInput('ELEMENT' + i);
+      i++;
+    }
   },
   customContextMenu: toggleStatementExpression,
-  mutationToDom: mutationToDom,
-  domToMutation: domModeToMutation
+  // mutationToDom: mutationToDom,
+  // domToMutation: domModeToMutation
 };
 
 Blockly.Blocks['madeup_array_create_with_container'] = {
