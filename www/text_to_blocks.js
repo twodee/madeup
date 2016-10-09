@@ -5,10 +5,6 @@ function connectExpression(block, connectionName, expressionBlock) {
 
 function connectStatement(block, connectionName, expressionBlock) {
   setStatementExpression(expressionBlock, false);
-  // console.log(block);
-  console.log(connectionName);
-  console.log(block.getInput(connectionName));
-  // console.log(expressionBlock);
   block.getInput(connectionName).connection.connect(expressionBlock.previousConnection);
 }
 
@@ -365,6 +361,20 @@ function parse(peeker) {
       connectExpression(block, 'CONDITION', condition);
       connectStatement(block, 'THEN', thenBlock);
     }
+  }
+
+  else if (token == 'if-ternary') {
+    peeker.get(); // eat space
+    var condition = parse(peeker);
+    peeker.get(); // eat space
+    var thenBlock = parse(peeker);
+    peeker.get(); // eat space
+    var elseBlock = parse(peeker);
+
+    block = blocklyWorkspace.newBlock('madeup_if_expr');
+    connectExpression(block, 'CONDITION', condition);
+    connectExpression(block, 'THEN', thenBlock);
+    connectExpression(block, 'ELSE', elseBlock);
   }
 
   else if (token == 'for-through') {

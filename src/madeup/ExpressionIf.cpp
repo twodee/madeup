@@ -9,11 +9,12 @@ namespace madeup {
 
 /* ------------------------------------------------------------------------- */
 
-ExpressionIf::ExpressionIf(Co<Expression> condition, Co<ExpressionBlock> then_block, Co<ExpressionBlock> else_block) :
+ExpressionIf::ExpressionIf(Co<Expression> condition, Co<ExpressionBlock> then_block, Co<ExpressionBlock> else_block, bool is_ternary) :
   Expression(),
   condition(condition),
   then_block(then_block),
-  else_block(else_block) {
+  else_block(else_block),
+  is_ternary(is_ternary) {
 }
 
 /* ------------------------------------------------------------------------- */
@@ -38,15 +39,31 @@ Co<Expression> ExpressionIf::evaluate(Environment &env) const {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionIf::write(ostream &out) const {
-  out << "(if ";
-  condition->write(out);
-  out << " ";
-  then_block->write(out);
-  if (!else_block.IsNull()) {
+  if (!is_ternary) {
+    out << "(if ";
+    condition->write(out);
+    out << " ";
+    then_block->write(out);
+    if (!else_block.IsNull()) {
+      out << " ";
+      else_block->write(out);
+    }
+    out << ")";
+  } else {
+    out << "(if-ternary ";
+    condition->write(out);
+    out << " ";
+    then_block->write(out);
     out << " ";
     else_block->write(out);
+    out << ")";
   }
-  out << ")";
+}
+
+/* ------------------------------------------------------------------------- */
+
+bool ExpressionIf::isTernary() const {
+  return is_ternary;  
 }
 
 /* ------------------------------------------------------------------------- */

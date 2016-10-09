@@ -573,8 +573,11 @@ void Parser::atom() {
     ++i;
     expressionLevel0();
 
+    bool is_ternary = false;
+
     // One-liner.
     if (isUp(Token::THEN)) {
+      is_ternary = true;
       ++i;
       expressionLevel0();
       Co<ExpressionBlock> then_block(new ExpressionBlock());
@@ -642,7 +645,7 @@ void Parser::atom() {
     Co<ExpressionBlock> else_block = popBlock();
     Co<ExpressionBlock> then_block = popBlock();
     Co<Expression> condition = popExpression();
-    pushExpression(new ExpressionIf(condition, then_block, else_block), if_token.getLocation(), end_location);
+    pushExpression(new ExpressionIf(condition, then_block, else_block, is_ternary), if_token.getLocation(), end_location);
   } else if (isUp(Token::TO)) {
     Token to_token = tokens[i];
     SourceLocation end_location;
