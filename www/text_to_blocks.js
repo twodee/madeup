@@ -157,7 +157,7 @@ function parse(peeker) {
       peeker.get(); // eat space
       var degrees = parse(peeker);
       block = blocklyWorkspace.newBlock('madeup_turn');
-      block.setFieldValue(id, 'TYPE');
+      block.setFieldValue(id, 'FUNCTION');
       connectExpression(block, 'DEGREES', degrees);
     } else if (id == 'coalesce') {
       peeker.get(); // eat space

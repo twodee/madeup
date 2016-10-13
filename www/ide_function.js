@@ -993,18 +993,32 @@ function setEditor(isText) {
 
   // We're heading to text.
   if (isEditorText) {
-    // Any blocks to convert to text?
-    if (blocklyWorkspace.getTopBlocks().length > 0 && confirm('Convert your blocks to text?')) {
-      var source = Blockly.Madeup.workspaceToCode(blocklyWorkspace);
-      textEditor.setValue(source);
+    if (blocklyWorkspace.getTopBlocks().length > 0) {
+      $('<div title="Convert">Convert your blocks program to text?</div>').dialog({
+        resizable: false,
+        height: 'auto',
+        width: 400,
+        modal: true,
+        buttons: {
+          'Convert to text': function() {
+            // Any blocks to convert to text?
+            var source = Blockly.Madeup.workspaceToCode(blocklyWorkspace);
+            textEditor.setValue(source, -1);
+            switchEditors();
+            $(this).dialog('close');
+          },
+          'Blank editor': function() {
+            switchEditors();
+            $(this).dialog('close');
+          }
+        }
+      });
     }
-
-    $('#blocksEditor').hide();
-    $('#textEditor').show();
   }
   
   // We're heading to blocks.
   else {
+    console.log('to blocks');
     if (!blocklyWorkspace) {
       blocklyWorkspace = Blockly.inject('blocksCanvas', {
         comments: false,
@@ -1023,11 +1037,38 @@ function setEditor(isText) {
 
     // Any text to convert to blocks?
     var source = textEditor.getValue();
-    if (source.length > 0 && confirm('Convert your text to blocks?')) {
-      blocklyWorkspace.clear();
-      convertTextToBlocks(source);
+    if (source.length > 0) {
+      $('<div title="Convert">Convert your text program to a blocks program?</div>').dialog({
+        resizable: false,
+        height: 'auto',
+        width: 400,
+        modal: true,
+        buttons: {
+          'Convert to blocks': function() {
+            blocklyWorkspace.clear();
+            convertTextToBlocks(source);
+            switchEditors();
+            $(this).dialog('close');
+          },
+          'Blank canvas': function() {
+            switchEditors();
+            $(this).dialog('close');
+          }
+        }
+      });
+    } else {
+      switchEditors();
     }
 
+  }
+
+}
+
+function switchEditors() {
+  if (isEditorText) {
+    $('#blocksEditor').hide();
+    $('#textEditor').show();
+  } else {
     $('#textEditor').hide();
     $('#blocksEditor').show();
   }
