@@ -1,9 +1,22 @@
 'use strict';
 
+goog.require('Blockly.Blocks');
+
 goog.provide('Blockly.Blocks.madeup');
 goog.provide('Blockly.Madeup');
-goog.require('Blockly.Blocks');
-goog.require('Blockly.Generator');
+
+Blockly.Variables.allUsedVariables = (function (proxied) {
+  return function (root) {
+    var list = proxied.call(this, root);
+    list.push('.rgb');
+    list.push('.innerRadius');
+    list.push('.outerRadius');
+    list.push('.radius');
+    list.push('nsides');
+    console.log('myAllUsedVariables: ' + list);
+    return list;
+  };
+})(Blockly.Variables.allUsedVariables);
 
 function setStatementExpression(block, isExpression) {
   var isExpressionAlready = !!block.outputConnection;
@@ -379,6 +392,64 @@ Blockly.Blocks['madeup_array_element'] = {
   domToMutation: domModeToMutation
 };
 
+// --------------------------------------------------------------------------- 
+// GENERATORS FOR BUILTINS
+
+Blockly.Madeup['variables_get'] = function(block) {
+  var code = Blockly.Madeup.variableDB_.getName(block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
+  return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+};
+
+Blockly.Madeup['variables_set'] = function(block) {
+  var argument0 = Blockly.Madeup.valueToCode(block, 'VALUE', Blockly.Madeup.ORDER_NONE) || '0';
+  var varName = Blockly.Madeup.variableDB_.getName(block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
+  var code = varName + ' = ' + argument0;
+  return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+};
+
+Blockly.Madeup['procedures_defnoreturn'] = function(block) {
+  var funcName = Blockly.Madeup.variableDB_.getName(block.getFieldValue('NAME'), Blockly.Procedures.NAME_TYPE);
+  var branch = Blockly.Madeup.statementToCode(block, 'STACK');
+
+  var args = [];
+  for (var x = 0; x < block.arguments_.length; x++) {
+    args[x] = Blockly.Madeup.variableDB_.getName(block.arguments_[x], Blockly.Variables.NAME_TYPE);
+  }
+
+  var code = 'to ' + funcName + ' ' + args.join(' ') + '\n' + branch + 'end';
+  return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+};
+
+Blockly.Madeup['procedures_callnoreturn'] = function(block) {
+  var funcName = Blockly.Madeup.variableDB_.getName(block.getFieldValue('NAME'), Blockly.Procedures.NAME_TYPE);
+  var args = [];
+  var precedence;
+  for (var i = 0; i < block.arguments_.length; i++) {
+    if (block.arguments_.length == 1) {
+      precedence = Blockly.Madeup.ORDER_FUNCTION_CALL_ONLY_PARAMETER;
+    } else if (i == 0) {
+      precedence = Blockly.Madeup.ORDER_FUNCTION_CALL_FIRST_PARAMETER;
+    } else {
+      precedence = Blockly.Madeup.ORDER_FUNCTION_CALL_NOT_FIRST_PARAMETER;
+    }
+    args[i] = Blockly.Madeup.valueToCode(block, 'ARG' + i, precedence) || '';
+  }
+  var code = funcName;
+  if (args.length) {
+    code += ' ' + args.join(', ');
+  }
+  return generateInMode(block, code, Blockly.Madeup.ORDER_FUNCTION_CALL);
+};
+
+Blockly.Madeup['madeup_array_literal'] = function(block) {
+  var elements = [];
+  for (var i = 0; i < block.itemCount_; i++) {
+    elements[i] = Blockly.Madeup.valueToCode(block, 'ELEMENT' + i, Blockly.Madeup.ORDER_ATOMIC) || '';
+  }
+  var code = '{' + elements.join(', ') + '}';
+  return generateInMode(block, code, Blockly.Madeup.ORDER_ATOMIC);
+};
+
 // ----------------------------------------------------------------------------
 // Remove the return blocks that Blockly automatically generates in the
 // PROCEDURES node of the toolbox. Madeup doesn't support explicit return
@@ -430,3 +501,4 @@ Blockly.Blocks.procedures.DEF_NO_RETURN_HUE = STATEMENT_HUE;
 Blockly.Blocks.procedures.DEF_RETURN_HUE = STATEMENT_HUE;
 Blockly.Blocks.procedures.CALL_NO_RETURN_HUE = STATEMENT_HUE;
 Blockly.Blocks.procedures.CALL_RETURN_HUE = EXPRESSION_HUE;
+

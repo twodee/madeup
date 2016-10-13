@@ -78,7 +78,6 @@ if (array_key_exists('movie', $_REQUEST)) {
   <script src="ide_function.js"></script>
   <script src="block_definitions.js"></script>
   <script src="blockly_blocks_madeup.js"></script>
-  <script src="blockly_generator_madeup.js"></script>
 </head>
 
 <body>

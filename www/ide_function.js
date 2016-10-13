@@ -880,7 +880,10 @@ $(document).ready(function() {
   $('#fileDelete').click(function() {
     var ok = confirm('Delete ' + mupName + '?');
     if (ok) {
-      if (blocklyWorkspace) blocklyWorkspace.clear();
+      if (blocklyWorkspace) {
+        blocklyWorkspace.clear();
+        blocklyWorkspace.updateVariableList();
+      }
       window.localStorage.removeItem(mupName);
       mupName = null;
       load('untitled');
@@ -1033,6 +1036,7 @@ function setEditor(isText) {
           scaleSpeed: 1.2
         }
       });
+      blocklyWorkspace.updateVariableList();
     }
 
     // Any text to convert to blocks?
@@ -1046,6 +1050,7 @@ function setEditor(isText) {
         buttons: {
           'Convert to blocks': function() {
             blocklyWorkspace.clear();
+            blocklyWorkspace.updateVariableList();
             convertTextToBlocks(source);
             switchEditors();
             $(this).dialog('close');
@@ -1089,7 +1094,10 @@ function load(mup) {
 
   // Clear the editors so they don't try to get converted.
   textEditor.setValue('');
-  if (blocklyWorkspace) blocklyWorkspace.clear();
+  if (blocklyWorkspace) {
+    blocklyWorkspace.clear();
+    blocklyWorkspace.updateVariableList();
+  }
 
   mupName = mup;
 
@@ -1106,6 +1114,7 @@ function load(mup) {
       textEditor.session.setValue(file.source, -1);
     } else {
       blocklyWorkspace.clear();
+      blocklyWorkspace.updateVariableList();
       var xml = Blockly.Xml.textToDom(file.source);
       console.log(xml);
       Blockly.Xml.domToWorkspace(xml, blocklyWorkspace);
@@ -1163,9 +1172,7 @@ function convertTextToBlocks(source) {
       if (data['exit_status'] == 0) {
         tree = data['tree'];
         console.log(data['tree']);
-        var block = parse(new Peeker(tree));
-        block.initSvg();
-        block.render();
+        parse(new Peeker(tree));
       }
     },
     failure: function(errorMessage) {
