@@ -310,20 +310,30 @@ if (array_key_exists('movie', $_REQUEST)) {
 <script src="ide_editor.js"></script>
 
 <!-- Blocks Switch ________________________________________________________ -->
+<script>
+
 <?php
-if (strpos($_SERVER['HTTP_HOST'], 'to.madeup') !== false) {
+if (strpos($_SERVER['HTTP_HOST'], 'to.madeup') !== false || (isset($_REQUEST['editor']) && strcmp($_REQUEST['editor'], 'blocks') == 0)) {
 ?>
 
-<script>
-  $(document).ready(function() {
-    setEditor(false);
-    showConsole(false);
-  });
-</script>
+var isBlocky = true;
+$(document).ready(function() {
+  setEditor(false);
+  showConsole(false);
+  resize();
+});
+
+<?php
+} else {
+?>
+
+var isBlocky = false;
 
 <?php
 }
 ?>
+
+</script>
 
 <!-- Source Loader ________________________________________________________ -->
 <?php

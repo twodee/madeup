@@ -13,7 +13,6 @@ Blockly.Variables.allUsedVariables = (function (proxied) {
     list.push('.outerRadius');
     list.push('.radius');
     list.push('nsides');
-    console.log('myAllUsedVariables: ' + list);
     return list;
   };
 })(Blockly.Variables.allUsedVariables);

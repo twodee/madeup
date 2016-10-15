@@ -12,11 +12,9 @@ function showConsole(isShown) {
   if (isShown) {
     $('#console').height(100);
     resize();
-    Blockly.fireUiEvent(window, 'resize');
   } else {
     $('#console').height(0);
     resize();
-    Blockly.fireUiEvent(window, 'resize');
   }
 }
 
@@ -244,7 +242,7 @@ function saveInCookies() {
   if (isGridExtentChanged) Cookies.set('gridExtent', gridExtent);
   if (isShowPointsChanged) Cookies.set('showPoints', showPoints ? 1 : 0);
 
-  // Embedded views had differing size requirements, so we don't try to
+  // Embedded views have differing size requirements, so we don't try to
   // preserve their values long term.
   if (!isEmbedded) {
     if (isFontSizeChanged) Cookies.set('fontSize', fontSize);
@@ -309,8 +307,12 @@ $(document).ready(function() {
       resize();
     }
 
-    if (!isEmbedded && Cookies.get('fontSize')) {
+    if (!isEmbedded && !isBlocky && Cookies.get('fontSize')) {
       fontSize = parseInt(Cookies.get('fontSize'));
+    } else if (isBlocky) {
+      fontSize = 30;
+      $('#menu').css('padding-top', '5px');
+      $('#menu').css('padding-bottom', '5px');
     } else {
       fontSize = 14;
     }
@@ -1021,7 +1023,6 @@ function setEditor(isText) {
   
   // We're heading to blocks.
   else {
-    console.log('to blocks');
     if (!blocklyWorkspace) {
       blocklyWorkspace = Blockly.inject('blocksCanvas', {
         comments: false,
@@ -1476,11 +1477,16 @@ function resize() {
 
   var blocklyArea = document.getElementById('blocksEditor');
   var blocklyDiv = document.getElementById('blocksCanvas');
+
   // Position blocklyDiv over blocklyArea.
   blocklyDiv.style.left = $('#blocksEditor').position().left + 'px';
   blocklyDiv.style.top = $('#blocksEditor').position().top + 'px';
   blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
   $("#blocksCanvas").width(blocklyArea.offsetWidth);
+
+  if (blocklyWorkspace) {
+    Blockly.svgResize(blocklyWorkspace);
+  }
 
   textEditor.resize();
   if (renderer) render();
