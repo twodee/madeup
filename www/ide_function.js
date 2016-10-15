@@ -310,7 +310,7 @@ $(document).ready(function() {
     if (!isEmbedded && !isBlocky && Cookies.get('fontSize')) {
       fontSize = parseInt(Cookies.get('fontSize'));
     } else if (isBlocky) {
-      fontSize = 30;
+      fontSize = 24;
       $('#menu').css('padding-top', '5px');
       $('#menu').css('padding-bottom', '5px');
     } else {
