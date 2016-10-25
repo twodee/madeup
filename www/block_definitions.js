@@ -118,7 +118,7 @@ var block_definitions = {
   'madeup_revolve': {
     config:
       {
-        "message0": "revolve x %1 y %2 z %3 length %4",
+        "message0": "revolve x %1 y %2 z %3 degrees %4",
         "args0": [
           { "type": "input_value", "align": "RIGHT", "name": "X", "check": ["Real", "Integer"] },
           { "type": "input_value", "align": "RIGHT", "name": "Y", "check": ["Real", "Integer"] },
