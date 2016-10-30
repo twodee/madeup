@@ -489,7 +489,7 @@ var block_definitions = {
           { "type": "input_value", "name": "B", "check": ["Integer", "Real"] }
         ],
         "inputsInline": true,
-        "output": ["Integer", "Real"],
+        "output": ["Integer", "Real", "Path", "Mesh"],
         "colour": EXPRESSION_HUE,
         "tooltip": "",
         "helpUrl": "http://www.example.com/"
@@ -826,7 +826,7 @@ var block_definitions = {
           { "type": "input_value", "name": "B", "check": ["Boolean"] }
         ],
         "inputsInline": true,
-        "output": ["Boolean"],
+        "output": ["Boolean", "Mesh"],
         "colour": EXPRESSION_HUE,
         "tooltip": "",
         "helpUrl": "http://www.example.com/"
