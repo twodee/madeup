@@ -26,6 +26,7 @@ MadeupRenderer::MadeupRenderer() :
   axes_attributes(NULL),
   paths_bounding_box(td::QVector3<float>(0.0f), td::QVector3<float>(0.0f)),
   show_heading(true),
+  show_path(true),
   show_stops(true),
   is_two_sided(true),
   has_specular(true),
@@ -140,11 +141,13 @@ void MadeupRenderer::render() {
     line_program->SetUniform("color", path_color[0], path_color[1], path_color[2], path_color[3]);
 
     // Disable depth writes on line strip so that the points appear on top of it.
-    glDepthMask(GL_FALSE);
-    path_arrays[i]->Bind();
-    path_arrays[i]->DrawSequence(GL_LINE_STRIP);
-    path_arrays[i]->Unbind();
-    glDepthMask(GL_TRUE);
+    if (show_path) {
+      glDepthMask(GL_FALSE);
+      path_arrays[i]->Bind();
+      path_arrays[i]->DrawSequence(GL_LINE_STRIP);
+      path_arrays[i]->Unbind();
+      glDepthMask(GL_TRUE);
+    }
 
     if (show_stops) {
       line_program->SetUniform("color", vertex_color[0], vertex_color[1], vertex_color[2], vertex_color[3]);
@@ -676,6 +679,18 @@ bool MadeupRenderer::showHeading() const {
 void MadeupRenderer::showHeading(bool show) {
   show_heading = show;
   // Effect will be seen next frame.
+}
+
+/* ------------------------------------------------------------------------- */
+
+bool MadeupRenderer::showPath() const {
+  return show_path;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupRenderer::showPath(bool show) {
+  show_path = show;
 }
 
 /* ------------------------------------------------------------------------- */

@@ -71,6 +71,7 @@ class MadeupWindow : public QMainWindow {
     QDoubleSpinBox *light_distance_factor_spinner;
 
     QCheckBox *show_heading_checkbox;
+    QCheckBox *show_path_checkbox;
     QCheckBox *show_stops_checkbox;
     QCheckBox *show_console_checkbox;
     QCheckBox *autopathify_checkbox;

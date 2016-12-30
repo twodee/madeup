@@ -140,6 +140,7 @@ MadeupWindow::MadeupWindow(QWidget *parent) :
 
   QGroupBox *path_group = new QGroupBox("Path");
   show_heading_checkbox = new QCheckBox("Show heading");
+  show_path_checkbox = new QCheckBox("Show path");
   show_stops_checkbox = new QCheckBox("Show stops");
 
   QLabel *path_stroke_width_label = new QLabel("Thickness");
@@ -226,15 +227,16 @@ MadeupWindow::MadeupWindow(QWidget *parent) :
   path_group_layout->setVerticalSpacing(5);
   path_group_layout->setContentsMargins(0, 0, 0, 0);
   path_group_layout->addWidget(show_heading_checkbox, 0, 0, 1, 2);
-  path_group_layout->addWidget(show_stops_checkbox, 1, 0, 1, 2);
-  path_group_layout->addWidget(path_stroke_width_label, 2, 0, 1, 1);
-  path_group_layout->addWidget(path_stroke_width_spinner, 2, 1, 1, 1);
-  path_group_layout->addWidget(vertex_size_label, 3, 0, 1, 1);
-  path_group_layout->addWidget(vertex_size_spinner, 3, 1, 1, 1);
-  path_group_layout->addWidget(path_color_label, 4, 0, 1, 1);
-  path_group_layout->addWidget(path_color_button, 4, 1, 1, 1);
-  path_group_layout->addWidget(vertex_color_label, 5, 0, 1, 1);
-  path_group_layout->addWidget(vertex_color_button, 5, 1, 1, 1);
+  path_group_layout->addWidget(show_path_checkbox, 1, 0, 1, 2);
+  path_group_layout->addWidget(show_stops_checkbox, 2, 0, 1, 2);
+  path_group_layout->addWidget(path_stroke_width_label, 3, 0, 1, 1);
+  path_group_layout->addWidget(path_stroke_width_spinner, 3, 1, 1, 1);
+  path_group_layout->addWidget(vertex_size_label, 4, 0, 1, 1);
+  path_group_layout->addWidget(vertex_size_spinner, 4, 1, 1, 1);
+  path_group_layout->addWidget(path_color_label, 5, 0, 1, 1);
+  path_group_layout->addWidget(path_color_button, 5, 1, 1, 1);
+  path_group_layout->addWidget(vertex_color_label, 6, 0, 1, 1);
+  path_group_layout->addWidget(vertex_color_button, 6, 1, 1, 1);
   path_group_layout->setColumnStretch(0, 0);
   path_group_layout->setColumnStretch(1, 1);
 
@@ -721,6 +723,12 @@ MadeupWindow::MadeupWindow(QWidget *parent) :
     canvas->update();
   });
 
+  connect(show_path_checkbox, &QCheckBox::toggled, [=](bool is_checked) {
+    canvas->makeCurrent();
+    renderer->showPath(is_checked);
+    canvas->update();
+  });
+
   connect(show_stops_checkbox, &QCheckBox::toggled, [=](bool is_checked) {
     canvas->makeCurrent();
     renderer->showStops(is_checked);
@@ -1139,6 +1147,9 @@ void MadeupWindow::loadPreferences() {
 
     renderer->showHeading(prefs.get("show.heading", renderer->showHeading()).asBool());
     show_heading_checkbox->setChecked(renderer->showHeading());
+
+    renderer->showHeading(prefs.get("show.path", renderer->showPath()).asBool());
+    show_path_checkbox->setChecked(renderer->showPath());
 
     renderer->showStops(prefs.get("show.stops", renderer->showStops()).asBool());
     show_stops_checkbox->setChecked(renderer->showStops());

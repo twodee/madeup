@@ -42,6 +42,8 @@ class MadeupRenderer {
     void setVertexColor(const td::QVector4<float> &color);
     void showHeading(bool show);
     bool showHeading() const;
+    void showPath(bool show);
+    bool showPath() const;
     void showStops(bool show);
     bool showStops() const;
     void isTwoSided(bool enabled);
@@ -136,6 +138,7 @@ class MadeupRenderer {
     float push;
 
     bool show_heading;
+    bool show_path;
     bool show_stops;
     bool is_two_sided;
     bool has_specular;
