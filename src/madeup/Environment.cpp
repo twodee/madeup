@@ -754,10 +754,11 @@ void Environment::center() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::echo(Co<Trimesh> mesh) {
+Co<Trimesh> Environment::echo(Co<Trimesh> mesh) {
   Trimesh *trimesh(new Trimesh(*mesh));
   *trimesh *= xforms.top();
-  *shapes += *trimesh;
+  return Co<Trimesh>(trimesh);
+  /* *shapes += *trimesh; */
 }
 
 /* ------------------------------------------------------------------------- */

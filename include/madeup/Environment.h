@@ -68,7 +68,7 @@ class Environment {
     int coalesce(float threshold);
     void home();
     void reverse();
-    void echo(td::Co<td::Trimesh> mesh);
+    td::Co<td::Trimesh> echo(td::Co<td::Trimesh> mesh);
     void echo(const std::vector<Node> &path);
     void echoWithoutTransform(td::Co<td::Trimesh> mesh);
     void yaw(float degrees);

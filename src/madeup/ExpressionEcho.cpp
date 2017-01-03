@@ -28,8 +28,8 @@ Co<Expression> ExpressionEcho::evaluate(Environment &env) const {
 
   ExpressionMesh *mesh_value = dynamic_cast<ExpressionMesh *>(value.GetPointer());
   if (mesh_value) {
-    env.echo(mesh_value->toMesh());
-    return ExpressionUnit::getSingleton();
+    return Co<Expression>(new ExpressionMesh(env.echo(mesh_value->toMesh())));
+    /* return ExpressionUnit::getSingleton(); */
   }
 
   ExpressionNodes *turtles_value = dynamic_cast<ExpressionNodes *>(value.GetPointer());
