@@ -35,7 +35,10 @@ function setStatementExpression(block, isExpression) {
   }
 }
 
-function toggleStatementExpression(options) {
+function extractBlock(options) {
+}
+
+function contextMenuPlusPlus(options) {
   var isExpression = !!this.outputConnection;
   var block = this;
   var option = {
@@ -43,6 +46,15 @@ function toggleStatementExpression(options) {
     text: isExpression ? 'Convert to Statement' : 'Convert to Expression',
     callback: function() {
       setStatementExpression(block, !isExpression);
+    }
+  };
+  options.push(option);
+
+  option = {
+    enabled: true,
+    text: 'Disconnect',
+    callback: function() {
+      block.unplug(true);
     }
   };
   options.push(option);
@@ -220,7 +232,7 @@ for (var block_type in block_definitions) {
           this.jsonInit(config);
           Blockly.addClass_(this.svgGroup_, 'wippo');
         },
-        customContextMenu: toggleStatementExpression,
+        customContextMenu: contextMenuPlusPlus,
         mutationToDom: mutationToDom,
         domToMutation: domModeToMutation
       };
@@ -354,7 +366,7 @@ Blockly.Blocks['madeup_array_literal'] = {
       i++;
     }
   },
-  customContextMenu: toggleStatementExpression,
+  customContextMenu: contextMenuPlusPlus,
   // mutationToDom: mutationToDom,
   // domToMutation: domModeToMutation
 };
@@ -371,7 +383,7 @@ Blockly.Blocks['madeup_array_create_with_container'] = {
     this.appendStatementInput('STACK');
     this.contextMenu = false;
   },
-  customContextMenu: toggleStatementExpression,
+  customContextMenu: contextMenuPlusPlus,
   mutationToDom: mutationToDom,
   domToMutation: domModeToMutation
 };
@@ -386,7 +398,7 @@ Blockly.Blocks['madeup_array_element'] = {
     // this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_ITEM_TOOLTIP);
     this.contextMenu = false;
   },
-  customContextMenu: toggleStatementExpression,
+  customContextMenu: contextMenuPlusPlus,
   mutationToDom: mutationToDom,
   domToMutation: domModeToMutation
 };
@@ -469,7 +481,7 @@ function extendBuiltin(id) {
   var oldContextMenu = Blockly.Blocks[id].customContextMenu;
   Blockly.Blocks[id].customContextMenu = function(options) {
     oldContextMenu.call(this, options);
-    toggleStatementExpression.call(this, options);
+    contextMenuPlusPlus.call(this, options);
   };
 
   var oldDomToMutation = Blockly.Blocks[id].domToMutation;

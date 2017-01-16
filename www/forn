@@ -26,7 +26,7 @@ pid = Process.spawn(ARGV.shelljoin)
 begin
   Timeout.timeout(delay) do
     Process.wait pid
-    exit $?.exitstatus
+    exit ($?.exitstatus || 1)
   end
 rescue Timeout::Error
   puts "Uh oh. Execution timed out after #{delay} second#{delay == 1 ? '' : 's'}."

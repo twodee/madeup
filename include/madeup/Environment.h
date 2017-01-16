@@ -86,6 +86,8 @@ class Environment {
     void forget();
     void axis(float x, float y, float z);
     void reframe();
+    void add();
+    void subtract();
 
     void push();
     void pop();
@@ -111,6 +113,9 @@ class Environment {
     std::chrono::high_resolution_clock::time_point start_time;
     int max_seconds;
 
+    static const int MODE_ADD = 0;
+    static const int MODE_SUBTRACT = 1;
+
     static Turtle turtle;
     static stack<Turtle> previous_turtles;
     static vector<Node> run;
@@ -118,6 +123,7 @@ class Environment {
     static std::vector<std::vector<Turtle> > paths;
     static std::stack<td::QMatrix4<float> > xforms;
     static GeometryMode::geometry_mode_t geometry_mode;
+    static int mode;
 };
 
 /* ------------------------------------------------------------------------- */

@@ -156,17 +156,26 @@ Co<Expression> construct_and_color(ExpressionMesh *l_mesh,
                                    operation_t operation) {
   Co<Trimesh> l = l_mesh->toMesh();
   Co<Trimesh> r = r_mesh->toMesh();
+  return Co<Expression>(new ExpressionMesh(construct_and_color(*l, *r, env, operation)));
+}
+
+/* ------------------------------------------------------------------------- */
+
+td::Trimesh *construct_and_color(const Trimesh &l,
+                                 const Trimesh &r,
+                                 Environment &env,
+                                 operation_t operation) {
 
   // If the meshes are both empty, libigl will complain. Let's preempt
   // that. Empty meshes come in when we're not in SURFACE mode or when
   // the user just doesn't visit any vertices before solidifying.
-  if (l->GetVertexCount() == 0 && r->GetVertexCount() == 0) {
+  if (l.GetVertexCount() == 0 && r.GetVertexCount() == 0) {
     Trimesh *trimesh = new Trimesh(0, 0);
     trimesh->AllocateVertexColors();
-    return Co<Expression>(new ExpressionMesh(trimesh));
+    return trimesh;
   }
 
-  Co<Trimesh> diff = MeshBoolean::construct(*l, *r, operation);
+  Trimesh *diff = MeshBoolean::construct(l, r, operation);
 
   Co<Expression> v = env[".rgb"]->evaluate(env);
   ExpressionArrayReference *rgb_value = dynamic_cast<ExpressionArrayReference *>(v.GetPointer());
@@ -191,7 +200,7 @@ Co<Expression> construct_and_color(ExpressionMesh *l_mesh,
     color += 3;
   }
 
-  return Co<Expression>(new ExpressionMesh(diff));
+  return diff;
 }
 
 /* ------------------------------------------------------------------------ */

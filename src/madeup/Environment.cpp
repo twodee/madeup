@@ -11,6 +11,8 @@
 #include "madeup/ExpressionBlobs.h"
 #include "madeup/ExpressionBoxes.h"
 #include "madeup/ExpressionCenter.h"
+#include "madeup/ExpressionModeAdd.h"
+#include "madeup/ExpressionModeSubtract.h"
 #include "madeup/ExpressionCoalesce.h"
 #include "madeup/ExpressionClosure.h"
 #include "madeup/ExpressionCosine.h"
@@ -62,6 +64,7 @@
 #include "madeup/ExpressionTube.h"
 #include "madeup/ExpressionWhere.h"
 #include "madeup/ExpressionYaw.h"
+#include "madeup/MeshBoolean.h"
 #include "twodee/Log.h"
 #include "twodee/Polyline.h"
 #include "twodee/QMath.h"
@@ -85,6 +88,7 @@ Trimesh *Environment::shapes = NULL; //new Trimesh(0, 0);
 vector<vector<Turtle> > Environment::paths;
 GeometryMode::geometry_mode_t Environment::geometry_mode = GeometryMode::SURFACE;
 stack<QMatrix4<float> > Environment::xforms;
+int Environment::mode = MODE_ADD;
 
 /* ------------------------------------------------------------------------- */
 
@@ -111,6 +115,7 @@ Environment::Environment(const Environment &other) :
 
 void Environment::prime() {
   std::vector<string> xyz_splats {"x", "y", "z"};
+  mode = MODE_ADD;
 
   shapes = new Trimesh(0, 0);
   shapes->AllocateVertexColors();
@@ -283,6 +288,9 @@ void Environment::prime() {
 
   Co<ExpressionDefine> define_center(new ExpressionDefine("center", Co<Expression>(new ExpressionCenter())));
 
+  Co<ExpressionDefine> define_add(new ExpressionDefine("add", Co<Expression>(new ExpressionModeAdd())));
+  Co<ExpressionDefine> define_subtract(new ExpressionDefine("subtract", Co<Expression>(new ExpressionModeSubtract())));
+
   Co<ExpressionDefine> define_echo(new ExpressionDefine("echo", Co<Expression>(new ExpressionEcho())));
   define_echo->addFormal("mesh");
 
@@ -395,6 +403,8 @@ void Environment::prime() {
   add("home", Co<ExpressionClosure>(new ExpressionClosure(define_home, globals)));
   add("reverse", Co<ExpressionClosure>(new ExpressionClosure(define_reverse, globals)));
   add("center", Co<ExpressionClosure>(new ExpressionClosure(define_center, globals)));
+  add("add", Co<ExpressionClosure>(new ExpressionClosure(define_add, globals)));
+  add("subtract", Co<ExpressionClosure>(new ExpressionClosure(define_subtract, globals)));
   add("echo", Co<ExpressionClosure>(new ExpressionClosure(define_echo, globals)));
   add("transform", Co<ExpressionClosure>(new ExpressionClosure(define_transform, globals)));
   add("coalesce", Co<ExpressionClosure>(new ExpressionClosure(define_coalesce, globals)));
@@ -453,6 +463,8 @@ void Environment::prime() {
   globals->add("home", (*this)["home"]);
   globals->add("reverse", (*this)["reverse"]);
   globals->add("center", (*this)["center"]);
+  globals->add("add", (*this)["add"]);
+  globals->add("subtract", (*this)["subtract"]);
   globals->add("echo", (*this)["echo"]);
   globals->add("transform", (*this)["transform"]);
   globals->add("coalesce", (*this)["coalesce"]);
@@ -754,11 +766,22 @@ void Environment::center() {
 
 /* ------------------------------------------------------------------------- */
 
+void Environment::add() {
+  mode = MODE_ADD;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void Environment::subtract() {
+  mode = MODE_SUBTRACT;
+}
+
+/* ------------------------------------------------------------------------- */
+
 Co<Trimesh> Environment::echo(Co<Trimesh> mesh) {
   Trimesh *trimesh(new Trimesh(*mesh));
   *trimesh *= xforms.top();
   return Co<Trimesh>(trimesh);
-  /* *shapes += *trimesh; */
 }
 
 /* ------------------------------------------------------------------------- */
@@ -776,7 +799,15 @@ void Environment::echo(const std::vector<Node> &path) {
 /* ------------------------------------------------------------------------- */
 
 void Environment::echoWithoutTransform(Co<Trimesh> mesh) {
-  *shapes += *mesh;
+  if (mode == MODE_ADD) {
+    *shapes += *mesh;
+  } else if (mode == MODE_SUBTRACT) {
+    Trimesh *new_shapes = MeshBoolean::construct_and_color(*shapes, *mesh, *this, MeshBoolean::DIFFERENCE);
+    delete shapes;
+    shapes = new_shapes;
+  } else {
+    throw UnlocatedException("Bad mode. Must be add or subtract.");
+  }
 }
 
 /* ------------------------------------------------------------------------- */

@@ -878,7 +878,7 @@ void MadeupWindow::onRun(GeometryMode::geometry_mode_t geometry_mode) {
         trimesh->DisconnectFaces();
         trimesh->ComputeMeta(true);
       } else {
-        td::Trimesh *sharped = madeup::MeshBoolean::compute_normals(*trimesh, 20);
+        td::Trimesh *sharped = madeup::MeshBoolean::compute_normals(*trimesh, 30);
         delete trimesh;
         trimesh = sharped;
         trimesh->ComputeMeta(false);
