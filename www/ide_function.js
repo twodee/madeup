@@ -501,6 +501,7 @@ $(document).ready(function() {
   $('input[type=radio][name=editorMode]').change(function() {
     hideMenus(); // setEditor may pop open a dialog, which doesn't look good with a menu still open
     var editorMode = $(this).val();
+    console.log(editorMode);
     setEditor(editorMode != "Blocks");
   });
 
@@ -980,6 +981,9 @@ function setTheme(isDark) {
 }
 
 function setEditor(isText) {
+  console.log('is text? ' + isEditorText);
+  console.log('wants text? ' + isText);
+
   // Bail if we're already in the requested mode.
   if (isEditorText == isText) return;
 
@@ -998,6 +1002,7 @@ function setEditor(isText) {
 
   // We're heading to text.
   if (isEditorText) {
+    // If we have blocks, let's offer to convert them to text.
     if (blocklyWorkspace.getTopBlocks().length > 0) {
       $('<div title="Convert">Convert your blocks program to text?</div>').dialog({
         resizable: false,
@@ -1018,6 +1023,8 @@ function setEditor(isText) {
           }
         }
       });
+    } else {
+      switchEditors();
     }
   }
   
