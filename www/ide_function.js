@@ -1620,6 +1620,7 @@ function hideMenus(exceptID) {
 }
 
 function focusEditor() {
+  console.log('focus');
   textEditor.focus();
 }
 
@@ -1644,4 +1645,8 @@ Mousetrap.bind('ctrl+t', function(e) {
     var source = Blockly.Madeup.workspaceToCode(blocklyWorkspace);
     log(source);
   }
+});
+
+Mousetrap.bind('esc', function(e) {
+  parent.focus();
 });
