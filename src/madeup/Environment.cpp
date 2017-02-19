@@ -31,6 +31,7 @@
 #include "madeup/ExpressionInverseSine.h"
 #include "madeup/ExpressionInverseCosine.h"
 #include "madeup/ExpressionInverseTangent.h"
+#include "madeup/ExpressionLoft.h"
 #include "madeup/ExpressionLog.h"
 #include "madeup/ExpressionMagnitude.h"
 #include "madeup/ExpressionMax.h"
@@ -294,6 +295,9 @@ void Environment::prime() {
   Co<ExpressionDefine> define_echo(new ExpressionDefine("echo", Co<Expression>(new ExpressionEcho())));
   define_echo->addFormal("mesh");
 
+  Co<ExpressionDefine> define_loft(new ExpressionDefine("loft", Co<Expression>(new ExpressionLoft())));
+  define_loft->addFormal("paths");
+
   Co<ExpressionDefine> define_transform(new ExpressionDefine("transform", Co<Expression>(new ExpressionTransform())));
   define_transform->addFormal("mesh");
 
@@ -406,6 +410,7 @@ void Environment::prime() {
   add("add", Co<ExpressionClosure>(new ExpressionClosure(define_add, globals)));
   add("subtract", Co<ExpressionClosure>(new ExpressionClosure(define_subtract, globals)));
   add("echo", Co<ExpressionClosure>(new ExpressionClosure(define_echo, globals)));
+  add("loft", Co<ExpressionClosure>(new ExpressionClosure(define_loft, globals)));
   add("transform", Co<ExpressionClosure>(new ExpressionClosure(define_transform, globals)));
   add("coalesce", Co<ExpressionClosure>(new ExpressionClosure(define_coalesce, globals)));
   add("dilate", Co<ExpressionClosure>(new ExpressionClosure(define_dilate, globals)));
