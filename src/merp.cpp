@@ -160,6 +160,7 @@ int main(int argc, char **argv) {
       if (wants_timeout) {
         env.setTimeout(timeout);
       }
+
       /* std::future<void> future = std::async(std::launch::async, [&program, &env] { */
         /* program->evaluate(env); */
       /* }); */

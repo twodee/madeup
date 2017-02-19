@@ -51,6 +51,7 @@ add_library(madeup
   ExpressionInverseTangent.cpp
   ExpressionLesser.cpp
   ExpressionLesserOrEqual.cpp
+  ExpressionLoft.cpp
   ExpressionLog.cpp
   ExpressionMagnitude.cpp
   ExpressionMax.cpp
