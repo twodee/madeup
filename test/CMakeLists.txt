@@ -21,7 +21,7 @@ if(USE_IGL)
     ${MPFR_LIBRARIES}
   )
 
-  target_link_libraries(test_subtract ${IGL_LIBRARIES})
+  target_link_libraries(test_subtract pthread ${IGL_LIBRARIES})
 endif()
 
 configure_file(test_mups ${CMAKE_BINARY_DIR}/test_mups @ONLY)
