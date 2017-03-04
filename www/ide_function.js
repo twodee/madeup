@@ -302,6 +302,9 @@ $(document).ready(function() {
       }
 
       load('untitled');
+    } else if (isPresenting) {
+      $('#left').width(350);
+      resize();
     } else {
       $('#left').width(250);
       resize();
@@ -313,6 +316,8 @@ $(document).ready(function() {
       fontSize = 24;
       $('#menu').css('padding-top', '5px');
       $('#menu').css('padding-bottom', '5px');
+    } else if (isPresenting) {
+      fontSize = 28;
     } else {
       fontSize = 14;
     }

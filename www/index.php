@@ -42,18 +42,19 @@
 
   <script>
     var isEmbedded = false;
+    var isPresenting = false;
     var keystrokesMoviePrefix = null;
   </script>
 
 <?php
 if (array_key_exists('src', $_REQUEST)) {
+  print('<script>isEmbedded = true;</script>');
+}
 ?>
 
-  <script>
-    isEmbedded = true;
-  </script>
-
 <?php
+if (array_key_exists('isPresenting', $_REQUEST)) {
+  print("<script>isPresenting = {$_REQUEST['isPresenting']};</script>");
 }
 ?>
 
