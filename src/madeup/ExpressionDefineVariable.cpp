@@ -27,7 +27,8 @@ Co<Expression> ExpressionDefineVariable::evaluate(Environment &env) const {
   define->setSource(getSource(), getSourceLocation());
   Co<ExpressionClosure> closure(new ExpressionClosure(define, env));
   env.add(name, closure);
-  return ExpressionUnit::getSingleton();
+  /* return ExpressionUnit::getSingleton(); */
+  return rhs_value;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -74,7 +75,8 @@ Co<Expression> ExpressionDefineVariableSeed::evaluate(Environment &env) const {
   srand(seed);
   rand();
 
-  return ExpressionUnit::getSingleton();
+  /* return ExpressionUnit::getSingleton(); */
+  return rhs_value;
 }
 
 /* ------------------------------------------------------------------------- */

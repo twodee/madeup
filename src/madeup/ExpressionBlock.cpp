@@ -1,5 +1,6 @@
 #include "madeup/ExpressionBlock.h"
 #include "madeup/ExpressionClosure.h"
+#include "madeup/ExpressionDefineVariable.h"
 #include "madeup/ExpressionMesh.h"
 #include "madeup/ExpressionUnit.h"
 
@@ -29,13 +30,34 @@ Co<Expression> ExpressionBlock::evaluate(Environment &env) const {
   }
 
   Co<Expression> value(ExpressionUnit::getSingleton());
-  for (vector<Co<Expression> >::const_iterator i = statements.begin(); i != statements.end(); ++i) {
+  int iexpr = 0;
+  for (vector<Co<Expression> >::const_iterator i = statements.begin(); i != statements.end(); ++i, ++iexpr) {
     value = (*i)->evaluate(env);
-    ExpressionMesh *mesh = dynamic_cast<ExpressionMesh *>(value.GetPointer());
-    if (mesh) {
-      env.echoWithoutTransform(mesh->toMesh());
+
+    // Don't issue geometry if expression was an assignment.
+    const ExpressionDefineVariable *define = dynamic_cast<const ExpressionDefineVariable *>(i->GetPointer());
+    if (!define) {
+      ExpressionMesh *mesh = dynamic_cast<ExpressionMesh *>(value.GetPointer());
+      if (mesh) {
+        env.echoWithoutTransform(mesh->toMesh());
+
+        // Disable return of mesh when last expression is a solidifier. We want to avoid this:
+        //
+        // to foo
+        //   moveto 0, 0, 0
+        //   box
+        // end
+        //
+        // foo
+        // 
+        // This would emit double geometry, once on the box call, once on the foo.
+        if (iexpr == getLength() - 1) {
+          value = ExpressionUnit::getSingleton();
+        }
+      }
     }
   }
+
   return value;
 }
 
