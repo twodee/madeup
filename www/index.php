@@ -344,10 +344,18 @@ if (array_key_exists('src', $_REQUEST)) {
 
   <script>
     textEditor.setValue('<?= $src ?>', 1);
+  </script>
+
+<?php
+  if (!array_key_exists('runonload', $_REQUEST) || strcmp($_REQUEST['runonload'], 'true') == 0) {
+?>
+
+  <script>
     run(getSource(), GeometryMode.SURFACE, fit);
   </script>
 
 <?php
+  }
 }
 ?>
 
