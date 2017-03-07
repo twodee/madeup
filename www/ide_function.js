@@ -215,7 +215,11 @@ var isAutorotateChanged = false;
 var isShowPointsChanged = false;
 
 function updateTitle() {
-  $('#toggleFilePopup').attr('value', mupName + (isSourceDirty ? '*' : ''));
+  // The name won't be set in certain situations -- namely, when it's embedded.
+  // Showing it as dirty makes no sense, because it's not a file.
+  if (mupName != null) {
+    $('#toggleFilePopup').attr('value', mupName + (isSourceDirty ? '*' : ''));
+  }
 }
 
 function saveInCookies() {
