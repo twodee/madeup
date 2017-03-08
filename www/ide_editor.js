@@ -8,6 +8,8 @@ textEditor.setSession(ace.createEditSession('', 'ace/mode/madeup'));
 textEditor.setTheme("ace/theme/twilight");
 textEditor.setHighlightSelectedWord(false);
 textEditor.setHighlightActiveLine(false);
+textEditor.setOption("tabSize", 2);
+textEditor.setOption("useSoftTabs", true);
 
 textEditor.commands.removeCommand('togglecomment');
 textEditor.commands.removeCommand('gotoline');

@@ -307,7 +307,8 @@ $(document).ready(function() {
 
       load('untitled');
     } else if (isPresenting) {
-      $('#left').width(350);
+      showConsole(false);
+      $('#left').width(375);
       resize();
     } else {
       $('#left').width(250);
