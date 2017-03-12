@@ -974,6 +974,8 @@ void MadeupWindow::onTextChanged() {
       case Token::RIGHT_CURLY_BRACE:
       case Token::LEFT_BRACKET:
       case Token::RIGHT_BRACKET:
+      case Token::AT_SIGN:
+      case Token::UNKNOWN:
         cursor.setCharFormat(comma_format);
         break;
       case Token::INTEGER:

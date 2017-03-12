@@ -2,6 +2,7 @@
 #include "madeup/ExpressionCall.h"
 #include "madeup/ExpressionClosure.h"
 #include "madeup/ExpressionInteger.h"
+#include "madeup/ExpressionUnknown.h"
 
 using std::string;
 using std::vector;
@@ -68,6 +69,8 @@ Co<Expression> ExpressionCall::evaluate(Environment &env) const {
   Co<Environment> closure_env(new Environment(*closure->getEnvironment()));
   unsigned int ai;
   unsigned int fi;
+  vector<FormalParameter> unknown_formals;
+
   for (ai = 0, fi = 0; ai < parameters.size() && fi < define->getArity(); ++ai, ++fi) {
     const FormalParameter &formal = define->getFormal(fi);
 
@@ -85,34 +88,42 @@ Co<Expression> ExpressionCall::evaluate(Environment &env) const {
     else {
       Co<Expression> actual = parameters[ai]->evaluate(env);
 
-      // If this formal is splattable, let's see if we have an array that we can expand.
-      bool isSplatted = false;
-      if (formal.isSplattable()) {
-        ExpressionArrayReference *array = dynamic_cast<ExpressionArrayReference *>(actual.GetPointer());
-        const vector<string> &splats = formal.getSplats();
-
-        if (array) {
-          for (int si = 0; si < array->getArray()->getSize(); ++si) {
-            string id = splats[si];
-            Co<ExpressionDefine> parameter_define = Co<ExpressionDefine>(new ExpressionDefine(id, (*array->getArray())[si]));
-            Co<ExpressionClosure> parameter_closure = Co<ExpressionClosure>(new ExpressionClosure(parameter_define, Environment()));
-            parameter_closure->setSource(parameters[ai]->getSource(), parameters[ai]->getSourceLocation());
-            closure_env->replace(id, parameter_closure);
-          }
-
-          // Advance iterator past the values we splatted.
-          nactuals += array->getArray()->getSize();
-          fi += array->getArray()->getSize() - 1;
-          isSplatted = true;
-        }
-      }
-
-      if (!isSplatted) {
-        Co<ExpressionDefine> parameter_define = Co<ExpressionDefine>(new ExpressionDefine(formal.getName(), actual));
-        Co<ExpressionClosure> parameter_closure = Co<ExpressionClosure>(new ExpressionClosure(parameter_define, Environment()));
-        parameter_closure->setSource(parameters[ai]->getSource(), parameters[ai]->getSourceLocation());
-        closure_env->replace(formal.getName(), parameter_closure);
+      if (dynamic_cast<ExpressionUnknown *>(actual.GetPointer())) {
+        unknown_formals.push_back(formal);
         ++nactuals;
+      } else if (dynamic_cast<ExpressionClosure *>(actual.GetPointer())) {
+        closure_env->replace(formal.getName(), actual);
+        ++nactuals;
+      } else {
+        // If this formal is splattable, let's see if we have an array that we can expand.
+        bool isSplatted = false;
+        if (formal.isSplattable()) {
+          ExpressionArrayReference *array = dynamic_cast<ExpressionArrayReference *>(actual.GetPointer());
+          const vector<string> &splats = formal.getSplats();
+
+          if (array) {
+            for (int si = 0; si < array->getArray()->getSize(); ++si) {
+              string id = splats[si];
+              Co<ExpressionDefine> parameter_define = Co<ExpressionDefine>(new ExpressionDefine(id, (*array->getArray())[si]));
+              Co<ExpressionClosure> parameter_closure = Co<ExpressionClosure>(new ExpressionClosure(parameter_define, Environment()));
+              parameter_closure->setSource(parameters[ai]->getSource(), parameters[ai]->getSourceLocation());
+              closure_env->replace(id, parameter_closure);
+            }
+
+            // Advance iterator past the values we splatted.
+            nactuals += array->getArray()->getSize();
+            fi += array->getArray()->getSize() - 1;
+            isSplatted = true;
+          }
+        }
+
+        if (!isSplatted) {
+          Co<ExpressionDefine> parameter_define = Co<ExpressionDefine>(new ExpressionDefine(formal.getName(), actual));
+          Co<ExpressionClosure> parameter_closure = Co<ExpressionClosure>(new ExpressionClosure(parameter_define, Environment()));
+          parameter_closure->setSource(parameters[ai]->getSource(), parameters[ai]->getSourceLocation());
+          closure_env->replace(formal.getName(), parameter_closure);
+          ++nactuals;
+        }
       }
     }
   }
@@ -120,7 +131,7 @@ Co<Expression> ExpressionCall::evaluate(Environment &env) const {
   // Make sure there are the correct number of parameters! If ai is short of
   // parameter.size, that means the loop got cut off by the number of formal
   // parameters. The user supplied more than was specified.
-  if (nactuals != define->getArity() || ai < parameters.size()) {
+  if ((nactuals != define->getArity() || ai < parameters.size())) {
     std::stringstream ss;
     ss << getSourceLocation().toAnchor() << ": I expect function " << define->getName() << " to be given " << define->getArity() << " parameter";
     if (define->getArity() != 1) {
@@ -139,10 +150,16 @@ Co<Expression> ExpressionCall::evaluate(Environment &env) const {
     throw MessagedException(ss.str());
   }
 
-  try {
-    return closure->evaluate(*closure_env);
-  } catch (UnlocatedException e) {
-    throw MessagedException(getSourceLocation().toAnchor() + ": " + e.GetMessage());
+  if (unknown_formals.size() > 0) {
+    Co<ExpressionDefine> partial_define(new ExpressionDefine("ooo", define->getBody(), unknown_formals));
+    Co<ExpressionClosure> partial_closure(new ExpressionClosure(partial_define, closure_env));
+    return partial_closure;
+  } else {
+    try {
+      return closure->evaluate(*closure_env);
+    } catch (UnlocatedException e) {
+      throw MessagedException(getSourceLocation().toAnchor() + ": " + e.GetMessage());
+    }
   }
 }
 

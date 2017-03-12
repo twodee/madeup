@@ -50,6 +50,8 @@ const std::string Token::getTypeString() const {
   switch (type) {
     case COMMENT:
       return "COMMENT";
+    case AT_SIGN:
+      return "AT_SIGN";
     case LEFT_PARENTHESIS:
       return "LEFT_PARENTHESIS";
     case RIGHT_PARENTHESIS:
@@ -60,6 +62,8 @@ const std::string Token::getTypeString() const {
       return "NOTHING";
     case CIRCUMFLEX:
       return "CIRCUMFLEX";
+    case UNKNOWN:
+      return "UNKNOWN";
     case AROUND:
       return "AROUND";
     case ID:

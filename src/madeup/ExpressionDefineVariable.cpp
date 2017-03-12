@@ -23,11 +23,22 @@ ExpressionDefineVariable::ExpressionDefineVariable(const string &name, Co<Expres
 Co<Expression> ExpressionDefineVariable::evaluate(Environment &env) const {
   Co<Expression> rhs_value = rhs->evaluate(env);
   rhs_value->setSource(rhs->getSource(), rhs->getSourceLocation());
-  Co<ExpressionDefine> define = Co<ExpressionDefine>(new ExpressionDefine(name, rhs_value));
-  define->setSource(getSource(), getSourceLocation());
-  Co<ExpressionClosure> closure(new ExpressionClosure(define, env));
-  env.add(name, closure);
-  /* return ExpressionUnit::getSingleton(); */
+  
+  // If right-hand side is a closure already, as we would get from partial
+  // function evaluation, we can just add it in directly.
+  if (dynamic_cast<ExpressionClosure *>(rhs_value.GetPointer())) {
+    env.add(name, rhs_value);
+  }
+
+  // Otherwise, we wrap up a binding between the ID and a closure. Why do 
+  // I do this again? TODO.
+  else {
+    Co<ExpressionDefine> define = Co<ExpressionDefine>(new ExpressionDefine(name, rhs_value));
+    define->setSource(getSource(), getSourceLocation());
+    Co<ExpressionClosure> closure(new ExpressionClosure(define, env));
+    env.add(name, closure);
+  }
+
   return rhs_value;
 }
 

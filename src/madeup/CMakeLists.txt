@@ -31,6 +31,7 @@ add_library(madeup
   ExpressionDefineElement.cpp
   ExpressionDefineVariable.cpp
   ExpressionDilate.cpp
+  ExpressionDistort.cpp
   ExpressionDivide.cpp
   ExpressionDot.cpp
   ExpressionSpheres.cpp
@@ -43,6 +44,7 @@ add_library(madeup
   ExpressionGreater.cpp
   ExpressionGreaterOrEqual.cpp
   ExpressionHome.cpp
+  ExpressionIdentifier.cpp
   ExpressionIdentity.cpp
   ExpressionIf.cpp
   ExpressionInteger.cpp
@@ -102,6 +104,7 @@ add_library(madeup
   ExpressionTransform.cpp
   ExpressionTube.cpp
   ExpressionUnit.cpp
+  ExpressionUnknown.cpp
   ExpressionWhere.cpp
   ExpressionWhile.cpp
   ExpressionYaw.cpp

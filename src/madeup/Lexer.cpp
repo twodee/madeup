@@ -103,6 +103,10 @@ Token Lexer::getToken() {
     return makeToken(Token::TIMES);
   } else if (c == '%') {
     return makeToken(Token::REMAINDER);
+  } else if (c == '@') {
+    return makeToken(Token::AT_SIGN);
+  } else if (c == '?') {
+    return makeToken(Token::UNKNOWN);
   } else if (c == '|') {
     return makeToken(Token::PIPE);
   } else if (c == ',') {

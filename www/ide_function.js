@@ -1285,6 +1285,29 @@ function run(source, mode, pingback) {
             log('The geometry I got back had some funny stuff in it that I didn\'t know how to read.');
           }
         } else {
+          var lineMaterialDepthNotColor = new THREE.LineBasicMaterial({
+            color: 0xCC6600,
+            linewidth: 3,
+            colorWrite: false,
+            depthWrite: true
+          });
+          var lineMaterialColorNotDepth = lineMaterialDepthNotColor.clone();
+          lineMaterialColorNotDepth.depthWrite = false;
+          lineMaterialColorNotDepth.colorWrite = true;
+
+          var pointsMaterialDepthNotColor = new THREE.PointsMaterial({
+            color: 0x000000,
+            size: 8,
+            sizeAttenuation: false,
+            map: vertexTexture,
+            alphaTest: 0.5,
+            colorWrite: false,
+            depthWrite: true
+          });
+          var pointsMaterialColorNotDepth = pointsMaterialDepthNotColor.clone();
+          pointsMaterialColorNotDepth.depthWrite = false;
+          pointsMaterialColorNotDepth.colorWrite = true;
+
           var paths = [];
           try {
             paths = JSON.parse(data['model']);
@@ -1293,25 +1316,25 @@ function run(source, mode, pingback) {
           }
 
           allGeometry = new THREE.Geometry();
-          if (showPoints) {
-            var dotsGeometry = new THREE.Geometry();
-          }
 
           for (var pi = 0; pi < paths.length; ++pi) {
             var geometry = new THREE.Geometry();
+            var dotsGeometry = new THREE.Geometry();
             for (var i = 0; i < paths[pi].vertices.length; ++i) {
               var v = new THREE.Vector3(paths[pi].vertices[i][0], paths[pi].vertices[i][1], paths[pi].vertices[i][2]);
               geometry.vertices.push(v);
-              if (showPoints) {
+              if (!showHeadings || i < paths[pi].vertices.length - 1) {
                 dotsGeometry.vertices.push(v);
               }
               allGeometry.vertices.push(v);
             }
-            meshes[meshes.length] = new THREE.Line(geometry, new THREE.LineBasicMaterial({
-              // color: 0x6666FF,
-              color: 0xCC6600,
-              linewidth: 3
-            }));
+
+            meshes[meshes.length] = new THREE.Line(geometry, lineMaterialColorNotDepth);
+            meshes[meshes.length - 1].renderOrder = 0;
+            if (showPoints) {
+              meshes[meshes.length] = new THREE.Points(dotsGeometry, pointsMaterialColorNotDepth);
+              meshes[meshes.length - 1].renderOrder = 0;
+            }
 
             var nvertices = paths[pi].vertices.length;
             if (showHeadings && nvertices > 0) {
@@ -1345,16 +1368,16 @@ function run(source, mode, pingback) {
               meshes[meshes.length] = new THREE.Mesh(g2, new THREE.MeshLambertMaterial({
                 color: 0x0000ff,
               }));
+              meshes[meshes.length - 1].renderOrder = 1;
               modelScene.add(meshes[meshes.length - 1]);
             }
-          }
 
-          if (showPoints) {
-            meshes[meshes.length] = new THREE.Points(dotsGeometry, new THREE.PointsMaterial({
-              color: 0x000000,
-              size: 8,
-              sizeAttenuation: false
-            }));
+            meshes[meshes.length] = new THREE.Line(geometry, lineMaterialDepthNotColor);
+            meshes[meshes.length - 1].renderOrder = 2;
+            if (showPoints) {
+              meshes[meshes.length] = new THREE.Points(dotsGeometry, pointsMaterialDepthNotColor);
+              meshes[meshes.length - 1].renderOrder = 2;
+            }
           }
         }
 
@@ -1539,7 +1562,11 @@ function highlight(startIndex, stopIndex) {
   textEditor.centerSelection();
 }
 
+var vertexTexture;
 function init() {
+  var loader = new THREE.TextureLoader();
+  vertexTexture = loader.load('vertex.png');
+
   camera = new THREE.PerspectiveCamera(45.0, 1.0, 0.1, 10000.0);
   // camera = new THREE.OrthographicCamera(-50, 50, 50, -50, -100, 100);
   camera.position.z = 30;

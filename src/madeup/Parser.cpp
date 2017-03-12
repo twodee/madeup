@@ -18,6 +18,7 @@
 #include "madeup/ExpressionFor.h"
 #include "madeup/ExpressionGreater.h"
 #include "madeup/ExpressionGreaterOrEqual.h"
+#include "madeup/ExpressionIdentifier.h"
 #include "madeup/ExpressionIf.h"
 #include "madeup/ExpressionInteger.h"
 #include "madeup/ExpressionLesser.h"
@@ -39,6 +40,7 @@
 #include "madeup/ExpressionSubrange.h"
 #include "madeup/ExpressionSubtract.h"
 #include "madeup/ExpressionUnit.h"
+#include "madeup/ExpressionUnknown.h"
 #include "madeup/ExpressionWhile.h"
 #include "madeup/Lexer.h"
 #include "madeup/Parser.h"
@@ -80,6 +82,8 @@ bool Parser::isInExpressionFirst(int k) const {
          isUp(Token::STRING, k) ||
          isUp(Token::TRUE, k) ||
          isUp(Token::FALSE, k) ||
+         isUp(Token::AT_SIGN, k) ||
+         isUp(Token::UNKNOWN, k) ||
          isUp(Token::IF, k) ||
          isUp(Token::FOR, k) ||
          isUp(Token::REPEAT, k) ||
@@ -498,6 +502,21 @@ void Parser::atom() {
     expressions.push(Co<Expression>(new ExpressionBoolean(false)));
     expressions.top()->setSource(getSubsource(tokens[i].getLocation()), tokens[i].getLocation());
     ++i;
+  } else if (isUp(Token::UNKNOWN)) {
+    expressions.push(Co<Expression>(new ExpressionUnknown()));
+    expressions.top()->setSource(getSubsource(tokens[i].getLocation()), tokens[i].getLocation());
+    ++i;
+  } else if (isUp(Token::AT_SIGN)) {
+    ++i;
+    if (isUp(Token::ID)) {
+      expressions.push(Co<Expression>(new ExpressionIdentifier(tokens[i].getText())));
+      expressions.top()->setSource(getSubsource(tokens[i].getLocation()), tokens[i].getLocation());
+      ++i;
+    } else {
+      std::stringstream ss;
+      ss << tokens[i].getLocation().toAnchor() << ": I expected an identifier after @.";
+      throw MessagedException(ss.str());
+    }
   } else if (isUp(Token::NOTHING)) {
     expressions.push(ExpressionUnit::getSingleton());
     expressions.top()->setSource(getSubsource(tokens[i].getLocation()), tokens[i].getLocation());

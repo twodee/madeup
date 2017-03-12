@@ -15,6 +15,7 @@ class Token {
       COLON,
       CIRCUMFLEX,
       ID,
+      AT_SIGN,
       LEFT_BRACKET,
       RIGHT_BRACKET,
       LEFT_CURLY_BRACE,
@@ -59,7 +60,8 @@ class Token {
       NOTHING,
       AROUND,
       COMMENT,
-      END_OF_FILE
+      END_OF_FILE,
+      UNKNOWN
     };
 
     Token(token_t type,

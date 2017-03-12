@@ -19,6 +19,7 @@
 #include "madeup/ExpressionCross.h"
 #include "madeup/ExpressionDebug.h"
 #include "madeup/ExpressionDilate.h"
+#include "madeup/ExpressionDistort.h"
 #include "madeup/ExpressionDot.h"
 #include "madeup/ExpressionSpheres.h"
 #include "madeup/ExpressionDowel.h"
@@ -264,6 +265,10 @@ void Environment::prime() {
   define_moveto->addFormal("z");
   define_moveto->splat("x", xyz_splats);
 
+  Co<ExpressionDefine> define_distort(new ExpressionDefine("distort", Co<Expression>(new ExpressionDistort())));
+  define_distort->addFormal("f");
+  define_distort->addFormal("mesh");
+
   Co<ExpressionDefine> define_scale(new ExpressionDefine("scale", Co<Expression>(new ExpressionScale())));
   define_scale->addFormal("x");
   define_scale->addFormal("y");
@@ -400,6 +405,7 @@ void Environment::prime() {
   add("move", Co<ExpressionClosure>(new ExpressionClosure(define_move, globals)));
   add("movex", Co<ExpressionClosure>(new ExpressionClosure(define_movex, globals)));
   add("moveto", Co<ExpressionClosure>(new ExpressionClosure(define_moveto, globals)));
+  add("distort", Co<ExpressionClosure>(new ExpressionClosure(define_distort, globals)));
   add("scale", Co<ExpressionClosure>(new ExpressionClosure(define_scale, globals)));
   add("translate", Co<ExpressionClosure>(new ExpressionClosure(define_translate, globals)));
   add("rotate", Co<ExpressionClosure>(new ExpressionClosure(define_rotate, globals)));
@@ -438,67 +444,68 @@ void Environment::prime() {
   add("pop", Co<ExpressionClosure>(new ExpressionClosure(define_pop, globals)));
   add("print", Co<ExpressionClosure>(new ExpressionClosure(define_print, globals)));
 
-  globals->add("atan", (*this)["atan"]);
-  globals->add("yaw", (*this)["yaw"]);
-  globals->add("pitch", (*this)["pitch"]);
-  globals->add("roll", (*this)["roll"]);
-  globals->add("push", (*this)["push"]);
-  globals->add("pop", (*this)["pop"]);
-  globals->add("dowel", (*this)["dowel"]);
-  globals->add("tube", (*this)["tube"]);
-  globals->add("polygon", (*this)["polygon"]);
-  globals->add("revolve", (*this)["revolve"]);
-  globals->add("box", (*this)["box"]);
-  globals->add("boxes", (*this)["boxes"]);
-  globals->add("sphere", (*this)["sphere"]);
-  globals->add("spheres", (*this)["spheres"]);
-  globals->add("print", (*this)["print"]);
-  globals->add("debug", (*this)["debug"]);
-  globals->add("atan2", (*this)["atan2"]);
-  globals->add("where", (*this)["where"]);
-  globals->add("reframe", (*this)["reframe"]);
   globals->add("acos", (*this)["acos"]);
-  globals->add("move", (*this)["move"]);
-  globals->add("moveto", (*this)["moveto"]);
-  globals->add("movex", (*this)["movex"]);
-  globals->add("scale", (*this)["scale"]);
-  globals->add("translate", (*this)["translate"]);
-  globals->add("rotate", (*this)["rotate"]);
-  globals->add("identity", (*this)["identity"]);
-  globals->add("home", (*this)["home"]);
-  globals->add("reverse", (*this)["reverse"]);
-  globals->add("center", (*this)["center"]);
   globals->add("add", (*this)["add"]);
-  globals->add("subtract", (*this)["subtract"]);
-  globals->add("echo", (*this)["echo"]);
-  globals->add("transform", (*this)["transform"]);
-  globals->add("coalesce", (*this)["coalesce"]);
-  globals->add("dilate", (*this)["dilate"]);
-  globals->add("axis", (*this)["axis"]);
-  globals->add("surface", (*this)["surface"]);
-  globals->add("random", (*this)["random"]);
-  globals->add("max", (*this)["max"]);
-  globals->add("min", (*this)["min"]);
-  globals->add("sign", (*this)["sign"]);
   globals->add("all", (*this)["all"]);
   globals->add("any", (*this)["any"]);
   globals->add("asin", (*this)["asin"]);
-  globals->add("tan", (*this)["tan"]);
-  globals->add("log", (*this)["log"]);
+  globals->add("atan", (*this)["atan"]);
+  globals->add("atan2", (*this)["atan2"]);
+  globals->add("axis", (*this)["axis"]);
+  globals->add("box", (*this)["box"]);
+  globals->add("boxes", (*this)["boxes"]);
+  globals->add("center", (*this)["center"]);
+  globals->add("coalesce", (*this)["coalesce"]);
   globals->add("cos", (*this)["cos"]);
-  globals->add("size", (*this)["size"]);
-  globals->add("normalize", (*this)["normalize"]);
-  globals->add("magnitude", (*this)["magnitude"]);
-  globals->add("dot", (*this)["dot"]);
   globals->add("cross", (*this)["cross"]);
-  globals->add("sin", (*this)["sin"]);
+  globals->add("debug", (*this)["debug"]);
+  globals->add("dilate", (*this)["dilate"]);
+  globals->add("distort", (*this)["distort"]);
+  globals->add("dot", (*this)["dot"]);
+  globals->add("dowel", (*this)["dowel"]);
+  globals->add("echo", (*this)["echo"]);
   globals->add("extrude", (*this)["extrude"]);
   globals->add("forget", (*this)["forget"]);
-  globals->add("path", (*this)["path"]);
-  globals->add("where", (*this)["where"]);
   globals->add("forward", (*this)["forward"]);
+  globals->add("home", (*this)["home"]);
+  globals->add("identity", (*this)["identity"]);
+  globals->add("log", (*this)["log"]);
+  globals->add("magnitude", (*this)["magnitude"]);
+  globals->add("max", (*this)["max"]);
+  globals->add("min", (*this)["min"]);
+  globals->add("move", (*this)["move"]);
+  globals->add("moveto", (*this)["moveto"]);
+  globals->add("movex", (*this)["movex"]);
+  globals->add("normalize", (*this)["normalize"]);
+  globals->add("path", (*this)["path"]);
+  globals->add("pitch", (*this)["pitch"]);
+  globals->add("polygon", (*this)["polygon"]);
+  globals->add("pop", (*this)["pop"]);
+  globals->add("print", (*this)["print"]);
+  globals->add("push", (*this)["push"]);
+  globals->add("random", (*this)["random"]);
+  globals->add("reframe", (*this)["reframe"]);
+  globals->add("reverse", (*this)["reverse"]);
+  globals->add("revolve", (*this)["revolve"]);
   globals->add("right", (*this)["right"]);
+  globals->add("roll", (*this)["roll"]);
+  globals->add("rotate", (*this)["rotate"]);
+  globals->add("scale", (*this)["scale"]);
+  globals->add("sign", (*this)["sign"]);
+  globals->add("sin", (*this)["sin"]);
+  globals->add("size", (*this)["size"]);
+  globals->add("sphere", (*this)["sphere"]);
+  globals->add("spheres", (*this)["spheres"]);
+  globals->add("subtract", (*this)["subtract"]);
+  globals->add("surface", (*this)["surface"]);
+  globals->add("tan", (*this)["tan"]);
+  globals->add("transform", (*this)["transform"]);
+  globals->add("translate", (*this)["translate"]);
+  globals->add("tube", (*this)["tube"]);
   globals->add("up", (*this)["up"]);
+  globals->add("where", (*this)["where"]);
+  globals->add("where", (*this)["where"]);
+  globals->add("yaw", (*this)["yaw"]);
 }
 
 /* ------------------------------------------------------------------------- */
