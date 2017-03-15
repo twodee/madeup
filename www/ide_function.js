@@ -991,9 +991,6 @@ function setTheme(isDark) {
 }
 
 function setEditor(isText) {
-  console.log('is text? ' + isEditorText);
-  console.log('wants text? ' + isText);
-
   // Bail if we're already in the requested mode.
   if (isEditorText == isText) return;
 
@@ -1320,10 +1317,20 @@ function run(source, mode, pingback) {
           for (var pi = 0; pi < paths.length; ++pi) {
             var geometry = new THREE.Geometry();
             var dotsGeometry = new THREE.Geometry();
+            var iLastUnique = paths[pi].vertices.length - 1;
+            for (var i = paths[pi].vertices.length - 1; i > 0; --i) {
+              var curr = new THREE.Vector3(paths[pi].vertices[i][0], paths[pi].vertices[i][1], paths[pi].vertices[i][2]);
+              var prev = new THREE.Vector3(paths[pi].vertices[i - 1][0], paths[pi].vertices[i - 1][1], paths[pi].vertices[i - 1][2]);
+              if (!curr.equals(prev)) {
+                break;
+              } else {
+                --iLastUnique;
+              }
+            }
             for (var i = 0; i < paths[pi].vertices.length; ++i) {
               var v = new THREE.Vector3(paths[pi].vertices[i][0], paths[pi].vertices[i][1], paths[pi].vertices[i][2]);
               geometry.vertices.push(v);
-              if (!showHeadings || i < paths[pi].vertices.length - 1) {
+              if (!showHeadings || i < iLastUnique) {
                 dotsGeometry.vertices.push(v);
               }
               allGeometry.vertices.push(v);

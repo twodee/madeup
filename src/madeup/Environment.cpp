@@ -160,9 +160,9 @@ void Environment::prime() {
   add("flip", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("flip", Co<Expression>(new ExpressionBoolean(false)))), Environment())));
 
   ExpressionArray *rgb = new ExpressionArray(3);
-  rgb->setElement(0, Co<Expression>(new ExpressionReal(1.0f)));
-  rgb->setElement(1, Co<Expression>(new ExpressionReal(0.0f)));
-  rgb->setElement(2, Co<Expression>(new ExpressionReal(0.0f)));
+  rgb->setElement(0, Co<Expression>(new ExpressionReal(100 / 255.0f)));
+  rgb->setElement(1, Co<Expression>(new ExpressionReal(149 / 255.0f)));
+  rgb->setElement(2, Co<Expression>(new ExpressionReal(237 / 255.0f)));
   add(".rgb", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine(".rgb", Co<Expression>(new ExpressionArrayReference(Co<ExpressionArray>(rgb))))), Environment())));
 
   globals->add(".rgb", (*this)[".rgb"]);
