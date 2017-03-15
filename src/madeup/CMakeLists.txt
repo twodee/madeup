@@ -34,13 +34,13 @@ add_library(madeup
   ExpressionDistort.cpp
   ExpressionDivide.cpp
   ExpressionDot.cpp
-  ExpressionSpheres.cpp
   ExpressionDowel.cpp
   ExpressionEcho.cpp
   ExpressionEqual.cpp
   ExpressionExtrude.cpp
   ExpressionFor.cpp
   ExpressionForget.cpp
+  ExpressionFracture.cpp
   ExpressionGreater.cpp
   ExpressionGreaterOrEqual.cpp
   ExpressionHome.cpp
@@ -94,6 +94,7 @@ add_library(madeup
   ExpressionSign.cpp
   ExpressionSine.cpp
   ExpressionSize.cpp
+  ExpressionSpheres.cpp
   ExpressionString.cpp
   ExpressionSubrange.cpp
   ExpressionSubscript.cpp

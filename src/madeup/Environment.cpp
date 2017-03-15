@@ -21,11 +21,11 @@
 #include "madeup/ExpressionDilate.h"
 #include "madeup/ExpressionDistort.h"
 #include "madeup/ExpressionDot.h"
-#include "madeup/ExpressionSpheres.h"
 #include "madeup/ExpressionDowel.h"
 #include "madeup/ExpressionEcho.h"
 #include "madeup/ExpressionExtrude.h"
 #include "madeup/ExpressionForget.h"
+#include "madeup/ExpressionFracture.h"
 #include "madeup/ExpressionHome.h"
 #include "madeup/ExpressionIdentity.h"
 #include "madeup/ExpressionInteger.h"
@@ -59,6 +59,7 @@
 #include "madeup/ExpressionSign.h"
 #include "madeup/ExpressionSine.h"
 #include "madeup/ExpressionSize.h"
+#include "madeup/ExpressionSpheres.h"
 #include "madeup/ExpressionSurface.h"
 #include "madeup/ExpressionTangent.h"
 #include "madeup/ExpressionTransform.h"
@@ -144,7 +145,6 @@ void Environment::prime() {
   add(".outerRadius", radius_closure);
   add(".innerRadius", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine(".innerRadius", Co<Expression>(new ExpressionReal(0.5f)))), Environment())));
   add("nsides", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("nsides", Co<Expression>(new ExpressionInteger(4)))), Environment())));
-  add("fracture", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("fracture", Co<Expression>(new ExpressionReal(100)))), Environment())));
   add("pi", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("pi", Co<Expression>(new ExpressionReal(td::PI)))), Environment())));
   add("e", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("e", Co<Expression>(new ExpressionReal(td::E)))), Environment())));
   add("twist", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("twist", Co<Expression>(new ExpressionReal(45.0f)))), Environment())));
@@ -169,7 +169,6 @@ void Environment::prime() {
   globals->add(".outerRadius", (*this)[".outerRadius"]);
   globals->add(".innerRadius", (*this)[".innerRadius"]);
   globals->add("nsides", (*this)["nsides"]);
-  globals->add("fracture", (*this)["fracture"]);
   globals->add("pi", (*this)["pi"]);
   globals->add("e", (*this)["e"]);
   globals->add("twist", (*this)["twist"]);
@@ -309,6 +308,10 @@ void Environment::prime() {
   Co<ExpressionDefine> define_coalesce(new ExpressionDefine("coalesce", Co<Expression>(new ExpressionCoalesce())));
   define_coalesce->addFormal("threshold");
 
+  Co<ExpressionDefine> define_fracture(new ExpressionDefine("fracture", Co<Expression>(new ExpressionFracture())));
+  define_fracture->addFormal("length");
+  define_fracture->addFormal("path");
+
   Co<ExpressionDefine> define_dilate(new ExpressionDefine("dilate", Co<Expression>(new ExpressionDilate())));
   define_dilate->addFormal("path");
   define_dilate->addFormal("length");
@@ -419,6 +422,7 @@ void Environment::prime() {
   add("loft", Co<ExpressionClosure>(new ExpressionClosure(define_loft, globals)));
   add("transform", Co<ExpressionClosure>(new ExpressionClosure(define_transform, globals)));
   add("coalesce", Co<ExpressionClosure>(new ExpressionClosure(define_coalesce, globals)));
+  add("fracture", Co<ExpressionClosure>(new ExpressionClosure(define_fracture, globals)));
   add("dilate", Co<ExpressionClosure>(new ExpressionClosure(define_dilate, globals)));
   add("axis", Co<ExpressionClosure>(new ExpressionClosure(define_axis, globals)));
   add("blobs", Co<ExpressionClosure>(new ExpressionClosure(define_blobs, globals)));
@@ -456,6 +460,7 @@ void Environment::prime() {
   globals->add("boxes", (*this)["boxes"]);
   globals->add("center", (*this)["center"]);
   globals->add("coalesce", (*this)["coalesce"]);
+  globals->add("fracture", (*this)["fracture"]);
   globals->add("cos", (*this)["cos"]);
   globals->add("cross", (*this)["cross"]);
   globals->add("debug", (*this)["debug"]);
