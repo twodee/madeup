@@ -815,6 +815,16 @@ void Environment::echo(const std::vector<Node> &path) {
 
 /* ------------------------------------------------------------------------- */
 
+void Environment::echoWithoutTransform(const std::vector<Node> &path) {
+  for (auto node : path) {
+    Turtle path_turtle = {node.position, turtle.camera};
+    paths[paths.size() - 1].push_back(path_turtle);
+    run.push_back(node);
+  }
+}
+
+/* ------------------------------------------------------------------------- */
+
 void Environment::echoWithoutTransform(Co<Trimesh> mesh) {
   if (mode == MODE_ADD) {
     *shapes += *mesh;

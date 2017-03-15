@@ -2,6 +2,7 @@
 #include "madeup/ExpressionClosure.h"
 #include "madeup/ExpressionDefineVariable.h"
 #include "madeup/ExpressionMesh.h"
+#include "madeup/ExpressionNodes.h"
 #include "madeup/ExpressionUnit.h"
 
 using std::vector;
@@ -53,6 +54,14 @@ Co<Expression> ExpressionBlock::evaluate(Environment &env) const {
         // This would emit double geometry, once on the box call, once on the foo.
         if (iexpr == getLength() - 1) {
           value = ExpressionUnit::getSingleton();
+        }
+      } else {
+        ExpressionNodes *nodes = dynamic_cast<ExpressionNodes *>(value.GetPointer());
+        if (nodes) {
+          env.echoWithoutTransform(nodes->getPath());
+          if (iexpr == getLength() - 1) {
+            value = ExpressionUnit::getSingleton();
+          }
         }
       }
     }

@@ -70,6 +70,7 @@ class Environment {
     void reverse();
     td::Co<td::Trimesh> echo(td::Co<td::Trimesh> mesh);
     void echo(const std::vector<Node> &path);
+    void echoWithoutTransform(const std::vector<Node> &path);
     void echoWithoutTransform(td::Co<td::Trimesh> mesh);
     void yaw(float degrees);
     void pitch(float degrees);
