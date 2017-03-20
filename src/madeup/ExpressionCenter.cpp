@@ -1,9 +1,13 @@
 #include "madeup/ExpressionCenter.h"
 #include "madeup/ExpressionClosure.h"
+#include "madeup/ExpressionNodes.h"
 #include "madeup/ExpressionNumber.h"
+#include "madeup/ExpressionObject.h"
 #include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionUnit.h"
+#include "madeup/ExpressionUtilities.h"
 #include "twodee/MessagedException.h"
+#include <typeinfo>
 
 using namespace td;
 
@@ -18,8 +22,8 @@ ExpressionCenter::ExpressionCenter() :
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionCenter::evaluate(Environment &env) const {
-  env.center();
-  return Co<Expression>(ExpressionUnit::getSingleton());
+  Co<ExpressionObject> object = ExpressionUtilities::lookup<ExpressionObject>("object", "path or mesh", "center", env);
+  return object->center();
 }
 
 /* ------------------------------------------------------------------------- */

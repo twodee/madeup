@@ -292,6 +292,7 @@ void Environment::prime() {
   Co<ExpressionDefine> define_reverse(new ExpressionDefine("reverse", Co<Expression>(new ExpressionReverse())));
 
   Co<ExpressionDefine> define_center(new ExpressionDefine("center", Co<Expression>(new ExpressionCenter())));
+  define_center->addFormal("object");
 
   Co<ExpressionDefine> define_add(new ExpressionDefine("add", Co<Expression>(new ExpressionModeAdd())));
   Co<ExpressionDefine> define_subtract(new ExpressionDefine("subtract", Co<Expression>(new ExpressionModeSubtract())));
