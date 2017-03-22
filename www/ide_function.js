@@ -173,7 +173,6 @@ function yyyymmdd() {
 }
 
 var isDownloading = false;
-var swatch = null;
 var initialized = false;
 var mupName = null;
 var overallScene;
@@ -284,9 +283,12 @@ $(document).ready(function() {
   // When we are embedded in an iframe, the wheel event will cause the
   // embedding context to scroll. That's not what we want, so we capture and
   // squelch any wheel events.
-  document.body.addEventListener('wheel', function (e) {
-    e.preventDefault();
-  });
+  if (isEmbedded) {
+    document.body.addEventListener('wheel', function (e) {
+      e.preventDefault();
+    });
+    // TODO: confirm that this works as intended.
+  }
 
   $(window).load(function() {
     $('#textEditor textarea').addClass('mousetrap');
@@ -1656,10 +1658,6 @@ function hideMenus(exceptID) {
   } else {
     $('.popup').not(exceptID).hide();
     $('.togglePopup').not('#toggle' + exceptID.charAt(1).toUpperCase() + exceptID.substring(2)).removeClass('open').addClass('closed');
-  }
-
-  if (swatch) {
-    swatch.ColorPickerHide();
   }
 }
 
