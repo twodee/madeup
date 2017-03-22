@@ -3,7 +3,6 @@
 
 #include "madeup/Expression.h"
 #include "madeup/ExpressionObject.h"
-#include "madeup/Centerable.h"
 #include "twodee/Trimesh.h"
 
 namespace madeup {

@@ -7,7 +7,6 @@
 #include "madeup/ExpressionUnit.h"
 #include "madeup/ExpressionUtilities.h"
 #include "twodee/MessagedException.h"
-#include <typeinfo>
 
 using namespace td;
 
