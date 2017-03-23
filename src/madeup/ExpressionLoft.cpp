@@ -51,12 +51,12 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
   /* ExpressionInteger *debugi = dynamic_cast<ExpressionInteger *>(debug_value.GetPointer()); */
   /* std::cout << "debugi->toInteger(): " << debugi->toInteger() << std::endl; */
 
-  for (int i = 0; i < paths.size(); ++i) {
-    for (int j = 0; j < paths[i].size(); ++j) {
-      std::cout << "paths[" << i << "][" << j << "]: " << paths[i][j].position << std::endl;
-    }
-    std::cout << "" << std::endl;
-  }
+  /* for (int i = 0; i < paths.size(); ++i) { */
+    /* for (int j = 0; j < paths[i].size(); ++j) { */
+      /* std::cout << "paths[" << i << "][" << j << "]: " << paths[i][j].position << std::endl; */
+    /* } */
+    /* std::cout << "" << std::endl; */
+  /* } */
 
   // Find closest pair in paths 0 and 1. Those are our bonders.
   
@@ -73,8 +73,8 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
 
   int npre = 0;
   for (int pi = 0; pi < paths.size() - 1; ++pi) {
-    int last_a = 0;
-    int last_b = 0;
+    int first_a = 0;
+    int first_b = 0;
     float least_distance = paths[pi][0].position.GetDistanceTo(paths[pi + 1][0].position);
 
     int nprea = npre;
@@ -83,78 +83,80 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
     for (int i0 = 0; i0 < paths[pi].size(); ++i0) {
       for (int i1 = 0; i1 < paths[pi + 1].size(); ++i1) {
         float distance = paths[pi][i0].position.GetDistanceTo(paths[pi + 1][i1].position);
+        /* std::cout << "distance from a[" << i0 << "] to b[" << i1 << "] is " << distance << std::endl; */
         if (distance < least_distance) {
-          last_a = i0;
-          last_b = i1;
+          first_a = i0;
+          first_b = i1;
+          least_distance = distance;
         }
       }
     }
 
-    std::cout << "" << std::endl;
-    std::cout << "pi: " << pi << std::endl;
-    std::cout << "least_distance: " << least_distance << std::endl;
-    std::cout << "last_a: " << last_a << std::endl;
-    std::cout << "last_b: " << last_b << std::endl;
-    std::cout << "" << std::endl;
+    /* std::cout << "" << std::endl; */
+    /* std::cout << "pi: " << pi << std::endl; */
+    /* std::cout << "least_distance: " << least_distance << std::endl; */
+    /* std::cout << "first_a: " << first_a << std::endl; */
+    /* std::cout << "first_b: " << first_b << std::endl; */
+    /* std::cout << "" << std::endl; */
 
+    int last_a = first_a;
+    int last_b = first_b;
     int na = 0;
     int nb = 0;
 
-    while (na < paths[pi].size() || nb < paths[pi + 1].size()) {
+    /* while (na < paths[pi].size() || nb < paths[pi + 1].size()) { */
+    do {
       int next_a = (last_a + 1) % paths[pi].size();
       int next_b = (last_b + 1) % paths[pi + 1].size();
+      // TODO last_a == next_a && last_b == next_b
 
       if (na < paths[pi].size() && nb < paths[pi + 1].size()) {
-        QVector3<float> ab1 = paths[pi + 1][last_b].position - paths[pi][last_a].position;
-        QVector3<float> ab2 = paths[pi + 1][next_b].position - paths[pi][last_a].position;
+        /* QVector3<float> ab1 = paths[pi + 1][last_b].position - paths[pi][last_a].position; */
+        /* QVector3<float> ab2 = paths[pi + 1][next_b].position - paths[pi][last_a].position; */
 
-        QVector3<float> ba1 = paths[pi][last_a].position - paths[pi + 1][last_b].position;
-        QVector3<float> ba2 = paths[pi][next_a].position - paths[pi + 1][last_b].position;
+        /* QVector3<float> ba1 = paths[pi][last_a].position - paths[pi + 1][last_b].position; */
+        /* QVector3<float> ba2 = paths[pi][next_a].position - paths[pi + 1][last_b].position; */
 
-        QVector3<float> b2a = paths[pi][last_a].position - paths[pi + 1][last_b].position;
+        /* QVector3<float> b2a = paths[pi][last_a].position - paths[pi + 1][last_b].position; */
         QVector3<float> b2nexta = paths[pi][next_a].position - paths[pi + 1][last_b].position;
         QVector3<float> a2nextb = paths[pi + 1][next_b].position - paths[pi][last_a].position;
 
-        /* float ab_area = ab1.Cross(ab2).GetLength(); */
-        /* float ba_area = ba1.Cross(ba2).GetLength(); */
-        /* float ab_area = b2a.Dot(b2nexta); //ab1.Cross(ab2).GetLength(); */
-        /* float ba_area = b2a.Dot(b2nextb); //ba1.Cross(ba2).GetLength(); */
-        if (a2nextb.GetLength() < b2nexta.GetLength()) {
+        if (last_b != next_b && (last_a == next_a || a2nextb.GetLength() < b2nexta.GetLength())) {
           faces.push_back(QVector3<int>(nprea + last_a, npreb + last_b, npreb + next_b));
           last_b = next_b;
           ++nb;
-          std::cout << "b?" << std::endl;
         } else {
           faces.push_back(QVector3<int>(nprea + last_a, npreb + last_b, nprea + next_a));
           last_a = next_a;
           ++na;
-          std::cout << "a?" << std::endl;
         }
-      } else if (na < paths[pi].size()) {
+      } else if (last_a != next_a && na < paths[pi].size()) {
         faces.push_back(QVector3<int>(nprea + last_a, npreb + last_b, nprea + next_a));
         last_a = next_a;
         ++na;
-        std::cout << "a!" << std::endl;
-      } else if (nb < paths[pi + 1].size()) {
+      } else {
         faces.push_back(QVector3<int>(nprea + last_a, npreb + last_b, npreb + next_b));
         last_b = next_b;
         ++nb;
-        std::cout << "b!" << std::endl;
       }
 
       npre = npreb;
-    }
+
+      if (last_a == first_a && last_b == first_b) {
+        break;
+      }
+    } while (true);
   }
 
-  for (int i = 0; i < positions.size(); ++i) {
-    std::cout << "positions[i]: " << positions[i] << std::endl;
-  }
-  std::cout << "" << std::endl;
+  /* for (int i = 0; i < positions.size(); ++i) { */
+    /* std::cout << "positions[i]: " << positions[i] << std::endl; */
+  /* } */
+  /* std::cout << "" << std::endl; */
 
-  for (int i = 0; i < faces.size(); ++i) {
-    std::cout << "faces[i]: " << faces[i] << std::endl;
-  }
-  std::cout << "" << std::endl;
+  /* for (int i = 0; i < faces.size(); ++i) { */
+    /* std::cout << "faces[i]: " << faces[i] << std::endl; */
+  /* } */
+  /* std::cout << "" << std::endl; */
 
   /* faces.erase(faces.begin() + debugi->toInteger(), faces.end()); */
 
