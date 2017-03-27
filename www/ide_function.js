@@ -304,6 +304,7 @@ $(document).ready(function() {
 
       if (Cookies.get('consoleHeight')) {
         $('#console').height(Cookies.get('consoleHeight'));
+        $('#showConsole').prop('checked', $('#console').height() != 0);
         resize();
       }
 
