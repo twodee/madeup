@@ -215,7 +215,7 @@ yaw 90
 move 5 -- top horizontal
 
 nsides = 30
-dowel 1
+dowel maxBend:1
 ~~~
 
 ![Smooth S](images/s_smooth.png){:.bigimg}
