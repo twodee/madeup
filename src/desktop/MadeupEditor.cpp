@@ -13,31 +13,59 @@ using namespace madeup;
 
 class Transition : public QUndoCommand {
   public:
-    Transition(MadeupEditor *editor, const QString &previous, const QString &current) :
+    Transition(MadeupEditor *editor,
+               const QString &previous_text,
+               const QTextCursor &previous_cursor,
+               const QString &current_text,
+               const QTextCursor &current_cursor) :
       editor(editor),
-      previous(previous),
-      current(current) {
+      previous_text(previous_text),
+      previous_cursor(previous_cursor),
+      current_text(current_text),
+      current_cursor(current_cursor) {
       setText("edit text");
     }
 
     virtual void undo() {
       editor->blockSignals(true);
-      editor->document()->setPlainText(previous);
+
+      int start = previous_cursor.selectionStart();
+      int end = previous_cursor.selectionEnd();
+      editor->document()->setPlainText(current_text); // resets cursor selection
+
+      QTextCursor cursor = editor->textCursor();
+      cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+      cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, start);
+      cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, (end - start));
+      editor->setTextCursor(cursor);
+
       editor->blockSignals(false);
       editor->hilite();
     }
 
     virtual void redo() {
       editor->blockSignals(true);
-      editor->document()->setPlainText(current);
+
+      int start = current_cursor.selectionStart();
+      int end = current_cursor.selectionEnd();
+      editor->document()->setPlainText(current_text); // resets cursor selection
+
+      QTextCursor cursor = editor->textCursor();
+      cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+      cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, start);
+      cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, (end - start));
+      editor->setTextCursor(cursor);
+
       editor->blockSignals(false);
       editor->hilite();
     }
 
   private:
     MadeupEditor *editor;
-    QString previous;
-    QString current;
+    QString previous_text;
+    QTextCursor previous_cursor;
+    QString current_text;
+    QTextCursor current_cursor;
 };
 
 /* ------------------------------------------------------------------------- */
@@ -45,7 +73,8 @@ class Transition : public QUndoCommand {
 MadeupEditor::MadeupEditor(QWidget *parent) :
   QPlainTextEdit(parent),
   undo_stack(new QUndoStack(this)),
-  previous_text() {
+  previous_text(),
+  previous_cursor(textCursor()) {
   setUndoRedoEnabled(false);
 }
 
@@ -85,9 +114,11 @@ QUndoStack *MadeupEditor::getUndoStack() const {
 
 void MadeupEditor::onTextChanged() {
   const QString &current_text = toPlainText();
+  const QTextCursor &current_cursor = textCursor();
 
-  undo_stack->push(new Transition(this, previous_text, current_text));
+  undo_stack->push(new Transition(this, previous_text, previous_cursor, current_text, current_cursor));
   previous_text = current_text;
+  previous_cursor = current_cursor;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -214,6 +245,124 @@ void MadeupEditor::hilite() {
   }
 
   blockSignals(false);
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupEditor::indent() {
+  blockSignals(true);   
+
+  QTextCursor cursor = textCursor();
+  QTextCursor before_cursor = cursor;
+
+  int start = cursor.selectionStart();
+  int end = cursor.selectionEnd();
+
+  // Go to start position.
+  cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+  cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, start);
+  cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+
+  // Walk through and indent each line.
+  int ninserted = 0;
+  bool is_moved = true;
+  while (is_moved && cursor.position() <= end + ninserted) {
+    cursor.insertText("  ");
+    ninserted += 2;
+    is_moved = cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
+    cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+  }
+
+  setTextCursor(before_cursor);
+
+  blockSignals(false);   
+  onTextChanged();
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupEditor::unindent() {
+  blockSignals(true);   
+
+  QTextCursor cursor = textCursor();
+  QTextCursor before_cursor = cursor;
+
+  int start = cursor.selectionStart();
+  int end = cursor.selectionEnd();
+
+  // Go to start position.
+  cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+  cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, start);
+  cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+
+  // Walk through and indent each line.
+  int ninserted = 0;
+  bool is_moved = true;
+  while (is_moved && cursor.position() <= end + ninserted) {
+    if (document()->characterAt(cursor.position()) == ' ') {
+      cursor.deleteChar();
+      ninserted -= 1;
+    }
+    if (document()->characterAt(cursor.position()) == ' ') {
+      cursor.deleteChar();
+      ninserted -= 1;
+    }
+    is_moved = cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
+    cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+  }
+
+  setTextCursor(before_cursor);
+
+  blockSignals(false);   
+  onTextChanged();
+}
+
+/* ------------------------------------------------------------------------- */
+
+void MadeupEditor::comment() {
+  blockSignals(true);   
+
+  QTextCursor cursor = textCursor();
+  QTextCursor before_cursor = cursor;
+
+  int start = cursor.selectionStart();
+  int end = cursor.selectionEnd();
+
+  // Go to start position.
+  cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+  cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, start);
+  cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+
+  bool is_adding = document()->characterAt(cursor.position()) != '-' ||
+                   document()->characterAt(cursor.position() + 1) != '-';
+
+  // Walk through and indent each line.
+  int ninserted = 0;
+  bool is_moved = true;
+  while (is_moved && cursor.position() <= end + ninserted) {
+    if (is_adding) {
+      cursor.insertText("-- ");
+      ninserted += 3;
+    } else {
+      if (document()->characterAt(cursor.position()) == '-' &&
+          document()->characterAt(cursor.position() + 1) == '-') {
+        cursor.deleteChar();
+        cursor.deleteChar();
+        ninserted -= 2;
+        if (document()->characterAt(cursor.position()) == ' ') {
+          cursor.deleteChar();
+          ninserted -= 1;
+        }
+      }
+    }
+    is_moved = cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor);
+    cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+  }
+
+  setTextCursor(before_cursor);
+
+  blockSignals(false);   
+  onTextChanged();
 }
 
 /* ------------------------------------------------------------------------- */

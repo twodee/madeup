@@ -458,6 +458,18 @@ MadeupWindow::MadeupWindow(QWidget *parent) :
   QAction *action_redo = editor->getUndoStack()->createRedoAction(this, "Redo");
   action_redo->setShortcut(QKeySequence::Redo);
 
+  QAction *action_indent = new QAction(this);
+  action_indent->setText("Indent");
+  action_indent->setShortcut(Qt::CTRL + Qt::Key_BracketRight);
+
+  QAction *action_unindent = new QAction(this);
+  action_unindent->setText("Unindent");
+  action_unindent->setShortcut(Qt::CTRL + Qt::Key_BracketLeft);
+
+  QAction *action_comment = new QAction(this);
+  action_comment->setText("Toggle comment");
+  action_comment->setShortcut(Qt::CTRL + Qt::Key_Slash);
+
   // Toolbar
   QToolBar *toolbar = new QToolBar(this);
   toolbar->setMovable(false);
@@ -488,6 +500,9 @@ MadeupWindow::MadeupWindow(QWidget *parent) :
   menuEdit->setTitle("Edit");
   menuEdit->addAction(action_undo);
   menuEdit->addAction(action_redo);
+  menuEdit->addAction(action_indent);
+  menuEdit->addAction(action_unindent);
+  menuEdit->addAction(action_comment);
 
   QMenu *menuView = new QMenu(menuBar);
   menuView->setTitle("View");
@@ -516,6 +531,9 @@ MadeupWindow::MadeupWindow(QWidget *parent) :
 
   connect(action_undo, &QAction::triggered, editor, &MadeupEditor::undo);
   connect(action_redo, &QAction::triggered, editor, &MadeupEditor::redo);
+  connect(action_indent, &QAction::triggered, editor, &MadeupEditor::indent);
+  connect(action_unindent, &QAction::triggered, editor, &MadeupEditor::unindent);
+  connect(action_comment, &QAction::triggered, editor, &MadeupEditor::comment);
 
   connect(console, &QTextBrowser::anchorClicked, [=](const QUrl &link) {
     string command = link.toString().toStdString();

@@ -16,10 +16,14 @@ class MadeupEditor : public QPlainTextEdit {
     void redo();
     void onTextChanged();
     void hilite();
+    void indent();
+    void unindent();
+    void comment();
 
   private:
     QUndoStack *undo_stack;
     QString previous_text;
+    QTextCursor previous_cursor;
 };
 
 #endif
