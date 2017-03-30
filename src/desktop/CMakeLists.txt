@@ -20,6 +20,7 @@ add_executable(${MADEUP_EXECUTABLE}
   madeup.cpp
   MadeupWindow.cpp
   MadeupCanvas.cpp
+  MadeupEditor.cpp
   MadeupRenderer.cpp
   jsoncpp.cpp)
 include_directories(${MADEUP_EXECUTABLE} ${CMAKE_SOURCE_DIR}/include ${Qt5Widgets_INCLUDE_DIRS})

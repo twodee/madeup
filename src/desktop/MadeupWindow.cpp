@@ -57,7 +57,7 @@ MadeupWindow::MadeupWindow(QWidget *parent) :
   vertical_splitter->setOrientation(Qt::Vertical);
 
   // - Editor
-  editor = new QPlainTextEdit(vertical_splitter);
+  editor = new MadeupEditor(vertical_splitter);
   QFont font;
   font.setFamily(QStringLiteral("Courier New"));
   font.setPointSize(18);

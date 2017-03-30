@@ -39,6 +39,10 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
     ExpressionNodes *nodes = dynamic_cast<ExpressionNodes *>(element.GetPointer());
     if (nodes) {
       paths.push_back(nodes->getPath());
+      std::vector<Node> &path = paths[paths.size() - 1];
+      if ((path[0].position - path[path.size() - 1].position).GetLength() < 1.0e3f) {
+        path.erase(path.begin() + path.size() - 1);
+      }
     } else {
       throw MessagedException(element->getSourceLocation().toAnchor() + ": I expect function loft to be given an array of paths, but that's not what you gave it.");
     }
@@ -51,12 +55,12 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
   /* ExpressionInteger *debugi = dynamic_cast<ExpressionInteger *>(debug_value.GetPointer()); */
   /* std::cout << "debugi->toInteger(): " << debugi->toInteger() << std::endl; */
 
-  /* for (int i = 0; i < paths.size(); ++i) { */
-    /* for (int j = 0; j < paths[i].size(); ++j) { */
-      /* std::cout << "paths[" << i << "][" << j << "]: " << paths[i][j].position << std::endl; */
-    /* } */
-    /* std::cout << "" << std::endl; */
-  /* } */
+  for (int i = 0; i < paths.size(); ++i) {
+    for (int j = 0; j < paths[i].size(); ++j) {
+      std::cout << "paths[" << i << "][" << j << "]: " << paths[i][j].position << std::endl;
+    }
+    std::cout << "" << std::endl;
+  }
 
   // Find closest pair in paths 0 and 1. Those are our bonders.
   
@@ -83,7 +87,7 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
     for (int i0 = 0; i0 < paths[pi].size(); ++i0) {
       for (int i1 = 0; i1 < paths[pi + 1].size(); ++i1) {
         float distance = paths[pi][i0].position.GetDistanceTo(paths[pi + 1][i1].position);
-        /* std::cout << "distance from a[" << i0 << "] to b[" << i1 << "] is " << distance << std::endl; */
+        std::cout << "distance from a[" << i0 << "] to b[" << i1 << "] is " << distance << std::endl;
         if (distance < least_distance) {
           first_a = i0;
           first_b = i1;
@@ -92,12 +96,12 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
       }
     }
 
-    /* std::cout << "" << std::endl; */
-    /* std::cout << "pi: " << pi << std::endl; */
-    /* std::cout << "least_distance: " << least_distance << std::endl; */
-    /* std::cout << "first_a: " << first_a << std::endl; */
-    /* std::cout << "first_b: " << first_b << std::endl; */
-    /* std::cout << "" << std::endl; */
+    std::cout << "" << std::endl;
+    std::cout << "pi: " << pi << std::endl;
+    std::cout << "least_distance: " << least_distance << std::endl;
+    std::cout << "first_a: " << first_a << std::endl;
+    std::cout << "first_b: " << first_b << std::endl;
+    std::cout << "" << std::endl;
 
     int last_a = first_a;
     int last_b = first_b;
@@ -121,6 +125,7 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
         QVector3<float> b2nexta = paths[pi][next_a].position - paths[pi + 1][last_b].position;
         QVector3<float> a2nextb = paths[pi + 1][next_b].position - paths[pi][last_a].position;
 
+        std::cout << "a or b" << std::endl;
         if (last_b != next_b && (last_a == next_a || a2nextb.GetLength() < b2nexta.GetLength())) {
           faces.push_back(QVector3<int>(nprea + last_a, npreb + last_b, npreb + next_b));
           last_b = next_b;
@@ -148,15 +153,15 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
     } while (true);
   }
 
-  /* for (int i = 0; i < positions.size(); ++i) { */
-    /* std::cout << "positions[i]: " << positions[i] << std::endl; */
-  /* } */
-  /* std::cout << "" << std::endl; */
+  for (int i = 0; i < positions.size(); ++i) {
+    std::cout << "positions[i]: " << positions[i] << std::endl;
+  }
+  std::cout << "" << std::endl;
 
-  /* for (int i = 0; i < faces.size(); ++i) { */
-    /* std::cout << "faces[i]: " << faces[i] << std::endl; */
-  /* } */
-  /* std::cout << "" << std::endl; */
+  for (int i = 0; i < faces.size(); ++i) {
+    std::cout << "faces[i]: " << faces[i] << std::endl;
+  }
+  std::cout << "" << std::endl;
 
   /* faces.erase(faces.begin() + debugi->toInteger(), faces.end()); */
 

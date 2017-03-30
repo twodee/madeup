@@ -12,6 +12,7 @@
 #include <QPlainTextEdit>
 
 #include "MadeupCanvas.h"
+#include "MadeupEditor.h"
 
 /* ------------------------------------------------------------------------- */
 
@@ -51,7 +52,7 @@ class MadeupWindow : public QMainWindow {
     static QColor toQColor(const td::QVector4<float> &color);
 
     QTimer *autopathify_timer;
-    QPlainTextEdit *editor;
+    MadeupEditor *editor;
     QTextBrowser *console;
     MadeupCanvas *canvas;
     MadeupRenderer *renderer;
