@@ -40,7 +40,9 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
     if (nodes) {
       paths.push_back(nodes->getPath());
       std::vector<Node> &path = paths[paths.size() - 1];
-      if ((path[0].position - path[path.size() - 1].position).GetLength() < 1.0e3f) {
+
+      // If path is explicitly closed (first and last are nearly the same), remove duplicate.
+      if (path.size() > 1 && (path[0].position - path[path.size() - 1].position).GetLength() < 1.0e3f) {
         path.erase(path.begin() + path.size() - 1);
       }
     } else {
@@ -55,12 +57,12 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
   /* ExpressionInteger *debugi = dynamic_cast<ExpressionInteger *>(debug_value.GetPointer()); */
   /* std::cout << "debugi->toInteger(): " << debugi->toInteger() << std::endl; */
 
-  for (int i = 0; i < paths.size(); ++i) {
-    for (int j = 0; j < paths[i].size(); ++j) {
-      std::cout << "paths[" << i << "][" << j << "]: " << paths[i][j].position << std::endl;
-    }
-    std::cout << "" << std::endl;
-  }
+  /* for (int i = 0; i < paths.size(); ++i) { */
+    /* for (int j = 0; j < paths[i].size(); ++j) { */
+      /* std::cout << "paths[" << i << "][" << j << "]: " << paths[i][j].position << std::endl; */
+    /* } */
+    /* std::cout << "" << std::endl; */
+  /* } */
 
   // Find closest pair in paths 0 and 1. Those are our bonders.
   
@@ -87,7 +89,7 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
     for (int i0 = 0; i0 < paths[pi].size(); ++i0) {
       for (int i1 = 0; i1 < paths[pi + 1].size(); ++i1) {
         float distance = paths[pi][i0].position.GetDistanceTo(paths[pi + 1][i1].position);
-        std::cout << "distance from a[" << i0 << "] to b[" << i1 << "] is " << distance << std::endl;
+        /* std::cout << "distance from a[" << i0 << "] to b[" << i1 << "] is " << distance << std::endl; */
         if (distance < least_distance) {
           first_a = i0;
           first_b = i1;
@@ -96,12 +98,12 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
       }
     }
 
-    std::cout << "" << std::endl;
-    std::cout << "pi: " << pi << std::endl;
-    std::cout << "least_distance: " << least_distance << std::endl;
-    std::cout << "first_a: " << first_a << std::endl;
-    std::cout << "first_b: " << first_b << std::endl;
-    std::cout << "" << std::endl;
+    /* std::cout << "" << std::endl; */
+    /* std::cout << "pi: " << pi << std::endl; */
+    /* std::cout << "least_distance: " << least_distance << std::endl; */
+    /* std::cout << "first_a: " << first_a << std::endl; */
+    /* std::cout << "first_b: " << first_b << std::endl; */
+    /* std::cout << "" << std::endl; */
 
     int last_a = first_a;
     int last_b = first_b;
@@ -110,9 +112,13 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
 
     /* while (na < paths[pi].size() || nb < paths[pi + 1].size()) { */
     do {
+      /* std::cout << "pi: " << pi << std::endl; */
+      /* std::cout << "paths[pi].size(): " << paths[pi].size() << std::endl; */
       int next_a = (last_a + 1) % paths[pi].size();
       int next_b = (last_b + 1) % paths[pi + 1].size();
       // TODO last_a == next_a && last_b == next_b
+      /* std::cout << "next_a: " << next_a << std::endl; */
+      /* std::cout << "next_b: " << next_b << std::endl; */
 
       if (na < paths[pi].size() && nb < paths[pi + 1].size()) {
         /* QVector3<float> ab1 = paths[pi + 1][last_b].position - paths[pi][last_a].position; */
@@ -122,6 +128,7 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
         /* QVector3<float> ba2 = paths[pi][next_a].position - paths[pi + 1][last_b].position; */
 
         /* QVector3<float> b2a = paths[pi][last_a].position - paths[pi + 1][last_b].position; */
+#if 0
         QVector3<float> b2nexta = paths[pi][next_a].position - paths[pi + 1][last_b].position;
         QVector3<float> a2nextb = paths[pi + 1][next_b].position - paths[pi][last_a].position;
 
@@ -135,6 +142,78 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
           last_a = next_a;
           ++na;
         }
+#else
+        // If this is the first pick, just choose the point that yields the shortest diagonal.
+        if (na == 0 && na == 0) {
+          QVector3<float> b2nexta = paths[pi][next_a].position - paths[pi + 1][last_b].position;
+          QVector3<float> a2nextb = paths[pi + 1][next_b].position - paths[pi][last_a].position;
+
+          /* std::cout << "a or b" << std::endl; */
+          if (last_b != next_b && (last_a == next_a || a2nextb.GetLength() < b2nexta.GetLength())) {
+            faces.push_back(QVector3<int>(nprea + last_a, npreb + last_b, npreb + next_b));
+            last_b = next_b;
+            ++nb;
+          } else {
+            faces.push_back(QVector3<int>(nprea + last_a, npreb + last_b, nprea + next_a));
+            last_a = next_a;
+            ++na;
+          }
+        }
+
+        // Otherwise, let's try to find a face that bends the least.
+        else {
+          /* std::cout << "find normals" << std::endl; */
+
+          // Find previous face's normal.
+          const QVector3<int> &prev_face = faces[faces.size() - 1];
+          QVector3<float> v0 = positions[prev_face[0]];
+          QVector3<float> v1 = positions[prev_face[1]];
+          QVector3<float> v2 = positions[prev_face[2]];
+          QVector3<float> diff01 = v1 - v0;
+          QVector3<float> diff02 = v2 - v0;
+          QVector3<float> prev_normal = diff01.Cross(diff02);
+          prev_normal.Normalize();
+          /* std::cout << "prev_normal: " << prev_normal << std::endl; */
+
+          // Find normal of aba face.
+          v0 = paths[pi][last_a].position;
+          v1 = paths[pi + 1][last_b].position;
+          v2 = paths[pi][next_a].position;
+          diff01 = v1 - v0;
+          diff02 = v2 - v0;
+          QVector3<float> aba_normal = diff01.Cross(diff02);
+          aba_normal.Normalize();
+          /* std::cout << "aba_normal: " << aba_normal << std::endl; */
+ 
+          // Find normal of bab face.
+          v0 = paths[pi + 1][last_b].position;
+          v1 = paths[pi][last_a].position;
+          v2 = paths[pi + 1][next_b].position;
+          diff01 = v1 - v0;
+          diff02 = v2 - v0;
+          QVector3<float> bab_normal = diff01.Cross(diff02);
+          bab_normal.Normalize();
+          /* std::cout << "bab_normal: " << bab_normal << std::endl; */
+ 
+          // Pick the one that when abs-dotted with prev normal is closest to 1.
+          float dot_aba = aba_normal.Dot(prev_normal);
+          float dot_bab = bab_normal.Dot(prev_normal);
+          /* std::cout << "dot_aba: " << dot_aba << std::endl; */
+          /* std::cout << "dot_bab: " << dot_bab << std::endl; */
+          if (fabs(dot_bab) > fabs(dot_aba)) {
+            /* std::cout << "went with b" << std::endl; */
+            faces.push_back(QVector3<int>(nprea + last_a, npreb + last_b, npreb + next_b));
+            last_b = next_b;
+            ++nb;
+          } else {
+            /* std::cout << "went with a" << std::endl; */
+            faces.push_back(QVector3<int>(nprea + last_a, npreb + last_b, nprea + next_a));
+            last_a = next_a;
+            ++na;
+          }
+          /* std::cout << "" << std::endl; */
+        }
+#endif
       } else if (last_a != next_a && na < paths[pi].size()) {
         faces.push_back(QVector3<int>(nprea + last_a, npreb + last_b, nprea + next_a));
         last_a = next_a;
@@ -153,15 +232,15 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
     } while (true);
   }
 
-  for (int i = 0; i < positions.size(); ++i) {
-    std::cout << "positions[i]: " << positions[i] << std::endl;
-  }
-  std::cout << "" << std::endl;
+  /* for (int i = 0; i < positions.size(); ++i) { */
+    /* std::cout << "positions[i]: " << positions[i] << std::endl; */
+  /* } */
+  /* std::cout << "" << std::endl; */
 
-  for (int i = 0; i < faces.size(); ++i) {
-    std::cout << "faces[i]: " << faces[i] << std::endl;
-  }
-  std::cout << "" << std::endl;
+  /* for (int i = 0; i < faces.size(); ++i) { */
+    /* std::cout << "faces[i]: " << faces[i] << std::endl; */
+  /* } */
+  /* std::cout << "" << std::endl; */
 
   /* faces.erase(faces.begin() + debugi->toInteger(), faces.end()); */
 
