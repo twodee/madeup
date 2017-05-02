@@ -57,7 +57,7 @@ body {
 }
 
 #glcanvas {
-  float: left;
+  /* float: left; */ /* Caused flickering in Electron. */
   width: auto;
   overflow: hidden;
   margin: 0;

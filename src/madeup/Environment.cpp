@@ -1296,7 +1296,7 @@ Co<Trimesh> Environment::extrude(const QVector3<float> &axis, float length) {
       }
 
       try {
-        trimesh = Co<Trimesh>(line->Extrude(axis, length, xforms.top()));
+        trimesh = Co<Trimesh>(line->Extrude(axis, length));//, xforms.top()));
         trimesh->MigrateVertexMetasToColors(0, 1, 2);
       } catch (MessagedException e) {
         throw UnlocatedException("I tried extruding your path, but I couldn't. Do you have duplicated vertices, all your vertices in a line, or edges that cross over each other? Any of these spell geometric trouble.");

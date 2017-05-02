@@ -798,7 +798,7 @@ $(document).ready(function() {
     var name = prompt("What's your name?");
     $.ajax({
       type: 'POST',
-      url: 'save.php',
+      url: madeupPrefix + '/save.php',
       data: JSON.stringify({
         name: name,
         source: source
@@ -1182,7 +1182,7 @@ function getSource() {
 function convertTextToBlocks(source) {
   $.ajax({
     type: 'POST',
-    url: 'translate.php',
+    url: madeupPrefix + '/translate.php',
     data: JSON.stringify({ source: source }),
     contentType: 'application/json; charset=utf-8',
     dataType: 'json',
@@ -1203,6 +1203,11 @@ var allGeometry = undefined;
 var timeOfLatestRun = undefined;
 
 function run(source, mode, pingback) {
+  // If a preview is scheduled, clear it.
+  if (preview) {
+    clearTimeout(preview); 
+  }
+
   if (mode == GeometryMode.SURFACE) {
     log('Solidifying...'); 
   } else if (mode == GeometryMode.PATH) {
@@ -1211,204 +1216,195 @@ function run(source, mode, pingback) {
 
   timeOfLatestRun = new Date().getTime();
 
-  $.ajax({
-    type: 'POST',
-    url: 'interpret.php',
-    data: JSON.stringify(
-      {
-        timestamp: timeOfLatestRun,
-        source: source,
-        extension: 'json',
-        geometry_mode: mode,
-        shading_mode: isFlatShaded ? 'FLAT' : 'SMOOTH'
-      }
-    ),
-    contentType: 'application/json; charset=utf-8',
-    dataType: 'json',
-    success: function(data) {
-      // Only listen to responses to latest run.
-      if (data['timestamp'] != timeOfLatestRun) {
-        return;
-      }
-
-      var sansDebug = data['stdout'].replace(/^Debug:.*$\n/gm, '');
-      if (sansDebug.length > 0) {
-        console.log(sansDebug);
-      }
-
-      if (data['exit_status'] == 0) {
-        tree = data['tree'];
-        console.log(data['tree']);
-
-        for (var i = 0; i < meshes.length; ++i) {
-          modelScene.remove(meshes[i]);
-        }
-        meshes = [];
-
-        log(sansDebug);
-        
-        if (mode == GeometryMode.SURFACE) {
-          var loader = new THREE.JSONLoader();
-          try {
-            var model = loader.parse(JSON.parse(data['model']));
-
-            if (showMode == 'triangles' || showMode == 'shaded_triangles') {
-              var solidMaterial;
-              if (showMode == 'shaded_triangles') {
-                solidMaterial = new THREE.MeshLambertMaterial({color: 0xcccccc});
-              } else {
-                solidMaterial = new THREE.MeshBasicMaterial({color: 0xcccccc});
-              }
-              solidMaterial.side = THREE.DoubleSide;
-              var wireframeMaterial = new THREE.MeshBasicMaterial({color: 0x333333, wireframe: true, transparent: true, wireframeLinewidth: 3}); 
-              wireframeMaterial.side = THREE.DoubleSide;
-              var material = [solidMaterial, wireframeMaterial];
-              material.side = THREE.DoubleSide;
-              meshes[0] = THREE.SceneUtils.createMultiMaterialObject(model.geometry, material);
-            } else {
-              var frontMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: showMode == 'wireframe', wireframeLinewidth: 5, side: THREE.FrontSide});
-              var backMaterial;
-              if (lightBothSides) {
-                backMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: showMode == 'wireframe', wireframeLinewidth: 5, side: THREE.BackSide});
-              } else {
-                backMaterial = new THREE.MeshBasicMaterial({color: 0x000000, wireframe: showMode == 'wireframe', wireframeLinewidth: 5, side: THREE.BackSide});
-              }
-              var material = [frontMaterial, backMaterial];
-              meshes[0] = THREE.SceneUtils.createMultiMaterialObject(model.geometry, material);
-            }
-
-            allGeometry = model.geometry;
-            enableDownload(true);
-          } catch (err) {
-            console.log(err);
-            console.log(data['model']);
-            log('The geometry I got back had some funny stuff in it that I didn\'t know how to read.');
-          }
-        } else {
-          var lineMaterialDepthNotColor = new THREE.LineBasicMaterial({
-            color: 0xCC6600,
-            linewidth: 3,
-            colorWrite: false,
-            depthWrite: true
-          });
-          var lineMaterialColorNotDepth = lineMaterialDepthNotColor.clone();
-          lineMaterialColorNotDepth.depthWrite = false;
-          lineMaterialColorNotDepth.colorWrite = true;
-
-          var pointsMaterialDepthNotColor = new THREE.PointsMaterial({
-            color: 0x000000,
-            size: 8,
-            sizeAttenuation: false,
-            map: vertexTexture,
-            alphaTest: 0.5,
-            colorWrite: false,
-            depthWrite: true
-          });
-          var pointsMaterialColorNotDepth = pointsMaterialDepthNotColor.clone();
-          pointsMaterialColorNotDepth.depthWrite = false;
-          pointsMaterialColorNotDepth.colorWrite = true;
-
-          var paths = [];
-          try {
-            paths = JSON.parse(data['model']);
-          } catch (err) {
-            log('The geometry I got back had some funny stuff in it that I didn\'t know how to read.');
-          }
-
-          allGeometry = new THREE.Geometry();
-
-          for (var pi = 0; pi < paths.length; ++pi) {
-            var geometry = new THREE.Geometry();
-            var dotsGeometry = new THREE.Geometry();
-            var iLastUnique = paths[pi].vertices.length - 1;
-            for (var i = paths[pi].vertices.length - 1; i > 0; --i) {
-              var curr = new THREE.Vector3(paths[pi].vertices[i][0], paths[pi].vertices[i][1], paths[pi].vertices[i][2]);
-              var prev = new THREE.Vector3(paths[pi].vertices[i - 1][0], paths[pi].vertices[i - 1][1], paths[pi].vertices[i - 1][2]);
-              if (!curr.equals(prev)) {
-                break;
-              } else {
-                --iLastUnique;
-              }
-            }
-            for (var i = 0; i < paths[pi].vertices.length; ++i) {
-              var v = new THREE.Vector3(paths[pi].vertices[i][0], paths[pi].vertices[i][1], paths[pi].vertices[i][2]);
-              geometry.vertices.push(v);
-              if (!showHeadings || i < iLastUnique) {
-                dotsGeometry.vertices.push(v);
-              }
-              allGeometry.vertices.push(v);
-            }
-
-            meshes[meshes.length] = new THREE.Line(geometry, lineMaterialColorNotDepth);
-            meshes[meshes.length - 1].renderOrder = 0;
-            if (showPoints) {
-              meshes[meshes.length] = new THREE.Points(dotsGeometry, pointsMaterialColorNotDepth);
-              meshes[meshes.length - 1].renderOrder = 0;
-            }
-
-            var nvertices = paths[pi].vertices.length;
-            if (showHeadings && nvertices > 0) {
-              var m = paths[pi].orientation;
-              
-              var g2 = new THREE.Geometry();
-
-              g2.vertices.push(
-                new THREE.Vector3(-0.5, 0,  0),
-                new THREE.Vector3( 0.5, 0,  0),
-                new THREE.Vector3( 0, 0, -1),
-                new THREE.Vector3( 0, 0.3, -0.2)
-              );
-
-              g2.faces.push(
-                new THREE.Face3(1, 0, 2),
-                new THREE.Face3(0, 1, 3),
-                new THREE.Face3(3, 2, 0),
-                new THREE.Face3(1, 2, 3)
-              );
-
-              var mm = new THREE.Matrix4().set(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
-              var mmm = new THREE.Matrix4().getInverse(mm);
-              g2.applyMatrix(mmm);
-              var offset = new THREE.Vector3(paths[pi].vertices[paths[pi].vertices.length - 1][0], paths[pi].vertices[paths[pi].vertices.length - 1][1], paths[pi].vertices[paths[pi].vertices.length - 1][2]);
-              g2.applyMatrix(new THREE.Matrix4().makeTranslation(offset.x, offset.y, offset.z));
-
-              g2.computeFaceNormals();
-              allGeometry.vertices = allGeometry.vertices.concat(g2.vertices);
-
-              meshes[meshes.length] = new THREE.Mesh(g2, new THREE.MeshLambertMaterial({
-                color: 0x0000ff,
-              }));
-              meshes[meshes.length - 1].renderOrder = 1;
-              modelScene.add(meshes[meshes.length - 1]);
-            }
-
-            meshes[meshes.length] = new THREE.Line(geometry, lineMaterialDepthNotColor);
-            meshes[meshes.length - 1].renderOrder = 2;
-            if (showPoints) {
-              meshes[meshes.length] = new THREE.Points(dotsGeometry, pointsMaterialDepthNotColor);
-              meshes[meshes.length - 1].renderOrder = 2;
-            }
-          }
-        }
-
-        for (var mi = 0; mi < meshes.length; ++mi) {
-          modelScene.add(meshes[mi]);
-        }
-
-        render();
-        if (pingback) {
-          pingback();
-        }
-      } else if (data['exit_status'] == 22) {
-        log(data['stdout'] + '\nYour model was taking a long time to build. It felt like it was never going to finish! So, I stopped trying. Sorry.');
-      } else {
-        log(sansDebug);
-      }
-    },
-    failure: function(errorMessage) {
-      console.log('Failure. :(');
+  interpret({
+    timestamp: timeOfLatestRun,
+    source: source,
+    extension: 'json',
+    geometry_mode: mode,
+    shading_mode: isFlatShaded ? 'FLAT' : 'SMOOTH'
+  }, function(data) {
+    onInterpret(data);
+    if (pingback) {
+      pingback();
     }
+  }, function(errorMessage) {
+    console.log('Failure. :(');
   });
+}
+
+function onInterpret(data) {
+  // Only listen to responses to latest run.
+  if (data['timestamp'] != timeOfLatestRun) {
+    return;
+  }
+
+  var sansDebug = data['stdout'].replace(/^Debug:.*$\n/gm, '');
+  if (sansDebug.length > 0) {
+    console.log(sansDebug);
+  }
+
+  if (data['exit_status'] == 0) {
+    for (var i = 0; i < meshes.length; ++i) {
+      modelScene.remove(meshes[i]);
+    }
+    meshes = [];
+
+    log(sansDebug);
+    
+    if (data.geometry_mode == GeometryMode.SURFACE) {
+      var loader = new THREE.JSONLoader();
+      try {
+        var model = loader.parse(JSON.parse(data['model']));
+
+        if (showMode == 'triangles' || showMode == 'shaded_triangles') {
+          var solidMaterial;
+          if (showMode == 'shaded_triangles') {
+            solidMaterial = new THREE.MeshLambertMaterial({color: 0xcccccc});
+          } else {
+            solidMaterial = new THREE.MeshBasicMaterial({color: 0xcccccc});
+          }
+          solidMaterial.side = THREE.DoubleSide;
+          var wireframeMaterial = new THREE.MeshBasicMaterial({color: 0x333333, wireframe: true, transparent: true, wireframeLinewidth: 3}); 
+          wireframeMaterial.side = THREE.DoubleSide;
+          var material = [solidMaterial, wireframeMaterial];
+          material.side = THREE.DoubleSide;
+          meshes[0] = THREE.SceneUtils.createMultiMaterialObject(model.geometry, material);
+        } else {
+          var frontMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: showMode == 'wireframe', wireframeLinewidth: 5, side: THREE.FrontSide});
+          var backMaterial;
+          if (lightBothSides) {
+            backMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: showMode == 'wireframe', wireframeLinewidth: 5, side: THREE.BackSide});
+          } else {
+            backMaterial = new THREE.MeshBasicMaterial({color: 0x000000, wireframe: showMode == 'wireframe', wireframeLinewidth: 5, side: THREE.BackSide});
+          }
+          var material = [frontMaterial, backMaterial];
+          meshes[0] = THREE.SceneUtils.createMultiMaterialObject(model.geometry, material);
+        }
+
+        allGeometry = model.geometry;
+        enableDownload(true);
+      } catch (err) {
+        console.log(err);
+        console.log(data['model']);
+        log('The geometry I got back had some funny stuff in it that I didn\'t know how to read.');
+      }
+    } else {
+      var lineMaterialDepthNotColor = new THREE.LineBasicMaterial({
+        color: 0xCC6600,
+        linewidth: 3,
+        colorWrite: false,
+        depthWrite: true
+      });
+      var lineMaterialColorNotDepth = lineMaterialDepthNotColor.clone();
+      lineMaterialColorNotDepth.depthWrite = false;
+      lineMaterialColorNotDepth.colorWrite = true;
+
+      var pointsMaterialDepthNotColor = new THREE.PointsMaterial({
+        color: 0x000000,
+        size: 8,
+        sizeAttenuation: false,
+        map: vertexTexture,
+        alphaTest: 0.5,
+        colorWrite: false,
+        depthWrite: true
+      });
+      var pointsMaterialColorNotDepth = pointsMaterialDepthNotColor.clone();
+      pointsMaterialColorNotDepth.depthWrite = false;
+      pointsMaterialColorNotDepth.colorWrite = true;
+
+      var paths = [];
+      try {
+        paths = JSON.parse(data['model']);
+      } catch (err) {
+        log('The geometry I got back had some funny stuff in it that I didn\'t know how to read.');
+      }
+
+      allGeometry = new THREE.Geometry();
+
+      for (var pi = 0; pi < paths.length; ++pi) {
+        var geometry = new THREE.Geometry();
+        var dotsGeometry = new THREE.Geometry();
+        var iLastUnique = paths[pi].vertices.length - 1;
+        for (var i = paths[pi].vertices.length - 1; i > 0; --i) {
+          var curr = new THREE.Vector3(paths[pi].vertices[i][0], paths[pi].vertices[i][1], paths[pi].vertices[i][2]);
+          var prev = new THREE.Vector3(paths[pi].vertices[i - 1][0], paths[pi].vertices[i - 1][1], paths[pi].vertices[i - 1][2]);
+          if (!curr.equals(prev)) {
+            break;
+          } else {
+            --iLastUnique;
+          }
+        }
+        for (var i = 0; i < paths[pi].vertices.length; ++i) {
+          var v = new THREE.Vector3(paths[pi].vertices[i][0], paths[pi].vertices[i][1], paths[pi].vertices[i][2]);
+          geometry.vertices.push(v);
+          if (!showHeadings || i < iLastUnique) {
+            dotsGeometry.vertices.push(v);
+          }
+          allGeometry.vertices.push(v);
+        }
+
+        meshes[meshes.length] = new THREE.Line(geometry, lineMaterialColorNotDepth);
+        meshes[meshes.length - 1].renderOrder = 0;
+        if (showPoints) {
+          meshes[meshes.length] = new THREE.Points(dotsGeometry, pointsMaterialColorNotDepth);
+          meshes[meshes.length - 1].renderOrder = 0;
+        }
+
+        var nvertices = paths[pi].vertices.length;
+        if (showHeadings && nvertices > 0) {
+          var m = paths[pi].orientation;
+          
+          var g2 = new THREE.Geometry();
+
+          g2.vertices.push(
+            new THREE.Vector3(-0.5, 0,  0),
+            new THREE.Vector3( 0.5, 0,  0),
+            new THREE.Vector3( 0, 0, -1),
+            new THREE.Vector3( 0, 0.3, -0.2)
+          );
+
+          g2.faces.push(
+            new THREE.Face3(1, 0, 2),
+            new THREE.Face3(0, 1, 3),
+            new THREE.Face3(3, 2, 0),
+            new THREE.Face3(1, 2, 3)
+          );
+
+          var mm = new THREE.Matrix4().set(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
+          var mmm = new THREE.Matrix4().getInverse(mm);
+          g2.applyMatrix(mmm);
+          var offset = new THREE.Vector3(paths[pi].vertices[paths[pi].vertices.length - 1][0], paths[pi].vertices[paths[pi].vertices.length - 1][1], paths[pi].vertices[paths[pi].vertices.length - 1][2]);
+          g2.applyMatrix(new THREE.Matrix4().makeTranslation(offset.x, offset.y, offset.z));
+
+          g2.computeFaceNormals();
+          allGeometry.vertices = allGeometry.vertices.concat(g2.vertices);
+
+          meshes[meshes.length] = new THREE.Mesh(g2, new THREE.MeshLambertMaterial({
+            color: 0x0000ff,
+          }));
+          meshes[meshes.length - 1].renderOrder = 1;
+          modelScene.add(meshes[meshes.length - 1]);
+        }
+
+        meshes[meshes.length] = new THREE.Line(geometry, lineMaterialDepthNotColor);
+        meshes[meshes.length - 1].renderOrder = 2;
+        if (showPoints) {
+          meshes[meshes.length] = new THREE.Points(dotsGeometry, pointsMaterialDepthNotColor);
+          meshes[meshes.length - 1].renderOrder = 2;
+        }
+      }
+    }
+
+    for (var mi = 0; mi < meshes.length; ++mi) {
+      modelScene.add(meshes[mi]);
+    }
+
+    render();
+  } else if (data['exit_status'] == 22) {
+    log(data['stdout'] + '\nYour model was taking a long time to build. It felt like it was never going to finish! So, I stopped trying. Sorry.');
+  } else {
+    log(sansDebug);
+  }
 }
 
 function fit() {
@@ -1539,7 +1535,9 @@ function resize() {
   }
 
   textEditor.resize();
-  if (renderer) render();
+  if (renderer) {
+    render();
+  }
 }
 
 function highlight(startIndex, stopIndex) {
@@ -1663,7 +1661,6 @@ function hideMenus(exceptID) {
 }
 
 function focusEditor() {
-  console.log('focus');
   textEditor.focus();
 }
 

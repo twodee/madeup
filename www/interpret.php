@@ -94,6 +94,7 @@ if (!(strcmp($in['extension'], 'json') == 0 || strcmp($in['extension'], 'obj') =
                      $in_path);
   exec($command, $lines, $out['exit_status']);
   $out['stdout'] = implode("\n", $lines);
+  $out['geometry_mode'] = $in['geometry_mode'];
 
   $lines = array();
   $command = sprintf("./merp --tree -q %s", $in_path);

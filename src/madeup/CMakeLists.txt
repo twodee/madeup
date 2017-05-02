@@ -35,6 +35,7 @@ add_library(madeup
   ExpressionDivide.cpp
   ExpressionDot.cpp
   ExpressionDowel.cpp
+  ExpressionDynamicMinus.cpp
   ExpressionEcho.cpp
   ExpressionEqual.cpp
   ExpressionExtrude.cpp

@@ -171,6 +171,10 @@ function show(nseconds) {
 }
 
 $(document).ready(function() {
+  if (keystrokesMoviePrefix === null) {
+    return;
+  }
+
   scrubber = $('#scrubber')[0];
 
   $.getJSON(keystrokesMoviePrefix + '.json', function(data) {

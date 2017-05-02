@@ -14,6 +14,7 @@
 #include "madeup/ExpressionDefineElement.h"
 #include "madeup/ExpressionDefineVariable.h"
 #include "madeup/ExpressionDivide.h"
+#include "madeup/ExpressionDynamicMinus.h"
 #include "madeup/ExpressionEqual.h"
 #include "madeup/ExpressionFor.h"
 #include "madeup/ExpressionGreater.h"
@@ -768,9 +769,11 @@ void Parser::atom() {
       call->setSource(getSubsource(location), location);
       expressions.push(call);
     } else {
-      Co<ExpressionCall> call(new ExpressionCall(name));
-      std::vector<Co<Expression> > actuals;
+
       if (!isUp(Token::MINUS) && isInExpressionFirst()) {
+        Co<ExpressionCall> call(new ExpressionCall(name));
+        std::vector<Co<Expression> > actuals;
+
         expressionLevel0();
         Co<Expression> actual = popExpression();
         actuals.push_back(actual);
@@ -789,9 +792,50 @@ void Parser::atom() {
             throw MessagedException(ss.str());
           }
         }
+
+        SourceLocation location(id_token.getLocation(), end_location);
+        call->setSource(getSubsource(location), location);
+        expressions.push(call);
+      } else if (isUp(Token::MINUS)) {
+        ++i; // skip past -
+        expressionLevel0();
+        Co<Expression> e = popExpression();
+
+        // If we see a comma, then the minus should be applied to the first parameter and we have a call.
+        if (isUp(Token::COMMA)) {
+          Co<ExpressionCall> call(new ExpressionCall(name));
+          std::vector<Co<Expression> > actuals;
+
+          Co<Expression> actual(new ExpressionNegation(e));
+          call->addParameter(actual);
+          
+          end_location = actual->getSourceLocation();
+          while (isUp(Token::COMMA)) {
+            ++i;
+            if (isInExpressionFirst()) {
+              expressionLevel0();
+              actual = popExpression();
+              call->addParameter(actual);
+              end_location = actual->getSourceLocation();
+            } else {
+              std::stringstream ss;
+              ss << tokens[i - 1].getLocation().toAnchor() << ": I found an extra comma lying around.";
+              throw MessagedException(ss.str());
+            }
+          }
+
+          SourceLocation location(id_token.getLocation(), end_location);
+          call->setSource(getSubsource(location), location);
+          expressions.push(call);
+        } else {
+          expressions.push(Co<Expression>(new ExpressionDynamicMinus(name, e)));
+        }
+
+        // yaw - foo
+        // if has a comma, definitely a call
+        // if no comma, create an ambiguous expr that's either a call or a subtraction
       }
-      SourceLocation location(id_token.getLocation(), end_location);
-      call->setSource(getSubsource(location), location);
+
       /* std::cout << "just saw call" << std::endl; */
       /* std::cout << isUp(Token::ASSIGN) << std::endl; */
 
@@ -816,7 +860,7 @@ void Parser::atom() {
         /* pushExpression(new ExpressionDefineElement(call, rhs), call->getSourceLocation(), rhs->getSourceLocation()); */
       /* } else { */
         /* pushExpression(new ExpressionArraySubscript(array, subscript), array->getSourceLocation(), subscript->getSourceLocation()); */
-        expressions.push(call);
+        /* expressions.push(call); */
       /* } */
     }
   } else if (isUp(Token::FOR)) {
