@@ -6,7 +6,6 @@
 #include "madeup/ExpressionAll.h"
 #include "madeup/ExpressionAny.h"
 #include "madeup/ExpressionArray.h"
-#include "madeup/ExpressionAxis.h"
 #include "madeup/ExpressionBoolean.h"
 #include "madeup/ExpressionBlobs.h"
 #include "madeup/ExpressionBoxes.h"
@@ -51,6 +50,7 @@
 #include "madeup/ExpressionRandom.h"
 #include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionReframe.h"
+#include "madeup/ExpressionReturn.h"
 #include "madeup/ExpressionReverse.h"
 #include "madeup/ExpressionRevolve.h"
 #include "madeup/ExpressionRoll.h"
@@ -144,20 +144,11 @@ void Environment::prime() {
   add(".radius", radius_closure);
   add(".outerRadius", radius_closure);
   add(".innerRadius", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine(".innerRadius", Co<Expression>(new ExpressionReal(0.5f)))), Environment())));
+  add(".energy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("energy", Co<Expression>(new ExpressionReal(100.0f)))), Environment())));
+  add(".halflife", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("halflife", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
   add("nsides", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("nsides", Co<Expression>(new ExpressionInteger(4)))), Environment())));
   add("pi", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("pi", Co<Expression>(new ExpressionReal(td::PI)))), Environment())));
   add("e", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("e", Co<Expression>(new ExpressionReal(td::E)))), Environment())));
-  add("twist", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("twist", Co<Expression>(new ExpressionReal(45.0f)))), Environment())));
-  add("maxBend", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("maxBend", Co<Expression>(new ExpressionReal(361.0f)))), Environment())));
-  add("axisx", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisx", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
-  add("axisy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisy", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
-  add("axisz", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisz", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
-  add(".energy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("energy", Co<Expression>(new ExpressionReal(100.0f)))), Environment())));
-  add(".halflife", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("halflife", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
-  add("x", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("x", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
-  add("y", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("y", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
-  add("z", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("z", Co<Expression>(new ExpressionReal(0.0f)))), Environment())));
-  add("flip", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("flip", Co<Expression>(new ExpressionBoolean(false)))), Environment())));
 
   ExpressionArray *rgb = new ExpressionArray(3);
   rgb->setElement(0, Co<Expression>(new ExpressionReal(100 / 255.0f)));
@@ -168,20 +159,11 @@ void Environment::prime() {
   globals->add(".rgb", (*this)[".rgb"]);
   globals->add(".outerRadius", (*this)[".outerRadius"]);
   globals->add(".innerRadius", (*this)[".innerRadius"]);
+  globals->add(".energy", (*this)[".energy"]);
+  globals->add(".halflife", (*this)[".halflife"]);
   globals->add("nsides", (*this)["nsides"]);
   globals->add("pi", (*this)["pi"]);
   globals->add("e", (*this)["e"]);
-  globals->add("twist", (*this)["twist"]);
-  globals->add("maxBend", (*this)["maxBend"]);
-  globals->add("axisx", (*this)["axisx"]);
-  globals->add("axisy", (*this)["axisy"]);
-  globals->add("axisz", (*this)["axisz"]);
-  globals->add(".energy", (*this)[".energy"]);
-  globals->add(".halflife", (*this)[".halflife"]);
-  globals->add("x", (*this)["x"]);
-  globals->add("y", (*this)["y"]);
-  globals->add("z", (*this)["z"]);
-  globals->add("flip", (*this)["flip"]);
 
   Co<ExpressionDefine> define_sine(new ExpressionDefine("sin", Co<Expression>(new ExpressionSine())));
   define_sine->addFormal("degrees");
@@ -261,7 +243,9 @@ void Environment::prime() {
   Co<ExpressionDefine> define_moveto(new ExpressionDefine("moveto", Co<Expression>(new ExpressionMoveTo())));
   define_moveto->addFormal("x");
   define_moveto->addFormal("y");
-  define_moveto->addFormal("z");
+  FormalParameter z("z");
+  z.setDefaultValue(Co<Expression>(new ExpressionInteger(0)));
+  define_moveto->addFormal(z);
   define_moveto->splat("x", xyz_splats);
 
   Co<ExpressionDefine> define_distort(new ExpressionDefine("distort", Co<Expression>(new ExpressionDistort())));
@@ -317,11 +301,6 @@ void Environment::prime() {
   define_dilate->addFormal("path");
   define_dilate->addFormal("length");
 
-  Co<ExpressionDefine> define_axis(new ExpressionDefine("axis", Co<Expression>(new ExpressionAxis())));
-  define_axis->addFormal("x");
-  define_axis->addFormal("y");
-  define_axis->addFormal("z");
-
   Co<ExpressionDefine> define_surface(new ExpressionDefine("surface", Co<Expression>(new ExpressionSurface())));
   define_surface->addFormal("width");
   define_surface->addFormal("height");
@@ -351,16 +330,23 @@ void Environment::prime() {
   Co<ExpressionDefine> define_any(new ExpressionDefine("any", Co<Expression>(new ExpressionAny())));
   define_any->addFormal("array");
 
+  FormalParameter twist("twist");
+  twist.setDefaultValue(Co<Expression>(new ExpressionInteger(45)));
+  FormalParameter maxBend("maxBend");
+  maxBend.setDefaultValue(Co<Expression>(new ExpressionInteger(360)));
+
   Co<ExpressionDefine> define_dowel(new ExpressionDefine("dowel", Co<Expression>(new ExpressionDowel())));
-  define_dowel->addFormal("twist");
-  define_dowel->addFormal("maxBend");
+  define_dowel->addFormal(twist);
+  define_dowel->addFormal(maxBend);
 
   Co<ExpressionDefine> define_tube(new ExpressionDefine("tube", Co<Expression>(new ExpressionTube())));
-  define_tube->addFormal("twist");
-  define_tube->addFormal("maxBend");
+  define_tube->addFormal(twist);
+  define_tube->addFormal(maxBend);
 
   Co<ExpressionDefine> define_polygon(new ExpressionDefine("polygon", Co<Expression>(new ExpressionPolygon())));
-  define_polygon->addFormal("flip");
+  FormalParameter flip("flip");
+  flip.setDefaultValue(Co<Expression>(new ExpressionBoolean(false)));
+  define_polygon->addFormal(flip);
 
   Co<ExpressionDefine> define_spheres(new ExpressionDefine("spheres", Co<Expression>(new ExpressionSpheres())));
 
@@ -425,7 +411,6 @@ void Environment::prime() {
   add("coalesce", Co<ExpressionClosure>(new ExpressionClosure(define_coalesce, globals)));
   add("fracture", Co<ExpressionClosure>(new ExpressionClosure(define_fracture, globals)));
   add("dilate", Co<ExpressionClosure>(new ExpressionClosure(define_dilate, globals)));
-  add("axis", Co<ExpressionClosure>(new ExpressionClosure(define_axis, globals)));
   add("blobs", Co<ExpressionClosure>(new ExpressionClosure(define_blobs, globals)));
   add("surface", Co<ExpressionClosure>(new ExpressionClosure(define_surface, globals)));
   add("random", Co<ExpressionClosure>(new ExpressionClosure(define_random, globals)));
@@ -456,7 +441,6 @@ void Environment::prime() {
   globals->add("asin", (*this)["asin"]);
   globals->add("atan", (*this)["atan"]);
   globals->add("atan2", (*this)["atan2"]);
-  globals->add("axis", (*this)["axis"]);
   globals->add("box", (*this)["box"]);
   globals->add("boxes", (*this)["boxes"]);
   globals->add("center", (*this)["center"]);
@@ -1540,11 +1524,11 @@ void Environment::forget() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::axis(float x, float y, float z) {
-  add("axisx", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisx", new ExpressionReal(x))), Environment())));
-  add("axisy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisy", new ExpressionReal(y))), Environment())));
-  add("axisz", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisz", new ExpressionReal(z))), Environment())));
-}
+/* void Environment::axis(float x, float y, float z) { */
+  /* add("axisx", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisx", new ExpressionReal(x))), Environment()))); */
+  /* add("axisy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisy", new ExpressionReal(y))), Environment()))); */
+  /* add("axisz", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("axisz", new ExpressionReal(z))), Environment()))); */
+/* } */
 
 /* ------------------------------------------------------------------------- */
 

@@ -85,7 +85,6 @@ class Environment {
     td::Co<td::Trimesh> blobs(float grain, float iso);
     td::Co<td::Trimesh> surface(int width, int height);
     void forget();
-    void axis(float x, float y, float z);
     void reframe();
     void add();
     void subtract();

@@ -36,6 +36,7 @@
 #include "madeup/ExpressionRemainder.h"
 #include "madeup/ExpressionRepeat.h"
 #include "madeup/ExpressionRepeatwich.h"
+#include "madeup/ExpressionReturn.h"
 #include "madeup/ExpressionString.h"
 #include "madeup/ExpressionSubscript.h"
 #include "madeup/ExpressionSubrange.h"
@@ -89,6 +90,7 @@ bool Parser::isInExpressionFirst(int k) const {
          isUp(Token::FOR, k) ||
          isUp(Token::REPEAT, k) ||
          isUp(Token::WHILE, k) ||
+         isUp(Token::RETURN, k) ||
          isUp(Token::NOT, k) ||
          isUp(Token::NOTHING, k) ||
          isUp(Token::MINUS, k) ||
@@ -673,11 +675,47 @@ void Parser::atom() {
     if (isUp(Token::ID)) {
       std::string name = tokens[i].getText();
       ++i;
-      std::vector<std::string> formals;
-      while (isUp(Token::ID)) {
+
+      // Formals are a comma-separated list of identifiers: "ID1, ID2, ID3" or
+      // "ID". They are optionally given default values: "ID1 = 5".
+      std::vector<FormalParameter> formals;
+      if (isUp(Token::ID)) {
+
+        // First parameter
         formals.push_back(tokens[i].getText());
         ++i;
+
+        // Default value
+        if (isUp(Token::ASSIGN)) {
+          ++i;
+          expressionLevel0(); 
+          formals[formals.size() - 1].setDefaultValue(popExpression());
+        }
+
+        // Remaining parameters
+        while (isUp(Token::COMMA)) {
+          // Comma
+          ++i;
+
+          // Identifier
+          if (isUp(Token::ID)) {
+            formals.push_back(tokens[i].getText());
+            ++i;
+          } else {
+            std::stringstream ss;
+            ss << tokens[i].getLocation().toAnchor() << ": I expected a parameter name after that comma. Instead, you gave me " << tokens[i].getQuotedText() << ".";
+            throw MessagedException(ss.str());
+          }
+
+          // Default value
+          if (isUp(Token::ASSIGN)) {
+            ++i;
+            expressionLevel0(); 
+            formals[formals.size() - 1].setDefaultValue(popExpression());
+          }
+        }
       }
+
       Co<Expression> rhs;
       if (isUp(Token::ASSIGN)) {
         if (isUp(Token::NEWLINE, 2)) {
@@ -701,6 +739,14 @@ void Parser::atom() {
           ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'end'.";
           throw MessagedException(ss.str());
         }
+      } else if (isUp(Token::ID)) {
+        // For the above condition to be true, previous token must also have
+        // been an identifier. Proof by contradiction: suppose previous token
+        // was not an identifier. Then we do not advance i, and we are looking
+        // at the same token now, which is still not an identifier.
+        std::stringstream ss;
+        ss << tokens[i].getLocation().toAnchor() << ": I expect a comma to separate a function's parameter names. I see no comma between " << tokens[i - 1].getQuotedText() << " and " << tokens[i].getQuotedText() << ".";
+        throw MessagedException(ss.str());
       } else {
         std::stringstream ss;
         ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected an assignment.";
@@ -708,7 +754,7 @@ void Parser::atom() {
       }
 
       Co<ExpressionDefine> define(new ExpressionDefine(name, rhs));
-      for (std::vector<std::string>::const_iterator formal = formals.begin(); formal != formals.end(); ++formal) {
+      for (std::vector<FormalParameter>::const_iterator formal = formals.begin(); formal != formals.end(); ++formal) {
         define->addFormal(*formal);
       }
       SourceLocation location(to_token.getLocation(), end_location);
@@ -772,11 +818,9 @@ void Parser::atom() {
 
       if (!isUp(Token::MINUS) && isInExpressionFirst()) {
         Co<ExpressionCall> call(new ExpressionCall(name));
-        std::vector<Co<Expression> > actuals;
 
         expressionLevel0();
         Co<Expression> actual = popExpression();
-        actuals.push_back(actual);
         call->addParameter(actual);
         end_location = actual->getSourceLocation();
         while (isUp(Token::COMMA)) {
@@ -804,7 +848,6 @@ void Parser::atom() {
         // If we see a comma, then the minus should be applied to the first parameter and we have a call.
         if (isUp(Token::COMMA)) {
           Co<ExpressionCall> call(new ExpressionCall(name));
-          std::vector<Co<Expression> > actuals;
 
           Co<Expression> actual(new ExpressionNegation(e));
           call->addParameter(actual);
@@ -828,40 +871,13 @@ void Parser::atom() {
           call->setSource(getSubsource(location), location);
           expressions.push(call);
         } else {
-          expressions.push(Co<Expression>(new ExpressionDynamicMinus(name, e)));
+          pushExpression(new ExpressionDynamicMinus(name, e), id_token.getLocation(), e->getSourceLocation());
         }
 
         // yaw - foo
         // if has a comma, definitely a call
         // if no comma, create an ambiguous expr that's either a call or a subtraction
       }
-
-      /* std::cout << "just saw call" << std::endl; */
-      /* std::cout << isUp(Token::ASSIGN) << std::endl; */
-
-      /* if (isUp(Token::ASSIGN)) { */
-        /* ++i; */
-        /* Co<Expression> rhs; */
-        /* if (isUp(Token::NEWLINE)) { */
-          /* ++i; */
-          /* block(); */
-          /* rhs = popBlock(); */
-          /* if (isUp(Token::END)) { */
-            /* ++i; */
-          /* } else { */
-            /* std::stringstream ss; */
-            /* ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected 'end'."; */
-            /* throw MessagedException(ss.str()); */
-          /* } */
-        /* } else { */
-          /* expressionLevel0(); */
-          /* rhs = popExpression(); */
-        /* } */
-        /* pushExpression(new ExpressionDefineElement(call, rhs), call->getSourceLocation(), rhs->getSourceLocation()); */
-      /* } else { */
-        /* pushExpression(new ExpressionArraySubscript(array, subscript), array->getSourceLocation(), subscript->getSourceLocation()); */
-        /* expressions.push(call); */
-      /* } */
     }
   } else if (isUp(Token::FOR)) {
     Token for_token = tokens[i];
@@ -982,7 +998,7 @@ void Parser::atom() {
 
     if (!isUp(Token::RIGHT_CURLY_BRACE)) {
       do {
-        ++i; // consume { or ,
+        ++i; // consume left curly or ,
         expressionLevel0();
         items.push_back(popExpression());
       } while (isUp(Token::COMMA));
@@ -999,6 +1015,19 @@ void Parser::atom() {
       throw MessagedException(ss.str());
     }
 
+  } else if (isUp(Token::RETURN)) {
+    Token return_token = tokens[i];
+    ++i;
+
+    Co<Expression> e;
+    if (isInExpressionFirst()) {
+      expressionLevel0();
+      e = popExpression();
+    } else {
+      e = ExpressionUnit::getSingleton();
+    }
+
+    pushExpression(new ExpressionReturn(e), return_token.getLocation(), e->getSourceLocation());
   } else {
     std::stringstream ss;
     ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place I didn't expect it.";

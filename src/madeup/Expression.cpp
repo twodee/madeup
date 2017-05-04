@@ -40,7 +40,7 @@ namespace madeup {
 /* ------------------------------------------------------------------------- */
 
 Expression::Expression() :
-  source("n/a"),
+  source(),
   location() {
 }
 

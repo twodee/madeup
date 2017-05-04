@@ -36,33 +36,6 @@ Co<Expression> ExpressionCall::evaluate(Environment &env) const {
   }
 
   Co<ExpressionDefine> define = closure->getDefine();
-  /* std::cout << "name: " << name << std::endl; */
-  /* std::cout << "define->getArity(): " << define->getArity() << std::endl; */
-
-  // If the expression takes no parameters, it might be an array and we'll need
-  // to look for a subscript. Even if its not, we can skip over a bunch of
-  // logic for handling parameters.
-  /* if (false && define->getArity() == 0) { */
-    /* Co<Expression> result = closure->evaluate(env); */
-    /* ExpressionArrayReference *array = dynamic_cast<ExpressionArrayReference *>(result.GetPointer()); */
-    /* if (array) { */
-      /* // assert only 1 param  */
-      /* if (parameters.size() != 1) { */
-        /* throw MessagedException(getSourceLocation().toAnchor() + ": " + "Bad subscript."); */
-      /* } */
-
-      /* // evaluate param */
-      /* Co<Expression> subscript_value = parameters[0]->evaluate(env); */
-      /* ExpressionInteger *subscript = dynamic_cast<ExpressionInteger *>(subscript_value.GetPointer()); */
-      /* if (!subscript) { */
-        /* throw MessagedException(getSourceLocation().toAnchor() + ": " + "Non-integer subscript."); */
-      /* } */
-
-      /* return (*array->getArray())[subscript->toInteger()]; */
-    /* } else { */
-      /* return result; */
-    /* } */
-  /* } else { */
 
   unsigned int nactuals = 0;
  
@@ -128,6 +101,18 @@ Co<Expression> ExpressionCall::evaluate(Environment &env) const {
     }
   }
 
+  // Also auto-supply autosupply actual parameters for any formals that have
+  // default values.
+  for (; fi < define->getArity() && !define->getFormal(fi).getDefaultValue().IsNull(); ++fi, ++ai) {
+    const FormalParameter &formal = define->getFormal(fi);
+    Co<Expression> actual = formal.getDefaultValue()->evaluate(env);
+    Co<ExpressionDefine> parameter_define = Co<ExpressionDefine>(new ExpressionDefine(formal.getName(), actual));
+    Co<ExpressionClosure> parameter_closure = Co<ExpressionClosure>(new ExpressionClosure(parameter_define, Environment()));
+    parameter_closure->setSource(formal.getDefaultValue()->getSource(), formal.getDefaultValue()->getSourceLocation());
+    closure_env->replace(formal.getName(), parameter_closure);
+    ++nactuals;
+  }
+
   // Make sure there are the correct number of parameters! If ai is short of
   // parameter.size, that means the loop got cut off by the number of formal
   // parameters. The user supplied more than was specified.
@@ -157,6 +142,8 @@ Co<Expression> ExpressionCall::evaluate(Environment &env) const {
   } else {
     try {
       return closure->evaluate(*closure_env);
+    } catch (Co<Expression> return_value) {
+      return return_value;
     } catch (UnlocatedException e) {
       throw MessagedException(getSourceLocation().toAnchor() + ": " + e.GetMessage());
     }

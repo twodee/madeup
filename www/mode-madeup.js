@@ -77,7 +77,7 @@ var MadeupHighlightRules = function() {
       },
       {
         token: "keyword",
-        regex: /\b(?:repeat|not|of|around|while|end|for|end|else|if|through|and|or|to|in|by|then)\b/,
+        regex: /\b(?:repeat|return|not|of|around|while|end|for|end|else|if|through|and|or|to|in|by|then)\b/,
         next: "start"
       },
       {

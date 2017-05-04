@@ -32,13 +32,6 @@ Co<Expression> ExpressionCallWithNamedParameters::evaluate(Environment &env) con
     throw MessagedException(getSourceLocation().toAnchor() + ": No function named " + name + " is defined.");
   }
 
-  /* std::cout << "" << std::endl; */
-  /* std::cout << "with names" << std::endl; */
-  /* std::cout << "getSource(): " << getSource() << std::endl; */
-  /* std::cout << "closure: " << closure << std::endl; */
-  /* std::cout << "closure->GetDefine(): " << closure->getDefine() << std::endl; */
-  /* std::cout << "closure->GetDefine()->name: " << closure->getDefine()->getName() << std::endl; */
-
   Co<ExpressionDefine> define = closure->getDefine();
   Co<Environment> closure_env(new Environment(*closure->getEnvironment()));
 
@@ -69,15 +62,20 @@ Co<Expression> ExpressionCallWithNamedParameters::evaluate(Environment &env) con
       parameter_define = Co<ExpressionDefine>(new ExpressionDefine(formal.getName(), is_lazy ? match->second : match->second->evaluate(env)));
       parameter_closure = Co<ExpressionClosure>(new ExpressionClosure(parameter_define, is_lazy ? env : Environment()));
       parameter_closure->setSource(match->second->getSource(), match->second->getSourceLocation());
-    }
+    } else if (!formal.getDefaultValue().IsNull()) {
+      parameter_define = Co<ExpressionDefine>(new ExpressionDefine(formal.getName(), formal.getDefaultValue()->evaluate(env)));
+      parameter_closure = Co<ExpressionClosure>(new ExpressionClosure(parameter_define, Environment()));
+      parameter_closure->setSource(formal.getDefaultValue()->getSource(), formal.getDefaultValue()->getSourceLocation());
 
+    // UPDATE: disallow implicits. They work, but their benefit is small and
+    // risk of confusion is too high.
     // If no such parameter was enumerated, checking for a binding with that
     // name in the surrounding environment at the time of the call.
-    else if (env.isBound(formal.getName())) {
-      Co<Expression> closure = env[formal.getName()];
-      parameter_define = Co<ExpressionDefine>(new ExpressionDefine(formal.getName(), is_lazy ? closure : closure->evaluate(env)));
-      parameter_closure = Co<ExpressionClosure>(new ExpressionClosure(parameter_define, is_lazy ? env : Environment()));
-      parameter_closure->setSource(closure->getSource(), closure->getSourceLocation());
+    /* else if (env.isBound(formal.getName())) { */
+      /* Co<Expression> closure = env[formal.getName()]; */
+      /* parameter_define = Co<ExpressionDefine>(new ExpressionDefine(formal.getName(), is_lazy ? closure : closure->evaluate(env))); */
+      /* parameter_closure = Co<ExpressionClosure>(new ExpressionClosure(parameter_define, is_lazy ? env : Environment())); */
+      /* parameter_closure->setSource(closure->getSource(), closure->getSourceLocation()); */
     } else {
       throw MessagedException(getSourceLocation().toAnchor() + ": Function " + define->getName() + " expects a parameter named " + formal.getName() + ". No such parameter was provided and no variable with that name was defined.");
     }
@@ -87,6 +85,8 @@ Co<Expression> ExpressionCallWithNamedParameters::evaluate(Environment &env) con
 
   try {
     return closure->evaluate(*closure_env);
+  } catch (Co<Expression> return_value) {
+    return return_value;
   } catch (UnlocatedException e) {
     throw MessagedException(getSourceLocation().toAnchor() + ": " + e.GetMessage());
   }

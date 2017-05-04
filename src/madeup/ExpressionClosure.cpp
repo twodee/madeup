@@ -41,14 +41,6 @@ Co<Expression> ExpressionClosure::evaluate(Environment &env) const {
   // including the state at the time it was created and any temporaries for
   // parameters.
  
-  /* std::cout << "------------------------------------------------" << std::endl; */
-  /* std::cout << "in closure" << std::endl; */
-  /* std::cout << "define->getName(): " << define->getName() << std::endl; */
-  /* std::cout << "define->getBody(): " << define->getBody() << std::endl; */
-  /* std::cout << env << std::endl; */
-  /* std::cout << "about to print env" << std::endl; */
-  /* std::cout << *this->env << std::endl; */
-  /* std::cout << "printed env" << std::endl; */
   return define->getBody()->evaluate(env);
 }
 

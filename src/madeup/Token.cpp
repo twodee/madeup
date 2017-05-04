@@ -150,6 +150,8 @@ const std::string Token::getTypeString() const {
       return "TRUE";
     case WHILE:
       return "WHILE";
+    case RETURN:
+      return "RETURN";
     case END_OF_FILE:
       return "END_OF_FILE";
     default:

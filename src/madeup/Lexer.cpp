@@ -350,6 +350,8 @@ Token Lexer::getTokenAfterLetter() {
     return makeToken(Token::TRUE);
   } else if (text_so_far == "while") {
     return makeToken(Token::WHILE);
+  } else if (text_so_far == "return") {
+    return makeToken(Token::RETURN);
   } else {
     return makeToken(Token::ID);
   }

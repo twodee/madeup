@@ -12,7 +12,7 @@ namespace madeup {
 /* ------------------------------------------------------------------------- */
 
 FormalParameter::FormalParameter(const std::string &name,
-                evaluation_mode_t evaluation_mode) :
+                                 evaluation_mode_t evaluation_mode) :
   name(name),
   evaluation_mode(evaluation_mode) {
 }
@@ -49,6 +49,18 @@ const std::vector<std::string> &FormalParameter::getSplats() const {
 
 /* ------------------------------------------------------------------------- */
 
+void FormalParameter::setDefaultValue(Co<Expression> default_value) {
+  this->default_value = default_value; 
+}
+
+/* ------------------------------------------------------------------------- */
+
+Co<Expression> FormalParameter::getDefaultValue() const {
+  return default_value; 
+}
+
+/* ------------------------------------------------------------------------- */
+
 std::ostream &operator<<(std::ostream &out, const FormalParameter &parameter) {
   out << parameter.getName();
   return out;
@@ -77,6 +89,12 @@ ExpressionDefine::ExpressionDefine(const string &name, Co<Expression> body, cons
 
 void ExpressionDefine::addFormal(const string &name, FormalParameter::evaluation_mode_t evaluation_mode) {
   formals.push_back(FormalParameter(name, evaluation_mode));
+}
+
+/* ------------------------------------------------------------------------- */
+
+void ExpressionDefine::addFormal(const FormalParameter &formal) {
+  formals.push_back(formal);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -122,10 +140,22 @@ Co<Expression> ExpressionDefine::getBody() const {
 
 /* ------------------------------------------------------------------------- */
 
+void FormalParameter::write(ostream &out) const {
+  out << "(" << name;
+  if (!getDefaultValue().IsNull()) {
+    out << " ";
+    default_value->write(out);
+  }
+  out << ")";
+}
+
+/* ------------------------------------------------------------------------- */
+
 void ExpressionDefine::write(ostream &out) const {
   out << "(define " << name << " ";
   for (vector<FormalParameter>::const_iterator i = formals.begin(); i != formals.end(); ++i) {
-    out << *i << " ";
+    i->write(out);
+    out << " ";
   }
   body->write(out);
   out << ")";

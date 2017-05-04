@@ -13,7 +13,6 @@ add_library(madeup
   ExpressionAny.cpp
   ExpressionAnd.cpp
   ExpressionArray.cpp
-  ExpressionAxis.cpp
   ExpressionBlobs.cpp
   ExpressionBlock.cpp
   ExpressionBoolean.cpp
@@ -87,6 +86,7 @@ add_library(madeup
   ExpressionRemainder.cpp
   ExpressionRepeat.cpp
   ExpressionRepeatwich.cpp
+  ExpressionReturn.cpp
   ExpressionReverse.cpp
   ExpressionRevolve.cpp
   ExpressionRoll.cpp

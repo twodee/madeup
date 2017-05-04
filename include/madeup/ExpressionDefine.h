@@ -19,18 +19,22 @@ class FormalParameter {
     };
 
     FormalParameter(const std::string &name,
-                    evaluation_mode_t evaluation_mode);
+                    evaluation_mode_t evaluation_mode = EAGER);
 
     evaluation_mode_t getEvaluationMode() const;
     const std::string &getName() const;
     bool isSplattable() const;
     void splatTo(const std::vector<std::string> &splats);
     const std::vector<std::string> &getSplats() const;
+    void setDefaultValue(td::Co<Expression> default_value);
+    td::Co<Expression> getDefaultValue() const;
+    void write(ostream &out) const;
 
   private:
     std::string name;
     evaluation_mode_t evaluation_mode;
     std::vector<std::string> splats;
+    td::Co<Expression> default_value;
 };
 
 /* ------------------------------------------------------------------------- */
@@ -44,6 +48,7 @@ class ExpressionDefine : public Expression {
     ExpressionDefine(const std::string &name, td::Co<Expression> body);
     ExpressionDefine(const std::string &name, td::Co<Expression> body, const std::vector<FormalParameter> &formals);
     void addFormal(const std::string &name, FormalParameter::evaluation_mode_t evaluation_mode = FormalParameter::EAGER);
+    void addFormal(const FormalParameter &formal);
     const FormalParameter &getFormal(int i);
     unsigned int getArity() const;
     td::Co<Expression> evaluate(Environment &env) const;

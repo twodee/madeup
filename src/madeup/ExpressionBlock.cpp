@@ -1,5 +1,6 @@
 #include "madeup/ExpressionBlock.h"
 #include "madeup/ExpressionClosure.h"
+#include "madeup/ExpressionDefineElement.h"
 #include "madeup/ExpressionDefineVariable.h"
 #include "madeup/ExpressionMesh.h"
 #include "madeup/ExpressionNodes.h"
@@ -36,8 +37,9 @@ Co<Expression> ExpressionBlock::evaluate(Environment &env) const {
     value = (*i)->evaluate(env);
 
     // Don't issue geometry if expression was an assignment.
-    const ExpressionDefineVariable *define = dynamic_cast<const ExpressionDefineVariable *>(i->GetPointer());
-    if (!define) {
+    const ExpressionDefineVariable *define_variable = dynamic_cast<const ExpressionDefineVariable *>(i->GetPointer());
+    const ExpressionDefineElement *define_element = dynamic_cast<const ExpressionDefineElement *>(i->GetPointer());
+    if (!define_variable && !define_element) {
       ExpressionMesh *mesh = dynamic_cast<ExpressionMesh *>(value.GetPointer());
       if (mesh) {
         env.echoWithoutTransform(mesh->toMesh());

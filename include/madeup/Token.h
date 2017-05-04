@@ -61,6 +61,7 @@ class Token {
       AROUND,
       COMMENT,
       END_OF_FILE,
+      RETURN,
       UNKNOWN
     };
 
