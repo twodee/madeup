@@ -313,9 +313,8 @@ if (array_key_exists('movie', $_REQUEST)) {
 
 <!-- Blocks Switch ________________________________________________________ -->
 <script>
-
-<?php
 var madeupPrefix = 'http://madeup.xyz';
+<?php
 if (strpos($_SERVER['HTTP_HOST'], 'to.madeup') !== false || (isset($_REQUEST['editor']) && strcmp($_REQUEST['editor'], 'blocks') == 0)) {
 ?>
 
