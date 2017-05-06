@@ -76,6 +76,7 @@ if (array_key_exists('movie', $_REQUEST)) {
   <link rel="stylesheet" href="ide_skin.css"/>
   <link rel="stylesheet" href="ide_skin_dark.css" title="theme"/>
   <script src="text_to_blocks.js"></script>
+  <script src="bridge.js"></script>
   <script src="ide_function.js"></script>
   <script src="block_definitions.js"></script>
   <script src="blockly_blocks_madeup.js"></script>
