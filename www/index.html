@@ -175,19 +175,19 @@
 
   <div id="glcanvas">
     <div id="toolbar">
-      <div class="quick-button" id="pathify-button" title="Pathify (Control ,)"><img src="images/pathify_icon.png"></div>
-      <div class="quick-button" id="solidify-button" title="Solidify (Control .)"><img src="images/solidify_icon.png"></div>
-      <div class="quick-button" id="fit-button" title="Fit (Control /)"><img src="images/fit.png"></div>
-      <div class="quick-button" id="settings-button" title="Settings (Control ?)"><img src="images/gear.png"></div>
+      <div class="quick-button" id="pathify-button" title="Pathify (Control ,)"><img src="images/pathify_icon.png" class="unselectable"></div>
+      <div class="quick-button" id="solidify-button" title="Solidify (Control .)"><img src="images/solidify_icon.png" class="unselectable"></div>
+      <div class="quick-button" id="fit-button" title="Fit (Control /)"><img src="images/fit.png" class="unselectable"></div>
+      <div class="quick-button" id="settings-button" title="Settings (Control ?)"><img src="images/gear.png" class="unselectable"></div>
     </div>
   </div>
 
   <div id="right">
-    <div class="quick-button" id="close-settings-button" title="Close settings (Control ?)"><img src="images/close.png"></div>
+    <div class="quick-button unselectable" id="close-settings-button" title="Close settings (Control ?)"><img src="images/close.png"></div>
 
     <ul id="settings">
       <li id="panel-section-file">
-        <span class="panel-section-label">File</span>
+        <span class="panel-section-label unselectable">File</span>
         <div class="panel-section-content">
           <a href="#" id="fileSave" class="fileLink">Save</a><br/>
           <a href="#" id="fileSaveAs" class="fileLink">Save As</a><br/>
@@ -210,12 +210,12 @@
       </li>
 
       <li id="panel-section-mups">
-        <span class="panel-section-label">Mups</span>
+        <span class="panel-section-label unselectable">Mups</span>
         <div class="panel-section-content"></div>
       </li>
 
       <li id="panel-section-editor">
-        <span class="panel-section-label">Editor</span>
+        <span class="panel-section-label unselectable">Editor</span>
         <div class="panel-section-content">
           Text size: <a href="#" id="smaller" class="fileLink">smaller</a> or <a href="#" id="bigger" class="fileLink">bigger</a><br/>
           <input type="radio" name="editorMode" id="isEditorText" value="Text" checked="checked"/>Text or 
@@ -228,7 +228,7 @@
       </li>
 
       <li id="panel-section-display">
-        <span class="panel-section-label">Display</span>
+        <span class="panel-section-label unselectable">Display</span>
         <div class="panel-section-content">
           Show <select name="showMode" id="showMode" class="popupDropdown">
             <option value="solid" selected>Solid</option> 
@@ -260,7 +260,7 @@
       </li>
 
       <li id="panel-section-about">
-        <span class="panel-section-label">About</span>
+        <span class="panel-section-label unselectable">About</span>
         <div class="panel-section-content">
           <a href="#" id="docs" class="fileLink">Documentation</a><br>
           <a href="#" id="github" class="fileLink">Source Code</a><br>

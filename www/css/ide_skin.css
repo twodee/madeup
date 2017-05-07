@@ -16,7 +16,7 @@ body {
   margin: 0;
 }
 
-img {
+.unselectable {
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
@@ -260,6 +260,10 @@ ul#settings > li {
 ul#settings > li > .panel-section-label {
   color: #FFCC99;
   text-transform: uppercase;
+}
+
+ul#settings > li > .panel-section-label:hover {
+  color: #DDDD00;
 }
 
 ul#settings > li > .panel-section-label:before {
