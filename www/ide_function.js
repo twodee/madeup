@@ -280,6 +280,8 @@ function saveInCookies() {
 }
 
 $(document).ready(function() {
+  $(document).tooltip({show: {effect: 'slideDown', delay: 1000}, position: {my: 'center top', at: 'center bottom'}});
+
   // When we are embedded in an iframe, the wheel event will cause the
   // embedding context to scroll. That's not what we want, so we capture and
   // squelch any wheel events.
@@ -322,8 +324,6 @@ $(document).ready(function() {
       fontSize = parseInt(Cookies.get('fontSize'));
     } else if (isBlocky) {
       fontSize = 24;
-      $('#menu').css('padding-top', '5px');
-      $('#menu').css('padding-bottom', '5px');
     } else if (isPresenting) {
       fontSize = 28;
     } else {
@@ -482,7 +482,7 @@ $(document).ready(function() {
     Blockly.fireUiEvent(window, 'resize');
   });
 
-  $('#fit').click(function() {
+  $('#fit-button').click(function() {
     fit();
     focusEditor();
   });
@@ -512,7 +512,6 @@ $(document).ready(function() {
   });
 
   $('input[type=radio][name=editorMode]').change(function() {
-    hideMenus(); // setEditor may pop open a dialog, which doesn't look good with a menu still open
     var editorMode = $(this).val();
     console.log(editorMode);
     setEditor(editorMode != "Blocks");
@@ -563,18 +562,6 @@ $(document).ready(function() {
       fontSize = newSize;
       isFontSizeChanged = true;
     }
-
-    $('#menu input').each(function (i) {
-      this.style.fontSize = fontSize + 'px';
-    });
-
-    $('.popup').each(function (i) {
-      this.style.fontSize = fontSize + 'px';
-    });
-
-    $('.popupDropdown').each(function (i) {
-      this.style.fontSize = fontSize + 'px';
-    });
 
     textEditor.setFontSize(fontSize);
     $('#console')[0].style.fontSize = fontSize + 'px';
@@ -736,42 +723,6 @@ $(document).ready(function() {
     run(getSource(), GeometryMode.PATH);
   });
 
-  function toggleMenu(id) {
-    var buttonID = '#toggle' + id.charAt(1).toUpperCase() + id.substring(2);
-
-    $(id).css('top', $(buttonID).offset().top + $(buttonID).innerHeight(true)) - 8; 
-    $(id).css('left', $(buttonID).offset().left); 
-
-    // Hilite the menu if it's opening.
-    if (!$(id).is(":visible")) {
-      $(buttonID).removeClass('closed').addClass('open');
-    }
-
-    $(id).slideToggle('fast', function() {
-      // Unhilite the menu once it's closed.
-      if (!$(id).is(":visible")) {
-        $(buttonID).removeClass('open').addClass('closed');
-      }
-    });
-  }
-
-  $('#toggleFilePopup').click(function() {
-    toggleMenu('#filePopup');
-    populateFileMenu();
-  });
-
-  $('#toggleEditorPopup').click(function() {
-    toggleMenu('#editorPopup');
-  });
-
-  $('#toggleAboutPopup').click(function() {
-    toggleMenu('#aboutPopup');
-  });
-
-  $('#toggleDisplayPopup').click(function() {
-    toggleMenu('#displayPopup');
-  });
-
   enableDownload(false);
   $('#download').click(function() {
     $('#tag').val(mupName);
@@ -814,20 +765,27 @@ $(document).ready(function() {
     });
   });
 
-  $('#solidify').click(function() {
+  $('#solidify-button').click(function() {
     saveInCookies();
     run(getSource(), GeometryMode.SURFACE);
     focusEditor();
   });
 
-  $('#pathify').click(function() {
+  $('#pathify-button').click(function() {
     saveInCookies();
     run(getSource(), GeometryMode.PATH);
     focusEditor();
   });
 
+  $('#settings-button').click(showSettings);
+  $('#close-settings-button').click(hideSettings);
+
+  $('ul#settings > li > .panel-section-label').click(function() {
+    $(this).toggleClass('open-panel-section-label');
+    $(this).next().slideToggle(200);
+  });
+
   $('#fileSaveAs').click(function() {
-    hideMenus();
     var name = prompt('Save under what name?');
     if (name != null) {
       mupName = name;
@@ -837,8 +795,6 @@ $(document).ready(function() {
   });
 
   $('#fileSave').click(function() {
-    hideMenus();
-
     if (!mupName) {
       mupName = prompt('Save under what name?');
     }
@@ -850,8 +806,6 @@ $(document).ready(function() {
   });
 
   $('#exportArchive').click(function() {
-    hideMenus();
-
     var archive = new Object;
     for (var mup in window.localStorage) {
       if (mup != 'untitled') {
@@ -886,7 +840,6 @@ $(document).ready(function() {
   });
 
   $('#fileClose').click(function() {
-    hideMenus();
     if (mupName && isSourceDirty && confirm('Save changes to ' + mupName + '?')) {
       save();
     }
@@ -915,6 +868,16 @@ $(document).ready(function() {
     } 
   });
 
+  $('#right').resizable({
+    handles: "w",
+    minWidth: 300,
+    resize: function(event, ui) {
+      resize();
+      window.dispatchEvent(new Event('resize'))
+      render();
+    } 
+  });
+
   $('#console').resizable({
     handles: "n",
     resize: function(event, ui) {
@@ -925,40 +888,32 @@ $(document).ready(function() {
     } 
   });
 
-  $(document).on('click', function(event) {
-    // If a non-menu was clicked on, so let's close all the menus.
-    if ($(event.target).closest('.togglePopup').length == 0 &&
-        $(event.target).closest('.popup').length == 0) {
-      hideMenus();
-    }
-    
-    // Otherwise, if got a click on a menu toggle button, let's hide any other
-    // menus. 
-    else if ($(event.target).hasClass('togglePopup')) {
-      // The menu button has ID toggleNamePopup. Strip off the toggle and lowercase
-      // the name to get the menu's ID.
-      var id = event.target.id.substring(6);
-      var id = '#' + id.charAt(0).toLowerCase() + id.substring(1);
-      hideMenus(id);
-      focusEditor();
-    }
- 
-    // Otherwise, if got a click on a menu itself, let's hide any other menus. 
-    else if ($(event.target).hasClass('popup')) {
-      hideMenus('#' + event.target.id);
-      focusEditor();
-    }
-
-    return true;
-  });
-
   if (hasWebGL()) {
     init();
     animate();
   }
 });
 
-var onEditorChange = function(delta) {
+function showSettings() {
+  $('#settings-button').fadeToggle(100, function() {
+    $('#right').toggle('slide', {direction: 'right', duration: 500}, function() {
+      resize();
+      $('#right').css('overflow', 'visible');
+      $('#close-settings-button').fadeToggle(500);
+    });
+  });
+}
+
+function hideSettings() {
+  $('#close-settings-button').fadeToggle(100, function() {
+    $('#right').toggle('slide', {direction: 'right', duration: 500}, function() {
+      resize();
+      $('#settings-button').fadeToggle(500);
+    });
+  });
+}
+
+function onEditorChange(delta) {
   isSourceDirty = true;
   updateTitle();
   enableDownload(false);
@@ -1105,7 +1060,6 @@ function switchEditors() {
 }
 
 function load(mup) {
-  hideMenus();
   if (mupName && isSourceDirty && confirm('Save changes to ' + mupName + '?')) {
     save();
   }
@@ -1507,10 +1461,16 @@ function resize() {
 
   controls.handleResize();
 
-  var nonChromeHeight = $(window).height() - $('#menu').height() - $('#keystrokes').height();
+  var nonChromeHeight = $(window).height() - $('#keystrokes').height();
   var flexHeight = nonChromeHeight - $('#console').height();
 
-  var width = window.innerWidth - $('#left').width();
+  var rightWidth = 0;
+  if ($('#right').css('display') != 'none') {
+    rightWidth = $('#right').outerWidth();
+  }
+
+  var width = window.innerWidth - $('#left').width() - rightWidth;
+  $('#glcanvas').width(width);
   var height = window.innerHeight;
   if (renderer) renderer.setSize(width, nonChromeHeight);
   camera.aspect = width / height;
@@ -1573,7 +1533,7 @@ function highlight(startIndex, stopIndex) {
 var vertexTexture;
 function init() {
   var loader = new THREE.TextureLoader();
-  vertexTexture = loader.load('vertex.png');
+  vertexTexture = loader.load('images/vertex.png');
 
   camera = new THREE.PerspectiveCamera(45.0, 1.0, 0.1, 10000.0);
   // camera = new THREE.OrthographicCamera(-50, 50, 50, -50, -100, 100);
@@ -1650,16 +1610,6 @@ function render() {
   renderer.render(overallScene, camera);
 }
 
-function hideMenus(exceptID) {
-  if (exceptID === undefined) {
-    $('.popup').hide();
-    $('.togglePopup').removeClass('open').addClass('closed');
-  } else {
-    $('.popup').not(exceptID).hide();
-    $('.togglePopup').not('#toggle' + exceptID.charAt(1).toUpperCase() + exceptID.substring(2)).removeClass('open').addClass('closed');
-  }
-}
-
 function focusEditor() {
   textEditor.focus();
 }
@@ -1669,15 +1619,23 @@ Mousetrap.bind('ctrl+s', function(e) {
 });
 
 Mousetrap.bind('ctrl+,', function(e) {
-  run(getSource(), GeometryMode.SURFACE);
+  run(getSource(), GeometryMode.PATH);
 });
 
 Mousetrap.bind('ctrl+.', function(e) {
-  run(getSource(), GeometryMode.PATH);
+  run(getSource(), GeometryMode.SURFACE);
 });
 
 Mousetrap.bind('ctrl+/', function(e) {
   fit();
+});
+
+Mousetrap.bind('ctrl+shift+/', function(e) {
+  if ($('#right').css('display') == 'none') {
+    showSettings();
+  } else {
+    hideSettings();
+  }
 });
 
 Mousetrap.bind('ctrl+t', function(e) {

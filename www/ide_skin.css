@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 html {
   height: 100%;
   width: 100%;
@@ -10,6 +14,16 @@ body {
   overflow: hidden;
   padding: 0;
   margin: 0;
+}
+
+img {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+  -webkit-touch-callout: none;
 }
 
 #tools {
@@ -57,12 +71,13 @@ body {
 }
 
 #glcanvas {
-  /* float: left; */ /* Caused flickering in Electron. */
+  float: left;
   width: auto;
   overflow: hidden;
   margin: 0;
   padding: 0;
   border: none;
+  position: relative; /* needed to anchor toolbar */
 }
 
 #textEditor { 
@@ -101,30 +116,6 @@ body {
   height: 5px;
 }
 
-#menu input[type="button"] {
-  border: 0px;
-  margin-left: 4px;
-  margin-right: 4px;
-  margin-top: 0px;
-  margin-bottom: 0px;
-
-  /* We use padding instead of margin, because we want the background color to stretch up and down to the menu. */
-  padding-top: 4px;
-  padding-bottom: 4px;
-
-  font-size: 10pt;
-  outline: none;
-  pointer-events: auto;
-  z-index: 10;
-
-  /* iOS wants to pretty up the buttons. No. */
-  -webkit-appearance: none;
-  -webkit-border-radius: 0;
-}
-
-#menu input[type="button"]:active {
-}
-
 .srclink:link {
 }
 
@@ -137,13 +128,6 @@ body {
 .srclink:active {
 }
 
-#menu {
-  position: relative;
-  margin: 0px;
-  padding: 0px;
-  width: 100%;
-}
-
 #downloader {
   position: fixed;
   top: 600px;
@@ -152,15 +136,6 @@ body {
 }
 
 .fileLink {
-}
-
-#mupsContainer {
-  height: 400px;
-}
-
-#mups {
-  height: 100%;
-  overflow: auto;
 }
 
 audio::-webkit-media-controls-enclosure {
@@ -204,4 +179,107 @@ audio::-webkit-media-controls-enclosure {
 .blocklyTreeRow {
   height: 28px !important;
   margin-top: 5px !important;
+}
+
+.quick-button {
+  float: left;
+  margin-top: 10px;
+}
+
+#settings-button {
+  float: right;
+}
+
+#toolbar > .quick-button:first-child {
+  margin-left: 10px;
+}
+
+#settings-button, #close-settings-button {
+  margin-right: 10px;
+}
+
+.quick-button img {
+  width: 50px;
+  height: 50px;
+  padding: 5px;
+  transition-property: transform; 
+  transition-duration: 500ms;
+  transition-timing-function: ease-in-ease-out;
+}
+
+.quick-button img:hover {
+  transform: scale(1.1, 1.1);
+}
+
+/* I tried not having a div wrapper around the settings ul, but the overflow:
+   auto on the ul cut off the absolutely position X box. */
+#right {
+  overflow: none;
+  display: none;
+  background-color: black;
+  color: white;
+  width: 300px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+ul#settings {
+  position: absolute;
+  overflow: auto;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+#close-settings-button {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-60px, 0);
+}
+
+ul#settings > li > .panel-section-content {
+  display: none;
+}
+
+ul#settings > li {
+  font-family: sans-serif;
+  font-size: 18pt;
+  display: inline-block;
+  width: 100%;
+  margin: 0;
+  border-bottom: 1px solid #404040;
+}
+
+ul#settings > li > .panel-section-label {
+  color: #FFCC99;
+  text-transform: uppercase;
+}
+
+ul#settings > li > .panel-section-label:before {
+  content: '\25b8';
+  padding: 5px;
+  width: 12pt;
+  display: inline-block;
+}
+
+ul#settings > li > .open-panel-section-label:before {
+  content: '\25be';
+}
+
+ul#settings > li > .panel-section-content {
+  margin: 10px;
+}
+
+#toolbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
 }
