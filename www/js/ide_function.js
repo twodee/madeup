@@ -473,13 +473,13 @@ $(document).ready(function() {
   $('#smaller').click(function() {
     setFontSize(fontSize - 2);
     resize();
-    Blockly.fireUiEvent(window, 'resize');
+    // Blockly.fireUiEvent(window, 'resize'); TODO
   });
 
   $('#bigger').click(function() {
     setFontSize(fontSize + 2);
     resize();
-    Blockly.fireUiEvent(window, 'resize');
+    // Blockly.fireUiEvent(window, 'resize'); TODO
   });
 
   $('#fit-button').click(function() {
@@ -565,6 +565,7 @@ $(document).ready(function() {
 
     textEditor.setFontSize(fontSize);
     $('#console')[0].style.fontSize = fontSize + 'px';
+    $('ul#settings')[0].style.fontSize = (fontSize + 8) + 'px';
   }
 
   var red = 0xB80000;
@@ -944,7 +945,7 @@ function setTheme(isDark) {
     $("#isLight").prop('checked', true);
   }
 
-  $('link[title="theme"]').attr('href', isThemeDark ? 'ide_skin_dark.css' : 'ide_skin_light.css');
+  $('link[title="theme"]').attr('href', isThemeDark ? 'css/ide_skin_dark.css' : 'css/ide_skin_light.css');
   textEditor.setTheme(isThemeDark ? 'ace/theme/twilight' : 'ace/theme/katzenmilch');
 }
 

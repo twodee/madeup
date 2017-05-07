@@ -226,6 +226,7 @@ audio::-webkit-media-controls-enclosure {
 }
 
 ul#settings {
+  font-size: 20pt;
   position: absolute;
   overflow: auto;
   right: 0;
@@ -250,7 +251,6 @@ ul#settings > li > .panel-section-content {
 
 ul#settings > li {
   font-family: sans-serif;
-  font-size: 18pt;
   display: inline-block;
   width: 100%;
   margin: 0;
@@ -264,17 +264,23 @@ ul#settings > li > .panel-section-label {
 
 ul#settings > li > .panel-section-label:before {
   content: '\25b8';
-  padding: 5px;
-  width: 12pt;
+  padding: 10px 0.3em;
   display: inline-block;
+}
+
+ul#settings > li > .open-panel-section-label {
+  font-style: italic;
+  color: #DDDD00;
 }
 
 ul#settings > li > .open-panel-section-label:before {
   content: '\25be';
+  font-style: normal; /* The root is italicized. Not so this. */
 }
 
 ul#settings > li > .panel-section-content {
   margin: 10px;
+  margin-top: 0;
 }
 
 #toolbar {
