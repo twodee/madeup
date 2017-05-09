@@ -1,4 +1,7 @@
-SRC = forn index.php translate.php save.php interpret.php blockly_blocks_madeup.js text_to_blocks.js ide_editor.js ide_function.js ide_skin.css ide_skin_dark.css ide_skin_light.css favicon-16x16.png favicon-32x32.png keystrokes.js block_definitions.js vertex.png boot.php index.html bridge.js
+JS = $(addprefix js/,blockly_blocks_madeup.js text_to_blocks.js ide_editor.js ide_function.js keystrokes.js block_definitions.js)
+CSS = $(addprefix css/,ide_skin.css ide_skin_dark.css ide_skin_light.css)
+IMAGES = $(addprefix images/,favicon-16x16.png favicon-32x32.png vertex.png pathify_icon.png solidify_icon.png fit.png gear.png close.png)
+SRC = forn index.php translate.php save.php interpret.php boot.php index.html bridge.js $(JS) $(CSS) $(IMAGES)
 DST = $(addprefix $(WWW_ROOT)/, $(SRC))
 JQUERY_UI_VERSION = 1.11.2
 
@@ -34,7 +37,7 @@ $(WWW_ROOT)/filesaver:
 	$(SUDO) git clone https://github.com/eligrey/FileSaver.js $(WWW_ROOT)/filesaver
 	$(SUDO) chmod -R a+rX $(WWW_ROOT)/filesaver
 
-$(WWW_ROOT)/ace/src-noconflict/mode-madeup.js: mode-madeup.js
+$(WWW_ROOT)/ace/src-noconflict/mode-madeup.js: js/mode-madeup.js
 	$(SUDO) cp $^ $@
 	$(SUDO) chmod a+rX $@
 
@@ -72,6 +75,19 @@ $(WWW_ROOT)/mousetrap:
 	$(SUDO) git clone https://github.com/ccampbell/mousetrap.git $(WWW_ROOT)/mousetrap
 	$(SUDO) chmod -R a+rX $(WWW_ROOT)/mousetrap
 
-$(DST): $(WWW_ROOT)/%: %
-	$(SUDO) cp $^ $@
+$(WWW_ROOT)/js:
+	mkdir $@
+	chmod a+rX $@
+
+$(WWW_ROOT)/css:
+	mkdir $@
+	chmod a+rX $@
+
+$(WWW_ROOT)/images:
+	mkdir $@
+	chmod a+rX $@
+
+$(DST): $(WWW_ROOT)/%: % $(WWW_ROOT)/js $(WWW_ROOT)/css $(WWW_ROOT)/images
+	echo $(SUDO) cp $* $@
+	$(SUDO) cp $* $@
 	$(SUDO) chmod a+rX $@

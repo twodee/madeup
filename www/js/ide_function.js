@@ -280,7 +280,18 @@ function saveInCookies() {
 }
 
 $(document).ready(function() {
-  $(document).tooltip({show: {effect: 'slideDown', delay: 1000}, position: {my: 'center top', at: 'center bottom'}});
+  $(document).tooltip({
+    show: {
+      effect: 'slideDown',
+      delay: 2000
+    },
+    position: {
+      my: 'center top',
+      at: 'center bottom'
+    }
+  });
+
+  populateFileMenu();
 
   // When we are embedded in an iframe, the wheel event will cause the
   // embedding context to scroll. That's not what we want, so we capture and
@@ -327,7 +338,7 @@ $(document).ready(function() {
     } else if (isPresenting) {
       fontSize = 28;
     } else {
-      fontSize = 14;
+      fontSize = 20;
     }
     setFontSize(fontSize);
 
@@ -565,7 +576,7 @@ $(document).ready(function() {
 
     textEditor.setFontSize(fontSize);
     $('#console')[0].style.fontSize = fontSize + 'px';
-    $('ul#settings')[0].style.fontSize = (fontSize + 8) + 'px';
+    $('ul#settings')[0].style.fontSize = (fontSize + 0) + 'px';
   }
 
   var red = 0xB80000;
