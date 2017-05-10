@@ -17,7 +17,7 @@ check:
 		exit 1; \
 	fi
 
-libdeps: $(WWW_ROOT)/ace $(WWW_ROOT)/three-js $(WWW_ROOT)/jquery.js $(WWW_ROOT)/js-cookie $(WWW_ROOT)/jquery-ui $(WWW_ROOT)/blockly $(WWW_ROOT)/closure-library $(WWW_ROOT)/filesaver $(WWW_ROOT)/jquery_ui_touch_punch $(WWW_ROOT)/mousetrap
+libdeps: $(WWW_ROOT)/ace $(WWW_ROOT)/three-js $(WWW_ROOT)/jquery.js $(WWW_ROOT)/js-cookie $(WWW_ROOT)/jquery-ui $(WWW_ROOT)/blockly $(WWW_ROOT)/closure-library $(WWW_ROOT)/filesaver $(WWW_ROOT)/jquery_ui_touch_punch $(WWW_ROOT)/mousetrap $(WWW_ROOT)/meshline
 
 init: libdeps madeup all
 
@@ -36,6 +36,10 @@ $(WWW_ROOT)/ace:
 $(WWW_ROOT)/filesaver:
 	$(SUDO) git clone https://github.com/eligrey/FileSaver.js $(WWW_ROOT)/filesaver
 	$(SUDO) chmod -R a+rX $(WWW_ROOT)/filesaver
+
+$(WWW_ROOT)/meshline:
+	$(SUDO) git clone https://github.com/spite/THREE.MeshLine.git $(WWW_ROOT)/meshline
+	$(SUDO) chmod -R a+rX $(WWW_ROOT)/meshline
 
 $(WWW_ROOT)/ace/src-noconflict/mode-madeup.js: js/mode-madeup.js
 	$(SUDO) cp $^ $@
