@@ -1,6 +1,6 @@
 JS = $(addprefix js/,blockly_blocks_madeup.js text_to_blocks.js ide_editor.js ide_function.js keystrokes.js block_definitions.js)
 CSS = $(addprefix css/,ide_skin.css ide_skin_dark.css ide_skin_light.css)
-IMAGES = $(addprefix images/,favicon-16x16.png favicon-32x32.png vertex.png pathify_icon.png solidify_icon.png fit.png gear.png close.png)
+IMAGES = $(addprefix images/,favicon-16x16.png favicon-32x32.png pathify_icon.png solidify_icon.png fit.png gear.png close.png)
 SRC = forn index.php translate.php save.php interpret.php index.html bridge.js $(JS) $(CSS) $(IMAGES)
 DST = $(addprefix $(WWW_ROOT)/, $(SRC))
 JQUERY_UI_VERSION = 1.11.2
