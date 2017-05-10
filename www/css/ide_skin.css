@@ -203,12 +203,16 @@ audio::-webkit-media-controls-enclosure {
   height: 50px;
   padding: 5px;
   transition-property: transform; 
-  transition-duration: 500ms;
-  transition-timing-function: ease-in-ease-out;
+  transition-duration: 200ms;
+  transition-timing-function: ease-in-out;
 }
 
 .quick-button img:hover {
-  transform: scale(1.1, 1.1);
+  transform: scale(1.2);
+}
+
+.quick-button img:active {
+  transform: rotate(20deg) scale(0.9);
 }
 
 /* I tried not having a div wrapper around the settings ul, but the overflow:
