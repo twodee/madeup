@@ -598,11 +598,24 @@ $(document).ready(function() {
     b.setComponent(d, gridExtent);
     geometry.vertices.push(a);
     geometry.vertices.push(b);
-    axes[d] = new THREE.Line(geometry, new THREE.LineBasicMaterial({
-      color: colors[d],
-      linewidth: 5
-    }), THREE.LineSegments);
-    glyphScene.add(axes[d]);
+    // axes[d] = new THREE.Line(geometry, new THREE.LineBasicMaterial({
+      // color: colors[d],
+      // linewidth: 5
+    // }), THREE.LineSegments);
+    axes[d] = new MeshLine();
+    axes[d].setGeometry(geometry);
+    var material = new MeshLineMaterial({
+      lineWidth: 0.1,
+      color: new THREE.Color(colors[d]),
+      useMap: false,
+      useAlphaMap: false,
+      opacity: 1,
+      sizeAttenuation: !false,
+      resolution: new THREE.Vector2(800, 600),
+      near: camera.near,
+      far: camera.far
+    });
+    glyphScene.add(new THREE.Mesh(axes[d].geometry, material));
     render();
   }
 
@@ -1255,28 +1268,8 @@ function onInterpret(data) {
         log('The geometry I got back had some funny stuff in it that I didn\'t know how to read.');
       }
     } else {
-      var lineMaterialDepthNotColor = new THREE.LineBasicMaterial({
-        color: 0xCC6600,
-        linewidth: 3,
-        colorWrite: false,
-        depthWrite: true
-      });
-      var lineMaterialColorNotDepth = lineMaterialDepthNotColor.clone();
-      lineMaterialColorNotDepth.depthWrite = false;
-      lineMaterialColorNotDepth.colorWrite = true;
-
-      var pointsMaterialDepthNotColor = new THREE.PointsMaterial({
-        color: 0x000000,
-        size: 8,
-        sizeAttenuation: false,
-        map: vertexTexture,
-        alphaTest: 0.5,
-        colorWrite: false,
-        depthWrite: true
-      });
-      var pointsMaterialColorNotDepth = pointsMaterialDepthNotColor.clone();
-      pointsMaterialColorNotDepth.depthWrite = false;
-      pointsMaterialColorNotDepth.colorWrite = true;
+      var sphereGeometry = new THREE.SphereGeometry(0.3, 20, 20);
+      var sphereMaterial = new THREE.MeshBasicMaterial({color: 'rgb(0, 0, 0)'});
 
       var paths = [];
       try {
@@ -1289,7 +1282,8 @@ function onInterpret(data) {
 
       for (var pi = 0; pi < paths.length; ++pi) {
         var geometry = new THREE.Geometry();
-        var dotsGeometry = new THREE.Geometry();
+ 
+        var nodeVertices = [];
         var iLastUnique = paths[pi].vertices.length - 1;
         for (var i = paths[pi].vertices.length - 1; i > 0; --i) {
           var curr = new THREE.Vector3(paths[pi].vertices[i][0], paths[pi].vertices[i][1], paths[pi].vertices[i][2]);
@@ -1300,20 +1294,39 @@ function onInterpret(data) {
             --iLastUnique;
           }
         }
+
         for (var i = 0; i < paths[pi].vertices.length; ++i) {
           var v = new THREE.Vector3(paths[pi].vertices[i][0], paths[pi].vertices[i][1], paths[pi].vertices[i][2]);
           geometry.vertices.push(v);
           if (!showHeadings || i < iLastUnique) {
-            dotsGeometry.vertices.push(v);
+            nodeVertices.push(v);
           }
           allGeometry.vertices.push(v);
         }
 
-        meshes[meshes.length] = new THREE.Line(geometry, lineMaterialColorNotDepth);
-        meshes[meshes.length - 1].renderOrder = 0;
+        var polyline = new MeshLine();
+        polyline.setGeometry(geometry);
+        var lineMaterialColorNotDepth = new MeshLineMaterial({
+          lineWidth: 5.1,
+          color: new THREE.Color('#CC6600'),
+          useMap: false,
+          useAlphaMap: false,
+          opacity: 1,
+          sizeAttenuation: false,
+          resolution: new THREE.Vector2(800, 600),
+          near: camera.near,
+          far: camera.far
+        });
+        meshes.push(new THREE.Mesh(polyline.geometry, lineMaterialColorNotDepth));
+        
         if (showPoints) {
-          meshes[meshes.length] = new THREE.Points(dotsGeometry, pointsMaterialColorNotDepth);
-          meshes[meshes.length - 1].renderOrder = 0;
+          for (var vi = 0; vi < nodeVertices.length; ++vi) {
+            var node = new THREE.Mesh(sphereGeometry, sphereMaterial);
+            node.position.x = nodeVertices[vi].x;
+            node.position.y = nodeVertices[vi].y;
+            node.position.z = nodeVertices[vi].z;
+            meshes.push(node);
+          }
         }
 
         var nvertices = paths[pi].vertices.length;
@@ -1348,15 +1361,7 @@ function onInterpret(data) {
           meshes[meshes.length] = new THREE.Mesh(g2, new THREE.MeshLambertMaterial({
             color: 0x0000ff,
           }));
-          meshes[meshes.length - 1].renderOrder = 1;
           modelScene.add(meshes[meshes.length - 1]);
-        }
-
-        meshes[meshes.length] = new THREE.Line(geometry, lineMaterialDepthNotColor);
-        meshes[meshes.length - 1].renderOrder = 2;
-        if (showPoints) {
-          meshes[meshes.length] = new THREE.Points(dotsGeometry, pointsMaterialDepthNotColor);
-          meshes[meshes.length - 1].renderOrder = 2;
         }
       }
     }
@@ -1542,11 +1547,7 @@ function highlight(startIndex, stopIndex) {
   textEditor.centerSelection();
 }
 
-var vertexTexture;
 function init() {
-  var loader = new THREE.TextureLoader();
-  vertexTexture = loader.load('images/vertex.png');
-
   camera = new THREE.PerspectiveCamera(45.0, 1.0, 0.1, 10000.0);
   // camera = new THREE.OrthographicCamera(-50, 50, 50, -50, -100, 100);
   camera.position.z = 30;
