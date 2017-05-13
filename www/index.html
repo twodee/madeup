@@ -224,7 +224,6 @@
           <input type="radio" name="theme" id="isDark" value="isDark" checked="checked"/>Dark or 
           <input type="radio" name="theme" id="isLight" value="isLight"/>Light<br/>
           <input type="checkbox" id="showConsole" checked="checked"/>Show Console<br/>
-          <input type="checkbox" id="autopathify" checked="checked"/>Auto-pathify <input type="text" id="nSecondsTillAutopathify" size="5"/> seconds after last edit<br/>
         </div>
       </li>
 
@@ -257,6 +256,14 @@
           <input type="checkbox" id="gridZ"/>Z = 0 plane<br/>
           Grid Extent: <input type="text" id="gridExtent" size="5"/><br/>
           Grid Spacing: <input type="text" id="gridSpacing" size="5"/><br/>
+        </div>
+      </li>
+
+      <li id="panel-section-pathify">
+        <span class="panel-section-label unselectable">Pathify</span>
+        <div class="panel-section-content">
+          Vertex Size <input type="number" min="0" max="1000" step="0.05" id="pathify-node-size"><br>
+          <input type="checkbox" id="autopathify" checked="checked"/>Auto-pathify <input type="text" id="nSecondsTillAutopathify" size="5"/> seconds after last edit<br/>
         </div>
       </li>
 

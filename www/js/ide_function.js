@@ -197,6 +197,7 @@ var preview = undefined;
 var isThemeDark = true;
 var isSourceDirty = false;
 var showPoints = true;
+var pathifyNodeSize = 0.3;
 
 var isThemeDarkChanged = false;
 var isShowModeChanged = false;
@@ -204,6 +205,7 @@ var isAxisChanged = [false, false, false];
 var isGridChanged = [false, false, false];
 var isAutopathifyChanged = false;
 var isNSecondsTillAutopathifyChanged = false;
+var isPathifyNodeSizeChanged = false;
 var isShowHeadingsChanged = false;
 var isFontSizeChanged = false;
 var isGridSpacingChanged = false;
@@ -251,6 +253,7 @@ function saveInCookies() {
   if (isGridChanged[2]) Cookies.set('gridZ', $('#gridZ').prop('checked') ? 1 : 0);
   if (isAutopathifyChanged) Cookies.set('isAutopathify', $('#autopathify').prop('checked') ? 1 : 0);
   if (isNSecondsTillAutopathifyChanged) Cookies.set('nSecondsTillAutopathify', nSecondsTillAutopathify);
+  if (isPathifyNodeSizeChanged) Cookies.set('pathifyNodeSize', pathifyNodeSize);
   if (isGridSpacingChanged) Cookies.set('gridSpacing', gridSpacing);
   if (isGridExtentChanged) Cookies.set('gridExtent', gridExtent);
   if (isShowPointsChanged) Cookies.set('showPoints', showPoints ? 1 : 0);
@@ -280,6 +283,7 @@ function saveInCookies() {
   isThemeDarkChanged = false;
   isShowHeadingsChanged = false;
   isNSecondsTillAutopathifyChanged = false;
+  isPathifyNodeSizeChanged = false;
   isGridSpacingChanged = false;
   isGridExtentChanged = false;
   isShowPointsChanged = false;
@@ -419,6 +423,17 @@ $(document).ready(function() {
     if (Cookies.get('nSecondsTillAutopathify')) {
       nSecondsTillAutopathify = parseFloat(Cookies.get('nSecondsTillAutopathify'));
     }
+
+    if (Cookies.get('pathifyNodeSize')) {
+      pathifyNodeSize = parseFloat(Cookies.get('pathifyNodeSize'));
+    }
+
+    $('#pathify-node-size').val(pathifyNodeSize);
+    $('#pathify-node-size').change(function () {
+      pathifyNodeSize = parseFloat($('#pathify-node-size').val());
+      console.log(pathifyNodeSize);
+      run(getSource(), GeometryMode.PATH);
+    });
 
     $('#nSecondsTillAutopathify').val(nSecondsTillAutopathify + '');
     $('#nSecondsTillAutopathify').change(function () {
@@ -1280,7 +1295,7 @@ function onInterpret(data) {
         log('The geometry I got back had some funny stuff in it that I didn\'t know how to read.');
       }
     } else {
-      var sphereGeometry = new THREE.SphereGeometry(0.3, 20, 20);
+      var sphereGeometry = new THREE.SphereGeometry(pathifyNodeSize, 20, 20);
       var sphereMaterial = new THREE.MeshBasicMaterial({color: 'rgb(0, 0, 0)'});
 
       var paths = [];
