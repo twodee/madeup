@@ -3,11 +3,6 @@
   color: #FFFFFF;
 }
 
-.popup {
-  background-color: #333333;
-  color: white;
-}
-
 #left {
   background-color: #000000;
 }
@@ -56,22 +51,14 @@
   background-color: #000000;
 }
 
-.fileLink {
+.menu-link {
   color: #FFFFFF;
 }
 
-#download.unclickable {
+.menu-link.unclickable {
   color: #666666 !important;
 }
 
-#download.clickable {
+.menu-link.clickable {
   color: #FFFFFF !important;
-}
-
-#toggleFilePopup {
-  color: yellow !important;
-}
-
-.popupDropdown {
-  color: #FFFFFF;
 }

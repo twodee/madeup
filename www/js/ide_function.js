@@ -139,7 +139,7 @@ function populateFileMenu() {
   for (var i = 0; i < mups.length; ++i) {
     var mup = mups[i];
     if (mup != 'untitled') {
-      list += '<a href="#" class="fileLink" onclick="load(\'' + mup.replace(/'/g, '\\&#39;').replace(/"/g, '\\&quot;') + '\')">- ' + mup + '</a><br/>';
+      list += '<a href="#" class="menu-link" onclick="load(\'' + mup.replace(/'/g, '\\&#39;').replace(/"/g, '\\&quot;') + '\')">' + mup + '</a><br/>';
     }
   }
   $('#mups').html(list);
@@ -217,7 +217,17 @@ function updateTitle() {
   // The name won't be set in certain situations -- namely, when it's embedded.
   // Showing it as dirty makes no sense, because it's not a file.
   if (mupName != null) {
-    $('#toggleFilePopup').attr('value', mupName + (isSourceDirty ? '*' : ''));
+    document.title = (isSourceDirty ? '*' : '') + 'Madeup: ' + mupName;
+    document.title = (isSourceDirty ? '*' : '') + 'Madeup: ' + mupName;
+  }
+  if (isSourceDirty) {
+    $('#fileSave').prop('disabled', false);
+    $('#fileSave').removeClass('unclickable').addClass('clickable');
+    $('#dirty-suffix').text('*');
+  } else {
+    $('#fileSave').prop('disabled', true);
+    $('#fileSave').removeClass('clickable').addClass('unclickable');
+    $('#dirty-suffix').text('');
   }
 }
 
@@ -1147,6 +1157,8 @@ function save() {
     window.localStorage.setItem(mupName, JSON.stringify(file));
     isSourceDirty = false;
     updateTitle();
+
+    $('#message').text('I saved your program. It is precious! Find it later under Settings / Mups / ' + mupName + '.');
   }
 }
 

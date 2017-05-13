@@ -135,9 +135,6 @@ body {
   width: 420px;
 }
 
-.fileLink {
-}
-
 audio::-webkit-media-controls-enclosure {
   max-width: 100%;
 }
@@ -278,7 +275,7 @@ ul#settings > li > .panel-section-label:before {
 
 ul#settings > li > .open-panel-section-label {
   font-style: italic;
-  color: #DDDD00;
+  /* color: #DDDD00; */
 }
 
 ul#settings > li > .open-panel-section-label:before {
@@ -296,4 +293,16 @@ ul#settings > li > .panel-section-content {
   top: 0;
   left: 0;
   right: 0;
+}
+
+.menu-link {
+  text-decoration: none;
+}
+
+.menu-link.clickable {
+  pointer-events: initial;
+}
+
+.menu-link.unclickable {
+  pointer-events: none;
 }
