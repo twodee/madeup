@@ -1,0 +1,5 @@
+#!/bin/bash
+
+for i in *.png; do
+  convert $i \( +clone -background white -shadow 100x15+0+0 -channel A -level 0,30% +channel \) +swap +repage -gravity center -composite ../$i
+done
