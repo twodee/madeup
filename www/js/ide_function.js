@@ -198,6 +198,7 @@ var isThemeDark = true;
 var isSourceDirty = false;
 var showPoints = true;
 var pathifyNodeSize = 0.3;
+var pathifyLineSize = 6;
 
 var isThemeDarkChanged = false;
 var isShowModeChanged = false;
@@ -206,6 +207,7 @@ var isGridChanged = [false, false, false];
 var isAutopathifyChanged = false;
 var isNSecondsTillAutopathifyChanged = false;
 var isPathifyNodeSizeChanged = false;
+var isPathifyLineSizeChanged = false;
 var isShowHeadingsChanged = false;
 var isFontSizeChanged = false;
 var isGridSpacingChanged = false;
@@ -254,6 +256,7 @@ function saveInCookies() {
   if (isAutopathifyChanged) Cookies.set('isAutopathify', $('#autopathify').prop('checked') ? 1 : 0);
   if (isNSecondsTillAutopathifyChanged) Cookies.set('nSecondsTillAutopathify', nSecondsTillAutopathify);
   if (isPathifyNodeSizeChanged) Cookies.set('pathifyNodeSize', pathifyNodeSize);
+  if (isPathifyLineSizeChanged) Cookies.set('pathifyLineSize', pathifyLineSize);
   if (isGridSpacingChanged) Cookies.set('gridSpacing', gridSpacing);
   if (isGridExtentChanged) Cookies.set('gridExtent', gridExtent);
   if (isShowPointsChanged) Cookies.set('showPoints', showPoints ? 1 : 0);
@@ -284,6 +287,7 @@ function saveInCookies() {
   isShowHeadingsChanged = false;
   isNSecondsTillAutopathifyChanged = false;
   isPathifyNodeSizeChanged = false;
+  isPathifyLineSizeChanged = false;
   isGridSpacingChanged = false;
   isGridExtentChanged = false;
   isShowPointsChanged = false;
@@ -424,16 +428,27 @@ $(document).ready(function() {
       nSecondsTillAutopathify = parseFloat(Cookies.get('nSecondsTillAutopathify'));
     }
 
+    // Node size
     if (Cookies.get('pathifyNodeSize')) {
       pathifyNodeSize = parseFloat(Cookies.get('pathifyNodeSize'));
     }
 
     $('#pathify-node-size').val(pathifyNodeSize);
-    $('#pathify-node-size').change(function () {
+    $('#pathify-node-size')[0].oninput = function () {
       pathifyNodeSize = parseFloat($('#pathify-node-size').val());
-      console.log(pathifyNodeSize);
       run(getSource(), GeometryMode.PATH);
-    });
+    };
+
+    // Line size
+    if (Cookies.get('pathifyLineSize')) {
+      pathifyLineSize = parseFloat(Cookies.get('pathifyLineSize'));
+    }
+
+    $('#pathify-line-size').val(pathifyLineSize);
+    $('#pathify-line-size')[0].oninput = function () {
+      pathifyLineSize = parseFloat($('#pathify-line-size').val());
+      run(getSource(), GeometryMode.PATH);
+    };
 
     $('#nSecondsTillAutopathify').val(nSecondsTillAutopathify + '');
     $('#nSecondsTillAutopathify').change(function () {
@@ -1173,7 +1188,7 @@ function save() {
     isSourceDirty = false;
     updateTitle();
 
-    $('#message').text('I saved your program. It is precious! Find it later under Settings / Mups / ' + mupName + '.');
+    $('#message').html('I saved your program. It is precious! Find it later under <image src="images/gear.png" id="gear-in-console" width="' + fontSize + 'pt"> / Mups / ' + mupName + '.');
   }
 }
 
@@ -1334,7 +1349,7 @@ function onInterpret(data) {
         var polyline = new MeshLine();
         polyline.setGeometry(geometry);
         var lineMaterialColorNotDepth = new MeshLineMaterial({
-          lineWidth: 5.1,
+          lineWidth: pathifyLineSize,
           color: new THREE.Color('#CC6600'),
           useMap: false,
           useAlphaMap: false,

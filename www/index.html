@@ -227,8 +227,19 @@
         </div>
       </li>
 
-      <li id="panel-section-display">
-        <span class="panel-section-label unselectable">Display</span>
+      <li id="panel-section-pathify">
+        <span class="panel-section-label unselectable">Pathify</span>
+        <div class="panel-section-content">
+          <input type="checkbox" id="showHeadings"/>Show heading<br/>
+          <input type="checkbox" id="showPoints"/>Show points<br/>
+          Vertex size <input type="number" min="0" max="1000" step="0.05" id="pathify-node-size"><br>
+          Line size <input type="number" min="0" max="1000" step="0.5" id="pathify-line-size"><br>
+          <input type="checkbox" id="autopathify" checked="checked"/>Auto-pathify <input type="text" id="nSecondsTillAutopathify" size="5"/> seconds after last edit<br/>
+        </div>
+      </li>
+
+      <li id="panel-section-solidify">
+        <span class="panel-section-label unselectable">Solidify</span>
         <div class="panel-section-content">
           Show <select name="showMode" id="showMode" class="popupDropdown">
             <option value="solid" selected>Solid</option> 
@@ -236,17 +247,26 @@
             <option value="shaded_triangles">Shaded Triangles</option> 
             <option value="wireframe">Wireframe</option> 
           </select><br/>
-          <input type="checkbox" id="showHeadings"/>Show heading<br/>
-          <input type="checkbox" id="showPoints"/>Show points<br/>
           <input type="checkbox" id="lightBothSides"/>Two-sided lighting<br/>
           <input type="checkbox" id="isFlatShaded"/>Flat shading<br/>
+        </div>
+      </li>
+
+      <li id="panel-section-camera">
+        <span class="panel-section-label unselectable">Camera</span>
+        <div class="panel-section-content">
           <input type="checkbox" id="isAutorotate"/>Autorotate<br/>
           <hr>
           View From:
           <a href="#" id="cameraLeft" class="menu-link">-X</a> <a href="#" id="cameraRight" class="menu-link">+X</a>
           <a href="#" id="cameraBottom" class="menu-link">-Y</a> <a href="#" id="cameraTop" class="menu-link">+Y</a>
           <a href="#" id="cameraBack" class="menu-link">-Z</a> <a href="#" id="cameraFront" class="menu-link">+Z</a><br/>
-          <hr>
+        </div>
+      </li>
+
+      <li id="panel-section-grid">
+        <span class="panel-section-label unselectable">Grid</span>
+        <div class="panel-section-content">
           Grid:<br/>
           <input type="checkbox" id="axisX"/>X axis<br/>
           <input type="checkbox" id="axisY"/>Y axis<br/>
@@ -256,14 +276,6 @@
           <input type="checkbox" id="gridZ"/>Z = 0 plane<br/>
           Grid Extent: <input type="text" id="gridExtent" size="5"/><br/>
           Grid Spacing: <input type="text" id="gridSpacing" size="5"/><br/>
-        </div>
-      </li>
-
-      <li id="panel-section-pathify">
-        <span class="panel-section-label unselectable">Pathify</span>
-        <div class="panel-section-content">
-          Vertex Size <input type="number" min="0" max="1000" step="0.05" id="pathify-node-size"><br>
-          <input type="checkbox" id="autopathify" checked="checked"/>Auto-pathify <input type="text" id="nSecondsTillAutopathify" size="5"/> seconds after last edit<br/>
         </div>
       </li>
 

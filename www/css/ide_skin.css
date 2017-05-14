@@ -306,3 +306,7 @@ ul#settings > li > .panel-section-content {
 .menu-link.unclickable {
   pointer-events: none;
 }
+
+#gear-in-console {
+  transform: translate(0, 20%);
+}
