@@ -12,9 +12,9 @@
   <link href="https://fonts.googleapis.com/css?family=Kanit" rel="stylesheet">
 
   <!-- JQuery dependencies -->
-  <link rel="stylesheet" href="jquery-ui-1.11.2/jquery-ui.css"/>
+  <link rel="stylesheet" href="jquery-ui/jquery-ui.css"/>
   <script src="jquery.js"></script>
-  <script src="jquery-ui-1.11.2/jquery-ui.js"></script>
+  <script src="jquery-ui/jquery-ui.js"></script>
   <script src="js-cookie/src/js.cookie.js"></script>
   <script src="jquery_ui_touch_punch/jquery.ui.touch-punch.min.js"></script>
 
@@ -49,6 +49,10 @@
     var madeupPrefix = 'http://madeup.xyz'; // PHP
   </script>
   <script src="js/keystrokes.js"></script>
+
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="http://cdn.materialdesignicons.com/1.9.32/css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pretty-checkbox/2.2.1/pretty.min.css"/>
 
   <!-- Madeup IDE dependencies -->
   <link rel="stylesheet" href="css/ide_skin.css"/>
@@ -218,62 +222,133 @@
       <li id="panel-section-editor">
         <span class="panel-section-label unselectable">Editor</span>
         <div class="panel-section-content">
-          Text size: <a href="#" id="smaller" class="menu-link">smaller</a> or <a href="#" id="bigger" class="menu-link">bigger</a><br/>
-          <input type="radio" name="editorMode" id="isEditorText" value="Text" checked="checked"/>Text or 
-          <input type="radio" name="editorMode" id="isEditorBlocks" value="Blocks"/>Blocks<br/>
-          <input type="radio" name="theme" id="isDark" value="isDark" checked="checked"/>Dark or 
-          <input type="radio" name="theme" id="isLight" value="isLight"/>Light<br/>
-          <input type="checkbox" id="showConsole" checked="checked"/>Show Console<br/>
+          <div>
+            Text size: <a href="#" id="smaller" class="menu-link">smaller</a> or <a href="#" id="bigger" class="menu-link">bigger</a><br/>
+          </div>
+
+          Editor:
+          <div class="pretty circle primary">
+            <input type="radio" name="editorMode" id="isEditorText" value="Text" checked="checked">
+            <label><i class="mdi mdi-check"></i> Text</label>
+          </div>
+          <div class="pretty circle primary">
+            <input type="radio" name="editorMode" id="isEditorBlocks" value="Blocks">
+            <label><i class="mdi mdi-check"></i> Blocks</label>
+          </div><br>
+
+          Colors:
+          <div class="pretty circle primary">
+            <input type="radio" name="theme" id="isDark" value="isDark" checked="checked">
+            <label><i class="mdi mdi-check"></i> Dark</label>
+          </div>
+          <div class="pretty circle primary">
+            <input type="radio" name="theme" id="isLight" value="isLight">
+            <label><i class="mdi mdi-check"></i> Light</label>
+          </div><br>
+
+          <div class="pretty primary">
+            <input type="checkbox" id="showConsole" checked>
+            <label><i class="mdi mdi-check"></i> Show console</label>
+          </div><br>
         </div>
       </li>
 
       <li id="panel-section-pathify">
         <span class="panel-section-label unselectable">Pathify</span>
         <div class="panel-section-content">
-          <input type="checkbox" id="showHeadings"/>Show heading<br/>
-          <input type="checkbox" id="showPoints"/>Show points<br/>
-          Vertex size <input type="number" min="0" max="1000" step="0.05" id="pathify-node-size"><br>
-          Line size <input type="number" min="0" max="1000" step="0.5" id="pathify-line-size"><br>
-          <input type="checkbox" id="autopathify" checked="checked"/>Auto-pathify <input type="text" id="nSecondsTillAutopathify" size="5"/> seconds after last edit<br/>
+          <div class="pretty primary">
+            <input type="checkbox" id="showHeadings"/>
+            <label><i class="mdi mdi-check"></i> Show heading</label>
+          </div><br>
+
+          <div class="pretty primary">
+            <input type="checkbox" id="showPoints"/>
+            <label><i class="mdi mdi-check"></i> Show vertices</label>
+          </div><br>
+
+          <div>
+            Vertex size <input type="number" min="0" max="1000" step="0.05" id="pathify-node-size">
+          </div>
+
+          <div>
+            Line size <input type="number" min="0" max="1000" step="0.5" id="pathify-line-size">
+          </div>
+
+          <div class="pretty primary">
+            <input type="checkbox" id="autopathify" checked="checked"/>
+            <label><i class="mdi mdi-check"></i> Auto-pathify</label>
+            <input type="text" id="nSecondsTillAutopathify" size="5"/> seconds after last edit
+          </div>
         </div>
       </li>
 
       <li id="panel-section-solidify">
         <span class="panel-section-label unselectable">Solidify</span>
         <div class="panel-section-content">
-          Show <select name="showMode" id="showMode" class="popupDropdown">
-            <option value="solid" selected>Solid</option> 
-            <option value="triangles">Triangles</option> 
-            <option value="shaded_triangles">Shaded Triangles</option> 
-            <option value="wireframe">Wireframe</option> 
-          </select><br/>
-          <input type="checkbox" id="lightBothSides"/>Two-sided lighting<br/>
-          <input type="checkbox" id="isFlatShaded"/>Flat shading<br/>
+          <div>
+            Show
+            <select name="showMode" id="showMode">
+              <option value="solid" selected>Solid</option> 
+              <option value="triangles">Triangles</option> 
+              <option value="shaded_triangles">Shaded Triangles</option> 
+              <option value="wireframe">Wireframe</option> 
+            </select>
+          </div>
+          <div class="pretty primary">
+            <input type="checkbox" id="lightBothSides" checked="checked"/>
+            <label><i class="mdi mdi-check"></i> Two-sided lighting</label>
+          </div><br>
+          <div class="pretty primary">
+            <input type="checkbox" id="isFlatShaded">
+            <label><i class="mdi mdi-check"></i> Flat shading</label>
+          </div><br>
         </div>
       </li>
 
       <li id="panel-section-camera">
         <span class="panel-section-label unselectable">Camera</span>
         <div class="panel-section-content">
-          <input type="checkbox" id="isAutorotate"/>Autorotate<br/>
-          <hr>
-          View From:
-          <a href="#" id="cameraLeft" class="menu-link">-X</a> <a href="#" id="cameraRight" class="menu-link">+X</a>
-          <a href="#" id="cameraBottom" class="menu-link">-Y</a> <a href="#" id="cameraTop" class="menu-link">+Y</a>
-          <a href="#" id="cameraBack" class="menu-link">-Z</a> <a href="#" id="cameraFront" class="menu-link">+Z</a><br/>
+          <div class="pretty primary">
+            <input type="checkbox" id="isAutorotate">
+            <label><i class="mdi mdi-check"></i> Auto-rotate</label>
+          </div>
+
+          <div>
+            View From:
+            <a href="#" id="cameraLeft" class="menu-link">-X</a> <a href="#" id="cameraRight" class="menu-link">+X</a>
+            <a href="#" id="cameraBottom" class="menu-link">-Y</a> <a href="#" id="cameraTop" class="menu-link">+Y</a>
+            <a href="#" id="cameraBack" class="menu-link">-Z</a> <a href="#" id="cameraFront" class="menu-link">+Z</a><br/>
+          </div>
         </div>
       </li>
 
       <li id="panel-section-grid">
         <span class="panel-section-label unselectable">Grid</span>
         <div class="panel-section-content">
-          Grid:<br/>
-          <input type="checkbox" id="axisX"/>X axis<br/>
-          <input type="checkbox" id="axisY"/>Y axis<br/>
-          <input type="checkbox" id="axisZ"/>Z axis<br/>
-          <input type="checkbox" id="gridX"/>X = 0 plane<br/>
-          <input type="checkbox" id="gridY"/>Y = 0 plane<br/>
-          <input type="checkbox" id="gridZ"/>Z = 0 plane<br/>
+          <div class="pretty primary">
+            <input type="checkbox" id="axisX">
+            <label><i class="mdi mdi-check"></i> X axis</label>
+          </div><br>
+          <div class="pretty primary">
+            <input type="checkbox" id="axisY">
+            <label><i class="mdi mdi-check"></i> Y axis</label>
+          </div><br>
+          <div class="pretty primary">
+            <input type="checkbox" id="axisZ">
+            <label><i class="mdi mdi-check"></i> Z axis</label>
+          </div><br>
+          <div class="pretty primary">
+            <input type="checkbox" id="gridX">
+            <label><i class="mdi mdi-check"></i> X = 0 plane</label>
+          </div><br>
+          <div class="pretty primary">
+            <input type="checkbox" id="gridY">
+            <label><i class="mdi mdi-check"></i> Y = 0 plane</label>
+          </div><br>
+          <div class="pretty primary">
+            <input type="checkbox" id="gridZ">
+            <label><i class="mdi mdi-check"></i> Z = 0 plane</label>
+          </div><br>
           Grid Extent: <input type="text" id="gridExtent" size="5"/><br/>
           Grid Spacing: <input type="text" id="gridSpacing" size="5"/><br/>
         </div>

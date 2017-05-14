@@ -31,21 +31,6 @@ body {
   width: 300px;
 }
 
-.popup {
-  padding: 5px;
-  border: 0px;
-  font-size: 10pt;
-  outline: none;
-  font-family: sans-serif;
-  z-index: 10000000;
-  display: none;
-  position: absolute;
-}
-
-.popup input[type="text"] {
-  margin: 2px;
-}
-
 #entire {
   float: left;
   width: 100%;
@@ -309,4 +294,23 @@ ul#settings > li > .panel-section-content {
 
 #gear-in-console {
   transform: translate(0, 20%);
+}
+
+#settings input[type="checkbox"] {
+  background: none;
+  color: black;
+}
+
+.pretty > input + label > i:before {
+  left: 1px;
+  top: 1px;
+}
+
+#settings .pretty i {
+  color: black;
+}
+
+.panel-section-content > div {
+  margin-top: 4px;
+  margin-bottom: 4px;
 }

@@ -616,6 +616,7 @@ $(document).ready(function() {
 
     textEditor.setFontSize(fontSize);
     $('#console')[0].style.fontSize = fontSize + 'px';
+    $('#showMode')[0].style.fontSize = fontSize + 'px';
     $('ul#settings')[0].style.fontSize = (fontSize + 0) + 'px';
   }
 
