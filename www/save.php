@@ -3,6 +3,7 @@
 $json = file_get_contents("php://input");
 $in = json_decode($json, true);
 
+date_default_timezone_set('America/Chicago');
 $timestamp = date('Y_m_d_H_i_s');
 $source = "-- ${in['name']}\n-- $timestamp\n${in['source']}";
 

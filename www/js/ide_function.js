@@ -199,6 +199,8 @@ var isSourceDirty = false;
 var showPoints = true;
 var pathifyNodeSize = 0.3;
 var pathifyLineSize = 6;
+var allGeometry = undefined;
+var timeOfLatestRun = undefined;
 
 var isThemeDarkChanged = false;
 var isShowModeChanged = false;
@@ -564,7 +566,6 @@ $(document).ready(function() {
 
   $('input[type=radio][name=editorMode]').change(function() {
     var editorMode = $(this).val();
-    console.log(editorMode);
     setEditor(editorMode != "Blocks");
   });
 
@@ -811,24 +812,7 @@ $(document).ready(function() {
 
   $('#magic').click(function() {
     var source = getSource();
-
-    var name = prompt("What's your name?");
-    $.ajax({
-      type: 'POST',
-      url: madeupPrefix + '/save.php',
-      data: JSON.stringify({
-        name: name,
-        source: source
-      }),
-      contentType: 'application/json; charset=utf-8',
-      dataType: 'json',
-      success: function(data) {
-        console.log("Saved!");
-      },
-      failure: function(errorMessage) {
-        console.log('Failure. :(');
-      }
-    });
+    sendToChris(source);
   });
 
   $('#solidify-button').click(function() {
@@ -1090,7 +1074,16 @@ function setEditor(isText) {
           'Convert to blocks': function() {
             blocklyWorkspace.clear();
             blocklyWorkspace.updateVariableList();
-            convertTextToBlocks(source);
+            textToBlocks(source,
+              function(data) {
+                if (data['exit_status'] == 0) {
+                  tree = data['tree'];
+                  parse(new Peeker(tree));
+                }
+              },
+              function() {
+                console.log('Failure. :(');
+              });
             switchEditors();
             $(this).dialog('close');
           },
@@ -1200,29 +1193,6 @@ function getSource() {
     return Blockly.Madeup.workspaceToCode(blocklyWorkspace);
   }
 }
-
-function convertTextToBlocks(source) {
-  $.ajax({
-    type: 'POST',
-    url: madeupPrefix + '/translate.php',
-    data: JSON.stringify({ source: source }),
-    contentType: 'application/json; charset=utf-8',
-    dataType: 'json',
-    success: function(data) {
-      if (data['exit_status'] == 0) {
-        tree = data['tree'];
-        console.log(data['tree']);
-        parse(new Peeker(tree));
-      }
-    },
-    failure: function(errorMessage) {
-      console.log('Failure. :(');
-    }
-  });
-}
-
-var allGeometry = undefined;
-var timeOfLatestRun = undefined;
 
 function run(source, mode, pingback) {
   // If a preview is scheduled, clear it.
