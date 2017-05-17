@@ -7,6 +7,20 @@ function hasWebGL() {
   } 
 }
 
+function restoreSettings(settings) {
+  var json = localStorage.getItem('settings')
+  if (json != null) {
+    var stored = JSON.parse(json);
+    for (var key in stored) {
+      settings.set(key, stored[key]);
+    }
+  }
+}
+
+function persistSettings(settings) {
+  localStorage.setItem('settings', settings.toJSON());
+}
+
 function showConsole(isShown) {
   $('#showConsole').prop('checked', isShown);
   if (isShown) {
@@ -97,7 +111,7 @@ function onBlocksChanged() {
   var currentBlocks = Blockly.Xml.domToText(xml);
   isSourceDirty = lastBlocks != currentBlocks;
   updateTitle();
-  if (isAutopathify) {
+  if (settings.get('isAutopathify')) {
     run(getSource(), GeometryMode.PATH);
   }
 }
@@ -138,7 +152,7 @@ function populateFileMenu() {
   var mups = Object.keys(window.localStorage).sort();
   for (var i = 0; i < mups.length; ++i) {
     var mup = mups[i];
-    if (mup != 'untitled') {
+    if (mup != 'untitled' && mup != 'settings') {
       list += '<a href="#" class="menu-link" onclick="load(\'' + mup.replace(/'/g, '\\&#39;').replace(/"/g, '\\&quot;') + '\')">' + mup + '</a><br/>';
     }
   }
@@ -172,6 +186,92 @@ function yyyymmdd() {
   return year + '_' + month + '_' + day;
 }
 
+function Settings() {
+  function Setting(initialValue) {
+    this.value = initialValue;
+    this.isChanged = false;
+  }
+
+  var pairs = {};
+
+  pairs.showMode = new Setting('solid');
+  pairs.showHeadings = new Setting(true);
+  pairs.showPoints = new Setting(true);
+  pairs.pathifyNodeSize = new Setting(0.3);
+  pairs.pathifyLineSize = new Setting(6);
+
+  pairs.lightBothSides = new Setting(true);
+  pairs.fontSize = new Setting(14);
+
+  pairs.gridSpacing = new Setting(1.0);
+  pairs.gridExtent = new Setting(10.0);
+
+  pairs.isFlatShaded = new Setting(true);
+  pairs.isAutorotate = new Setting(false);
+  pairs.isEditorText = new Setting(true);
+  pairs.isThemeDark = new Setting(true);
+
+  pairs.isAutopathify = new Setting(true);
+  pairs.nSecondsTillAutopathify = new Setting(1.0);
+
+  pairs.showAxisX = new Setting(false);
+  pairs.showAxisY = new Setting(false);
+  pairs.showAxisZ = new Setting(false);
+  pairs.showGridX = new Setting(false);
+  pairs.showGridY = new Setting(false);
+  pairs.showGridZ = new Setting(false);
+
+  this.toJSON = function() {
+    var simpler = {};
+    for (var key in pairs) {
+      simpler[key] = pairs[key].value;
+    }
+    return JSON.stringify(simpler, null, 2); 
+  }
+
+  this.set = function(key, value) {
+    if (this.has(key)) {
+      var oldValue = pairs[key].value;
+      pairs[key].value = value;
+      pairs[key].isChanged = oldValue != value;
+    } else {
+      pairs[key] = new Setting(value);
+      pairs[key].isChanged = true;
+    }
+  }
+
+  this.get = function(key) {
+    if (this.has(key)) {
+      return pairs[key].value;
+    } else {
+      throw 'No setting ' + key + '!';
+    }
+  }
+
+  this.has = function(key) {
+    return pairs.hasOwnProperty(key);
+  }
+
+  this.keys = function() {
+    return Object.keys(pairs);
+  }
+
+  this.isChanged = function(key) {
+    if (this.has(key)) {
+      return pairs[key].isChanged;
+    } else {
+      throw 'No setting ' + key + '!';
+    }
+  }
+
+  this.dump = function() {
+    this.keys().forEach((key) => {
+      console.log(key + ' -> ' + this.get(key) + '[' + this.get(key).constructor.name + ']');
+    });
+  }
+}
+
+var gearSections = ['file', 'mups', 'editor', 'pathify', 'solidify', 'camera', 'grid', 'about'];
 var isDownloading = false;
 var initialized = false;
 var mupName = null;
@@ -180,44 +280,13 @@ var modelScene;
 var glyphScene;
 var renderer, camera, controls;
 var meshes = [];
-var isAutopathify = true;
-var nSecondsTillAutopathify = 1.0;
-var showMode = 'solid';
-var showHeadings = true;
-var lightBothSides = true;
 var blocklyWorkspace = null;
-var fontSize = 14;
-var gridSpacing = 1.0;
-var gridExtent = 10.0;
-var isFlatShaded = true;
-var isAutorotate = false;
-var isEditorText = true;
-var tree = null;
-var preview = undefined;
-var isThemeDark = true;
-var isSourceDirty = false;
-var showPoints = true;
-var pathifyNodeSize = 0.3;
-var pathifyLineSize = 6;
 var allGeometry = undefined;
 var timeOfLatestRun = undefined;
-
-var isThemeDarkChanged = false;
-var isShowModeChanged = false;
-var isAxisChanged = [false, false, false];
-var isGridChanged = [false, false, false];
-var isAutopathifyChanged = false;
-var isNSecondsTillAutopathifyChanged = false;
-var isPathifyNodeSizeChanged = false;
-var isPathifyLineSizeChanged = false;
-var isShowHeadingsChanged = false;
-var isFontSizeChanged = false;
-var isGridSpacingChanged = false;
-var isGridExtentChanged = false;
-var isLightBothSidesChanged = false;
-var isFlatShadedChanged = false;
-var isAutorotateChanged = false;
-var isShowPointsChanged = false;
+var tree = null;
+var preview = undefined;
+var isSourceDirty = false;
+var settings = new Settings();
 
 function updateTitle() {
   // The name won't be set in certain situations -- namely, when it's embedded.
@@ -237,66 +306,27 @@ function updateTitle() {
   }
 }
 
-function saveInCookies() {
-  // Cookies.set('lastMup', mupName); 
- 
-  // Only store a cookie if a setting has changed. If we unconditionally stored
-  // these, then updates to the default value would not be seen by users, as
-  // the old defaults persisted in the cookies would override the new ones.
-  if (isShowHeadingsChanged) Cookies.set('showHeadings', showHeadings ? 1 : 0);
-  if (isLightBothSidesChanged) Cookies.set('lightBothSides', lightBothSides ? 1 : 0);
-  if (isShowModeChanged) Cookies.set('showMode', showMode);
-  if (isFlatShadedChanged) Cookies.set('isFlatShaded', isFlatShaded ? 1 : 0);
-  if (isAutorotateChanged) Cookies.set('isAutorotate', isAutorotate ? 1 : 0);
-  if (isThemeDarkChanged) Cookies.set('isThemeDark', isThemeDark ? 1 : 0);
-  if (isAxisChanged[0]) Cookies.set('axisX', $('#axisX').prop('checked') ? 1 : 0);
-  if (isAxisChanged[1]) Cookies.set('axisY', $('#axisY').prop('checked') ? 1 : 0);
-  if (isAxisChanged[2]) Cookies.set('axisZ', $('#axisZ').prop('checked') ? 1 : 0);
-  if (isGridChanged[0]) Cookies.set('gridX', $('#gridX').prop('checked') ? 1 : 0);
-  if (isGridChanged[1]) Cookies.set('gridY', $('#gridY').prop('checked') ? 1 : 0);
-  if (isGridChanged[2]) Cookies.set('gridZ', $('#gridZ').prop('checked') ? 1 : 0);
-  if (isAutopathifyChanged) Cookies.set('isAutopathify', $('#autopathify').prop('checked') ? 1 : 0);
-  if (isNSecondsTillAutopathifyChanged) Cookies.set('nSecondsTillAutopathify', nSecondsTillAutopathify);
-  if (isPathifyNodeSizeChanged) Cookies.set('pathifyNodeSize', pathifyNodeSize);
-  if (isPathifyLineSizeChanged) Cookies.set('pathifyLineSize', pathifyLineSize);
-  if (isGridSpacingChanged) Cookies.set('gridSpacing', gridSpacing);
-  if (isGridExtentChanged) Cookies.set('gridExtent', gridExtent);
-  if (isShowPointsChanged) Cookies.set('showPoints', showPoints ? 1 : 0);
-
+function syncSettings() {
   // Embedded views have differing size requirements, so we don't try to
   // preserve their values long term.
   if (!isEmbedded) {
-    if (isFontSizeChanged) Cookies.set('fontSize', fontSize);
-    Cookies.set('leftWidth', $('#left').width());
-    Cookies.set('consoleHeight', $('#console').height());
+    settings.set('leftWidth', $('#left').width());
+    settings.set('consoleHeight', $('#console').height());
   }
 
   if (blocklyWorkspace) {
     var xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
     var xmlText = Blockly.Xml.domToText(xml);
-    Cookies.set('lastBlocks', xmlText);
+    settings.set('lastBlocks', xmlText);
   }
 
-  // Changes have been committed, so let's reset the dirty flags.
-  isFontSizeChanged = false;
-  isShowHeadingsChanged = false;
-  isLightBothSidesChanged = false;
-  isShowClockwiseChanged = false;
-  isFlatShadedChanged = false;
-  isAutorotateChanged = false;
-  isShowModeChanged = false;
-  isThemeDarkChanged = false;
-  isShowHeadingsChanged = false;
-  isNSecondsTillAutopathifyChanged = false;
-  isPathifyNodeSizeChanged = false;
-  isPathifyLineSizeChanged = false;
-  isGridSpacingChanged = false;
-  isGridExtentChanged = false;
-  isShowPointsChanged = false;
-  for (var d = 0; d < 3; ++d) {
-    isAxisChanged[d] = false;
-    isGridChanged[d] = false;
-  }
+  // Save gear menu config.
+  settings.set('showGearMenu', $('#right').css('display') != 'none');
+  gearSections.forEach(function(tag) {
+    settings.set('isOpen' + tag.charAt(0).toUpperCase() + tag.substring(1), $('#panel-section-' + tag + ' > .panel-section-label').hasClass('open-panel-section-label'));
+  });
+
+  persistSettings(settings);
 }
 
 $(document).ready(function() {
@@ -325,20 +355,18 @@ $(document).ready(function() {
 
   $(window).load(function() {
     configureDownloader();
+    restoreSettings(settings);
 
     $('#textEditor textarea').addClass('mousetrap');
-    Cookies.defaults = {
-      expires: 10 * 365
-    };
 
     if (!isEmbedded) {
-      if (Cookies.get('leftWidth')) {
-        $('#left').width(Cookies.get('leftWidth'));
+      if (settings.has('leftWidth')) {
+        $('#left').width(settings.get('leftWidth'));
         resize();
       }
 
-      if (Cookies.get('consoleHeight')) {
-        $('#console').height(Cookies.get('consoleHeight'));
+      if (settings.has('consoleHeight')) {
+        $('#console').height(settings.get('consoleHeight'));
         $('#showConsole').prop('checked', $('#console').height() != 0);
         resize();
       }
@@ -353,113 +381,67 @@ $(document).ready(function() {
       resize();
     }
 
-    if (!isEmbedded && !isBlocky && Cookies.get('fontSize')) {
-      fontSize = parseInt(Cookies.get('fontSize'));
+    if (!isEmbedded && !isBlocky && settings.has('fontSize')) {
     } else if (isBlocky) {
-      fontSize = 24;
+      settings.set('fontSize', 24);
     } else if (isPresenting) {
-      fontSize = 28;
+      settings.set('fontSize', 28);
     } else {
-      fontSize = 20;
+      settings.set('fontSize', 20);
     }
-    setFontSize(fontSize);
+    setFontSize(settings.get('fontSize'));
 
-    if (Cookies.get('showHeadings')) {
-      showHeadings = parseInt(Cookies.get('showHeadings')) != 0;
-    }
-    $('#showHeadings').prop('checked', showHeadings);
+    $('#showHeadings').prop('checked', settings.get('showHeadings'));
+    $('#isFlatShaded').prop('checked', settings.get('isFlatShaded'));
+    $('#lightBothSides').prop('checked', settings.get('lightBothSides'));
+    $('#showPoints').prop('checked', settings.get('showPoints'));
+    $("#autopathify").prop('checked', settings.get('isAutopathify'));
+    $('#showMode').val(settings.get('showMode'));
+    $('#gridSpacing').val(settings.get('gridSpacing'));
+    $('#gridExtent').val(settings.get('gridExtent'));
 
-    if (Cookies.get('isFlatShaded')) {
-      isFlatShaded = parseInt(Cookies.get('isFlatShaded')) != 0;
-    }
-    $('#isFlatShaded').prop('checked', isFlatShaded);
+    $('#isAutorotate').prop('checked', settings.get('isAutorotate'));
+    enableAutorotate(settings.get('isAutorotate'));
 
-    if (Cookies.get('isAutorotate')) {
-      isAutorotate = parseInt(Cookies.get('isAutorotate')) != 0;
-    }
-    $('#isAutorotate').prop('checked', isAutorotate);
-    enableAutorotate(isAutorotate);
-
-    if (Cookies.get('lightBothSides')) {
-      lightBothSides = parseInt(Cookies.get('lightBothSides')) != 0;
-    }
-    $('#lightBothSides').prop('checked', lightBothSides);
-
-    if (Cookies.get('showMode')) {
-      showMode = Cookies.get('showMode');
-    } else {
-      showMode = 'solid';
-    }
-    $('#showMode').val(showMode);
-
-    if (isEditorText) {
+    if (settings.get('isEditorText')) {
       $("#isEditorText").prop('checked', true);
     } else {
       $("#isEditorBlocks").prop('checked', true);
     }
 
-    if (Cookies.get('isThemeDark')) {
-      setTheme(parseInt(Cookies.get('isThemeDark')) != 0);
-    }
-
-    if (isThemeDark) {
+    setTheme(settings.get('isThemeDark'));
+    if (settings.get('isThemeDark')) {
       $("#isDark").prop('checked', true);
     } else {
       $("#isLight").prop('checked', true);
     }
 
-    if (Cookies.get('showPoints')) {
-      showPoints = parseInt(Cookies.get('showPoints')) != 0;
-    }
-    $("#showPoints").prop('checked', showPoints);
-
-    if (Cookies.get('gridExtent')) {
-      gridExtent = parseFloat(Cookies.get('gridExtent'));
-    }
-    $('#gridSpacing').val(gridSpacing + '');
-
-    if (Cookies.get('gridSpacing')) {
-      gridSpacing = parseFloat(Cookies.get('gridSpacing'));
-    }
-    $('#gridExtent').val(gridExtent + '');
-
-    if (Cookies.get('isAutopathify')) {
-      isAutopathify = parseInt(Cookies.get('isAutopathify')) != 0;
-    }
-    $("#autopathify").prop('checked', isAutopathify);
-
-    if (Cookies.get('nSecondsTillAutopathify')) {
-      nSecondsTillAutopathify = parseFloat(Cookies.get('nSecondsTillAutopathify'));
-    }
-
-    // Node size
-    if (Cookies.get('pathifyNodeSize')) {
-      pathifyNodeSize = parseFloat(Cookies.get('pathifyNodeSize'));
-    }
-
-    $('#pathify-node-size').val(pathifyNodeSize);
+    $('#pathify-node-size').val(settings.get('pathifyNodeSize'));
     $('#pathify-node-size')[0].oninput = function () {
-      pathifyNodeSize = parseFloat($('#pathify-node-size').val());
       run(getSource(), GeometryMode.PATH);
     };
 
     // Line size
-    if (Cookies.get('pathifyLineSize')) {
-      pathifyLineSize = parseFloat(Cookies.get('pathifyLineSize'));
-    }
-
-    $('#pathify-line-size').val(pathifyLineSize);
+    $('#pathify-line-size').val(settings.get('pathifyLineSize'));
     $('#pathify-line-size')[0].oninput = function () {
-      pathifyLineSize = parseFloat($('#pathify-line-size').val());
       run(getSource(), GeometryMode.PATH);
     };
 
-    $('#nSecondsTillAutopathify').val(nSecondsTillAutopathify + '');
-    $('#nSecondsTillAutopathify').change(function () {
-      if (!isAutopathify) return;
+    // Showing gear menu?
+    if (settings.has('showGearMenu') && settings.get('showGearMenu')) {
+      showGearMenu();
+    }
 
-      nSecondsTillAutopathify = parseFloat($('#nSecondsTillAutopathify').val());
-      isNSecondsTillAutopathifyChanged = true;
+    gearSections.forEach(function(tag) {
+      var property = 'isOpen' + tag.charAt(0).toUpperCase() + tag.substring(1);
+      if (settings.has(property) && settings.get(property)) {
+        $('#panel-section-' + tag + ' > .panel-section-label').click();
+      }
+    });
+
+    $('#nSecondsTillAutopathify').val(settings.get('nSecondsTillAutopathify'));
+    $('#nSecondsTillAutopathify').change(function () {
+      if (!settings.get('isAutopathify')) return;
       textEditor.getSession().off('change', onEditorChange);
       if (preview) {
         clearTimeout(preview); 
@@ -469,56 +451,25 @@ $(document).ready(function() {
     });
     schedulePathify();
 
-    // WebGL-dependent stuff.
-    if (!hasWebGL()) {
-      log('No WebGL.');
-    } else {
-      if (Cookies.get('axisX')) {
-        if (parseInt(Cookies.get('axisX')) != 0) {
-          $('#axisX').prop('checked', true);
-          generateAxis(0);
-        }
+    // Axes and grids
+    var axes = "XYZ";
+    for (var i = 0; i < 3; ++i) {
+      var d = axes[i];
+
+      if (settings.get('showAxis' + d)) {
+        $('#axis' + d).prop('checked', true);
+        generateAxis(i);
       }
 
-      if (Cookies.get('axisY')) {
-        if (parseInt(Cookies.get('axisY')) != 0) {
-          $('#axisY').prop('checked', true);
-          generateAxis(1);
-        }
-      }
-
-      if (Cookies.get('axisZ')) {
-        if (parseInt(Cookies.get('axisZ')) != 0) {
-          $('#axisZ').prop('checked', true);
-          generateAxis(2);
-        }
-      }
-
-      if (Cookies.get('gridX')) {
-        if (parseInt(Cookies.get('gridX')) != 0) {
-          $('#gridX').prop('checked', true);
-          generateGrid(0);
-        }
-      }
-
-      if (Cookies.get('gridY')) {
-        if (parseInt(Cookies.get('gridY')) != 0) {
-          $('#gridY').prop('checked', true);
-          generateGrid(1);
-        }
-      }
-
-      if (Cookies.get('gridZ')) {
-        if (parseInt(Cookies.get('gridZ')) != 0) {
-          $('#gridZ').prop('checked', true);
-          generateGrid(2);
-        }
+      if (settings.get('showGrid' + d)) {
+        $('#grid' + d).prop('checked', true);
+        generateGrid(i);
       }
     }
 
     // Only save cookies if they were successfully loaded.
     $(window).unload(function() {
-      saveInCookies();
+      syncSettings();
       if (mupName && isSourceDirty && confirm('Save changes to ' + mupName + '?')) {
         save();
       }
@@ -526,13 +477,13 @@ $(document).ready(function() {
   });
 
   $('#smaller').click(function() {
-    setFontSize(fontSize - 2);
+    setFontSize(settings.get('fontSize') - 2);
     resize();
     // Blockly.fireUiEvent(window, 'resize'); TODO
   });
 
   $('#bigger').click(function() {
-    setFontSize(fontSize + 2);
+    setFontSize(settings.get('fontSize') + 2);
     resize();
     // Blockly.fireUiEvent(window, 'resize'); TODO
   });
@@ -581,29 +532,25 @@ $(document).ready(function() {
   });
 
   $('#showHeadings').click(function() {
-    isShowHeadingsChanged = true;
-    showHeadings = this.checked;
+    settings.set('showHeadings', this.checked);
     run(getSource(), GeometryMode.PATH);
   });
 
   $('#isFlatShaded').click(function() {
-    isFlatShadedChanged = true;
-    isFlatShaded = this.checked;
+    settings.set('isFlatShaded', this.checked);
   });
 
   $('#isAutorotate').click(function() {
-    isAutorotateChanged = true;
     enableAutorotate(this.checked);
   });
 
   $('#lightBothSides').click(function() {
-    isLightBothSidesChanged = true;
-    lightBothSides = this.checked;
+    settings.set('lightBothSides', this.checked);
   });
 
   function enableAutorotate(isEnabled) {
-    isAutorotate = isEnabled;
-    if (isAutorotate) {
+    settings.set('isAutorotate', isEnabled);
+    if (settings.get('isAutorotate')) {
       renderer.domElement.addEventListener('mousedown', onMouseDown, false);
     } else {
       renderer.domElement.removeEventListener('mousedown', onMouseDown);
@@ -612,15 +559,11 @@ $(document).ready(function() {
   }
 
   function setFontSize(newSize) {
-    if (newSize != fontSize) {
-      fontSize = newSize;
-      isFontSizeChanged = true;
-    }
-
-    textEditor.setFontSize(fontSize);
-    $('#console')[0].style.fontSize = fontSize + 'px';
-    $('#showMode')[0].style.fontSize = fontSize + 'px';
-    $('ul#settings')[0].style.fontSize = (fontSize + 0) + 'px';
+    settings.set('fontSize', newSize);
+    textEditor.setFontSize(settings.get('fontSize'));
+    $('#console')[0].style.fontSize = settings.get('fontSize') + 'px';
+    $('#showMode')[0].style.fontSize = settings.get('fontSize') + 'px';
+    $('ul#settings')[0].style.fontSize = (settings.get('fontSize') + 0) + 'px';
   }
 
   var red = 0xB80000;
@@ -638,8 +581,8 @@ $(document).ready(function() {
     var geometry = new THREE.Geometry();
     var a = new THREE.Vector3(0, 0, 0);
     var b = new THREE.Vector3(0, 0, 0);
-    a.setComponent(d, -gridExtent);
-    b.setComponent(d, gridExtent);
+    a.setComponent(d, -settings.get('gridExtent'));
+    b.setComponent(d, settings.get('gridExtent'));
     geometry.vertices.push(a);
     geometry.vertices.push(b);
     // axes[d] = new THREE.Line(geometry, new THREE.LineBasicMaterial({
@@ -673,7 +616,8 @@ $(document).ready(function() {
 
   function toggleAxis(d) {
     return function() {
-      isAxisChanged[d] = true;
+      var axes = "XYZ";
+      settings.set('showAxis' + axes.charAt(d), this.checked);
       if (this.checked) {
         generateAxis(d);
       } else {
@@ -692,11 +636,11 @@ $(document).ready(function() {
     }
 
     var geometry = new THREE.Geometry();
-    for (var i = -gridExtent; i <= gridExtent; i += gridSpacing) {
+    for (var i = -settings.get('gridExtent'); i <= settings.get('gridExtent'); i += settings.get('gridSpacing')) {
       var a = new THREE.Vector3(0, 0, 0);
       var b = new THREE.Vector3(0, 0, 0);
-      a.setComponent((d + 1) % 3, -gridExtent);
-      b.setComponent((d + 1) % 3, gridExtent);
+      a.setComponent((d + 1) % 3, -settings.get('gridExtent'));
+      b.setComponent((d + 1) % 3, settings.get('gridExtent'));
       a.setComponent((d + 2) % 3, i);
       b.setComponent((d + 2) % 3, i);
       geometry.vertices.push(a);
@@ -706,8 +650,8 @@ $(document).ready(function() {
       b = new THREE.Vector3(0, 0, 0);
       a.setComponent((d + 1) % 3, i);
       b.setComponent((d + 1) % 3, i);
-      a.setComponent((d + 2) % 3, -gridExtent);
-      b.setComponent((d + 2) % 3, gridExtent);
+      a.setComponent((d + 2) % 3, -settings.get('gridExtent'));
+      b.setComponent((d + 2) % 3, settings.get('gridExtent'));
       geometry.vertices.push(a);
       geometry.vertices.push(b);
     }
@@ -727,7 +671,8 @@ $(document).ready(function() {
 
   function toggleGrid(d) {
     return function() {
-      isGridChanged[d] = true;
+      var axes = "XYZ";
+      settings.set('showGrid' + axes.charAt(d), this.checked);
       if (this.checked) {
         generateGrid(d);
       } else {
@@ -741,8 +686,7 @@ $(document).ready(function() {
   $('#gridZ').click(toggleGrid(2));
 
   $('#gridExtent').change(function() {
-    isGridExtentChanged = true;
-    gridExtent = parseFloat($(this).val());
+    settings.set('gridExtent', parseFloat($(this).val()));
     for (var d = 0; d < 3; ++d) {
       if (axes[d]) {
         generateAxis(d);
@@ -754,8 +698,7 @@ $(document).ready(function() {
   });
 
   $('#gridSpacing').change(function() {
-    isGridSpacingChanged = true;
-    gridSpacing = parseFloat($(this).val());
+    settings.set('gridSpacing', parseFloat($(this).val()));
     for (var d = 0; d < 3; ++d) {
       if (grids[d]) {
         generateGrid(d);
@@ -764,8 +707,7 @@ $(document).ready(function() {
   });
 
   $('#autopathify').click(function() {
-    isAutopathifyChanged = true;
-    isAutopathify = this.checked;
+    settings.set('isAutopathify', this.checked);
 
     if (this.checked) {
       $('#nSecondsTillAutopathify').prop('disabled', false);
@@ -781,14 +723,12 @@ $(document).ready(function() {
   });
 
   $('#showMode').change(function() {
-    isShowModeChanged = true;
-    showMode = $('#showMode').find(":selected").val();
+    settings.set('showMode', $('#showMode').find(":selected").val());
     run(getSource(), GeometryMode.PATH);
   });
 
   $('#showPoints').click(function() {
-    isShowPointsChanged = true;
-    showPoints = this.checked;
+    settings.set('showPoints', this.checked);
     run(getSource(), GeometryMode.PATH);
   });
 
@@ -818,19 +758,19 @@ $(document).ready(function() {
   });
 
   $('#solidify-button').click(function() {
-    saveInCookies();
+    syncSettings();
     run(getSource(), GeometryMode.SURFACE);
     focusEditor();
   });
 
   $('#pathify-button').click(function() {
-    saveInCookies();
+    syncSettings();
     run(getSource(), GeometryMode.PATH);
     focusEditor();
   });
 
-  $('#settings-button').click(showSettings);
-  $('#close-settings-button').click(hideSettings);
+  $('#settings-button').click(showGearMenu);
+  $('#close-settings-button').click(hideGearMenu);
 
   $('ul#settings > li > .panel-section-label').click(function() {
     $(this).toggleClass('open-panel-section-label');
@@ -859,10 +799,10 @@ $(document).ready(function() {
 
   $('#exportArchive').click(function() {
     var archive = new Object;
-    for (var mup in window.localStorage) {
-      if (mup != 'untitled') {
-        var file = JSON.parse(window.localStorage.getItem(mup));
-        archive[mup] = file;
+    for (var key in localStorage) {
+      var value = localStorage.getItem(key);
+      if (key != 'untitled' && key != 'settings') {
+        archive[mup] = JSON.parse(value);
       }
     }
 
@@ -946,7 +886,7 @@ $(document).ready(function() {
   }
 });
 
-function showSettings() {
+function showGearMenu() {
   $('#settings-button').fadeToggle(100, function() {
     $('#right').toggle('slide', {direction: 'right', duration: 500}, function() {
       resize();
@@ -956,7 +896,7 @@ function showSettings() {
   });
 }
 
-function hideSettings() {
+function hideGearMenu() {
   $('#close-settings-button').fadeToggle(100, function() {
     $('#right').toggle('slide', {direction: 'right', duration: 500}, function() {
       resize();
@@ -972,10 +912,10 @@ function onEditorChange(delta) {
   if (preview) {
     clearTimeout(preview); 
   }
-  if (isAutopathify) {
+  if (settings.get('isAutopathify')) {
     preview = setTimeout(function() {
       run(getSource(), GeometryMode.PATH);
-    }, nSecondsTillAutopathify * 1000);
+    }, settings.get('nSecondsTillAutopathify') * 1000);
   }
 }
 
@@ -984,41 +924,39 @@ function schedulePathify() {
 }
 
 function setTheme(isDark) {
-  if (isThemeDark == isDark) return;
-  isThemeDark = isDark;
-
-  isThemeDarkChanged = true;
+  if (settings.get('isThemeDark') == isDark) return;
+  settings.set('isThemeDark', isDark);
 
   // Update radio buttons to reflect current editor.
-  if (isThemeDark) {
+  if (settings.get('isThemeDark')) {
     $("#isDark").prop('checked', true);
   } else {
     $("#isLight").prop('checked', true);
   }
 
-  $('link[title="theme"]').attr('href', isThemeDark ? 'css/ide_skin_dark.css' : 'css/ide_skin_light.css');
-  textEditor.setTheme(isThemeDark ? 'ace/theme/twilight' : 'ace/theme/katzenmilch');
+  $('link[title="theme"]').attr('href', settings.get('isThemeDark') ? 'css/ide_skin_dark.css' : 'css/ide_skin_light.css');
+  textEditor.setTheme(settings.get('isThemeDark') ? 'ace/theme/twilight' : 'ace/theme/katzenmilch');
 }
 
 function setEditor(isText) {
   // Bail if we're already in the requested mode.
-  if (isEditorText == isText) return;
+  if (settings.get('isEditorText') == isText) return;
 
   if (blocklyWorkspace) {
     blocklyWorkspace.removeChangeListener(onBlocksChanged);
   }
 
-  isEditorText = isText;
+  settings.set('isEditorText', isText);
 
   // Update radio buttons to reflect current editor.
-  if (isEditorText) {
+  if (settings.get('isEditorText')) {
     $("#isEditorText").prop('checked', true);
   } else {
     $("#isEditorBlocks").prop('checked', true);
   }
 
   // We're heading to text.
-  if (isEditorText) {
+  if (settings.get('isEditorText')) {
     // If we have blocks, let's offer to convert them to text.
     if (blocklyWorkspace.getTopBlocks().length > 0) {
       $('<div title="Convert">Convert your blocks program to text?</div>').dialog({
@@ -1104,7 +1042,7 @@ function setEditor(isText) {
 }
 
 function switchEditors() {
-  if (isEditorText) {
+  if (settings.get('isEditorText')) {
     $('#blocksEditor').hide();
     $('#textEditor').show();
   } else {
@@ -1115,7 +1053,7 @@ function switchEditors() {
   resize();
   window.dispatchEvent(new Event('resize'))
 
-  if (!isEditorText && blocklyWorkspace) {
+  if (!settings.get('isEditorText') && blocklyWorkspace) {
     blocklyWorkspace.addChangeListener(onBlocksChanged);
   }
 }
@@ -1143,7 +1081,7 @@ function load(mup) {
   if (json) {
     var file = JSON.parse(window.localStorage.getItem(mup));
     setEditor(file.mode == 'text');
-    if (isEditorText) {
+    if (settings.get('isEditorText')) {
       textEditor.session.setValue(file.source, -1);
     } else {
       blocklyWorkspace.clear();
@@ -1165,7 +1103,7 @@ function save() {
   if (mupName != null) {
     var mode = null;
     var source = null;
-    if (isEditorText) {
+    if (settings.get('isEditorText')) {
       source = getSource();
       mode = 'text';
     } else {
@@ -1184,12 +1122,12 @@ function save() {
     isSourceDirty = false;
     updateTitle();
 
-    $('#message').html('I saved your program. It is precious! Find it later under <image src="images/gear.png" id="gear-in-console" width="' + fontSize + 'pt"> / Mups / ' + mupName + '.');
+    $('#message').html('I saved your program. It is precious! Find it later under <image src="images/gear.png" id="gear-in-console" width="' + settings.get('fontSize') + 'pt"> / Mups / ' + mupName + '.');
   }
 }
 
 function getSource() {
-  if (isEditorText) {
+  if (settings.get('isEditorText')) {
     return textEditor.getValue();
   } else {
     return Blockly.Madeup.workspaceToCode(blocklyWorkspace);
@@ -1215,7 +1153,7 @@ function run(source, mode, pingback) {
     source: source,
     extension: 'json',
     geometry_mode: mode,
-    shading_mode: isFlatShaded ? 'FLAT' : 'SMOOTH'
+    shading_mode: settings.get('isFlatShaded') ? 'FLAT' : 'SMOOTH'
   }, function(data) {
     onInterpret(data);
     if (pingback) {
@@ -1250,9 +1188,9 @@ function onInterpret(data) {
       try {
         var model = loader.parse(JSON.parse(data['model']));
 
-        if (showMode == 'triangles' || showMode == 'shaded_triangles') {
+        if (settings.get('showMode') == 'triangles' || settings.get('showMode') == 'shaded_triangles') {
           var solidMaterial;
-          if (showMode == 'shaded_triangles') {
+          if (settings.get('showMode') == 'shaded_triangles') {
             solidMaterial = new THREE.MeshLambertMaterial({color: 0xcccccc});
           } else {
             solidMaterial = new THREE.MeshBasicMaterial({color: 0xcccccc});
@@ -1264,12 +1202,12 @@ function onInterpret(data) {
           material.side = THREE.DoubleSide;
           meshes[0] = THREE.SceneUtils.createMultiMaterialObject(model.geometry, material);
         } else {
-          var frontMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: showMode == 'wireframe', wireframeLinewidth: 5, side: THREE.FrontSide});
+          var frontMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: settings.get('showMode') == 'wireframe', wireframeLinewidth: 5, side: THREE.FrontSide});
           var backMaterial;
-          if (lightBothSides) {
-            backMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: showMode == 'wireframe', wireframeLinewidth: 5, side: THREE.BackSide});
+          if (settings.get('lightBothSides')) {
+            backMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: settings.get('showMode') == 'wireframe', wireframeLinewidth: 5, side: THREE.BackSide});
           } else {
-            backMaterial = new THREE.MeshBasicMaterial({color: 0x000000, wireframe: showMode == 'wireframe', wireframeLinewidth: 5, side: THREE.BackSide});
+            backMaterial = new THREE.MeshBasicMaterial({color: 0x000000, wireframe: settings.get('showMode') == 'wireframe', wireframeLinewidth: 5, side: THREE.BackSide});
           }
           var material = [frontMaterial, backMaterial];
           meshes[0] = THREE.SceneUtils.createMultiMaterialObject(model.geometry, material);
@@ -1283,7 +1221,7 @@ function onInterpret(data) {
         log('The geometry I got back had some funny stuff in it that I didn\'t know how to read.');
       }
     } else {
-      var sphereGeometry = new THREE.SphereGeometry(pathifyNodeSize, 20, 20);
+      var sphereGeometry = new THREE.SphereGeometry(settings.get('pathifyNodeSize'), 20, 20);
       var sphereMaterial = new THREE.MeshBasicMaterial({color: 'rgb(0, 0, 0)'});
 
       var paths = [];
@@ -1313,7 +1251,7 @@ function onInterpret(data) {
         for (var i = 0; i < paths[pi].vertices.length; ++i) {
           var v = new THREE.Vector3(paths[pi].vertices[i][0], paths[pi].vertices[i][1], paths[pi].vertices[i][2]);
           geometry.vertices.push(v);
-          if (!showHeadings || i < iLastUnique) {
+          if (!settings.get('showHeadings') || i < iLastUnique) {
             nodeVertices.push(v);
           }
           allGeometry.vertices.push(v);
@@ -1322,7 +1260,7 @@ function onInterpret(data) {
         var polyline = new MeshLine();
         polyline.setGeometry(geometry);
         var lineMaterialColorNotDepth = new MeshLineMaterial({
-          lineWidth: pathifyLineSize,
+          lineWidth: settings.get('pathifyLineSize'),
           color: new THREE.Color('#CC6600'),
           useMap: false,
           useAlphaMap: false,
@@ -1334,7 +1272,7 @@ function onInterpret(data) {
         });
         meshes.push(new THREE.Mesh(polyline.geometry, lineMaterialColorNotDepth));
         
-        if (showPoints) {
+        if (settings.get('showPoints')) {
           for (var vi = 0; vi < nodeVertices.length; ++vi) {
             var node = new THREE.Mesh(sphereGeometry, sphereMaterial);
             node.position.x = nodeVertices[vi].x;
@@ -1345,7 +1283,7 @@ function onInterpret(data) {
         }
 
         var nvertices = paths[pi].vertices.length;
-        if (showHeadings && nvertices > 0) {
+        if (settings.get('showHeadings') && nvertices > 0) {
           var m = paths[pi].orientation;
           
           var g2 = new THREE.Geometry();
@@ -1476,7 +1414,7 @@ function log(message) {
 
   // $1 is the whole source span. $2 is the start. $3 is the end.
   var linkMessage = message.replace(/^((\d+)\((\d+)(?:-(\d+))?\)):\s*/gm, function(match, full, startLine, startIndex, stopIndex) {
-    if (isEditorText) {
+    if (settings.get('isEditorText')) {
       return '<div style="color: #FF9999; display: inline;">Error on <a style="text-decoration: underline;" onclick="javascript:highlight(' + startIndex + ', ' + stopIndex + ')" class="srclink">line ' + startLine + '</a></div>: ';
     } else {
       // return '<div style="color: #FF9999; display: inline;">Error</div>';
@@ -1660,14 +1598,14 @@ Mousetrap.bind('ctrl+/', function(e) {
 
 Mousetrap.bind('ctrl+shift+/', function(e) {
   if ($('#right').css('display') == 'none') {
-    showSettings();
+    showGearMenu();
   } else {
-    hideSettings();
+    hideGearMenu();
   }
 });
 
 Mousetrap.bind('ctrl+t', function(e) {
-  if (!isEditorText) {
+  if (!settings.get('isEditorText')) {
     var source = Blockly.Madeup.workspaceToCode(blocklyWorkspace);
     log(source);
   }
