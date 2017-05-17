@@ -1,11 +1,12 @@
-function interpret(options, onSuccess) {
+function interpret(options, onSuccess, onError) {
   $.ajax({
     type: 'POST',
     url: 'interpret.php',
     data: JSON.stringify(options),
     contentType: 'application/json; charset=utf-8',
     dataType: 'json',
-    success: onSuccess
+    success: onSuccess,
+    error: onError
   });
 }
 
@@ -23,20 +24,27 @@ function textToBlocks(text, onSuccess, onError) {
 
 function sendToChris(text) {
   var name = prompt("What's your name?");
-  $.ajax({
-    type: 'POST',
-    url: 'save.php',
-    data: JSON.stringify({
-      name: name,
-      source: text
-    }),
-    contentType: 'application/json; charset=utf-8',
-    success: function(data) {
-      console.log("Saved!");
-    },
-    error: function(message) {
-      console.log('Failure. :(');
-      console.log(message);
-    }
-  });
+  if (name != null) {
+    $.ajax({
+      type: 'POST',
+      url: 'save.php',
+      data: JSON.stringify({
+        name: name,
+        source: text
+      }),
+      contentType: 'application/json; charset=utf-8',
+      success: function(data) {
+        console.log("Saved!");
+      },
+      error: function(message) {
+        console.log('Failure. :(');
+        console.log(message);
+      }
+    });
+  }
+}
+
+function configureDownloader() {
+  $('#downloader').attr('action', 'interpret.php');
+  $('#downloader').attr('method', 'post');
 }

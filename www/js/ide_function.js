@@ -324,6 +324,8 @@ $(document).ready(function() {
   }
 
   $(window).load(function() {
+    configureDownloader();
+
     $('#textEditor textarea').addClass('mousetrap');
     Cookies.defaults = {
       expires: 10 * 365
