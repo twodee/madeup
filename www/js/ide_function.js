@@ -1,3 +1,26 @@
+var GeometryMode = Object.freeze({
+  PATH: 'PATH',
+  SURFACE: 'SURFACE'
+});
+
+var gearSections = ['file', 'mups', 'editor', 'pathify', 'solidify', 'camera', 'grid', 'about'];
+var isDownloading = false;
+var initialized = false;
+var mupName = null;
+var overallScene;
+var modelScene;
+var glyphScene;
+var renderer, camera, controls;
+var meshes = [];
+var blocklyWorkspace = null;
+var allGeometry = undefined;
+var timeOfLatestRun = undefined;
+var tree = null;
+var preview = undefined;
+var isSourceDirty = false;
+var settings = new Settings();
+var lastBlocks = null;
+
 function hasWebGL() {
   try {
     var canvas = document.createElement("canvas");
@@ -105,7 +128,6 @@ window.onbeforeunload = function() {
   isDownloading = false;
 };
 
-var lastBlocks = null;
 function onBlocksChanged() {
   var xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
   var currentBlocks = Blockly.Xml.domToText(xml);
@@ -115,11 +137,6 @@ function onBlocksChanged() {
     run(getSource(), GeometryMode.PATH);
   }
 }
-
-var GeometryMode = Object.freeze({
-  PATH: 'PATH',
-  SURFACE: 'SURFACE'
-});
 
 THREE.Object3D.prototype.clear = function() {
   var children = this.children;
@@ -271,23 +288,6 @@ function Settings() {
   }
 }
 
-var gearSections = ['file', 'mups', 'editor', 'pathify', 'solidify', 'camera', 'grid', 'about'];
-var isDownloading = false;
-var initialized = false;
-var mupName = null;
-var overallScene;
-var modelScene;
-var glyphScene;
-var renderer, camera, controls;
-var meshes = [];
-var blocklyWorkspace = null;
-var allGeometry = undefined;
-var timeOfLatestRun = undefined;
-var tree = null;
-var preview = undefined;
-var isSourceDirty = false;
-var settings = new Settings();
-
 function updateTitle() {
   // The name won't be set in certain situations -- namely, when it's embedded.
   // Showing it as dirty makes no sense, because it's not a file.
@@ -418,12 +418,14 @@ $(document).ready(function() {
 
     $('#pathify-node-size').val(settings.get('pathifyNodeSize'));
     $('#pathify-node-size')[0].oninput = function () {
+      settings.set('pathifyNodeSize', parseFloat(this.value));
       run(getSource(), GeometryMode.PATH);
     };
 
     // Line size
     $('#pathify-line-size').val(settings.get('pathifyLineSize'));
     $('#pathify-line-size')[0].oninput = function () {
+      settings.set('pathifyLineSize', parseFloat(this.value));
       run(getSource(), GeometryMode.PATH);
     };
 
@@ -441,6 +443,7 @@ $(document).ready(function() {
 
     $('#nSecondsTillAutopathify').val(settings.get('nSecondsTillAutopathify'));
     $('#nSecondsTillAutopathify').change(function () {
+      settings.set('nSecondsTillAutopathify', parseFloat(this.value));
       if (!settings.get('isAutopathify')) return;
       textEditor.getSession().off('change', onEditorChange);
       if (preview) {
@@ -494,6 +497,7 @@ $(document).ready(function() {
   });
 
   $('#cameraLeft').click(function() {
+    console.log('left');
     viewFrom(0, -1);
   });
 
@@ -1363,14 +1367,13 @@ function fit() {
 
 function viewFrom(dim, sign) {
   if (allGeometry === undefined) {
-    return;
+    var bounds = new THREE.Box3(new THREE.Vector3(-7, -7, -7), new THREE.Vector3(7, 7, 7));
+  } else {
+    allGeometry.computeBoundingBox();
+    var bounds = allGeometry.boundingBox;
   }
 
-  allGeometry.computeBoundingBox();
-
-  var bounds = allGeometry.boundingBox;
   var centroid = bounds.getCenter();
-
   var xform = new THREE.Matrix4().makeTranslation(-centroid.x, -centroid.y, -centroid.z);
   modelScene.matrix = xform;
 
@@ -1524,13 +1527,6 @@ function init() {
   // controls = new THREE.OrbitControls(camera, renderer.domElement);  
   controls = new THREE.TrackballControls(camera, renderer.domElement);
   controls.addEventListener('change', render);
-
-  // (function() {
-    // var oldUpdate = controls.update;
-    // controls.update = function() {
-      // oldUpdate();
-    // };
-  // })();
 
   controls.rotateSpeed = 3.0;
   controls.zoomSpeed = 1.2;
