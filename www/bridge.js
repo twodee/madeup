@@ -22,6 +22,13 @@ function textToBlocks(text, onSuccess, onError) {
   });
 }
 
+function ask(question, onAnswer) {
+  var answer = prompt(question);
+  if (answer != null) {
+    onAnswer(answer);
+  }
+}
+
 function sendToChris(text) {
   var name = prompt("What's your name?");
   if (name != null) {

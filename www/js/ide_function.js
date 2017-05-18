@@ -166,13 +166,20 @@ function getBlocklyProcedureFormals(name) {
 
 function populateFileMenu() {
   var list = '';
-  var mups = Object.keys(window.localStorage).sort();
-  for (var i = 0; i < mups.length; ++i) {
-    var mup = mups[i];
-    if (mup != 'untitled' && mup != 'settings') {
-      list += '<a href="#" class="menu-link" onclick="load(\'' + mup.replace(/'/g, '\\&#39;').replace(/"/g, '\\&quot;') + '\')">' + mup + '</a><br/>';
-    }
+
+  var keys = [];
+  for (var i = 0; i < localStorage.length; ++i) {
+    keys.push(localStorage.key(i));
   }
+  keys = keys.sort();
+  console.log(keys);
+
+  keys.forEach(function(key) {
+    if (key != 'untitled' && key != 'settings') {
+      list += '<a href="#" class="menu-link" onclick="load(\'' + key.replace(/'/g, '\\&#39;').replace(/"/g, '\\&quot;') + '\')">' + key + '</a><br/>';
+    }
+  });
+
   $('#mups').html(list);
 }
 
@@ -189,6 +196,13 @@ function enableDownload(enable) {
 function generateDownloadable(filename, text) {
   var blob = new Blob([text], {type: "application/json"});
   saveAs(blob, filename);
+}
+
+function saveMupAs(name) {
+  mupName = name;
+  save();
+  updateTitle();
+  populateFileMenu();
 }
 
 function yyyymmdd() {
@@ -782,20 +796,13 @@ $(document).ready(function() {
   });
 
   $('#fileSaveAs').click(function() {
-    var name = prompt('Save under what name?');
-    if (name != null) {
-      mupName = name;
-      save();
-      updateTitle();
-    }
+    ask('Save under what name?', saveMupAs);
   });
 
   $('#fileSave').click(function() {
     if (!mupName) {
-      mupName = prompt('Save under what name?');
-    }
-
-    if (mupName) {
+      ask('Save under what name?', saveMupAs);
+    } else {
       save();
       updateTitle();
     }
@@ -803,7 +810,8 @@ $(document).ready(function() {
 
   $('#exportArchive').click(function() {
     var archive = new Object;
-    for (var key in localStorage) {
+    for (var i = 0; i < localStorage.length; ++i) {
+      var key = localStorage.key(i);
       var value = localStorage.getItem(key);
       if (key != 'untitled' && key != 'settings') {
         archive[mup] = JSON.parse(value);
@@ -828,7 +836,7 @@ $(document).ready(function() {
     reader.onload = function(e) {
       var mups = JSON.parse(e.target.result);
       for (mup in mups) {
-        window.localStorage.setItem(mup, JSON.stringify(mups[mup]));
+        localStorage.setItem(mup, JSON.stringify(mups[mup]));
         populateFileMenu();
       }
     };
@@ -849,7 +857,7 @@ $(document).ready(function() {
         blocklyWorkspace.clear();
         blocklyWorkspace.updateVariableList();
       }
-      window.localStorage.removeItem(mupName);
+      localStorage.removeItem(mupName);
       mupName = null;
       load('untitled');
     }
@@ -1081,9 +1089,9 @@ function load(mup) {
   }
   if (renderer) render();
 
-  var json = window.localStorage.getItem(mup); 
+  var json = localStorage.getItem(mup); 
   if (json) {
-    var file = JSON.parse(window.localStorage.getItem(mup));
+    var file = JSON.parse(localStorage.getItem(mup));
     setEditor(file.mode == 'text');
     if (settings.get('isEditorText')) {
       textEditor.session.setValue(file.source, -1);
@@ -1122,7 +1130,7 @@ function save() {
       'source' : source
     };
 
-    window.localStorage.setItem(mupName, JSON.stringify(file));
+    localStorage.setItem(mupName, JSON.stringify(file));
     isSourceDirty = false;
     updateTitle();
 
