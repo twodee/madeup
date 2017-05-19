@@ -2,6 +2,8 @@
 
 $html = file_get_contents('index.html');
 
+$html = str_replace('<!-- SCRIPTS // PHP -->', $deps, $html);
+
 if (array_key_exists('src', $_REQUEST)) {
   $html = str_replace('var isEmbedded = false; // PHP', 'var isEmbedded = true;', $html);
 }

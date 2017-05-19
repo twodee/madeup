@@ -3,13 +3,14 @@ CSS = $(addprefix css/,ide_skin.css ide_skin_dark.css ide_skin_light.css)
 IMAGES = $(addprefix images/,favicon-16x16.png favicon-32x32.png pathify_icon.png solidify_icon.png fit.png gear.png close.png)
 SRC = forn index.php translate.php save.php interpret.php index.html bridge.js $(JS) $(CSS) $(IMAGES)
 DST = $(addprefix $(WWW_ROOT)/, $(SRC))
+DEPS = ace three-js jquery.js js-cookie jquery-ui blockly closure-library filesaver jquery_ui_touch_punch mousetrap meshline
 JQUERY_UI_VERSION = 1.12.1
 
 DST_BINARIES = $(WWW_ROOT)/$(notdir $(MERP))
 
 .PHONY: madeup check
 
-all: check $(DST) $(WWW_ROOT)/ace/src-noconflict/mode-madeup.js $(DST_BINARIES)
+all: check $(DST) $(WWW_ROOT)/repos/ace/src-noconflict/mode-madeup.js $(DST_BINARIES)
 
 check:
 	@if [ -z "$(WWW_ROOT)" ]; then \
@@ -17,7 +18,7 @@ check:
 		exit 1; \
 	fi
 
-libdeps: $(WWW_ROOT)/ace $(WWW_ROOT)/three-js $(WWW_ROOT)/jquery.js $(WWW_ROOT)/js-cookie $(WWW_ROOT)/jquery-ui $(WWW_ROOT)/blockly $(WWW_ROOT)/closure-library $(WWW_ROOT)/filesaver $(WWW_ROOT)/jquery_ui_touch_punch $(WWW_ROOT)/mousetrap $(WWW_ROOT)/meshline
+libdeps: $(addprefix $(WWW_ROOT)/repos/, $(DEPS))
 
 init: libdeps madeup all
 
@@ -25,59 +26,55 @@ $(DST_BINARIES): $(MADEUP) $(TWODEE) $(MERP)
 	$(SUDO) cp $^ $(WWW_ROOT)
 	$(SUDO) chmod a+rX $@
 
-$(WWW_ROOT)/ace:
-	$(SUDO) git clone https://github.com/ajaxorg/ace-builds.git $(WWW_ROOT)/ace
-	$(SUDO) chmod -R a+rX $(WWW_ROOT)/ace
+$(WWW_ROOT)/repos/ace:
+	$(SUDO) git clone --depth=1 https://github.com/ajaxorg/ace-builds.git $@
+	$(SUDO) chmod -R a+rX $@
 
-# $(WWW_ROOT)/libigl:
-	# $(SUDO) git clone https://github.com/ajaxorg/ace-builds.git $(WWW_ROOT)/ace
-	# $(SUDO) chmod -R a+rX $(WWW_ROOT)/ace
+$(WWW_ROOT)/repos/filesaver:
+	$(SUDO) git clone --depth=1 https://github.com/eligrey/FileSaver.js $@
+	$(SUDO) chmod -R a+rX $@
 
-$(WWW_ROOT)/filesaver:
-	$(SUDO) git clone https://github.com/eligrey/FileSaver.js $(WWW_ROOT)/filesaver
-	$(SUDO) chmod -R a+rX $(WWW_ROOT)/filesaver
+$(WWW_ROOT)/repos/meshline:
+	$(SUDO) git clone --depth=1 https://github.com/spite/THREE.MeshLine.git $@
+	$(SUDO) chmod -R a+rX $@
 
-$(WWW_ROOT)/meshline:
-	$(SUDO) git clone https://github.com/spite/THREE.MeshLine.git $(WWW_ROOT)/meshline
-	$(SUDO) chmod -R a+rX $(WWW_ROOT)/meshline
-
-$(WWW_ROOT)/ace/src-noconflict/mode-madeup.js: js/mode-madeup.js
+$(WWW_ROOT)/repos/ace/src-noconflict/mode-madeup.js: js/mode-madeup.js
 	$(SUDO) cp $^ $@
 	$(SUDO) chmod a+rX $@
 
-$(WWW_ROOT)/js-cookie:
-	$(SUDO) git clone https://github.com/js-cookie/js-cookie.git $(WWW_ROOT)/js-cookie
-	$(SUDO) chmod -R a+rX $(WWW_ROOT)/js-cookie
+$(WWW_ROOT)/repos/js-cookie:
+	$(SUDO) git clone --depth=1 https://github.com/js-cookie/js-cookie.git $@
+	$(SUDO) chmod -R a+rX $@
 
-$(WWW_ROOT)/jquery.js:
-	$(SUDO) curl -o $(WWW_ROOT)/jquery.js http://code.jquery.com/jquery-1.11.2.min.js 
-	$(SUDO) chmod -R a+rX $(WWW_ROOT)/jquery.js
+$(WWW_ROOT)/repos/jquery.js:
+	$(SUDO) curl -o $@ http://code.jquery.com/jquery-1.11.2.min.js 
+	$(SUDO) chmod -R a+rX $@
 
-$(WWW_ROOT)/jquery-ui:
-	$(SUDO) curl -o $(WWW_ROOT)/jquery-ui.zip http://jqueryui.com/resources/download/jquery-ui-$(JQUERY_UI_VERSION).zip
-	$(SUDO) unzip -d $(WWW_ROOT) $(WWW_ROOT)/jquery-ui.zip
-	$(SUDO) ln -s $(WWW_ROOT)/jquery-ui-$(JQUERY_UI_VERSION) $(WWW_ROOT)/jquery-ui
-	$(SUDO) chmod -R a+rX $(WWW_ROOT)/jquery-ui $(WWW_ROOT)/jquery-ui-$(JQUERY_UI_VERSION)
+$(WWW_ROOT)/repos/jquery-ui:
+	$(SUDO) curl -o $(WWW_ROOT)/repos/jquery-ui.zip http://jqueryui.com/resources/download/jquery-ui-$(JQUERY_UI_VERSION).zip
+	$(SUDO) unzip -d $(WWW_ROOT)/repos $(WWW_ROOT)/repos/jquery-ui.zip
+	$(SUDO) ln -s $(WWW_ROOT)/repos/jquery-ui-$(JQUERY_UI_VERSION) $@
+	$(SUDO) chmod -R a+rX $@ $(WWW_ROOT)/repos/jquery-ui-$(JQUERY_UI_VERSION)
 
-$(WWW_ROOT)/three-js:
-	$(SUDO) git clone https://github.com/mrdoob/three.js.git $(WWW_ROOT)/three-js
-	$(SUDO) chmod -R a+rX $(WWW_ROOT)/three-js
+$(WWW_ROOT)/repos/three-js:
+	$(SUDO) git clone --depth=1 https://github.com/mrdoob/three.js.git $@
+	$(SUDO) chmod -R a+rX $@
 
-$(WWW_ROOT)/blockly:
-	$(SUDO) git clone https://github.com/twodee/blockly.git $(WWW_ROOT)/blockly
-	$(SUDO) chmod -R a+rX $(WWW_ROOT)/blockly
+$(WWW_ROOT)/repos/blockly:
+	$(SUDO) git clone --depth=1 https://github.com/twodee/blockly.git $@
+	$(SUDO) chmod -R a+rX $@
 
-$(WWW_ROOT)/closure-library:
-	$(SUDO) git clone https://github.com/google/closure-library.git $(WWW_ROOT)/closure-library
-	$(SUDO) chmod -R a+rX $(WWW_ROOT)/closure-library
+$(WWW_ROOT)/repos/closure-library:
+	$(SUDO) git clone --depth=1 https://github.com/google/closure-library.git $@
+	$(SUDO) chmod -R a+rX $@
 
-$(WWW_ROOT)/jquery_ui_touch_punch:
-	$(SUDO) git clone https://github.com/furf/jquery-ui-touch-punch.git $(WWW_ROOT)/jquery_ui_touch_punch
-	$(SUDO) chmod -R a+rX $(WWW_ROOT)/jquery_ui_touch_punch
+$(WWW_ROOT)/repos/jquery_ui_touch_punch:
+	$(SUDO) git clone --depth=1 https://github.com/furf/jquery-ui-touch-punch.git $@
+	$(SUDO) chmod -R a+rX $@
 
-$(WWW_ROOT)/mousetrap:
-	$(SUDO) git clone https://github.com/ccampbell/mousetrap.git $(WWW_ROOT)/mousetrap
-	$(SUDO) chmod -R a+rX $(WWW_ROOT)/mousetrap
+$(WWW_ROOT)/repos/mousetrap:
+	$(SUDO) git clone --depth=1 https://github.com/ccampbell/mousetrap.git $@
+	$(SUDO) chmod -R a+rX $@
 
 $(WWW_ROOT)/js:
 	mkdir $@
@@ -91,7 +88,11 @@ $(WWW_ROOT)/images:
 	mkdir $@
 	chmod a+rX $@
 
-$(DST): $(WWW_ROOT)/%: % $(WWW_ROOT)/js $(WWW_ROOT)/css $(WWW_ROOT)/images
+$(WWW_ROOT)/repos:
+	mkdir $@
+	chmod a+rX $@
+
+$(DST): $(WWW_ROOT)/%: % $(WWW_ROOT)/js $(WWW_ROOT)/css $(WWW_ROOT)/images $(WWW_ROOT)/repos
 	echo $(SUDO) cp $* $@
 	$(SUDO) cp $* $@
 	$(SUDO) chmod a+rX $@

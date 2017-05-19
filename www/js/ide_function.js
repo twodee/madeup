@@ -1177,6 +1177,7 @@ function run(source, mode, pingback) {
 }
 
 function onInterpret(data) {
+
   // Only listen to responses to latest run.
   if (data['timestamp'] != timeOfLatestRun) {
     return;

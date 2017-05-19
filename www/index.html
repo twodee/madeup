@@ -11,36 +11,39 @@
   <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
   <link href="https://fonts.googleapis.com/css?family=Kanit" rel="stylesheet">
 
-  <!-- JQuery dependencies -->
-  <link rel="stylesheet" href="jquery-ui/jquery-ui.css"/>
-  <script src="jquery.js"></script>
-  <script src="jquery-ui/jquery-ui.js"></script>
-  <script src="js-cookie/src/js.cookie.js"></script>
-  <script src="jquery_ui_touch_punch/jquery.ui.touch-punch.min.js"></script>
+  <script src="bridge.js"></script>
 
-  <script src="mousetrap/mousetrap.min.js"></script>
+  <!-- JQuery dependencies -->
+  <link rel="stylesheet" href="repos/jquery-ui/jquery-ui.css"/>
+  <script src="repos/jquery.js"></script>
+  <script src="repos/jquery-ui/jquery-ui.js"></script>
+  <script src="repos/js-cookie/src/js.cookie.js"></script>
+  <script src="repos/jquery_ui_touch_punch/jquery.ui.touch-punch.min.js"></script>
+
+  <script src="repos/mousetrap/mousetrap.min.js"></script>
 
   <!-- ThreeJS dependencies -->
-  <script src="three-js/build/three.js"></script>
-  <script src="three-js/examples/js/controls/TrackballControls.js"></script>
-  <script src="meshline/src/THREE.MeshLine.js"></script>
+  <script src="repos/three-js/build/three.js"></script>
+  <script src="repos/three-js/examples/js/controls/TrackballControls.js"></script>
+  <script src="repos/meshline/src/THREE.MeshLine.js"></script>
 
-  <script src="filesaver/FileSaver.min.js"></script>
+  <script src="repos/filesaver/FileSaver.min.js"></script>
+  <script src="repos/ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 
   <!-- Blockly dependencies -->
-  <script src="blockly/blockly_uncompressed.js"></script>
+  <script src="repos/blockly/blockly_uncompressed.js"></script>
 
   <!-- <script src="blockly/blocks_compressed.js"></script> -->
-  <script src="blockly/blocks/logic.js"></script>
-  <script src="blockly/blocks/loops.js"></script>
-  <script src="blockly/blocks/math.js"></script>
-  <script src="blockly/blocks/text.js"></script>
-  <script src="blockly/blocks/lists.js"></script>
-  <script src="blockly/blocks/colour.js"></script>
-  <script src="blockly/blocks/variables.js"></script>
-  <script src="blockly/blocks/procedures.js"></script>
+  <script src="repos/blockly/blocks/logic.js"></script>
+  <script src="repos/blockly/blocks/loops.js"></script>
+  <script src="repos/blockly/blocks/math.js"></script>
+  <script src="repos/blockly/blocks/text.js"></script>
+  <script src="repos/blockly/blocks/lists.js"></script>
+  <script src="repos/blockly/blocks/colour.js"></script>
+  <script src="repos/blockly/blocks/variables.js"></script>
+  <script src="repos/blockly/blocks/procedures.js"></script>
 
-  <script src="blockly/msg/js/en.js"></script>
+  <script src="repos/blockly/msg/js/en.js"></script>
 
   <script>
     var isEmbedded = false; // PHP
@@ -58,7 +61,6 @@
   <link rel="stylesheet" href="css/ide_skin.css"/>
   <link rel="stylesheet" href="css/ide_skin_dark.css" title="theme"/>
   <script src="js/text_to_blocks.js"></script>
-  <script src="bridge.js"></script>
   <script src="js/ide_function.js"></script>
   <script src="js/block_definitions.js"></script>
   <script src="js/blockly_blocks_madeup.js"></script>
@@ -378,7 +380,6 @@
   <textarea id="source" name="source"></textarea>
 </form>
 
-<script src="ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/ide_editor.js"></script>
 
 <!-- Blocks Switch ________________________________________________________ -->

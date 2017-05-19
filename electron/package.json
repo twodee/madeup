@@ -1,0 +1,15 @@
+{
+  "name": "Madeup",
+  "version": "0.1.0",
+  "main": "./main.js",
+  "scripts": {
+    "start" : "electron .",
+    "deps" : "mkdir -p repos && cd repos && make -f ../Makefile libdeps",
+    "links" : "ln -sf ../www/js ../www/css ../www/images ../www/index.html ."
+  },
+  "dependencies" : {
+    "node-localstorage" : ">=1.3.0",
+    "dialogs" : ">=1.1.19",
+    "tmp" : ">=0.0.31"
+  }
+}

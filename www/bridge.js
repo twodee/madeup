@@ -1,3 +1,5 @@
+console.log('asdfasdfadsfasd');
+
 function interpret(options, onSuccess, onError) {
   $.ajax({
     type: 'POST',
