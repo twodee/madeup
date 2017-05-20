@@ -813,7 +813,7 @@ $(document).ready(function() {
       var key = localStorage.key(i);
       var value = localStorage.getItem(key);
       if (key != 'untitled' && key != 'settings') {
-        archive[mup] = JSON.parse(value);
+        archive[key] = JSON.parse(value);
       }
     }
 
