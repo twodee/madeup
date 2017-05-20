@@ -2,6 +2,7 @@ var tmp = require('tmp');
 var fs = require('fs');
 var Dialogs = require('dialogs');
 var dialogs = Dialogs();
+const screenshot = require('electron-screenshot');
 const fsdialog = require('electron').remote.dialog;
 const LocalStorage = require('node-localstorage').LocalStorage;
 let localStorage = new LocalStorage('./config');
@@ -119,9 +120,8 @@ function configureDownloader() {
   var form = $('#downloader')[0];
 
   $('#downloader').submit(function(e) {
-    console.log('downloading');
     isDownloading = true;
-    var path = form.tag.value + '.obj';
+    var defaultPath = form.tag.value + '.obj';
     interpret({
       timestamp: form.timestamp.value,
       source: form.source.value,
@@ -132,9 +132,12 @@ function configureDownloader() {
     }, function(data) {
       fsdialog.showSaveDialog({
         title: 'Save as...',
-        defaultPath: path
+        defaultPath: defaultPath
+      }, function(path) {
+        fs.writeFile(path, data.model, function(e) {
+          isDownloading = false;
+        });
       });
-      isDownloading = false;
     }, function(errorMessage) {
       console.log('Failure. :(');
       isDownloading = false;
@@ -144,4 +147,6 @@ function configureDownloader() {
   });
 }
 
-
+function takeScreenshot(path) {
+  screenshot({filename: path});
+}

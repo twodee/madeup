@@ -3,7 +3,7 @@ var GeometryMode = Object.freeze({
   SURFACE: 'SURFACE'
 });
 
-var gearSections = ['file', 'mups', 'editor', 'pathify', 'solidify', 'camera', 'grid', 'about'];
+var gearSections = ['file', 'mups', 'editor', 'pathify', 'solidify', 'camera', 'grid', 'tutorial', 'about'];
 var isDownloading = false;
 var initialized = false;
 var mupName = null;
@@ -172,7 +172,6 @@ function populateFileMenu() {
     keys.push(localStorage.key(i));
   }
   keys = keys.sort();
-  console.log(keys);
 
   keys.forEach(function(key) {
     if (key != 'untitled' && key != 'settings') {
@@ -1607,6 +1606,11 @@ Mousetrap.bind('ctrl+shift+/', function(e) {
   } else {
     hideGearMenu();
   }
+});
+
+Mousetrap.bind('ctrl+0', function(e) {
+  console.log('pic');
+  takeScreenshot('/Users/johnch/Desktop/screenshot.png');
 });
 
 Mousetrap.bind('ctrl+t', function(e) {

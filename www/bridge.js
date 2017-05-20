@@ -57,3 +57,7 @@ function configureDownloader() {
   $('#downloader').attr('action', 'interpret.php');
   $('#downloader').attr('method', 'post');
 }
+
+function takeScreenshot(path) {
+  console.log('not implemented');
+}
