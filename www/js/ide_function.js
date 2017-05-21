@@ -586,8 +586,8 @@ $(document).ready(function() {
     settings.set('fontSize', newSize);
     textEditor.setFontSize(settings.get('fontSize'));
     $('#console')[0].style.fontSize = settings.get('fontSize') + 'px';
-    $('#showMode')[0].style.fontSize = settings.get('fontSize') + 'px';
     $('ul#settings')[0].style.fontSize = (settings.get('fontSize') + 0) + 'px';
+    $('#right input, #right select').css('font-size', newSize);
   }
 
   var red = 0xB80000;

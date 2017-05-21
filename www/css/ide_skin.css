@@ -202,8 +202,6 @@ audio::-webkit-media-controls-enclosure {
 #right {
   overflow: none;
   display: none;
-  background-color: black;
-  color: white;
   width: 300px;
   position: absolute;
   right: 0;
@@ -244,12 +242,7 @@ ul#settings > li {
 }
 
 ul#settings > li > .panel-section-label {
-  color: #FFCC99;
   text-transform: uppercase;
-}
-
-ul#settings > li > .panel-section-label:hover {
-  color: #DDDD00;
 }
 
 ul#settings > li > .panel-section-label:before {
@@ -260,7 +253,6 @@ ul#settings > li > .panel-section-label:before {
 
 ul#settings > li > .open-panel-section-label {
   font-style: italic;
-  /* color: #DDDD00; */
 }
 
 ul#settings > li > .open-panel-section-label:before {

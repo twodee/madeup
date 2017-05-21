@@ -3,11 +3,6 @@
   color: #FFFFFF;
 }
 
-.popup {
-  background-color: #CCCCCC;
-  color: #800000;
-}
-
 #left {
   background-color: #000000;
 }
@@ -56,22 +51,23 @@
   background-color: #DEDEDE;
 }
 
-.fileLink {
-  color: #800000;
+.menu-link {
+  color: #000040;
 }
 
-#download.unclickable {
-  color: #CCCCCC !important;
+.menu-link.unclickable {
+  color: #999999 !important;
 }
 
-#download.clickable {
-  color: #000000 !important;
+#right {
+  background-color: rgb(220, 220, 220);
+  color: black;
 }
 
-#toggleFilePopup {
-  color: #B000B0 !important;
+ul#settings > li > .panel-section-label {
+  color: rgb(100, 50, 0);
 }
 
-.popupDropdown {
-  color: #000000;
+ul#settings > li > .panel-section-label:hover {
+  color: rgb(200, 150, 0);
 }

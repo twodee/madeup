@@ -59,6 +59,15 @@
   color: #666666 !important;
 }
 
-.menu-link.clickable {
-  color: #FFFFFF !important;
+#right {
+  background-color: black;
+  color: white;
+}
+
+ul#settings > li > .panel-section-label {
+  color: #FFCC99;
+}
+
+ul#settings > li > .panel-section-label:hover {
+  color: #DDDD00;
 }
