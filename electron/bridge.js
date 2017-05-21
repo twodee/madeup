@@ -5,7 +5,7 @@ var dialogs = Dialogs();
 const screenshot = require('electron-screenshot');
 const fsdialog = require('electron').remote.dialog;
 const LocalStorage = require('node-localstorage').LocalStorage;
-let localStorage = new LocalStorage('./config');
+let localStorage = new LocalStorage(require('os').homedir() + '/.madeup');
 
 function interpret(options, onSuccess, onError) {
   var tmpIn = tmp.fileSync();

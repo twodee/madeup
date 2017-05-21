@@ -4,7 +4,7 @@ const url = require('url');
 const LocalStorage = require('node-localstorage').LocalStorage;
 
 let mainWindow;
-let localStorage = new LocalStorage('./config');
+let localStorage = new LocalStorage(require('os').homedir() + '/.madeup');
 
 function recall(key, default_value) {
   let value = localStorage.getItem(key);
@@ -24,7 +24,8 @@ function createWindow() {
 
   mainWindow = new BrowserWindow({
     width: width,
-    height: height
+    height: height,
+    icon: path.join(__dirname, 'assets/icons/png/64x64.png')
   })
 
   mainWindow.loadURL(url.format({

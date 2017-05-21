@@ -197,6 +197,12 @@ function generateDownloadable(filename, text) {
   saveAs(blob, filename);
 }
 
+function exportScreenshot() {
+  renderer.domElement.toBlob(function(blob) {
+    saveAs(blob, 'foo.png');
+  });
+}
+
 function saveMupAs(name) {
   mupName = name;
   save();
@@ -748,6 +754,8 @@ $(document).ready(function() {
     settings.set('showPoints', this.checked);
     run(getSource(), GeometryMode.PATH);
   });
+
+  $('#exportScreenshot').click(exportScreenshot);
 
   enableDownload(false);
   $('#download').click(function() {
@@ -1517,7 +1525,11 @@ function init() {
   camera.position.z = 30;
 
   var glcanvas = $("#glcanvas");
-  renderer = new THREE.WebGLRenderer({antialias: true});
+  renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    preserveDrawingBuffer: true,
+    alpha: true
+  });
 
   // Scratch out upstream implementation, which affects global culling state
   // that I rely on.
@@ -1525,7 +1537,7 @@ function init() {
     // console.log('dummy'); 
   // }
 
-  renderer.setClearColor(0xFFFFFF, 1);
+  renderer.setClearColor(0xFFFFFF, 0);
   // renderer.setClearColor(0xCCCCCC, 1);
   document.getElementById("glcanvas").appendChild(renderer.domElement);
   renderer.domElement.addEventListener('touchmove', function(e) {

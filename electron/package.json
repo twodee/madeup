@@ -1,14 +1,24 @@
 {
+  "productName" : "Madeup",
+  "description" : "Madeup is a programming language for building 3D models with algorithms.",
+  "repository" : "https://github.com/twodee/madeup",
+  "license" : "GPL-3.0",
   "name": "Madeup",
   "version": "0.1.0",
   "main": "./main.js",
   "scripts": {
     "start" : "electron .",
     "deps" : "mkdir -p repos && cd repos && make -f ../Makefile",
-    "links" : "ln -sf ../www/js ../www/css ../www/images ../www/index.html ."
+    "links" : "ln -sf ../www/js ../www/css ../www/images ../www/index.html .",
+    "build-mac" : "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=builds",
+    "build-win" : "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
+    "build-linux" : "electron-packager . --overwrite --platform=win --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds"
+  },
+  "devDependencies" : {
+    "electron" : ">=1.6.8",
+    "electron-packager" : ">=8.7.0"
   },
   "dependencies" : {
-    "electron" : ">=1.6.8",
     "node-localstorage" : ">=1.3.0",
     "dialogs" : ">=1.1.19",
     "tmp" : ">=0.0.31",
