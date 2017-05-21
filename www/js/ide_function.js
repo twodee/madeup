@@ -377,6 +377,7 @@ $(document).ready(function() {
     restoreSettings(settings);
 
     $('#textEditor textarea').addClass('mousetrap');
+    // $('input').addClass('mousetrap');
 
     if (!isEmbedded) {
       if (settings.has('leftWidth')) {
@@ -899,11 +900,60 @@ $(document).ready(function() {
     } 
   });
 
+  Mousetrap.bind('ctrl+s', save);
+  Mousetrap.bind('ctrl+,', pathify);
+  Mousetrap.bind('ctrl+.', solidify);
+  Mousetrap.bind('ctrl+/', fit);
+  Mousetrap.bind('ctrl+shift+/', toggleGearMenu);
+  Mousetrap.bind('ctrl+0', takeScreenshot);
+  Mousetrap.bind('ctrl+t', logText);
+  Mousetrap.bind('esc', focusParent);
+
+  // Form elements don't get events in the same way. We must explicitly bind.
+  document.querySelectorAll('input, select').forEach(function(element) {
+    var mousetrap = new Mousetrap(element);
+    mousetrap.bind('ctrl+s', save);
+    mousetrap.bind('ctrl+,', pathify);
+    mousetrap.bind('ctrl+.', solidify);
+    mousetrap.bind('ctrl+/', fit);
+    mousetrap.bind('ctrl+shift+/', toggleGearMenu);
+    mousetrap.bind('ctrl+0', takeScreenshot);
+    mousetrap.bind('ctrl+t', logText);
+    mousetrap.bind('esc', focusParent);
+  });
+
   if (hasWebGL()) {
     init();
     animate();
   }
 });
+
+function pathify() {
+  run(getSource(), GeometryMode.PATH);
+}
+
+function solidify() {
+  run(getSource(), GeometryMode.SURFACE);
+}
+
+function toggleGearMenu() {
+  if ($('#right').css('display') == 'none') {
+    showGearMenu();
+  } else {
+    hideGearMenu();
+  }
+}
+
+function logText() {
+  if (!settings.get('isEditorText')) {
+    var source = Blockly.Madeup.workspaceToCode(blocklyWorkspace);
+    log(source);
+  }
+}
+
+function focusParent() {
+  parent.focus();
+}
 
 function showGearMenu() {
   $('#settings-button').fadeToggle(100, function() {
@@ -1531,12 +1581,6 @@ function init() {
     alpha: true
   });
 
-  // Scratch out upstream implementation, which affects global culling state
-  // that I rely on.
-  // renderer.setMaterialFaces = function(material) {
-    // console.log('dummy'); 
-  // }
-
   renderer.setClearColor(0xFFFFFF, 0);
   // renderer.setClearColor(0xCCCCCC, 1);
   document.getElementById("glcanvas").appendChild(renderer.domElement);
@@ -1595,43 +1639,3 @@ function render() {
 function focusEditor() {
   textEditor.focus();
 }
-
-Mousetrap.bind('ctrl+s', function(e) {
-  save();
-});
-
-Mousetrap.bind('ctrl+,', function(e) {
-  run(getSource(), GeometryMode.PATH);
-});
-
-Mousetrap.bind('ctrl+.', function(e) {
-  run(getSource(), GeometryMode.SURFACE);
-});
-
-Mousetrap.bind('ctrl+/', function(e) {
-  fit();
-});
-
-Mousetrap.bind('ctrl+shift+/', function(e) {
-  if ($('#right').css('display') == 'none') {
-    showGearMenu();
-  } else {
-    hideGearMenu();
-  }
-});
-
-Mousetrap.bind('ctrl+0', function(e) {
-  console.log('pic');
-  takeScreenshot('/Users/johnch/Desktop/screenshot.png');
-});
-
-Mousetrap.bind('ctrl+t', function(e) {
-  if (!settings.get('isEditorText')) {
-    var source = Blockly.Madeup.workspaceToCode(blocklyWorkspace);
-    log(source);
-  }
-});
-
-Mousetrap.bind('esc', function(e) {
-  parent.focus();
-});
