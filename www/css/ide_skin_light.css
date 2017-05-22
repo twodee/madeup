@@ -64,6 +64,10 @@
   color: black;
 }
 
+ul#settings > li {
+  border-color: rgb(180, 180, 180);
+}
+
 ul#settings > li > .panel-section-label {
   color: rgb(100, 50, 0);
 }

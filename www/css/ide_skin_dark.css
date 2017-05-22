@@ -64,6 +64,10 @@
   color: white;
 }
 
+ul#settings > li {
+  border-color: #404040;
+}
+
 ul#settings > li > .panel-section-label {
   color: #FFCC99;
 }

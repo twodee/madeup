@@ -993,7 +993,6 @@ function schedulePathify() {
 }
 
 function setTheme(isDark) {
-  if (settings.get('isThemeDark') == isDark) return;
   settings.set('isThemeDark', isDark);
 
   // Update radio buttons to reflect current editor.

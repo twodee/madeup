@@ -238,7 +238,8 @@ ul#settings > li {
   display: inline-block;
   width: 100%;
   margin: 0;
-  border-bottom: 1px solid #404040;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
 }
 
 ul#settings > li > .panel-section-label {
