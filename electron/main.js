@@ -34,7 +34,7 @@ function createWindow() {
     slashes: true
   }))
 
-  if (true || showTools) {
+  if (showTools) {
     mainWindow.webContents.openDevTools({mode: 'bottom'});
   }
 
