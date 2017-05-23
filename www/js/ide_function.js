@@ -199,8 +199,9 @@ function generateDownloadable(filename, text) {
 
 function exportScreenshot() {
   renderer.domElement.toBlob(function(blob) {
-    saveAs(blob, 'foo.png');
+    saveAs(blob, mupName + '.png');
   });
+  return false;
 }
 
 function saveMupAs(name) {
@@ -498,17 +499,8 @@ $(document).ready(function() {
     });
   });
 
-  $('#smaller').click(function() {
-    setFontSize(settings.get('fontSize') - 2);
-    resize();
-    // Blockly.fireUiEvent(window, 'resize'); TODO
-  });
-
-  $('#bigger').click(function() {
-    setFontSize(settings.get('fontSize') + 2);
-    resize();
-    // Blockly.fireUiEvent(window, 'resize'); TODO
-  });
+  $('#smaller').click(decreaseFontSize);
+  $('#bigger').click(increaseFontSize);
 
   $('#fit-button').click(function() {
     fit();
@@ -579,14 +571,6 @@ $(document).ready(function() {
       renderer.domElement.removeEventListener('mousedown', onMouseDown);
       controls.staticMoving = true;
     }
-  }
-
-  function setFontSize(newSize) {
-    settings.set('fontSize', newSize);
-    textEditor.setFontSize(settings.get('fontSize'));
-    $('#console')[0].style.fontSize = settings.get('fontSize') + 'px';
-    $('ul#settings')[0].style.fontSize = (settings.get('fontSize') + 0) + 'px';
-    $('#right input, #right select').css('font-size', newSize);
   }
 
   var red = 0xB80000;
@@ -904,9 +888,11 @@ $(document).ready(function() {
   Mousetrap.bind('ctrl+.', solidify);
   Mousetrap.bind('ctrl+/', fit);
   Mousetrap.bind('ctrl+shift+/', toggleGearMenu);
-  Mousetrap.bind('ctrl+0', takeScreenshot);
+  Mousetrap.bind('ctrl+0', exportScreenshot);
   Mousetrap.bind('ctrl+t', logText);
   Mousetrap.bind('esc', focusParent);
+  Mousetrap.bind('ctrl+[', decreaseFontSize);
+  Mousetrap.bind('ctrl+]', increaseFontSize);
 
   // Form elements don't get events in the same way. We must explicitly bind.
   document.querySelectorAll('input, select, textarea').forEach(function(element) {
@@ -916,9 +902,11 @@ $(document).ready(function() {
     mousetrap.bind('ctrl+.', solidify);
     mousetrap.bind('ctrl+/', fit);
     mousetrap.bind('ctrl+shift+/', toggleGearMenu);
-    mousetrap.bind('ctrl+0', takeScreenshot);
+    mousetrap.bind('ctrl+0', exportScreenshot);
     mousetrap.bind('ctrl+t', logText);
     mousetrap.bind('esc', focusParent);
+    mousetrap.bind('ctrl+[', decreaseFontSize);
+    mousetrap.bind('ctrl+]', increaseFontSize);
   });
 
   if (hasWebGL()) {
@@ -952,6 +940,26 @@ function logText() {
 
 function focusParent() {
   parent.focus();
+}
+
+function increaseFontSize() {
+  setFontSize(settings.get('fontSize') + 2);
+  resize();
+  return false;
+}
+
+function decreaseFontSize() {
+  setFontSize(settings.get('fontSize') - 2);
+  resize();
+  return false;
+}
+
+function setFontSize(newSize) {
+  settings.set('fontSize', newSize);
+  textEditor.setFontSize(settings.get('fontSize'));
+  $('#console')[0].style.fontSize = settings.get('fontSize') + 'px';
+  $('ul#settings')[0].style.fontSize = (settings.get('fontSize') + 0) + 'px';
+  $('#right input, #right select').css('font-size', newSize);
 }
 
 function showGearMenu() {
