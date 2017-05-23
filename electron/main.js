@@ -1,4 +1,4 @@
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, globalShortcut} = require('electron');
 const path = require('path');
 const url = require('url');
 const LocalStorage = require('node-localstorage').LocalStorage;
@@ -25,7 +25,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: width,
     height: height,
-    icon: path.join(__dirname, 'assets/icons/png/64x64.png')
+    icon: path.join(__dirname, 'assets/icons/png/1024x1024.png')
   })
 
   mainWindow.loadURL(url.format({
@@ -34,7 +34,7 @@ function createWindow() {
     slashes: true
   }))
 
-  if (showTools) {
+  if (true || showTools) {
     mainWindow.webContents.openDevTools({mode: 'bottom'});
   }
 

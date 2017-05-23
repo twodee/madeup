@@ -377,7 +377,6 @@ $(document).ready(function() {
     restoreSettings(settings);
 
     $('#textEditor textarea').addClass('mousetrap');
-    // $('input').addClass('mousetrap');
 
     if (!isEmbedded) {
       if (settings.has('leftWidth')) {
@@ -910,7 +909,7 @@ $(document).ready(function() {
   Mousetrap.bind('esc', focusParent);
 
   // Form elements don't get events in the same way. We must explicitly bind.
-  document.querySelectorAll('input, select').forEach(function(element) {
+  document.querySelectorAll('input, select, textarea').forEach(function(element) {
     var mousetrap = new Mousetrap(element);
     mousetrap.bind('ctrl+s', save);
     mousetrap.bind('ctrl+,', pathify);
@@ -1401,33 +1400,35 @@ function onInterpret(data) {
 }
 
 function fit() {
-  if (allGeometry === undefined) {
-    return;
+  // Must return false. Otherwise everything gets highlighted on Linux.
+ 
+  if (allGeometry !== undefined) {
+    allGeometry.computeBoundingBox();
+
+    var bounds = allGeometry.boundingBox;
+    var centroid = bounds.getCenter();
+
+    var xform = new THREE.Matrix4().makeTranslation(-centroid.x, -centroid.y, -centroid.z);
+    modelScene.matrix = xform;
+
+    var constraint;
+    if (camera.aspect >= 1) {
+      var fovX = 2 * Math.atan(Math.tan(camera.fov * Math.PI / 180.0 * 0.5) * camera.aspect);
+      constraint = Math.tan(fovX * 0.5);
+    } else {
+      constraint = Math.tan(camera.fov * Math.PI / 180.0 * 0.5);
+    }
+
+    var dimensions = bounds.getSize();
+    var maxSpan = Math.max(dimensions.x, Math.max(dimensions.y, dimensions.z));
+    var fit = maxSpan / constraint;
+
+    controls.reset(); 
+    camera.position.z = bounds.max.z + fit;
+    camera.updateProjectionMatrix();
   }
 
-  allGeometry.computeBoundingBox();
-
-  var bounds = allGeometry.boundingBox;
-  var centroid = bounds.getCenter();
-
-  var xform = new THREE.Matrix4().makeTranslation(-centroid.x, -centroid.y, -centroid.z);
-  modelScene.matrix = xform;
-
-  var constraint;
-  if (camera.aspect >= 1) {
-    var fovX = 2 * Math.atan(Math.tan(camera.fov * Math.PI / 180.0 * 0.5) * camera.aspect);
-    constraint = Math.tan(fovX * 0.5);
-  } else {
-    constraint = Math.tan(camera.fov * Math.PI / 180.0 * 0.5);
-  }
-
-  var dimensions = bounds.getSize();
-  var maxSpan = Math.max(dimensions.x, Math.max(dimensions.y, dimensions.z));
-  var fit = maxSpan / constraint;
-
-  controls.reset(); 
-  camera.position.z = bounds.max.z + fit;
-  camera.updateProjectionMatrix();
+  return false;
 }
 
 function viewFrom(dim, sign) {

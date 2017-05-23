@@ -10,9 +10,9 @@
     "start" : "electron .",
     "deps" : "mkdir -p repos && cd repos && make -f ../Makefile",
     "links" : "ln -sf ../www/js ../www/css ../www/images ../www/index.html .",
-    "build-mac" : "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=builds",
-    "build-win" : "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
-    "build-linux" : "electron-packager . --overwrite --platform=win --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds"
+    "build-mac" : "electron-packager . Madeup --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=builds",
+    "build-win" : "electron-packager . --overwrite --platform=windows --arch=x64 --icon=assets/icons/win/icon.ico --prune=true --out=builds",
+    "build-linux" : "electron-packager . madeup --overwrite --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=builds"
   },
   "devDependencies" : {
     "electron" : ">=1.6.8",
