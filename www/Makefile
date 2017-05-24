@@ -1,4 +1,4 @@
-JS = $(addprefix js/,text_to_blocks.js ide_editor.js ide_function.js keystrokes.js)
+JS = $(addprefix js/,text_to_blocks.js ide_function.js keystrokes.js)
 CSS = $(addprefix css/,ide_skin.css ide_skin_dark.css ide_skin_light.css)
 IMAGES = $(addprefix images/,favicon-16x16.png favicon-32x32.png pathify_icon.png solidify_icon.png fit.png gear.png close.png)
 SRC = forn index.php translate.php save.php interpret.php index.html bridge.js $(JS) $(CSS) $(IMAGES)
@@ -78,17 +78,17 @@ $(WWW_ROOT)/repos/mousetrap:
 	$(SUDO) chmod -R a+rX $@
 
 $(WWW_ROOT)/deps.min.js:
-	$(SUDO) (cd $(WWW_ROOT) && uglifyjs bridge.js repos/jquery.js repos/jquery-ui/jquery-ui.js repos/jquery_ui_touch_punch/jquery.ui.touch-punch.js repos/js-cookie/src/js.cookie.js repos/mousetrap/mousetrap.min.js repos/three-js/build/three.js repos/three-js/examples/js/controls/TrackballControls.js repos/meshline/src/THREE.MeshLine.js repos/filesaver/FileSaver.min.js repos/ace/src-noconflict/ace.js js/text_to_blocks.js js/ide_function.js > $@)
+	cd $(WWW_ROOT) && $(SUDO) uglifyjs bridge.js repos/jquery.js repos/jquery-ui/jquery-ui.js repos/jquery_ui_touch_punch/jquery.ui.touch-punch.js repos/js-cookie/src/js.cookie.js repos/mousetrap/mousetrap.min.js repos/three-js/build/three.js repos/three-js/examples/js/controls/TrackballControls.js repos/meshline/src/THREE.MeshLine.js repos/filesaver/FileSaver.min.js repos/ace/src-noconflict/ace.js js/text_to_blocks.js js/ide_function.js > $@
 	$(SUDO) chmod a+r $@
 
 $(WWW_ROOT)/mode-madeup.js:
-	$(SUDO) (cd $(WWW_ROOT) && ln -s repos/ace/src-noconflict/mode-madeup.js .)
+	cd $(WWW_ROOT) && $(SUDO) ln -s repos/ace/src-noconflict/mode-madeup.js .
 
 $(WWW_ROOT)/theme-twilight.js:
-	$(SUDO) (cd $(WWW_ROOT) && ln -s repos/ace/src-noconflict/theme-twilight.js .)
+	cd $(WWW_ROOT) && $(SUDO) ln -s repos/ace/src-noconflict/theme-twilight.js .
 
 $(WWW_ROOT)/theme-katzenmilch.js:
-	$(SUDO) (cd $(WWW_ROOT) && ln -s repos/ace/src-noconflict/theme-katzenmilch.js .)
+	cd $(WWW_ROOT) && $(SUDO) ln -s repos/ace/src-noconflict/theme-katzenmilch.js .
 
 $(WWW_ROOT)/js:
 	mkdir $@
