@@ -663,7 +663,7 @@ $(document).ready(function() {
       geometry.vertices.push(b);
     }
 
-    grids[d] = new THREE.Line(geometry, new THREE.LineBasicMaterial({color: colors[d], linewidth: 1}), THREE.LineSegments);
+    grids[d] = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({color: colors[d], linewidth: 1}));
     glyphScene.add(grids[d]);
     render();
   }
