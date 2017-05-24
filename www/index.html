@@ -5,35 +5,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-  <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
-
   <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
-  <link href="https://fonts.googleapis.com/css?family=Kanit" rel="stylesheet">
 
-  <script src="bridge.js"></script>
-
-  <!-- JQuery dependencies -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Kanit">
   <link rel="stylesheet" href="repos/jquery-ui/jquery-ui.css"/>
-  <script src="repos/jquery.js"></script>
-  <script src="repos/jquery-ui/jquery-ui.js"></script>
-  <script src="repos/js-cookie/src/js.cookie.js"></script>
-  <script src="repos/jquery_ui_touch_punch/jquery.ui.touch-punch.min.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="http://cdn.materialdesignicons.com/1.9.32/css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pretty-checkbox/2.2.1/pretty.min.css"/>
+  <link rel="stylesheet" href="css/ide_skin.css"/>
+  <link rel="stylesheet" href="css/ide_skin_dark.css" title="theme"/>
 
-  <script src="repos/mousetrap/mousetrap.min.js"></script>
+  <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 
-  <!-- ThreeJS dependencies -->
-  <script src="repos/three-js/build/three.js"></script>
-  <script src="repos/three-js/examples/js/controls/TrackballControls.js"></script>
-  <script src="repos/meshline/src/THREE.MeshLine.js"></script>
-
-  <script src="repos/filesaver/FileSaver.min.js"></script>
-  <script src="repos/ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+  <script>
+    var isEmbedded = false; // PHP
+    var isPresenting = false; // PHP
+    var keystrokesMoviePrefix = null; // PHP
+    var madeupPrefix = 'http://madeup.xyz'; // PHP
+  </script>
 
   <!-- Blockly dependencies -->
-  <script src="repos/blockly/blockly_uncompressed.js"></script>
 
-  <!-- <script src="blockly/blocks_compressed.js"></script> -->
+  <!-- Unminified -->
+  <script src="repos/blockly/blockly_uncompressed.js"></script>
   <script src="repos/blockly/blocks/logic.js"></script>
   <script src="repos/blockly/blocks/loops.js"></script>
   <script src="repos/blockly/blocks/math.js"></script>
@@ -42,28 +37,40 @@
   <script src="repos/blockly/blocks/colour.js"></script>
   <script src="repos/blockly/blocks/variables.js"></script>
   <script src="repos/blockly/blocks/procedures.js"></script>
-
+  <script src="repos/blockly/blocks/zmadeup.js"></script>
+  <script src="repos/blockly/generators/madeup.js"></script>
   <script src="repos/blockly/msg/js/en.js"></script>
+  <!-- /Unminified -->
 
-  <script>
-    var isEmbedded = false; // PHP
-    var isPresenting = false; // PHP
-    var keystrokesMoviePrefix = null; // PHP
-    var madeupPrefix = 'http://madeup.xyz'; // PHP
-  </script>
-  <script src="js/keystrokes.js"></script>
+  <!-- Minified -->
+  <!-- <script src="repos/blockly/blockly_compressed.js"></script> -->
+  <!-- <script src="repos/blockly/blocks_compressed.js"></script> -->
+  <!-- <script src="repos/blockly/madeup_compressed.js"></script> -->
+  <!-- <script src="repos/blockly/msg/js/en.js"></script> -->
+  <!-- /Minified -->
 
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link rel="stylesheet" href="http://cdn.materialdesignicons.com/1.9.32/css/materialdesignicons.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pretty-checkbox/2.2.1/pretty.min.css"/>
+  <!-- Other dependencies -->
 
-  <!-- Madeup IDE dependencies -->
-  <link rel="stylesheet" href="css/ide_skin.css"/>
-  <link rel="stylesheet" href="css/ide_skin_dark.css" title="theme"/>
+  <!-- Unminified -->
+  <script src="repos/jquery.js"></script>
+  <script src="repos/jquery-ui/jquery-ui.js"></script>
+  <script src="repos/js-cookie/src/js.cookie.js"></script>
+  <script src="repos/jquery_ui_touch_punch/jquery.ui.touch-punch.min.js"></script>
+  <script src="repos/mousetrap/mousetrap.min.js"></script>
+  <script src="repos/three-js/build/three.js"></script>
+  <script src="repos/three-js/examples/js/controls/TrackballControls.js"></script>
+  <script src="repos/meshline/src/THREE.MeshLine.js"></script>
+  <script src="repos/filesaver/FileSaver.min.js"></script>
+  <script src="repos/ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
   <script src="js/text_to_blocks.js"></script>
+  <script src="js/keystrokes.js"></script>
+  <script src="bridge.js"></script>
   <script src="js/ide_function.js"></script>
-  <script src="js/block_definitions.js"></script>
-  <script src="js/blockly_blocks_madeup.js"></script>
+  <!-- /Unminified -->
+
+  <!-- Minified -->
+  <!-- <script src="deps.min.js"></script> -->
+  <!-- /Minified -->
 
   <script>if (window.module) module = window.module;</script>
 </head>
@@ -387,8 +394,6 @@
   <input id="timestamp" type="text" name="timestamp"/>
   <textarea id="source" name="source"></textarea>
 </form>
-
-<script src="js/ide_editor.js"></script>
 
 <!-- Blocks Switch ________________________________________________________ -->
 <script>

@@ -1,16 +1,17 @@
-JS = $(addprefix js/,blockly_blocks_madeup.js text_to_blocks.js ide_editor.js ide_function.js keystrokes.js block_definitions.js)
+JS = $(addprefix js/,text_to_blocks.js ide_editor.js ide_function.js keystrokes.js)
 CSS = $(addprefix css/,ide_skin.css ide_skin_dark.css ide_skin_light.css)
 IMAGES = $(addprefix images/,favicon-16x16.png favicon-32x32.png pathify_icon.png solidify_icon.png fit.png gear.png close.png)
 SRC = forn index.php translate.php save.php interpret.php index.html bridge.js $(JS) $(CSS) $(IMAGES)
 DST = $(addprefix $(WWW_ROOT)/, $(SRC))
 DEPS = ace three-js jquery.js js-cookie jquery-ui blockly closure-library filesaver jquery_ui_touch_punch mousetrap meshline
 JQUERY_UI_VERSION = 1.12.1
+MINIFIED_DEPS = $(addprefix $(WWW_ROOT)/,deps.min.js mode-madeup.js theme-twilight.js theme-katzenmilch.js)
 
 DST_BINARIES = $(WWW_ROOT)/$(notdir $(MERP))
 
 .PHONY: madeup check
 
-all: check $(DST) $(WWW_ROOT)/repos/ace/src-noconflict/mode-madeup.js $(DST_BINARIES)
+all: check $(DST) $(WWW_ROOT)/repos/ace/src-noconflict/mode-madeup.js $(DST_BINARIES) $(MINIFIED_DEPS)
 
 check:
 	@if [ -z "$(WWW_ROOT)" ]; then \
@@ -75,6 +76,19 @@ $(WWW_ROOT)/repos/jquery_ui_touch_punch:
 $(WWW_ROOT)/repos/mousetrap:
 	$(SUDO) git clone --depth=1 https://github.com/ccampbell/mousetrap.git $@
 	$(SUDO) chmod -R a+rX $@
+
+$(WWW_ROOT)/deps.min.js:
+	$(SUDO) (cd $(WWW_ROOT) && uglifyjs bridge.js repos/jquery.js repos/jquery-ui/jquery-ui.js repos/jquery_ui_touch_punch/jquery.ui.touch-punch.js repos/js-cookie/src/js.cookie.js repos/mousetrap/mousetrap.min.js repos/three-js/build/three.js repos/three-js/examples/js/controls/TrackballControls.js repos/meshline/src/THREE.MeshLine.js repos/filesaver/FileSaver.min.js repos/ace/src-noconflict/ace.js js/text_to_blocks.js js/ide_function.js > $@)
+	$(SUDO) chmod a+r $@
+
+$(WWW_ROOT)/mode-madeup.js:
+	$(SUDO) (cd $(WWW_ROOT) && ln -s repos/ace/src-noconflict/mode-madeup.js .)
+
+$(WWW_ROOT)/theme-twilight.js:
+	$(SUDO) (cd $(WWW_ROOT) && ln -s repos/ace/src-noconflict/theme-twilight.js .)
+
+$(WWW_ROOT)/theme-katzenmilch.js:
+	$(SUDO) (cd $(WWW_ROOT) && ln -s repos/ace/src-noconflict/theme-katzenmilch.js .)
 
 $(WWW_ROOT)/js:
 	mkdir $@
