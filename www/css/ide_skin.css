@@ -88,7 +88,7 @@ body {
 }
 
 #console {
-  font-family: Courier;
+  font-family: 'Courier', 'Courier New', monospace;
   outline: none;
   height: 50px;
   /* height: 0px; */

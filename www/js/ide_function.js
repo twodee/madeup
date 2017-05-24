@@ -395,7 +395,9 @@ $(document).ready(function() {
     // https://ace.c9.io/demo/keyboard_shortcuts.html
     // textEditor.commands.removeCommand(['togglecomment', 'gotoline', 'showSettingsMenu']);
     textEditor.commands.bindKey('ctrl-/', null);
+    textEditor.commands.bindKey('ctrl-?', null);
     textEditor.commands.bindKey('ctrl-shift-?', null);
+    textEditor.commands.bindKey('ctrl-shift-/', null);
     textEditor.commands.bindKey('ctrl-,', null);
     textEditor.commands.bindKey('ctrl-[', null);
     textEditor.commands.bindKey('ctrl-]', null);
