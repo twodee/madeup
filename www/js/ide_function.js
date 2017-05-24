@@ -397,6 +397,8 @@ $(document).ready(function() {
     textEditor.commands.bindKey('ctrl-/', null);
     textEditor.commands.bindKey('ctrl-shift-?', null);
     textEditor.commands.bindKey('ctrl-,', null);
+    textEditor.commands.bindKey('ctrl-[', null);
+    textEditor.commands.bindKey('ctrl-]', null);
     textEditor.commands.bindKey('ctrl-\'', 'togglecomment');
 
     $('#textEditor textarea').addClass('mousetrap');
