@@ -3,6 +3,7 @@ ace.define('ace/mode/madeup', ['require', 'exports', 'module' , 'ace/lib/oop', '
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
 var Tokenizer = require("../tokenizer").Tokenizer;
+var Range = ace.require('ace/range').Range;
 var MadeupHighlightRules = require("./madeup_highlight_rules").MadeupHighlightRules;
 
 var Mode = function() {

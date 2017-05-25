@@ -911,7 +911,7 @@ $(document).ready(function() {
     } 
   });
 
-  Mousetrap.bind('ctrl+s', save);
+  Mousetrap.bind('ctrl+shift+s', save);
   Mousetrap.bind('ctrl+,', pathify);
   Mousetrap.bind('ctrl+.', solidify);
   Mousetrap.bind('ctrl+/', fit);
@@ -925,7 +925,7 @@ $(document).ready(function() {
   // Form elements don't get events in the same way. We must explicitly bind.
   document.querySelectorAll('input, select, textarea').forEach(function(element) {
     var mousetrap = new Mousetrap(element);
-    mousetrap.bind('ctrl+s', save);
+    mousetrap.bind('ctrl+shift+s', save);
     mousetrap.bind('ctrl+,', pathify);
     mousetrap.bind('ctrl+.', solidify);
     mousetrap.bind('ctrl+/', fit);
