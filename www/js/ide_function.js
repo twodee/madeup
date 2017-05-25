@@ -622,8 +622,8 @@ $(document).ready(function() {
       // color: colors[d],
       // linewidth: 5
     // }), THREE.LineSegments);
-    axes[d] = new MeshLine();
-    axes[d].setGeometry(geometry);
+    var line = new MeshLine();
+    line.setGeometry(geometry);
     var material = new MeshLineMaterial({
       lineWidth: 0.1,
       color: new THREE.Color(colors[d]),
@@ -635,7 +635,8 @@ $(document).ready(function() {
       near: camera.near,
       far: camera.far
     });
-    glyphScene.add(new THREE.Mesh(axes[d].geometry, material));
+    axes[d] = new THREE.Mesh(line.geometry, material);
+    glyphScene.add(axes[d]);
     render();
   }
 
