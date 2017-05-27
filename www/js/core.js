@@ -208,6 +208,10 @@ function exportScreenshot() {
   return false;
 }
 
+function promptForSaveAs() {
+  ask('Save under what name?', saveMupAs);
+}
+
 function saveMupAs(name) {
   mupName = name;
   save();
@@ -819,13 +823,10 @@ $(document).ready(function() {
     $(this).next().slideToggle(200);
   });
 
-  $('#fileSaveAs').click(function() {
-    ask('Save under what name?', saveMupAs);
-  });
-
+  $('#fileSaveAs').click(promptForSaveAs);
   $('#fileSave').click(function() {
     if (!mupName) {
-      ask('Save under what name?', saveMupAs);
+      promptForSaveAs();
     } else {
       save();
       updateTitle();
@@ -917,6 +918,7 @@ $(document).ready(function() {
   });
 
   Mousetrap.bind('ctrl+s', save);
+  Mousetrap.bind('ctrl+shift+s', promptForSaveAs);
   Mousetrap.bind('ctrl+,', pathify);
   Mousetrap.bind('ctrl+.', solidify);
   Mousetrap.bind('ctrl+/', fit);
@@ -931,6 +933,7 @@ $(document).ready(function() {
   document.querySelectorAll('input, select, textarea').forEach(function(element) {
     var mousetrap = new Mousetrap(element);
     mousetrap.bind('ctrl+s', save);
+    mousetrap.bind('ctrl+shift+s', promptForSaveAs);
     mousetrap.bind('ctrl+,', pathify);
     mousetrap.bind('ctrl+.', solidify);
     mousetrap.bind('ctrl+/', fit);
