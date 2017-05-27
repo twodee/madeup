@@ -59,3 +59,7 @@ function configureDownloader() {
 function takeScreenshot(path) {
   console.log('not implemented');
 }
+
+function needsUnsavedPrompt() {
+  return true;
+}

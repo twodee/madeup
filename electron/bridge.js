@@ -136,3 +136,7 @@ function configureDownloader() {
 function takeScreenshot(path) {
   screenshot({filename: path});
 }
+
+function needsUnsavedPrompt() {
+  return false;
+}

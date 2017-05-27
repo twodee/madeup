@@ -122,12 +122,15 @@ var onMouseDown = (function() {
 // Warn on leaving the page if there are unsaved changes. Downloading triggers
 // this, even though we're not leaving the page, so we add a special flag to
 // filter out these events.
-window.onbeforeunload = function() {
-  if (!isDownloading && mupName && isSourceDirty) {
-    return 'You have unsaved changes.';
+window.addEventListener('beforeunload', function(e) {
+  if (!isDownloading && mupName && isSourceDirty && needsUnsavedPrompt()) {
+    var message = 'You have unsaved changes. Throw them away?';
+    e.returnValue = message;
+    return message;
+  } else if (isDownloading) {
+    isDownloading = false;
   }
-  isDownloading = false;
-};
+});
 
 function onBlocksChanged() {
   var xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
@@ -394,6 +397,7 @@ $(document).ready(function() {
     // https://github.com/ajaxorg/ace/blob/master/lib/ace/commands/default_commands.js
     // https://ace.c9.io/demo/keyboard_shortcuts.html
     // textEditor.commands.removeCommand(['togglecomment', 'gotoline', 'showSettingsMenu']);
+    textEditor.commands.bindKey('ctrl-s', null);
     textEditor.commands.bindKey('ctrl-/', null);
     textEditor.commands.bindKey('ctrl-?', null);
     textEditor.commands.bindKey('ctrl-shift-?', null);
@@ -402,6 +406,7 @@ $(document).ready(function() {
     textEditor.commands.bindKey('ctrl-[', null);
     textEditor.commands.bindKey('ctrl-]', null);
     textEditor.commands.bindKey('ctrl-l', null);
+    textEditor.commands.bindKey('command-l', null);
     textEditor.commands.bindKey('ctrl-\'', 'togglecomment');
 
     $('#textEditor textarea').addClass('mousetrap');
@@ -911,7 +916,7 @@ $(document).ready(function() {
     } 
   });
 
-  Mousetrap.bind('ctrl+shift+s', save);
+  Mousetrap.bind('ctrl+s', save);
   Mousetrap.bind('ctrl+,', pathify);
   Mousetrap.bind('ctrl+.', solidify);
   Mousetrap.bind('ctrl+/', fit);
@@ -925,7 +930,7 @@ $(document).ready(function() {
   // Form elements don't get events in the same way. We must explicitly bind.
   document.querySelectorAll('input, select, textarea').forEach(function(element) {
     var mousetrap = new Mousetrap(element);
-    mousetrap.bind('ctrl+shift+s', save);
+    mousetrap.bind('ctrl+s', save);
     mousetrap.bind('ctrl+,', pathify);
     mousetrap.bind('ctrl+.', solidify);
     mousetrap.bind('ctrl+/', fit);
@@ -1224,6 +1229,8 @@ function save() {
 
     $('#message').html('I saved your program. It is precious! Find it later under <image src="images/gear.png" id="gear-in-console" width="' + settings.get('fontSize') + 'pt"> / Mups / ' + mupName + '.');
   }
+
+  return false;
 }
 
 function getSource() {
