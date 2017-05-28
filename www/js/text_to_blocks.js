@@ -68,7 +68,7 @@ function Peeker(src) {
   };
 }
 
-function parse(peeker) {
+function parse(peeker, workspace) {
   var block = null;
 
   // assert '('
@@ -85,11 +85,11 @@ function parse(peeker) {
   if (token == 'block') {
     if (peeker.peek() == ' ') {
       peeker.get(); // eat space
-      block = parse(peeker);
+      block = parse(peeker, workspace);
       var prevStatement = block;
       while (peeker.peek() == ' ') {
         peeker.get(); // eat space
-        var statement = parse(peeker);
+        var statement = parse(peeker, workspace);
 
         setStatementExpression(statement, false);
         prevStatement.nextConnection.connect(statement.previousConnection);
@@ -103,114 +103,114 @@ function parse(peeker) {
     id = peeker.getToken();
     if (id == 'print') {
       peeker.get(); // eat space
-      var msg = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_print');
+      var msg = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_print');
       connectExpression(block, 'MESSAGE', msg);
     } else if (id == 'echo') {
       peeker.get(); // eat space
-      var mesh = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_echo');
+      var mesh = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_echo');
       connectExpression(block, 'OBJECT', mesh);
     } else if (id == 'debug') {
       peeker.get(); // eat space
-      var msg = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_debug');
+      var msg = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_debug');
       connectExpression(block, 'MESSAGE', msg);
     } else if (id == 'sign') {
       peeker.get(); // eat space
-      var x = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_sign');
+      var x = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_sign');
       connectExpression(block, 'X', x);
     } else if (id == 'moveto') {
       peeker.get(); // eat space
-      var x = parse(peeker);
+      var x = parse(peeker, workspace);
       peeker.get(); // eat space
-      var y = parse(peeker);
+      var y = parse(peeker, workspace);
       peeker.get(); // eat space
-      var z = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_moveto');
+      var z = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_moveto');
       connectExpression(block, 'X', x);
       connectExpression(block, 'Y', y);
       connectExpression(block, 'Z', z);
     } else if (id == 'move') {
       peeker.get(); // eat space
-      var x = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_move');
+      var x = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_move');
       connectExpression(block, 'DISTANCE', x);
     } else if (id == 'random') {
       peeker.get(); // eat space
-      var min = parse(peeker);
+      var min = parse(peeker, workspace);
       peeker.get(); // eat space
-      var max = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_random');
+      var max = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_random');
       connectExpression(block, 'MIN', min);
       connectExpression(block, 'MAX', max);
     } else if (id == 'atan2') {
       peeker.get(); // eat space
-      var opposite = parse(peeker);
+      var opposite = parse(peeker, workspace);
       peeker.get(); // eat space
-      var adjacent = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_atan2');
+      var adjacent = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_atan2');
       connectExpression(block, 'OPPOSITE', opposite);
       connectExpression(block, 'ADJACENT', adjacent);
     } else if (id == 'yaw' || id == 'roll' || id == 'pitch') {
       peeker.get(); // eat space
-      var degrees = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_turn');
+      var degrees = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_turn');
       block.setFieldValue(id, 'FUNCTION');
       connectExpression(block, 'DEGREES', degrees);
     } else if (id == 'coalesce') {
       peeker.get(); // eat space
-      var threshold = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_coalesce');
+      var threshold = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_coalesce');
       connectExpression(block, 'THRESHOLD', threshold);
     } else if (id == 'translate' || id == 'scale') {
       peeker.get(); // eat space
-      var x = parse(peeker);
+      var x = parse(peeker, workspace);
       peeker.get(); // eat space
-      var y = parse(peeker);
+      var y = parse(peeker, workspace);
       peeker.get(); // eat space
-      var z = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_' + id);
+      var z = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_' + id);
       connectExpression(block, 'X', x);
       connectExpression(block, 'Y', y);
       connectExpression(block, 'Z', z);
     } else if (id == 'spheres' || id == 'forget' || id == 'boxes' || id == 'polygon') {
-      block = blocklyWorkspace.newBlock('madeup_' + id);
+      block = workspace.newBlock('madeup_' + id);
     } else if (id == 'revolve') {
       peeker.get(); // eat space
-      var x = parse(peeker);
+      var x = parse(peeker, workspace);
       peeker.get(); // eat space
-      var y = parse(peeker);
+      var y = parse(peeker, workspace);
       peeker.get(); // eat space
-      var z = parse(peeker);
+      var z = parse(peeker, workspace);
       peeker.get(); // eat space
-      var degrees = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_revolve');
+      var degrees = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_revolve');
       connectExpression(block, 'X', x);
       connectExpression(block, 'Y', y);
       connectExpression(block, 'Z', z);
       connectExpression(block, 'DEGREES', degrees);
     } else if (id == 'extrude') {
       peeker.get(); // eat space
-      var x = parse(peeker);
+      var x = parse(peeker, workspace);
       peeker.get(); // eat space
-      var y = parse(peeker);
+      var y = parse(peeker, workspace);
       peeker.get(); // eat space
-      var z = parse(peeker);
+      var z = parse(peeker, workspace);
       peeker.get(); // eat space
-      var length = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_extrude');
+      var length = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_extrude');
       connectExpression(block, 'X', x);
       connectExpression(block, 'Y', y);
       connectExpression(block, 'Z', z);
       connectExpression(block, 'LENGTH', length);
     } else if (id == 'surface') {
       peeker.get(); // eat space
-      var columns = parse(peeker);
+      var columns = parse(peeker, workspace);
       peeker.get(); // eat space
-      var rows = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_surface');
+      var rows = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_surface');
       connectExpression(block, 'COLUMNS', columns);
       connectExpression(block, 'ROWS', rows);
     } else if (id == 'dowel' || id == 'tube') {
@@ -219,91 +219,91 @@ function parse(peeker) {
         peeker.get(); // eat space
         peeker.getToken(); // TODO consume maxBend
         peeker.get(); // eat space
-        maxBend = parse(peeker);
+        maxBend = parse(peeker, workspace);
       } else {
-        maxBend = blocklyWorkspace.newBlock('madeup_integer');
+        maxBend = workspace.newBlock('madeup_integer');
         maxBend.setFieldValue(360, 'INTEGER');
         maxBend.initSvg();
         maxBend.render();
       }
-      block = blocklyWorkspace.newBlock('madeup_' + id);
+      block = workspace.newBlock('madeup_' + id);
       connectExpression(block, 'MAXBEND', maxBend);
     } else if (id == 'rotate') {
       peeker.get(); // eat space
-      var x = parse(peeker);
+      var x = parse(peeker, workspace);
       peeker.get(); // eat space
-      var y = parse(peeker);
+      var y = parse(peeker, workspace);
       peeker.get(); // eat space
-      var z = parse(peeker);
+      var z = parse(peeker, workspace);
       peeker.get(); // eat space
-      var degrees = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_' + id);
+      var degrees = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_' + id);
       connectExpression(block, 'X', x);
       connectExpression(block, 'Y', y);
       connectExpression(block, 'Z', z);
       connectExpression(block, 'DEGREES', degrees);
     } else if (id == 'sin' || id == 'cos' || id == 'tan') {
       peeker.get(); // eat space
-      var degrees = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_sincostan');
+      var degrees = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_sincostan');
       block.setFieldValue(id, 'FUNCTION');
       connectExpression(block, 'DEGREES', degrees);
     } else if (id == 'asin' || id == 'acos' || id == 'atan') {
       peeker.get(); // eat space
-      var ratio = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_inverse_sincostan');
+      var ratio = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_inverse_sincostan');
       block.setFieldValue(id, 'FUNCTION');
       connectExpression(block, 'RATIO', ratio);
     } else if (id == 'center' || id == 'identity' || id == 'reframe' || id == 'push' || id == 'pop' || id == 'reverse') {
-      block = blocklyWorkspace.newBlock('madeup_' + id);
+      block = workspace.newBlock('madeup_' + id);
     } else if (id == 'where') {
-      block = blocklyWorkspace.newBlock('madeup_where');
+      block = workspace.newBlock('madeup_where');
     } else if (id == 'log') {
       peeker.get(); // eat space
-      var base = parse(peeker);
+      var base = parse(peeker, workspace);
       peeker.get(); // eat space
-      var x = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_log');
+      var x = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_log');
       connectExpression(block, 'BASE', base);
       connectExpression(block, 'X', x);
     } else if (id == 'min' || id == 'max') {
       peeker.get(); // eat space
-      var a = parse(peeker);
+      var a = parse(peeker, workspace);
       peeker.get(); // eat space
-      var b = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_minmax');
+      var b = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_minmax');
       block.setFieldValue(id, 'FUNCTION');
       connectExpression(block, 'A', a);
       connectExpression(block, 'B', b);
     } else if (id == 'normalize' || id == 'magnitude') {
       peeker.get(); // eat space
-      var v = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_' + id);
+      var v = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_' + id);
       connectExpression(block, 'VECTOR', v);
     } else if (id == 'cross' || id == 'dot') {
       peeker.get(); // eat space
-      var a = parse(peeker);
+      var a = parse(peeker, workspace);
       peeker.get(); // eat space
-      var b = parse(peeker);
-      block = blocklyWorkspace.newBlock('madeup_' + id);
+      var b = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_' + id);
       connectExpression(block, 'A', a);
       connectExpression(block, 'B', b);
     } else {
       // is it a variable or a function?
-      if (!Blockly.Procedures.isLegalName_(id, blocklyWorkspace)) {
-        block = blocklyWorkspace.newBlock('procedures_callnoreturn');
+      if (!Blockly.Procedures.isLegalName_(id, workspace)) {
+        block = workspace.newBlock('procedures_callnoreturn');
         block.setFieldValue(id, 'NAME');
         var formals = getBlocklyProcedureFormals(id);
         block.setProcedureParameters(formals, formals);
         var i = 0;
         while (peeker.peek() == ' ') {
           peeker.get(); // eat space
-          var actualBlock = parse(peeker);
+          var actualBlock = parse(peeker, workspace);
           connectExpression(block, 'ARG' + i, actualBlock);
           ++i;
         }
       } else {
-        block = blocklyWorkspace.newBlock('variables_get');
+        block = workspace.newBlock('variables_get');
         block.setFieldValue(id, 'VAR');
       }
     }
@@ -311,24 +311,24 @@ function parse(peeker) {
 
   else if (token == 'repeat') {
     peeker.get(); // eat space
-    var count = parse(peeker);
+    var count = parse(peeker, workspace);
     peeker.get(); // eat space
-    var body = parse(peeker);
+    var body = parse(peeker, workspace);
 
-    block = blocklyWorkspace.newBlock('madeup_repeat');
+    block = workspace.newBlock('madeup_repeat');
     connectExpression(block, 'COUNT', count);
     connectStatement(block, 'BODY', body);
   }
 
   else if (token == 'repeatwich') {
     peeker.get(); // eat space
-    var count = parse(peeker);
+    var count = parse(peeker, workspace);
     peeker.get(); // eat space
-    var surrounder = parse(peeker);
+    var surrounder = parse(peeker, workspace);
     peeker.get(); // eat space
-    var surroundee = parse(peeker);
+    var surroundee = parse(peeker, workspace);
 
-    block = blocklyWorkspace.newBlock('madeup_repeat_around');
+    block = workspace.newBlock('madeup_repeat_around');
     connectExpression(block, 'COUNT', count);
     connectStatement(block, 'SURROUNDER', surrounder);
     connectStatement(block, 'SURROUNDEE', surroundee);
@@ -336,28 +336,28 @@ function parse(peeker) {
 
   else if (token == 'while') {
     peeker.get(); // eat space
-    var condition = parse(peeker);
+    var condition = parse(peeker, workspace);
     peeker.get(); // eat space
-    var body = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_while');
+    var body = parse(peeker, workspace);
+    block = workspace.newBlock('madeup_while');
     connectExpression(block, 'CONDITION', condition);
     connectStatement(block, 'BODY', body);
   }
 
   else if (token == 'if') {
     peeker.get(); // eat space
-    var condition = parse(peeker);
+    var condition = parse(peeker, workspace);
     peeker.get(); // eat space
-    var thenBlock = parse(peeker);
+    var thenBlock = parse(peeker, workspace);
     peeker.get(); // eat space
-    var elseBlock = parse(peeker);
+    var elseBlock = parse(peeker, workspace);
     if (elseBlock) {
-      block = blocklyWorkspace.newBlock('madeup_if_else_statement');
+      block = workspace.newBlock('madeup_if_else_statement');
       connectExpression(block, 'CONDITION', condition);
       connectStatement(block, 'THEN', thenBlock);
       connectStatement(block, 'ELSE', elseBlock);
     } else {
-      block = blocklyWorkspace.newBlock('madeup_if_statement');
+      block = workspace.newBlock('madeup_if_statement');
       connectExpression(block, 'CONDITION', condition);
       connectStatement(block, 'THEN', thenBlock);
     }
@@ -365,13 +365,13 @@ function parse(peeker) {
 
   else if (token == 'if-ternary') {
     peeker.get(); // eat space
-    var condition = parse(peeker);
+    var condition = parse(peeker, workspace);
     peeker.get(); // eat space
-    var thenBlock = parse(peeker);
+    var thenBlock = parse(peeker, workspace);
     peeker.get(); // eat space
-    var elseBlock = parse(peeker);
+    var elseBlock = parse(peeker, workspace);
 
-    block = blocklyWorkspace.newBlock('madeup_if_expr');
+    block = workspace.newBlock('madeup_if_expr');
     connectExpression(block, 'CONDITION', condition);
     connectExpression(block, 'THEN', thenBlock);
     connectExpression(block, 'ELSE', elseBlock);
@@ -379,12 +379,12 @@ function parse(peeker) {
 
   else if (token == 'for-through') {
     peeker.get(); // eat space
-    var iterator = parse(peeker);
+    var iterator = parse(peeker, workspace);
     peeker.get(); // eat space
-    var stop = parse(peeker);
+    var stop = parse(peeker, workspace);
     peeker.get(); // eat space
-    var body = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_for_upper');
+    var body = parse(peeker, workspace);
+    block = workspace.newBlock('madeup_for_upper');
     block.setFieldValue('through', 'CLUSIVITY');
     connectExpression(block, 'ITERATOR', iterator);
     connectExpression(block, 'STOP', stop);
@@ -393,14 +393,14 @@ function parse(peeker) {
 
   else if (token == 'for-through-by') {
     peeker.get(); // eat space
-    var iterator = parse(peeker);
+    var iterator = parse(peeker, workspace);
     peeker.get(); // eat space
-    var stop = parse(peeker);
+    var stop = parse(peeker, workspace);
     peeker.get(); // eat space
-    var by = parse(peeker);
+    var by = parse(peeker, workspace);
     peeker.get(); // eat space
-    var body = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_for_upper_by');
+    var body = parse(peeker, workspace);
+    block = workspace.newBlock('madeup_for_upper_by');
     block.setFieldValue('through', 'CLUSIVITY');
     connectExpression(block, 'ITERATOR', iterator);
     connectExpression(block, 'STOP', stop);
@@ -410,12 +410,12 @@ function parse(peeker) {
 
   else if (token == 'for-to') {
     peeker.get(); // eat space
-    var iterator = parse(peeker);
+    var iterator = parse(peeker, workspace);
     peeker.get(); // eat space
-    var stop = parse(peeker);
+    var stop = parse(peeker, workspace);
     peeker.get(); // eat space
-    var body = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_for_upper');
+    var body = parse(peeker, workspace);
+    block = workspace.newBlock('madeup_for_upper');
     block.setFieldValue('to', 'CLUSIVITY');
     connectExpression(block, 'ITERATOR', iterator);
     connectExpression(block, 'STOP', stop);
@@ -424,14 +424,14 @@ function parse(peeker) {
 
   else if (token == 'for-to-by') {
     peeker.get(); // eat space
-    var iterator = parse(peeker);
+    var iterator = parse(peeker, workspace);
     peeker.get(); // eat space
-    var stop = parse(peeker);
+    var stop = parse(peeker, workspace);
     peeker.get(); // eat space
-    var by = parse(peeker);
+    var by = parse(peeker, workspace);
     peeker.get(); // eat space
-    var body = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_for_upper_by');
+    var body = parse(peeker, workspace);
+    block = workspace.newBlock('madeup_for_upper_by');
     block.setFieldValue('to', 'CLUSIVITY');
     connectExpression(block, 'ITERATOR', iterator);
     connectExpression(block, 'STOP', stop);
@@ -441,14 +441,14 @@ function parse(peeker) {
 
   else if (token == 'for-in') {
     peeker.get(); // eat space
-    var iterator = parse(peeker);
+    var iterator = parse(peeker, workspace);
     peeker.get(); // eat space
-    var start = parse(peeker);
+    var start = parse(peeker, workspace);
     peeker.get(); // eat space
-    var stop = parse(peeker);
+    var stop = parse(peeker, workspace);
     peeker.get(); // eat space
-    var body = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_for_in');
+    var body = parse(peeker, workspace);
+    block = workspace.newBlock('madeup_for_in');
     connectExpression(block, 'ITERATOR', iterator);
     connectExpression(block, 'START', start);
     connectExpression(block, 'STOP', stop);
@@ -457,16 +457,16 @@ function parse(peeker) {
 
   else if (token == 'for-in-by') {
     peeker.get(); // eat space
-    var iterator = parse(peeker);
+    var iterator = parse(peeker, workspace);
     peeker.get(); // eat space
-    var start = parse(peeker);
+    var start = parse(peeker, workspace);
     peeker.get(); // eat space
-    var stop = parse(peeker);
+    var stop = parse(peeker, workspace);
     peeker.get(); // eat space
-    var by = parse(peeker);
+    var by = parse(peeker, workspace);
     peeker.get(); // eat space
-    var body = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_for_in_by');
+    var body = parse(peeker, workspace);
+    block = workspace.newBlock('madeup_for_in_by');
     connectExpression(block, 'ITERATOR', iterator);
     connectExpression(block, 'START', start);
     connectExpression(block, 'STOP', stop);
@@ -476,10 +476,10 @@ function parse(peeker) {
 
   else if (token == '+' || token == '-' || token == '*' || token == '/' || token == '//' || token == '^' || token == '%') {
     peeker.get(); // eat space
-    var a = parse(peeker);
+    var a = parse(peeker, workspace);
     peeker.get(); // eat space
-    var b = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_binary_arithmetic_operator');
+    var b = parse(peeker, workspace);
+    block = workspace.newBlock('madeup_binary_arithmetic_operator');
     block.setFieldValue(token, 'OPERATOR');
     connectExpression(block, 'A', a);
     connectExpression(block, 'B', b);
@@ -487,15 +487,15 @@ function parse(peeker) {
 
   else if (token == 'negate') {
     peeker.get(); // eat space
-    var a = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_unary_operator');
+    var a = parse(peeker, workspace);
+    block = workspace.newBlock('madeup_unary_operator');
     connectExpression(block, 'A', a);
   }
 
   else if (token == 'define') {
     peeker.get(); // eat space
     var id = peeker.getToken();
-    block = blocklyWorkspace.newBlock('procedures_defnoreturn');
+    block = workspace.newBlock('procedures_defnoreturn');
     block.setFieldValue(id, 'NAME');
     peeker.get(); // eat space
     var formals = [];
@@ -506,7 +506,7 @@ function parse(peeker) {
     }
     block.arguments_ = formals;
     block.updateParams_();
-    var body = parse(peeker);
+    var body = parse(peeker, workspace);
     connectStatement(block, 'STACK', body);
   }
 
@@ -514,9 +514,9 @@ function parse(peeker) {
     peeker.get(); // eat space
     var id = peeker.getToken();
     peeker.get(); // eat space
-    var rhs = parse(peeker);
+    var rhs = parse(peeker, workspace);
 
-    block = blocklyWorkspace.newBlock('variables_set');
+    block = workspace.newBlock('variables_set');
     block.setFieldValue(id, 'VAR');
     connectExpression(block, 'VALUE', rhs);
   }
@@ -527,14 +527,14 @@ function parse(peeker) {
     peeker.getToken(); // eat SUBSCRIPT
     peeker.get(); // eat space
 
-    var collection = parse(peeker);
+    var collection = parse(peeker, workspace);
     peeker.get(); // eat space
-    var i = parse(peeker);
+    var i = parse(peeker, workspace);
     peeker.get(); // eat )
     peeker.get(); // eat space
-    var rhs = parse(peeker);
+    var rhs = parse(peeker, workspace);
 
-    block = blocklyWorkspace.newBlock('madeup_subscript_set');
+    block = workspace.newBlock('madeup_subscript_set');
     connectExpression(block, 'I', i);
     connectExpression(block, 'COLLECTION', collection);
     connectExpression(block, 'RHS', rhs);
@@ -542,10 +542,10 @@ function parse(peeker) {
 
   else if (token == '>' || token == '>=' || token == '<' || token == '<=' || token == '==' || token == '!=') {
     peeker.get(); // eat space
-    var a = parse(peeker);
+    var a = parse(peeker, workspace);
     peeker.get(); // eat space
-    var b = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_relational_operator');
+    var b = parse(peeker, workspace);
+    block = workspace.newBlock('madeup_relational_operator');
     block.setFieldValue(token, 'OPERATOR');
     connectExpression(block, 'A', a);
     connectExpression(block, 'B', b);
@@ -553,10 +553,10 @@ function parse(peeker) {
 
   else if (token == 'or' || token == 'and') {
     peeker.get(); // eat space
-    var a = parse(peeker);
+    var a = parse(peeker, workspace);
     peeker.get(); // eat space
-    var b = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_binary_logic_operator');
+    var b = parse(peeker, workspace);
+    block = workspace.newBlock('madeup_binary_logic_operator');
     block.setFieldValue(token, 'FUNCTION');
     connectExpression(block, 'A', a);
     connectExpression(block, 'B', b);
@@ -564,40 +564,40 @@ function parse(peeker) {
 
   else if (token == 'not') {
     peeker.get(); // eat space
-    var a = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_not');
+    var a = parse(peeker, workspace);
+    block = workspace.newBlock('madeup_not');
     connectExpression(block, 'A', a);
   }
 
   else if (token == 'abs') {
     peeker.get(); // eat space
-    var x = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_abs');
+    var x = parse(peeker, workspace);
+    block = workspace.newBlock('madeup_abs');
     connectExpression(block, 'X', x);
   }
 
   else if (token == 'unit') {
-    block = blocklyWorkspace.newBlock('madeup_nothing');
+    block = workspace.newBlock('madeup_nothing');
   }
 
   else if (token == 'INTEGER') {
     peeker.get(); // eat space
     var i = peeker.getInteger();
-    block = blocklyWorkspace.newBlock('madeup_integer');
+    block = workspace.newBlock('madeup_integer');
     block.setFieldValue('' + i, 'INTEGER');
   }
 
   else if (token == 'BOOLEAN') {
     peeker.get(); // eat space
     var literal = peeker.getToken();
-    block = blocklyWorkspace.newBlock('madeup_boolean');
+    block = workspace.newBlock('madeup_boolean');
     block.setFieldValue(literal, 'BOOLEAN');
   }
 
   else if (token == 'REAL') {
     peeker.get(); // eat space
     var i = peeker.getReal();
-    block = blocklyWorkspace.newBlock('madeup_real');
+    block = workspace.newBlock('madeup_real');
     block.setFieldValue('' + i, 'REAL');
   }
 
@@ -607,28 +607,28 @@ function parse(peeker) {
     while (peeker.peek() != ')') {
       s += peeker.get();
     }
-    block = blocklyWorkspace.newBlock('madeup_string');
+    block = workspace.newBlock('madeup_string');
     block.setFieldValue(s, 'STRING');
   }
 
   else if (token == 'SUBSCRIPT') {
     peeker.get(); // eat space
-    var collection = parse(peeker);
+    var collection = parse(peeker, workspace);
     peeker.get(); // eat space
-    var i = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_subscript');
+    var i = parse(peeker, workspace);
+    block = workspace.newBlock('madeup_subscript');
     connectExpression(block, 'I', i);
     connectExpression(block, 'COLLECTION', collection);
   }
 
   else if (token == 'SUBRANGE') {
     peeker.get(); // eat space
-    var collection = parse(peeker);
+    var collection = parse(peeker, workspace);
     peeker.get(); // eat space
-    var i = parse(peeker);
+    var i = parse(peeker, workspace);
     peeker.get(); // eat space
-    var j = parse(peeker);
-    block = blocklyWorkspace.newBlock('madeup_subrange');
+    var j = parse(peeker, workspace);
+    block = workspace.newBlock('madeup_subrange');
     connectExpression(block, 'I', i);
     connectExpression(block, 'J', j);
     connectExpression(block, 'COLLECTION', collection);
@@ -638,11 +638,11 @@ function parse(peeker) {
     var elements = [];
     while (peeker.peek() != ')') {
       peeker.get(); // eat space
-      var element = parse(peeker);
+      var element = parse(peeker, workspace);
       elements.push(element);
     }
 
-    block = blocklyWorkspace.newBlock('madeup_array_literal');
+    block = workspace.newBlock('madeup_array_literal');
     block.itemCount_ = elements.length;
     block.updateShape_();
 
@@ -653,11 +653,11 @@ function parse(peeker) {
 
   else if (token == 'MAKEARRAY') {
     peeker.get(); // eat space
-    var count = parse(peeker);
+    var count = parse(peeker, workspace);
     peeker.get(); // eat space
-    var element = parse(peeker);
+    var element = parse(peeker, workspace);
 
-    block = blocklyWorkspace.newBlock(element.type == 'madeup_array_of' ? 'madeup_array_by' : 'madeup_array_of');
+    block = workspace.newBlock(element.type == 'madeup_array_of' ? 'madeup_array_by' : 'madeup_array_of');
     connectExpression(block, 'N', count);
     connectExpression(block, 'ITEM', element);
   }
