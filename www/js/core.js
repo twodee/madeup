@@ -62,6 +62,14 @@ if (!Array.prototype.forEach) {
   };
 }
 
+// NodeList, as returned by querySelectorAll, doesn't support forEach
+// at the moment, except in Chrome and Firefox.
+var forEach = function (array, callback, scope) {
+  for (var i = 0; i < array.length; i++) {
+    callback.call(scope, i, array[i]); // passes back stuff we need
+  }
+};
+
 var GeometryMode = Object.freeze({
   PATH: 'PATH',
   SURFACE: 'SURFACE'
@@ -994,7 +1002,7 @@ $(document).ready(function() {
   Mousetrap.bind('ctrl+]', increaseFontSize);
 
   // Form elements don't get events in the same way. We must explicitly bind.
-  document.querySelectorAll('input, select, textarea').forEach(function(element) {
+  forEach(document.querySelectorAll('input, select, textarea'), function(i, element) {
     var mousetrap = new Mousetrap(element);
     mousetrap.bind('ctrl+s', save);
     mousetrap.bind('ctrl+shift+s', promptForSaveAs);
