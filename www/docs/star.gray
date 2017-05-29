@@ -1,0 +1,118 @@
+[let skin=madeupdocs]
+[let root=.]
+
+# Star
+
+In this lesson, we'll walk a star-shaped path and extend it into the scene with the `extrude` solidifier.
+
+Before jumping into code, do the following to get a feel for our task:
+
+1. Draw the outline of a five-pointed star on a piece of paper.
+2. Put your finger on one of the inner corners or vertices.
+3. Imagine you are sitting in a car (or on a bicycle) at that vertex.
+4. Start driving along the edge. What can you say about the turns you are making?
+
+You should see that driving around a star is a little like driving around a circle. What's different is that on some steps we turn left, while on others we turn right. This alternation creates the five pointed arms.
+
+Let's recreate that driving experience in Madeup. We start by positioning ourselves at the origin and walking up the first arm:
+
+[mup
+moveto 0, 0, 0
+
+move 10
+]
+
+Let's take a right and walk the other side of the arm. But how many degrees should we turn? There's not one right answer here. Let's use 122 for the time being:
+
+[mup
+moveto 0, 0, 0
+
+move 10
+yaw 122
+move 10
+]
+
+At this point we are almost ready to walk the next arm. But we need to do something first. What is that something?
+
+We need to turn left to get pointed along the next arm. But by how much?
+
+We know that we'll need to travel a full 360 degrees to get back where we started, and we have five arms to do it in. That means each arm will have to effectively turn 360 / 5 = 72 degrees. We've already turned 122 degrees. 122 plus what is 72?
+
+Exactly. We must turn -50 degrees:
+
+[mup
+moveto 0, 0, 0
+
+move 10
+yaw 122
+move 10
+yaw -50
+]
+
+To get the next arm, we could copy and paste. But that would be silly. This is a job for `repeat`:
+
+[mup
+moveto 0, 0, 0
+
+repeat 1
+  move 10
+  yaw 122
+  move 10
+  yaw -50
+end
+]
+
+Increase the repeat count to 2 to see the next arm. Then 3. Then 4. And finally 5. I always recommend testing loops incrementally like this. If you jump straight to 5, it's hard to reason about what the loop is doing.
+
+Now we're ready to solidify this. You could use `dowel` to make a cookie cutter. But let's check out the `extrude` solidifier, which interprets our path as the cross section of solid shape and extends it along some direction. Let's extend it along the Z axis, which is (0, 0, 1). We also need to tell `extrude` how far to extend the cross section. Let's go with 6:
+
+[mup
+moveto 0, 0, 0
+
+repeat 5
+  move 10
+  yaw 122
+  move 10
+  yaw -50
+end
+
+extrude 0, 0, 1, 6
+]
+
+How's that? Try tweaking the degrees you turn to change the pointiness of the star.
+
+If you change one of the turn numbers, you also have to change the other because the two turns must add up to 72. In general, we can say that `rightTurn + leftTurn = 72`. Given this mandatory relationship, wouldn't it be nice if we could just pick the right turn amount and have the left turn automatically calculated? We can do this using a *variable*.
+
+We start by creating a variable for the right turn amount. We'll call it `angle`. We assignment `angle` the value 144, and then we turn by `angle` instead of 122:
+
+[mup
+moveto 0, 0, 0
+
+angle = 144
+repeat 5
+  move 10
+  yaw angle
+  move 10
+  yaw -50
+end
+
+extrude 0, 0, 1, 6
+]
+
+Then we calculate the left turn with a little arithmetic:
+
+[mup
+moveto 0, 0, 0
+
+angle = 144
+repeat 5
+  move 10
+  yaw angle
+  move 10
+  yaw 72 - angle
+end
+
+extrude 0, 0, 1, 6
+]
+
+Now if we change `angle`, the left turn will be computed automatically to ensure that a star is born.

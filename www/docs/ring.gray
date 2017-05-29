@@ -1,9 +1,7 @@
-[let skin=vanilla]
+[let skin=madeupdocs]
 [let root=.]
-[style id=centeredblock
-display: block
-text-align: center
-]
+
+# Ring
 
 In this lesson, we'll walk a circular path and turn it into a ring. Let's start as before by moving the 3D cursor to the origin:
 
@@ -113,5 +111,3 @@ repeat 10
 end
 dowel
 ]
-
-[link to="index.html" title="Home" style=centeredblock]

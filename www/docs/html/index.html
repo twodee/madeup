@@ -285,10 +285,16 @@ body .il { color: #0000DD; font-weight: bold } /* Literal.Number.Integer.Long */
   text-align: right;
 }
 
-.to-mode {
-  color: black;
-  cursor: pointer;
+footer {
+  text-align: right;
 }
+
+
+/* Custom CSS */
+#mode-switcher, #home {
+  display: none;
+}
+
 </style>
   <script>function autosize(id) {
   var element = document.getElementById(id);
@@ -505,17 +511,125 @@ document.addEventListener('DOMContentLoaded', function() {
 </head>
 
 <body>
-  <div id="mode-switcher">
-    <a class="to-mode" id="to-text">text</a> |
-    <a class="to-mode" id="to-blocks">blocks</a>
-  </div>
+  <header id="mode-switcher">
+    <a href="#" class="to-mode" id="to-text">text</a> |
+    <a href="#" class="to-mode" id="to-blocks">blocks</a>
+  </header>
 
 
-<p class="grayblock">Use these tutorials to learn about Madeup!</p>
+<p class="grayblock"></p>
+
+<p class="grayblock">A lot of books introduce a tool by enumerating all of its features right away. We don't think that's a great way to learn. Instead, we introduce Madeup through a series of examples that we suggest you recreate as you follow along.</p>
 
 <ol>
   <li><a href="sdowel.html">Make an S with <code>dowel</code></a></li>
-  <li><a href="ring.html">Make a ring with <code>dowel</code> and loops</a></li>
+  <li><a href="ring.html">Make a ring with <code>dowel</code> and a loop</a></li>
+  <li><a href="star.html">Make a star with <code>extrude</code>, a loop, and a variable</a></li>
 </ol>
+
+<p class="grayblock">Once you feel like you've gotten the hang of Madeup, you may be interested in learning more about a particular command:</p>
+
+<ul>
+  <li>Solidifiers <div>
+<ul>
+  <li>dowel</li>
+  <li>tube</li>
+  <li>box / boxes</li>
+  <li>sphere / spheres</li>
+  <li>extrude</li>
+  <li>revolve</li>
+  <li>polygon</li>
+  <li>surface</li>
+  <li>loft</li>
+  <li>path</li>
+  <li>forget</li>
+  <li>transform</li>
+  <li>echo</li>
+</ul>
+</div></li>
+  <li>Loops <div>
+<ul>
+  <li>repeat</li>
+  <li>repeat around</li>
+  <li>for</li>
+  <li>while</li>
+</ul>
+</div></li>
+  <li>Vertex variables <div>
+<ul>
+  <li>.rgb</li>
+  <li>.radius / .outerRadius</li>
+  <li>.innerRadius</li>
+  <li>.rgb</li>
+</ul>
+</div></li>
+  <li>Global variables <div>
+<ul>
+  <li>nsides</li>
+</ul>
+</div></li>
+  <li>Arrays <div>
+<ul>
+  <li>construction</li>
+  <li>operations</li>
+  <li>magnitude</li>
+  <li>dot</li>
+  <li>cross</li>
+  <li>normalize</li>
+  <li>size</li>
+</ul>
+</div></li>
+  <li>Math functions <div>
+<ul>
+  <li>random</li>
+  <li>atan</li>
+  <li>sin / cos / tan</li>
+  <li>asin / acos / atan</li>
+  <li>log</li>
+  <li>sign</li>
+  <li>abs</li>
+</ul>
+</div></li>
+  <li>Geometry functions <div>
+<ul>
+  <li>center</li>
+  <li>fracture</li>
+  <li>where</li>
+  <li>dilate</li>
+  <li>yaw</li>
+  <li>pitch</li>
+  <li>roll</li>
+  <li>moveto</li>
+  <li>move</li>
+  <li>movex</li>
+  <li>echo</li>
+  <li>path</li>
+  <li>rotate</li>
+  <li>scale</li>
+  <li>translate</li>
+  <li>identity</li>
+  <li>reframe</li>
+  <li>push</li>
+  <li>pop</li>
+  <li>coalesce</li>
+  <li>reverse</li>
+</ul>
+</div></li>
+  <li>IO functions <div>
+<ul>
+  <li>print</li>
+  <li>debug</li>
+</ul>
+</div></li>
+  <li>Logic <div>
+<ul>
+  <li>not</li>
+  <li>and / or</li>
+  <li>if then else</li>
+  <li>relational operators</li>
+</ul>
+</div></li>
+</ul>
+  <footer><a id="home" href="index.html">Home</a></footer>
 </body>
 </html>

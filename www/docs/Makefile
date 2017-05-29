@@ -1,4 +1,4 @@
-DOCS := index sdowel ring
+DOCS := index sdowel ring star
 HTMLS := $(addprefix html/,$(addsuffix .html, $(DOCS)))
 
 all: html $(HTMLS)

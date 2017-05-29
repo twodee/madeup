@@ -288,6 +288,9 @@ body .il { color: #0000DD; font-weight: bold } /* Literal.Number.Integer.Long */
 footer {
   text-align: right;
 }
+
+
+/* Custom CSS */
 </style>
   <script>function autosize(id) {
   var element = document.getElementById(id);
@@ -511,143 +514,144 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-<h3>Ring</h3>
+<h3>Star</h3>
 
-<p class="grayblock">In this lesson, we'll walk a circular path and turn it into a ring. Let's start as before by moving the 3D cursor to the origin:</p>
+<p class="grayblock">In this lesson, we'll walk a star-shaped path and extend it into the scene with the <code>extrude</code> solidifier.</p>
 
-<p class="grayblock"><div class="mup-switcher">
-  <div class="text-editor">moveto 0, 0, 0</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)))
-</div></div>
-</div>
-</p>
+<p class="grayblock">Before jumping into code, do the following to get a feel for our task:</p>
 
-<p class="grayblock">We won't make an exact circle. We'll approximate one, starting with a four-sided "circle." Let's walk along one of its four sides and then turn to face the next side. How far do we want to turn? Well, how many degrees are in a circle? How many turns will we make?</p>
+<ol>
+  <li>Draw the outline of a five-pointed star on a piece of paper.</li>
+  <li>Put your finger on one of the inner corners or vertices.</li>
+  <li>Imagine you are sitting in a car (or on a bicycle) at that vertex.</li>
+  <li>Start driving along the edge. What can you say about the turns you are making?</li>
+</ol>
 
-<p class="grayblock">There are 360 degrees in a circle and 4 turns in this first approximation. Therefore, each turn will have to be 90 degrees&mdash;because 360 / 4 is 90. So, here's the first leg of our four-sided journey:</p>
+<p class="grayblock">You should see that driving around a star is a little like driving around a circle. What's different is that on some steps we turn left, while on others we turn right. This alternation creates the five pointed arms.</p>
 
-<p class="grayblock"><div class="mup-switcher">
-  <div class="text-editor">moveto 0, 0, 0
-
-move 2
-yaw 90</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (call move (INTEGER 2)) (call yaw (INTEGER 90)))
-</div></div>
-</div>
-</p>
-
-<p class="grayblock">The second leg is a lot like the first:</p>
+<p class="grayblock">Let's recreate that driving experience in Madeup. We start by positioning ourselves at the origin and walking up the first arm:</p>
 
 <p class="grayblock"><div class="mup-switcher">
   <div class="text-editor">moveto 0, 0, 0
 
-move 2
-yaw 90
-
-move 2
-yaw 90</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (call move (INTEGER 2)) (call yaw (INTEGER 90)) (call move (INTEGER 2)) (call yaw (INTEGER 90)))
+move 10</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (call move (INTEGER 10)))
 </div></div>
 </div>
 </p>
 
-<p class="grayblock">So's the third:</p>
+<p class="grayblock">Let's take a right and walk the other side of the arm. But how many degrees should we turn? There's not one right answer here. Let's use 122 for the time being:</p>
 
 <p class="grayblock"><div class="mup-switcher">
   <div class="text-editor">moveto 0, 0, 0
 
-move 2
-yaw 90
-
-move 2
-yaw 90
-
-move 2
-yaw 90</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (call move (INTEGER 2)) (call yaw (INTEGER 90)) (call move (INTEGER 2)) (call yaw (INTEGER 90)) (call move (INTEGER 2)) (call yaw (INTEGER 90)))
+move 10
+yaw 122
+move 10</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (call move (INTEGER 10)) (call yaw (INTEGER 122)) (call move (INTEGER 10)))
 </div></div>
 </div>
 </p>
 
-<p class="grayblock">And the fourth:</p>
+<p class="grayblock">At this point we are almost ready to walk the next arm. But we need to do something first. What is that something?</p>
+
+<p class="grayblock">We need to turn left to get pointed along the next arm. But by how much?</p>
+
+<p class="grayblock">We know that we'll need to travel a full 360 degrees to get back where we started, and we have five arms to do it in. That means each arm will have to effectively turn 360 / 5 = 72 degrees. We've already turned 122 degrees. 122 plus what is 72?</p>
+
+<p class="grayblock">Exactly. We must turn -50 degrees:</p>
 
 <p class="grayblock"><div class="mup-switcher">
   <div class="text-editor">moveto 0, 0, 0
 
-move 2
-yaw 90
-
-move 2
-yaw 90
-
-move 2
-yaw 90
-
-move 2
-yaw 90</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (call move (INTEGER 2)) (call yaw (INTEGER 90)) (call move (INTEGER 2)) (call yaw (INTEGER 90)) (call move (INTEGER 2)) (call yaw (INTEGER 90)) (call move (INTEGER 2)) (call yaw (INTEGER 90)))
+move 10
+yaw 122
+move 10
+yaw -50</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (call move (INTEGER 10)) (call yaw (INTEGER 122)) (call move (INTEGER 10)) (call yaw (INTEGER -50)))
 </div></div>
 </div>
 </p>
 
-<p class="grayblock">Was that fun? Or annoying? If you thought doing the same thing over and over again was annoying, I have good news for you! We can add a <code>repeat</code> loop to make a chunk of code happen again and again:</p>
+<p class="grayblock">To get the next arm, we could copy and paste. But that would be silly. This is a job for <code>repeat</code>:</p>
 
 <p class="grayblock"><div class="mup-switcher">
   <div class="text-editor">moveto 0, 0, 0
-repeat 4
-  move 2
-  yaw 90
+
+repeat 1
+  move 10
+  yaw 122
+  move 10
+  yaw -50
 end</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (repeat (INTEGER 4) (block (call move (INTEGER 2)) (call yaw (INTEGER 90)))))
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (repeat (INTEGER 1) (block (call move (INTEGER 10)) (call yaw (INTEGER 122)) (call move (INTEGER 10)) (call yaw (INTEGER -50)))))
 </div></div>
 </div>
 </p>
 
-<p class="grayblock">We just need to tell <code>repeat</code> how many times to go around. 0 means never, 1 means once, and so on. Notice how the code to repeat nests inside of the <code>repeat</code>.</p>
+<p class="grayblock">Increase the repeat count to 2 to see the next arm. Then 3. Then 4. And finally 5. I always recommend testing loops incrementally like this. If you jump straight to 5, it's hard to reason about what the loop is doing.</p>
 
-<p class="grayblock">You're probably thinking that that's not much a circle. You're right. Let's improve our approximation. Let's try a hexagon instead. What needs to change?</p>
-
-<p class="grayblock">We want to repeat the move-yaw combination 6 times, so let's change the count we give to <code>repeat</code>. We also need to change the angle to 360 / 60 = 6.</p>
+<p class="grayblock">Now we're ready to solidify this. You could use <code>dowel</code> to make a cookie cutter. But let's check out the <code>extrude</code> solidifier, which interprets our path as the cross section of solid shape and extends it along some direction. Let's extend it along the Z axis, which is (0, 0, 1). We also need to tell <code>extrude</code> how far to extend the cross section. Let's go with 6:</p>
 
 <p class="grayblock"><div class="mup-switcher">
   <div class="text-editor">moveto 0, 0, 0
-repeat 6
-  move 2
-  yaw 60
-end</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (repeat (INTEGER 6) (block (call move (INTEGER 2)) (call yaw (INTEGER 60)))))
-</div></div>
-</div>
-</p>
 
-<p class="grayblock">We can smooth it out even more. Suppose we approximate a circle with 10 sides. What angle will we turn?</p>
-
-<p class="grayblock">360 / 10 = 36, so we end up with:</p>
-
-<p class="grayblock"><div class="mup-switcher">
-  <div class="text-editor">moveto 0, 0, 0
-repeat 10
-  move 2
-  yaw 36
-end</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (repeat (INTEGER 10) (block (call move (INTEGER 2)) (call yaw (INTEGER 36)))))
-</div></div>
-</div>
-</p>
-
-<p class="grayblock">A decagon is close enough to a circle for our tastes. Now thicken the path using <code>dowel</code>:</p>
-
-<p class="grayblock"><div class="mup-switcher">
-  <div class="text-editor">moveto 0, 0, 0
-repeat 10
-  move 2
-  yaw 36
+repeat 5
+  move 10
+  yaw 122
+  move 10
+  yaw -50
 end
-dowel</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (repeat (INTEGER 10) (block (call move (INTEGER 2)) (call yaw (INTEGER 36)))) (call-with-names dowel))
+
+extrude 0, 0, 1, 6</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (repeat (INTEGER 5) (block (call move (INTEGER 10)) (call yaw (INTEGER 122)) (call move (INTEGER 10)) (call yaw (INTEGER -50)))) (call extrude (INTEGER 0) (INTEGER 0) (INTEGER 1) (INTEGER 6)))
 </div></div>
 </div>
 </p>
-  <footer><a href="index.html">Home</a></footer>
+
+<p class="grayblock">How's that? Try tweaking the degrees you turn to change the pointiness of the star.</p>
+
+<p class="grayblock">If you change one of the turn numbers, you also have to change the other because the two turns must add up to 72. In general, we can say that <code>rightTurn + leftTurn = 72</code>. Given this mandatory relationship, wouldn't it be nice if we could just pick the right turn amount and have the left turn automatically calculated? We can do this using a <em>variable</em>.</p>
+
+<p class="grayblock">We start by creating a variable for the right turn amount. We'll call it <code>angle</code>. We assignment <code>angle</code> the value 144, and then we turn by <code>angle</code> instead of 122:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">moveto 0, 0, 0
+
+angle = 144
+repeat 5
+  move 10
+  yaw angle
+  move 10
+  yaw -50
+end
+
+extrude 0, 0, 1, 6</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (define-variable angle (INTEGER 144)) (repeat (INTEGER 5) (block (call move (INTEGER 10)) (call yaw (call-with-names angle)) (call move (INTEGER 10)) (call yaw (INTEGER -50)))) (call extrude (INTEGER 0) (INTEGER 0) (INTEGER 1) (INTEGER 6)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">Then we calculate the left turn with a little arithmetic:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">moveto 0, 0, 0
+
+angle = 144
+repeat 5
+  move 10
+  yaw angle
+  move 10
+  yaw 72 - angle
+end
+
+extrude 0, 0, 1, 6</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (define-variable angle (INTEGER 144)) (repeat (INTEGER 5) (block (call move (INTEGER 10)) (call yaw (call-with-names angle)) (call move (INTEGER 10)) (call yaw (- (INTEGER 72) (call-with-names angle))))) (call extrude (INTEGER 0) (INTEGER 0) (INTEGER 1) (INTEGER 6)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">Now if we change <code>angle</code>, the left turn will be computed automatically to ensure that a star is born.</p>
+  <footer><a id="home" href="index.html">Home</a></footer>
 </body>
 </html>

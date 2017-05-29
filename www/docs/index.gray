@@ -1,6 +1,95 @@
-[let skin=vanilla]
+[let skin=madeupdocs]
 
-Use these tutorials to learn about Madeup!
+[css selector="#mode-switcher, #home"
+display: none
+]
+
+A lot of books introduce a tool by enumerating all of its features right away. We don't think that's a great way to learn. Instead, we introduce Madeup through a series of examples that we suggest you recreate as you follow along.
 
 1. [link to="sdowel.html" title="Make an S with <code>dowel</code>"]
-2. [link to="ring.html" title="Make a ring with <code>dowel</code> and loops"]
+1. [link to="ring.html" title="Make a ring with <code>dowel</code> and a loop"]
+1. [link to="star.html" title="Make a star with <code>extrude</code>, a loop, and a variable"]
+
+Once you feel like you've gotten the hang of Madeup, you may be interested in learning more about a particular command:
+
+- Solidifiers [block
+- dowel
+- tube
+- box / boxes
+- sphere / spheres
+- extrude
+- revolve
+- polygon
+- surface
+- loft
+- path
+- forget
+- transform
+- echo
+]
+- Loops [block
+- repeat
+- repeat around
+- for
+- while
+]
+- Vertex variables [block
+- .rgb
+- .radius / .outerRadius
+- .innerRadius
+- .rgb
+]
+- Global variables [block
+- nsides
+]
+- Arrays [block
+- construction
+- operations
+- magnitude
+- dot
+- cross
+- normalize
+- size
+]
+- Math functions [block
+- random
+- atan
+- sin / cos / tan
+- asin / acos / atan
+- log
+- sign
+- abs
+]
+- Geometry functions [block
+- center
+- fracture
+- where
+- dilate
+- yaw
+- pitch
+- roll
+- moveto
+- move
+- movex
+- echo
+- path
+- rotate
+- scale
+- translate
+- identity
+- reframe
+- push
+- pop
+- coalesce
+- reverse
+]
+- IO functions [block
+- print
+- debug
+]
+- Logic [block
+- not
+- and / or
+- if then else
+- relational operators
+]
