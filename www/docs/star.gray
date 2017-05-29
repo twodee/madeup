@@ -79,11 +79,13 @@ end
 extrude 0, 0, 1, 6
 ]
 
-How's that? Try tweaking the degrees you turn to change the pointiness of the star.
+How's that? Rotate the model to see its thickness.
+
+Try tweaking the degrees you turn to change the pointiness of the star.
 
 If you change one of the turn numbers, you also have to change the other because the two turns must add up to 72. In general, we can say that `rightTurn + leftTurn = 72`. Given this mandatory relationship, wouldn't it be nice if we could just pick the right turn amount and have the left turn automatically calculated? We can do this using a *variable*.
 
-We start by creating a variable for the right turn amount. We'll call it `angle`. We assignment `angle` the value 144, and then we turn by `angle` instead of 122:
+We start by creating a variable for the right turn amount. We'll call it `angle`. We assign `angle` the value 144, and then we turn by `angle` instead of 122:
 
 [mup
 moveto 0, 0, 0
@@ -99,7 +101,7 @@ end
 extrude 0, 0, 1, 6
 ]
 
-Then we calculate the left turn with a little arithmetic:
+Then we calculate the left turn with a little arithmetic using `angle` instead of some hardcoded amount:
 
 [mup
 moveto 0, 0, 0

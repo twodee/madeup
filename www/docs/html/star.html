@@ -611,11 +611,13 @@ extrude 0, 0, 1, 6</div>
 </div>
 </p>
 
-<p class="grayblock">How's that? Try tweaking the degrees you turn to change the pointiness of the star.</p>
+<p class="grayblock">How's that? Rotate the model to see its thickness.</p>
+
+<p class="grayblock">Try tweaking the degrees you turn to change the pointiness of the star.</p>
 
 <p class="grayblock">If you change one of the turn numbers, you also have to change the other because the two turns must add up to 72. In general, we can say that <code>rightTurn + leftTurn = 72</code>. Given this mandatory relationship, wouldn't it be nice if we could just pick the right turn amount and have the left turn automatically calculated? We can do this using a <em>variable</em>.</p>
 
-<p class="grayblock">We start by creating a variable for the right turn amount. We'll call it <code>angle</code>. We assignment <code>angle</code> the value 144, and then we turn by <code>angle</code> instead of 122:</p>
+<p class="grayblock">We start by creating a variable for the right turn amount. We'll call it <code>angle</code>. We assign <code>angle</code> the value 144, and then we turn by <code>angle</code> instead of 122:</p>
 
 <p class="grayblock"><div class="mup-switcher">
   <div class="text-editor">moveto 0, 0, 0
@@ -634,7 +636,7 @@ extrude 0, 0, 1, 6</div>
 </div>
 </p>
 
-<p class="grayblock">Then we calculate the left turn with a little arithmetic:</p>
+<p class="grayblock">Then we calculate the left turn with a little arithmetic using <code>angle</code> instead of some hardcoded amount:</p>
 
 <p class="grayblock"><div class="mup-switcher">
   <div class="text-editor">moveto 0, 0, 0
