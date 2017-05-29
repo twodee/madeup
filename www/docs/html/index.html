@@ -485,6 +485,7 @@ document.addEventListener('DOMContentLoaded', function() {
       textEditor.style.display = 'block';
       blocksEditor.style.display = 'none';
     });
+    return false;
   };
 
   document.getElementById('to-blocks').onclick = function() {
@@ -498,6 +499,7 @@ document.addEventListener('DOMContentLoaded', function() {
         Blockly.svgResize(workspace);
       });
     });
+    return false;
   };
 });
 
