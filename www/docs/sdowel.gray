@@ -1,0 +1,157 @@
+[style id=gear
+transform: translate(0, 5px)
+height: 20px
+]
+[style id=centeredblock
+display: block
+text-align: center
+]
+[let skin=vanilla]
+[let root=.]
+
+Let's make something in Madeup! Most Madeup programs involve a lot of moving and turning through 3D space. The letter S has a lot of turns in it, so let's make an S.
+
+Start by adding a `moveto` command to situate us at the origin:
+
+[mup
+moveto 0, 0, 0
+]
+
+To get the most of this tutorial, you absolutely must play along. Add this code into the Madeup editor right now---before reading on. If this step or any of the ones below fail to work, don't advance to the next step. Piling more code onto a bug is not going to fix it. Instead, check your code carefully. Walk through your code and say what each line does out loud---with someone else or to yourself. Draw pictures on paper.
+
+The `moveto` command wants to know the X, Y, and Z coordinates where our 3D cursor will be born. We provided zeroes, but other numbers would be okay too.
+
+Let's trace the S from bottom-left to top-right. That means (0, 0, 0) is the bottom-left. We want to face along the bottom strut of the S, so we must `yaw` to turn the cursor:
+
+[mup
+moveto 0, 0, 0
+yaw 90
+]
+
+Now we can walk along the strut with the `move` command:
+
+[mup
+moveto 0, 0, 0
+yaw 90
+move 5
+]
+
+The `moveto` command needs to be told exactly where to go. The `move` command only needs to be told how many steps to take---5 in this case. It will advance in the direction the cursor is pointing.
+
+Notice those three buttons in the top-left corner of the 3D canvas? Click the third one, the *Fit* button to center the shape in the view. You'll want to use this button frequently!
+
+With the bottom strut in place, let's turn left with a `yaw -90` and walk the vertical strut:
+
+[mup
+moveto 0, 0, 0
+yaw 90
+move 5
+yaw -90
+move 5
+]
+
+Now we can walk the middle strut. That's another left turn and move:
+
+[mup
+moveto 0, 0, 0
+yaw 90
+move 5
+yaw -90
+move 5
+yaw -90
+move 5
+]
+
+We're over halfway done. We now turn right and walk the left vertical strut:
+
+[mup
+moveto 0, 0, 0
+yaw 90
+move 5
+yaw -90
+move 5
+yaw -90
+move 5
+yaw 90
+move 5
+]
+
+Finally we can turn and walk the top strut:
+
+[mup
+moveto 0, 0, 0
+yaw 90
+move 5
+yaw -90
+move 5
+yaw -90
+move 5
+yaw 90
+move 5
+yaw 90
+move 5
+]
+
+Did it work? Do you see an S-shape? I hope so. If not, check your work carefully.
+
+This idea of tracing out paths is the core idea of Madeup. The next step is to turn the path into a solid using one of a handful of *solidifiers*. One of the simplest solidifiers is `dowel`, which thickens the path into a dowel or solid tube:
+
+[mup
+moveto 0, 0, 0
+yaw 90
+move 5
+yaw -90
+move 5
+yaw -90
+move 5
+yaw 90
+move 5
+yaw 90
+move 5
+dowel
+]
+
+Hit the *Solidify* button on the 3D canvas. Do you see a thick S? Feel free to click and drag on the 3D canvas to rotate it. Hit *Fit* to reset the view.
+
+The S is really blocky, huh? We can smooth it out a little. First, let's spread out the bending a bit using `dowel`'s `maxBend` parameter:
+
+[mup
+moveto 0, 0, 0
+yaw 90
+move 5
+yaw -90
+move 5
+yaw -90
+move 5
+yaw 90
+move 5
+yaw 90
+move 5
+dowel maxBend:5
+]
+
+Hit *Solidify* to see the difference. With `maxBend` set to 5, we break up any big turns in our path into lots of little turns, each no more than 5 degrees. 
+
+Our bends are smoothed, but the cross section of our S is still square. This is nice for printing, where we need flat surfaces. Suppose, however, want a round tube. For that, we set a special variable named `nsides`. By default, `nsides` is 4, which is why the dowel has four sides. Let's bump it up to 30:
+
+[mup
+moveto 0, 0, 0
+yaw 90
+move 5
+yaw -90
+move 5
+yaw -90
+move 5
+yaw 90
+move 5
+yaw 90
+move 5
+nsides = 30
+dowel maxBend:5
+]
+
+Note that `nsides` has to get set before the `dowel` command to have any effect.
+
+You did it! If you want to print your model, click [image src=../../images/gear.png style=gear] */ File / Export OBJ*. Save the file and then import it in your printer's slicing software.
+
+[link to="index.html" title="Home" style=centeredblock]
