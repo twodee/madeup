@@ -77,7 +77,7 @@ end
 
 We just need to tell `repeat` how many times to go around. 0 means never, 1 means once, and so on. Notice how the code to repeat nests inside of the `repeat`.
 
-You're probably thinking that that's not much a circle. You're right. Let's improve our approximation. Let's try a hexagon instead. What needs to change?
+You're probably thinking that that's not much of a circle. You're right. Let's improve our approximation. Let's try a hexagon instead. What needs to change?
 
 We want to repeat the move-yaw combination 6 times, so let's change the count we give to `repeat`. We also need to change the angle to 360 / 60 = 6.
 
@@ -111,3 +111,5 @@ repeat 10
 end
 dowel
 ]
+
+Loops make it very easy to tweak the number of sides. Thanks, `repeat`! Thanks, `repeat`!

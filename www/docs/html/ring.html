@@ -288,6 +288,9 @@ body .il { color: #0000DD; font-weight: bold } /* Literal.Number.Integer.Long */
 footer {
   text-align: right;
 }
+
+
+/* Custom CSS */
 </style>
   <script>function autosize(id) {
   var element = document.getElementById(id);
@@ -605,7 +608,7 @@ end</div>
 
 <p class="grayblock">We just need to tell <code>repeat</code> how many times to go around. 0 means never, 1 means once, and so on. Notice how the code to repeat nests inside of the <code>repeat</code>.</p>
 
-<p class="grayblock">You're probably thinking that that's not much a circle. You're right. Let's improve our approximation. Let's try a hexagon instead. What needs to change?</p>
+<p class="grayblock">You're probably thinking that that's not much of a circle. You're right. Let's improve our approximation. Let's try a hexagon instead. What needs to change?</p>
 
 <p class="grayblock">We want to repeat the move-yaw combination 6 times, so let's change the count we give to <code>repeat</code>. We also need to change the angle to 360 / 60 = 6.</p>
 
@@ -648,6 +651,8 @@ dowel</div>
 </div></div>
 </div>
 </p>
-  <footer><a href="index.html">Home</a></footer>
+
+<p class="grayblock">Loops make it very easy to tweak the number of sides. Thanks, <code>repeat</code>! Thanks, <code>repeat</code>!</p>
+  <footer><a id="home" href="index.html">Home</a></footer>
 </body>
 </html>
