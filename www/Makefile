@@ -6,12 +6,14 @@ DST = $(addprefix $(WWW_ROOT)/, $(SRC))
 DEPS = ace three-js jquery.js js-cookie jquery-ui blockly closure-library filesaver jquery_ui_touch_punch mousetrap meshline
 JQUERY_UI_VERSION = 1.12.1
 MINIFIED_DEPS = $(addprefix $(WWW_ROOT)/,deps.min.js mode-madeup.js theme-twilight.js theme-katzenmilch.js)
+DOCS = $(addsuffix .html,$(addprefix $(WWW_ROOT)/docs/html/,index sdowel ring star))
+
 
 DST_BINARIES = $(WWW_ROOT)/$(notdir $(MERP))
 
 .PHONY: madeup check
 
-all: check $(DST) $(WWW_ROOT)/repos/ace/src-noconflict/mode-madeup.js $(DST_BINARIES) $(MINIFIED_DEPS)
+all: check $(DST) $(WWW_ROOT)/docs/html $(DOCS) $(WWW_ROOT)/repos/ace/src-noconflict/mode-madeup.js $(DST_BINARIES) $(MINIFIED_DEPS)
 
 check:
 	@if [ -z "$(WWW_ROOT)" ]; then \
@@ -22,6 +24,14 @@ check:
 libdeps: $(addprefix $(WWW_ROOT)/repos/, $(DEPS))
 
 init: libdeps madeup all
+
+$(WWW_ROOT)/docs/html:
+	mkdir -p $(WWW_ROOT)/docs/html
+
+$(WWW_ROOT)/docs/html/%: docs/html/%
+	@echo cp -r $< $@
+	cp -r $< $@
+	chmod g+r $@
 
 $(DST_BINARIES): $(MADEUP) $(TWODEE) $(MERP)
 	$(SUDO) cp $^ $(WWW_ROOT)
