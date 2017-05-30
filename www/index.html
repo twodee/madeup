@@ -226,7 +226,18 @@
 
       <li id="panel-section-mups">
         <span class="panel-section-label unselectable">Mups</span>
-        <div class="panel-section-content" id="mups"></div>
+        <div class="panel-section-content">
+          Sort by
+          <div class="pretty circle primary">
+            <input type="radio" name="sortMupsBy" id="sortMupsByName" value="name" checked="checked">
+            <label><i class="mdi mdi-check"></i> name</label>
+          </div>
+          <div class="pretty circle primary">
+            <input type="radio" name="sortMupsBy" id="sortMupsByDate" value="date">
+            <label><i class="mdi mdi-check"></i> date</label>
+          </div><br>
+          <div id="mups"></div>
+        </div>
       </li>
 
       <li id="panel-section-editor">
