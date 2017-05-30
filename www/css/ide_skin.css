@@ -99,6 +99,8 @@ body {
 
 #message {
   overflow: auto;
+  height: 100%;
+  width: 100%;
 }
 
 /* Fattens the handle for resizing the console. Needed because the textEditor seems 

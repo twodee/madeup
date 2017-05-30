@@ -148,7 +148,7 @@ function needsUnsavedPrompt() {
 
 function writeMup(path, source, onSuccess) {
   fs.writeFile(path, source, function(e) {
-    $('#message').html('I saved your program at ' + path + '. It is precious!');
+    log('I saved your program at ' + path + '. It is precious!');
     onSuccess();
   });
 }
