@@ -87,7 +87,7 @@ $(WWW_ROOT)/repos/mousetrap:
 	$(SUDO) git clone --depth=1 https://github.com/ccampbell/mousetrap.git $@
 	$(SUDO) chmod -R a+rX $@
 
-$(WWW_ROOT)/deps.min.js: $(addprefix $(WWW_ROOT)/,bridge.js repos/jquery.js repos/jquery-ui/jquery-ui.js repos/jquery_ui_touch_punch/jquery.ui.touch-punch.js repos/js-cookie/src/js.cookie.js repos/mousetrap/mousetrap.min.js repos/three-js/build/three.js repos/three-js/examples/js/controls/TrackballControls.js repos/meshline/src/THREE.MeshLine.js repos/filesaver/FileSaver.min.js repos/ace/src-noconflict/ace.js js/text_to_blocks.js js/core.js)
+$(WWW_ROOT)/deps.min.js: $(addprefix $(WWW_ROOT)/,repos/jquery.js repos/jquery-ui/jquery-ui.js repos/jquery_ui_touch_punch/jquery.ui.touch-punch.js repos/js-cookie/src/js.cookie.js repos/mousetrap/mousetrap.min.js repos/three-js/build/three.js repos/three-js/examples/js/controls/TrackballControls.js repos/meshline/src/THREE.MeshLine.js repos/filesaver/FileSaver.min.js repos/ace/src-noconflict/ace.js js/text_to_blocks.js js/core.js bridge.js)
 	@echo uglifying...
 	cd $(WWW_ROOT) && $(SUDO) uglifyjs $^ > $@
 	$(SUDO) chmod a+r $@

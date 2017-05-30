@@ -1,4 +1,4 @@
-const {app, BrowserWindow, globalShortcut} = require('electron');
+const {app, Menu, BrowserWindow, globalShortcut} = require('electron');
 const path = require('path');
 const url = require('url');
 const LocalStorage = require('node-localstorage').LocalStorage;
@@ -48,6 +48,107 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null
   });
+
+	const template = [
+		{
+			label: 'File',
+			submenu: [
+        {
+          label: 'Open',
+          accelerator: 'CommandOrControl+O',
+          click() {
+            mainWindow.webContents.send('open');
+          },
+        },
+        {
+          label: 'Save',
+          accelerator: 'CommandOrControl+S',
+          click() {
+            mainWindow.webContents.send('save');
+          },
+        },
+        {
+          label: 'Save As...',
+          accelerator: 'Shift+CommandOrControl+S',
+          click() {
+            mainWindow.webContents.send('saveAs');
+          },
+        },
+			]
+		},
+		{
+			label: 'Edit',
+			submenu: [
+				{role: 'undo'},
+				{role: 'redo'},
+				{type: 'separator'},
+				{role: 'cut'},
+				{role: 'copy'},
+				{role: 'paste'},
+				{role: 'pasteandmatchstyle'},
+				{role: 'delete'},
+				{role: 'selectall'}
+			]
+		},
+		{
+			label: 'View',
+			submenu: [
+				{role: 'reload'},
+				{role: 'forcereload'},
+				{role: 'toggledevtools'},
+				{type: 'separator'},
+				{role: 'resetzoom'},
+				{role: 'zoomin'},
+				{role: 'zoomout'},
+				{type: 'separator'},
+				{role: 'togglefullscreen'}
+			]
+		},
+	];
+
+  if (process.platform === 'darwin') {
+    const name = app.getName();
+    template.unshift({
+      label: name,
+      submenu: [
+        {
+          label: `About ${name}`,
+          role: 'about',
+        },
+        { type: 'separator' },
+        {
+          label: 'Services',
+          role: 'services',
+          submenu: [],
+        },
+        { type: 'separator' },
+        {
+          label: `Hide ${name}`,
+          accelerator: 'Command+H',
+          role: 'hide',
+        },
+        {
+          label: 'Hide Others',
+          accelerator: 'Command+Alt+H',
+          role: 'hideothers',
+        },
+        {
+          label: 'Show All',
+          role: 'unhide',
+        },
+        { type: 'separator' },
+        {
+          label: `Quit ${name}`,
+          accelerator: 'Command+Q',
+          click() { app.quit(); },
+        },
+      ],
+    });
+  }
+
+
+	const menu = Menu.buildFromTemplate(template);
+	Menu.setApplicationMenu(menu);
 }
 
 app.on('ready', createWindow)

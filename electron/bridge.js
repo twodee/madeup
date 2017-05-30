@@ -7,6 +7,11 @@ var fsdialog = require('electron').remote.dialog;
 var LocalStorage = require('node-localstorage').LocalStorage;
 var localStorage = new LocalStorage(require('os').homedir() + '/.madeup');
 
+function platformize() {
+  $('#panel-section-file').remove();  
+  $('#panel-section-mups').remove();  
+}
+
 function interpret(options, onSuccess, onError) {
   var tmpIn = tmp.fileSync();
   var tmpOut = tmp.fileSync({postfix: '.' + options.extension});
@@ -140,3 +145,66 @@ function takeScreenshot(path) {
 function needsUnsavedPrompt() {
   return false;
 }
+
+function writeMup(path, source, onSuccess) {
+  fs.writeFile(path, source, function(e) {
+    console.log(e);
+    onSuccess();
+    $('#message').html('I saved your program at ' + path + '. It is precious!');
+    onSuccess();
+  });
+}
+
+function platformSave(path, source, mode, onSuccess) {
+  if (path == 'untitled') {
+    var file = {
+      'mup' : path,
+      'mode' : mode,
+      'updated_at' : new Date().toString(),
+      'source' : source
+    };
+    localStorage.setItem(path, JSON.stringify(file));
+  } else {
+    writeMup(path, source, onSuccess);
+  }
+}
+
+function platformPromptForSaveAs(onSuccess) {
+  fsdialog.showSaveDialog({
+    title: 'Save as...',
+  }, function(path) {
+    onSuccess(path);
+  });
+}
+
+function platformOpen() {
+  fsdialog.showOpenDialog({
+    title: 'Open...',
+  }, function(path) {
+    if (path) {
+      load(path[0]);    
+    }
+  });
+}
+
+function platformLoad(path, onSuccess) {
+  var source = null;
+  if (path == 'untitled') {
+    source = JSON.parse(localStorage.getItem(path)).source;
+  } else {
+    source = fs.readFileSync(path).toString();
+  }
+  onSuccess(source);
+}
+
+require('electron').ipcRenderer.on('open', function(event, data) {
+  platformOpen();
+});
+
+require('electron').ipcRenderer.on('save', function(event, data) {
+  save();
+});
+
+require('electron').ipcRenderer.on('saveAs', function(event, data) {
+  promptForSaveAs();
+});

@@ -43,7 +43,6 @@ function restoreSettings(settings) {
   var json = localStorage.getItem('settings')
   if (json != null) {
     var stored = JSON.parse(json);
-    console.log(stored);
     for (var key in stored) {
       settings.set(key, stored[key]);
     }
@@ -177,33 +176,6 @@ function getBlocklyProcedureFormals(name) {
   throw 'No procedure named ' + name;
 }
 
-function populateMupsList() {
-  var list = '';
-
-  var keys = [];
-  for (var i = 0; i < localStorage.length; ++i) {
-    keys.push(localStorage.key(i));
-  }
-
-  if (settings.get('sortMupsBy') == 'date') {
-    keys.sort(function(key1, key2) {
-      var mup1 = JSON.parse(localStorage.getItem(key1));
-      var mup2 = JSON.parse(localStorage.getItem(key2));
-      return Date.parse(mup2.updated_at) - Date.parse(mup1.updated_at);
-    });
-  } else {
-    keys = keys.sort();
-  }
-
-  keys.forEach(function(key) {
-    if (key != 'untitled' && key != 'settings') {
-      list += '<a href="#" class="menu-link" onclick="load(\'' + key.replace(/'/g, '\\&#39;').replace(/"/g, '\\&quot;') + '\')">' + key + '</a><br/>';
-    }
-  });
-
-  $('#mups').html(list);
-}
-
 function enableDownload(enable) {
   if (enable) {
     $('#download').prop('disabled', false);
@@ -227,14 +199,11 @@ function exportScreenshot() {
 }
 
 function promptForSaveAs() {
-  ask('Save under what name?', saveMupAs);
-}
-
-function saveMupAs(name) {
-  mupName = name;
-  save();
-  updateTitle();
-  populateMupsList();
+  platformPromptForSaveAs(function(name) {
+    mupName = name;
+    save();
+    updateTitle();
+  });
 }
 
 function yyyymmdd() {
@@ -403,7 +372,6 @@ $(document).ready(function() {
   $(window).load(function() {
     configureDownloader();
     restoreSettings(settings);
-    populateMupsList();
 
     textEditor = ace.edit("textEditor");
     textEditor.$blockScrolling = Infinity;
@@ -559,6 +527,8 @@ $(document).ready(function() {
         save();
       }
     });
+
+    platformize();
   });
 
   $('#smaller').click(decreaseFontSize);
@@ -592,11 +562,6 @@ $(document).ready(function() {
 
   $('#cameraFront').click(function() {
     viewFrom(2, 1);
-  });
-
-  $('input[type=radio][name=sortMupsBy]').change(function() {
-    settings.set('sortMupsBy', $(this).val());
-    populateMupsList();
   });
 
   $('input[type=radio][name=editorMode]').change(function() {
@@ -852,71 +817,6 @@ $(document).ready(function() {
   $('ul#settings > li > .panel-section-label').click(function() {
     $(this).toggleClass('open-panel-section-label');
     $(this).next().slideToggle(200);
-  });
-
-  $('#fileSaveAs').click(promptForSaveAs);
-  $('#fileSave').click(function() {
-    if (!mupName) {
-      promptForSaveAs();
-    } else {
-      save();
-      updateTitle();
-    }
-  });
-
-  $('#exportArchive').click(function() {
-    var archive = new Object;
-    for (var i = 0; i < localStorage.length; ++i) {
-      var key = localStorage.key(i);
-      var value = localStorage.getItem(key);
-      if (key != 'untitled' && key != 'settings') {
-        archive[key] = JSON.parse(value);
-      }
-    }
-
-    generateDownloadable('mups_archive_' + yyyymmdd() + '.json', JSON.stringify(archive));
-  });
-
-  $('#importForm').hide();
-  $('#importArchive').click(function() {
-    $('#importForm').show();
-  });
-  $('#cancelImport').click(function() {
-    $('#importForm').hide();
-  });
-  $('#archive').change(function() {
-    var archive = this.files[0];
-    $('#importForm').hide();
-
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      var mups = JSON.parse(e.target.result);
-      for (mup in mups) {
-        localStorage.setItem(mup, JSON.stringify(mups[mup]));
-        populateMupsList();
-      }
-    };
-    reader.readAsText(archive);
-  });
-
-  $('#fileClose').click(function() {
-    if (mupName && isSourceDirty && confirm('Save changes to ' + mupName + '?')) {
-      save();
-    }
-    load('untitled');
-  });
-
-  $('#fileDelete').click(function() {
-    var ok = confirm('Delete ' + mupName + '?');
-    if (ok) {
-      if (blocklyWorkspace) {
-        blocklyWorkspace.clear();
-        blocklyWorkspace.updateVariableList();
-      }
-      localStorage.removeItem(mupName);
-      mupName = null;
-      load('untitled');
-    }
   });
 
   $('#left').resizable({
@@ -1216,30 +1116,32 @@ function load(mup) {
   }
   if (renderer) render();
 
-  var json = localStorage.getItem(mup); 
-  if (json) {
-    var file = JSON.parse(localStorage.getItem(mup));
-    setEditor(file.mode == 'text');
+  platformLoad(mup, function(source) {
+    var isText = source.charAt(0) != '<';
+
+    setEditor(isText);
     if (settings.get('isEditorText')) {
-      textEditor.session.setValue(file.source, -1);
+      textEditor.session.setValue(source, -1);
     } else {
       blocklyWorkspace.clear();
       blocklyWorkspace.updateVariableList();
-      var xml = Blockly.Xml.textToDom(file.source);
-      console.log(xml);
+      var xml = Blockly.Xml.textToDom(source);
       Blockly.Xml.domToWorkspace(xml, blocklyWorkspace);
       xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
       lastBlocks = Blockly.Xml.domToText(xml);
     }
-  }
 
-  // TODO toggle modes
-  isSourceDirty = false;
-  updateTitle();
+    // TODO toggle modes
+    isSourceDirty = false;
+    updateTitle();
+  });
 }
 
 function save() {
-  if (mupName != null) {
+  if (mupName == null) {
+    promptForSaveAs();
+  } else {
+    updateTitle();
     var mode = null;
     var source = null;
     if (settings.get('isEditorText')) {
@@ -1251,17 +1153,10 @@ function save() {
       mode = 'blocks';
     }
 
-    var file = {
-      'mode' : mode,
-      'updated_at' : new Date().toString(),
-      'source' : source
-    };
-
-    localStorage.setItem(mupName, JSON.stringify(file));
-    isSourceDirty = false;
-    updateTitle();
-
-    $('#message').html('I saved your program. It is precious! Find it later under <image src="images/gear.png" id="gear-in-console" width="' + settings.get('fontSize') + 'pt"> / Mups / ' + mupName + '.');
+    platformSave(mupName, source, mode, function() {
+      isSourceDirty = false;
+      updateTitle();
+    });
   }
 
   return false;
