@@ -1,67 +1,3 @@
-// Production steps of ECMA-262, Edition 5, 15.4.4.18
-// Reference: http://es5.github.io/#x15.4.4.18
-if (!Array.prototype.forEach) {
-
-  Array.prototype.forEach = function(callback/*, thisArg*/) {
-
-    var T, k;
-
-    if (this == null) {
-      throw new TypeError('this is null or not defined');
-    }
-
-    // 1. Let O be the result of calling toObject() passing the
-    // |this| value as the argument.
-    var O = Object(this);
-
-    // 2. Let lenValue be the result of calling the Get() internal
-    // method of O with the argument "length".
-    // 3. Let len be toUint32(lenValue).
-    var len = O.length >>> 0;
-
-    // 4. If isCallable(callback) is false, throw a TypeError exception. 
-    // See: http://es5.github.com/#x9.11
-    if (typeof callback !== 'function') {
-      throw new TypeError(callback + ' is not a function');
-    }
-
-    // 5. If thisArg was supplied, let T be thisArg; else let
-    // T be undefined.
-    if (arguments.length > 1) {
-      T = arguments[1];
-    }
-
-    // 6. Let k be 0.
-    k = 0;
-
-    // 7. Repeat while k < len.
-    while (k < len) {
-
-      var kValue;
-
-      // a. Let Pk be ToString(k).
-      //    This is implicit for LHS operands of the in operator.
-      // b. Let kPresent be the result of calling the HasProperty
-      //    internal method of O with argument Pk.
-      //    This step can be combined with c.
-      // c. If kPresent is true, then
-      if (k in O) {
-
-        // i. Let kValue be the result of calling the Get internal
-        // method of O with argument Pk.
-        kValue = O[k];
-
-        // ii. Call the Call internal method of callback with T as
-        // the this value and argument list containing kValue, k, and O.
-        callback.call(T, kValue, k, O);
-      }
-      // d. Increase k by 1.
-      k++;
-    }
-    // 8. return undefined.
-  };
-}
-
 // NodeList, as returned by querySelectorAll, doesn't support forEach
 // at the moment, except in Chrome and Firefox.
 var forEach = function (array, callback, scope) {
@@ -107,6 +43,7 @@ function restoreSettings(settings) {
   var json = localStorage.getItem('settings')
   if (json != null) {
     var stored = JSON.parse(json);
+    console.log(stored);
     for (var key in stored) {
       settings.set(key, stored[key]);
     }
@@ -240,14 +177,23 @@ function getBlocklyProcedureFormals(name) {
   throw 'No procedure named ' + name;
 }
 
-function populateFileMenu() {
+function populateMupsList() {
   var list = '';
 
   var keys = [];
   for (var i = 0; i < localStorage.length; ++i) {
     keys.push(localStorage.key(i));
   }
-  keys = keys.sort();
+
+  if (settings.get('sortMupsBy') == 'date') {
+    keys.sort(function(key1, key2) {
+      var mup1 = JSON.parse(localStorage.getItem(key1));
+      var mup2 = JSON.parse(localStorage.getItem(key2));
+      return Date.parse(mup2.updated_at) - Date.parse(mup1.updated_at);
+    });
+  } else {
+    keys = keys.sort();
+  }
 
   keys.forEach(function(key) {
     if (key != 'untitled' && key != 'settings') {
@@ -288,7 +234,7 @@ function saveMupAs(name) {
   mupName = name;
   save();
   updateTitle();
-  populateFileMenu();
+  populateMupsList();
 }
 
 function yyyymmdd() {
@@ -327,6 +273,8 @@ function Settings() {
   pairs.isAutorotate = new Setting(false);
   pairs.isEditorText = new Setting(true);
   pairs.isThemeDark = new Setting(true);
+
+  pairs.sortMupsBy = new Setting('name');
 
   pairs.isAutopathify = new Setting(true);
   pairs.nSecondsTillAutopathify = new Setting(1.0);
@@ -441,8 +389,6 @@ $(document).ready(function() {
     }
   });
 
-  populateFileMenu();
-
   // When we are embedded in an iframe, the wheel event will cause the
   // embedding context to scroll. That's not what we want, so we capture and
   // squelch any wheel events.
@@ -453,9 +399,11 @@ $(document).ready(function() {
     // TODO: confirm that this works as intended.
   }
 
+  // renderer isn't ready yet, so we need to wait for the window onload event.
   $(window).load(function() {
     configureDownloader();
     restoreSettings(settings);
+    populateMupsList();
 
     textEditor = ace.edit("textEditor");
     textEditor.$blockScrolling = Infinity;
@@ -535,6 +483,12 @@ $(document).ready(function() {
       $("#isEditorText").prop('checked', true);
     } else {
       $("#isEditorBlocks").prop('checked', true);
+    }
+
+    if (settings.get('sortMupsBy') == 'date') {
+      $("#sortMupsByDate").prop('checked', true);
+    } else {
+      $("#sortMupsByName").prop('checked', true);
     }
 
     setTheme(settings.get('isThemeDark'));
@@ -638,6 +592,11 @@ $(document).ready(function() {
 
   $('#cameraFront').click(function() {
     viewFrom(2, 1);
+  });
+
+  $('input[type=radio][name=sortMupsBy]').change(function() {
+    settings.set('sortMupsBy', $(this).val());
+    populateMupsList();
   });
 
   $('input[type=radio][name=editorMode]').change(function() {
@@ -934,7 +893,7 @@ $(document).ready(function() {
       var mups = JSON.parse(e.target.result);
       for (mup in mups) {
         localStorage.setItem(mup, JSON.stringify(mups[mup]));
-        populateFileMenu();
+        populateMupsList();
       }
     };
     reader.readAsText(archive);
