@@ -148,8 +148,6 @@ function needsUnsavedPrompt() {
 
 function writeMup(path, source, onSuccess) {
   fs.writeFile(path, source, function(e) {
-    console.log(e);
-    onSuccess();
     $('#message').html('I saved your program at ' + path + '. It is precious!');
     onSuccess();
   });
@@ -164,6 +162,7 @@ function platformSave(path, source, mode, onSuccess) {
       'source' : source
     };
     localStorage.setItem(path, JSON.stringify(file));
+    onSuccess();
   } else {
     writeMup(path, source, onSuccess);
   }
