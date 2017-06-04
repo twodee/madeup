@@ -20,7 +20,7 @@ function interpret(options, onSuccess, onError) {
 
   var
     spawn = require('child_process').spawn,
-    merp = spawn('../build/merp', ['--timeout', '10', '--shading', options.shading_mode, '--geometry', options.geometry_mode, '-o', tmpOut.name, tmpIn.name]);
+    merp = spawn('../build/merp', ['--timeout', '100', '--shading', options.shading_mode, '--geometry', options.geometry_mode, '-o', tmpOut.name, tmpIn.name]);
 
   var out = {};
   out.stdout = '';

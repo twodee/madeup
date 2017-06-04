@@ -206,8 +206,10 @@ audio::-webkit-media-controls-enclosure {
   transform: rotate(20deg) scale(0.9);
 }
 
-/* I tried not having a div wrapper around the settings ul, but the overflow:
-   auto on the ul cut off the absolutely position X box. */
+/*
+I tried not having a div wrapper around the settings ul, but the overflow: auto
+on the ul cut off the absolutely positioned X box.
+*/
 #right {
   overflow: none;
   display: none;
@@ -218,6 +220,13 @@ audio::-webkit-media-controls-enclosure {
   bottom: 0;
 }
 
+/*
+If the gear menu gets smaller, we don't want its container to shrink in size,
+because that size can be set by the user and shouldn't be volatile. So, we use
+absolute positioning for the content. Yet, if the content grows to exceed the
+container because the font grows, we want to expand the container. That's done
+in JavaScript.
+*/
 ul#settings {
   font-size: 20pt;
   position: absolute;

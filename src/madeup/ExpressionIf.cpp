@@ -15,6 +15,7 @@ ExpressionIf::ExpressionIf(Co<Expression> condition, Co<ExpressionBlock> then_bl
   then_block(then_block),
   else_block(else_block),
   is_ternary(is_ternary) {
+  isEmitter(false);
 }
 
 /* ------------------------------------------------------------------------- */

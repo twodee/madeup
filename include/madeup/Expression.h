@@ -34,12 +34,15 @@ class Expression {
     void setSource(const std::string &source, const SourceLocation &location);
     virtual void predeclare(Environment &env) const;
     virtual void assign(Environment &env, td::Co<Expression> value) const;
+    bool isEmitter() const;
+    void isEmitter(bool enable);
 
     static td::Co<Expression> parse(const std::string &s);
 
   private:
     std::string source;
     SourceLocation location;
+    bool is_emitter;
 };
 
 /* ------------------------------------------------------------------------- */

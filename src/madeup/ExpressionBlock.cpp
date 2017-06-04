@@ -37,9 +37,7 @@ Co<Expression> ExpressionBlock::evaluate(Environment &env) const {
     value = (*i)->evaluate(env);
 
     // Don't issue geometry if expression was an assignment.
-    const ExpressionDefineVariable *define_variable = dynamic_cast<const ExpressionDefineVariable *>(i->GetPointer());
-    const ExpressionDefineElement *define_element = dynamic_cast<const ExpressionDefineElement *>(i->GetPointer());
-    if (!define_variable && !define_element) {
+    if ((*i)->isEmitter()) {
       ExpressionMesh *mesh = dynamic_cast<ExpressionMesh *>(value.GetPointer());
       if (mesh) {
         env.echoWithoutTransform(mesh->toMesh());

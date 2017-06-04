@@ -41,7 +41,8 @@ namespace madeup {
 
 Expression::Expression() :
   source(),
-  location() {
+  location(),
+  is_emitter(true) {
 }
 
 /* ------------------------------------------------------------------------- */
@@ -270,6 +271,18 @@ Co<Expression> Expression::parse(const std::string &s) {
 
 void Expression::assign(Environment &env, Co<Expression> value) const {
   throw MessagedException("Assignment not supported."); 
+}
+
+/* ------------------------------------------------------------------------- */
+
+bool Expression::isEmitter() const {
+  return is_emitter; 
+}
+
+/* ------------------------------------------------------------------------- */
+
+void Expression::isEmitter(bool enable) {
+  this->is_emitter = enable; 
 }
 
 /* ------------------------------------------------------------------------- */

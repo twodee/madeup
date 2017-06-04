@@ -16,6 +16,7 @@ ExpressionDefineElement::ExpressionDefineElement(Co<Expression> base,
   Expression(),
   subscript(Co<ExpressionSubscript>(new ExpressionSubscript(base, index))),
   rhs(rhs) {
+  isEmitter(false);
 }
 
 /* ------------------------------------------------------------------------- */

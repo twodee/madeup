@@ -13,6 +13,7 @@ ExpressionRepeat::ExpressionRepeat(Co<Expression> niterations, Co<Expression> bo
   Expression(),
   niterations(niterations),
   body(body) {
+  isEmitter(false);
 }
 
 /* ------------------------------------------------------------------------- */

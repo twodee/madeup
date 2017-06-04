@@ -19,6 +19,7 @@ ExpressionFor::ExpressionFor(Co<Expression> iterator, Co<Expression> start, Co<E
   delta(delta),
   body(body),
   is_inclusive(is_inclusive) {
+  isEmitter(false);
 }
 
 /* ------------------------------------------------------------------------- */

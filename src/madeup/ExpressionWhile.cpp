@@ -13,6 +13,7 @@ ExpressionWhile::ExpressionWhile(Co<Expression> condition, Co<Expression> body) 
   Expression(),
   condition(condition),
   body(body) {
+  isEmitter(false);
 }
 
 /* ------------------------------------------------------------------------- */

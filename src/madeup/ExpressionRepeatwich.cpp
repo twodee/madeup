@@ -16,6 +16,7 @@ ExpressionRepeatwich::ExpressionRepeatwich(Co<Expression> nmores,
   nmores(nmores),
   more(more),
   less(less) {
+  isEmitter(false);
 }
 
 /* ------------------------------------------------------------------------- */

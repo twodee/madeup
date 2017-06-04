@@ -16,6 +16,7 @@ ExpressionDefineVariable::ExpressionDefineVariable(const string &name, Co<Expres
   Expression(),
   name(name),
   rhs(rhs) {
+  isEmitter(false);
 }
 
 /* ------------------------------------------------------------------------- */
