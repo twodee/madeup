@@ -1,9 +1,8 @@
-const {app, Menu, BrowserWindow, globalShortcut} = require('electron');
+const {app, Menu, BrowserWindow, globalShortcut, dialog} = require('electron');
 const path = require('path');
 const url = require('url');
 const LocalStorage = require('node-localstorage').LocalStorage;
 
-let mainWindow;
 let localStorage = new LocalStorage(require('os').homedir() + '/.madeup');
 
 function recall(key, default_value) {
@@ -16,63 +15,89 @@ function recallInt(key, default_value) {
   return value === null ? default_value : parseInt(value);
 }
 
-function createWindow() {
+function createWindow(mup) {
   // Restore settings or their defaults.
   let width = recallInt('window_width', 800);
   let height = recallInt('window_height', 600);
   let showTools = recallInt('show_tools', 0) == 1;
 
-  mainWindow = new BrowserWindow({
+  var frame = new BrowserWindow({
     width: width,
     height: height,
     icon: path.join(__dirname, 'assets/icons/png/1024x1024.png')
   })
 
-  mainWindow.loadURL(url.format({
+  frame.loadURL(url.format({
     pathname: path.join(__dirname, 'index.html'),
     protocol: 'file:',
     slashes: true
   }))
 
   if (showTools) {
-    mainWindow.webContents.openDevTools({mode: 'bottom'});
+    frame.webContents.openDevTools({mode: 'bottom'});
   }
 
-  mainWindow.on('close', () => {
-    let size = mainWindow.getSize();
+  if (mup != undefined) {
+    frame.webContents.on('did-finish-load', () => {
+      frame.webContents.send('open', mup);
+    });
+  }
+
+  frame.on('close', () => {
+    let size = frame.getSize();
     localStorage.setItem('window_width', size[0]);
     localStorage.setItem('window_height', size[1]);
-    localStorage.setItem('show_tools', mainWindow.webContents.isDevToolsOpened() ? 1 : 0);
+    localStorage.setItem('show_tools', frame.webContents.isDevToolsOpened() ? 1 : 0);
   });
 
-  mainWindow.on('closed', () => {
-    mainWindow = null
-  });
+  return frame;
+}
 
+app.on('ready', function() {
 	const template = [
 		{
 			label: 'File',
 			submenu: [
         {
+          label: 'New',
+          accelerator: 'CommandOrControl+N',
+          click() {
+            createWindow();
+          },
+        },
+        {
           label: 'Open',
           accelerator: 'CommandOrControl+O',
           click() {
-            mainWindow.webContents.send('open');
+            dialog.showOpenDialog({
+              title: 'Open...',
+            }, function(path) {
+              if (path) {
+                // load(path[0]); 
+                createWindow(path[0]);
+              }
+            });
           },
         },
         {
           label: 'Save',
           accelerator: 'CommandOrControl+S',
-          click() {
-            mainWindow.webContents.send('save');
+          click(item, focusedWindow) {
+            focusedWindow.webContents.send('save');
           },
         },
         {
           label: 'Save As...',
           accelerator: 'Shift+CommandOrControl+S',
-          click() {
-            mainWindow.webContents.send('saveAs');
+          click(item, focusedWindow) {
+            focusedWindow.webContents.send('saveAs');
           },
+        },
+        {
+          type: 'separator'
+        },
+        {
+          role: 'close'
         },
 			]
 		},
@@ -146,13 +171,12 @@ function createWindow() {
     });
   }
 
-
 	const menu = Menu.buildFromTemplate(template);
 	Menu.setApplicationMenu(menu);
-}
 
-app.on('ready', createWindow)
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
-  app.quit()
-})
+  app.quit();
+});

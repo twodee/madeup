@@ -176,15 +176,15 @@ function platformPromptForSaveAs(onSuccess) {
   });
 }
 
-function platformOpen() {
-  fsdialog.showOpenDialog({
-    title: 'Open...',
-  }, function(path) {
-    if (path) {
-      load(path[0]);    
-    }
-  });
-}
+// function platformOpen() {
+  // fsdialog.showOpenDialog({
+    // title: 'Open...',
+  // }, function(path) {
+    // if (path) {
+      // load(path[0]);    
+    // }
+  // });
+// }
 
 function platformLoad(path, onSuccess) {
   var source = null;
@@ -196,9 +196,10 @@ function platformLoad(path, onSuccess) {
   onSuccess(source);
 }
 
-require('electron').ipcRenderer.on('open', function(event, data) {
-  platformOpen();
-});
+// require('electron').ipcRenderer.on('open', function(event, data) {
+  // console.log("foo");
+  // platformOpen();
+// });
 
 require('electron').ipcRenderer.on('save', function(event, data) {
   save();
@@ -206,4 +207,8 @@ require('electron').ipcRenderer.on('save', function(event, data) {
 
 require('electron').ipcRenderer.on('saveAs', function(event, data) {
   promptForSaveAs();
+});
+
+require('electron').ipcRenderer.on('open', function(event, mup) {
+  load(mup);
 });
