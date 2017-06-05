@@ -153,10 +153,14 @@ void FormalParameter::write(ostream &out) const {
 
 void ExpressionDefine::write(ostream &out) const {
   out << "(define " << name << " ";
+  out << "(";
   for (vector<FormalParameter>::const_iterator i = formals.begin(); i != formals.end(); ++i) {
+    if (i != formals.begin()) {
+      out << " ";
+    }
     i->write(out);
-    out << " ";
   }
+  out << ") ";
   body->write(out);
   out << ")";
 }

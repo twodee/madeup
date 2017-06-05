@@ -174,7 +174,18 @@ app.on('ready', function() {
 	const menu = Menu.buildFromTemplate(template);
 	Menu.setApplicationMenu(menu);
 
-  createWindow();
+  var mups = null;
+  if (process.argv[0].endsWith('lectron')) {
+    var mups = process.argv.slice(2);
+  } else {
+    var mups = process.argv.slice(1);
+  }
+
+  if (mups.length > 0) {
+    mups.forEach((mup) => createWindow(mup));
+  } else {
+    createWindow();
+  }
 });
 
 app.on('window-all-closed', () => {

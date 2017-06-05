@@ -59,6 +59,7 @@ add_library(madeup
   ExpressionMax.cpp
   ExpressionMesh.cpp 
   ExpressionMin.cpp
+  ExpressionMirror.cpp
   ExpressionModeAdd.cpp
   ExpressionModeSubtract.cpp
   ExpressionMove.cpp

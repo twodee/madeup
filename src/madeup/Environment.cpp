@@ -37,6 +37,7 @@
 #include "madeup/ExpressionMax.h"
 #include "madeup/ExpressionMesh.h"
 #include "madeup/ExpressionMin.h"
+#include "madeup/ExpressionMirror.h"
 #include "madeup/ExpressionMove.h"
 #include "madeup/ExpressionMoveX.h"
 #include "madeup/ExpressionMoveTo.h"
@@ -297,6 +298,15 @@ void Environment::prime() {
   define_fracture->addFormal("length");
   define_fracture->addFormal("path");
 
+  Co<ExpressionDefine> define_mirror(new ExpressionDefine("mirror", Co<Expression>(new ExpressionMirror())));
+  define_mirror->addFormal("path");
+  define_mirror->addFormal("axisX");
+  define_mirror->addFormal("axisY");
+  define_mirror->addFormal("axisZ");
+  define_mirror->addFormal("pointX");
+  define_mirror->addFormal("pointY");
+  define_mirror->addFormal("pointZ");
+
   Co<ExpressionDefine> define_dilate(new ExpressionDefine("dilate", Co<Expression>(new ExpressionDilate())));
   define_dilate->addFormal("path");
   define_dilate->addFormal("length");
@@ -410,6 +420,7 @@ void Environment::prime() {
   add("transform", Co<ExpressionClosure>(new ExpressionClosure(define_transform, globals)));
   add("coalesce", Co<ExpressionClosure>(new ExpressionClosure(define_coalesce, globals)));
   add("fracture", Co<ExpressionClosure>(new ExpressionClosure(define_fracture, globals)));
+  add("mirror", Co<ExpressionClosure>(new ExpressionClosure(define_mirror, globals)));
   add("dilate", Co<ExpressionClosure>(new ExpressionClosure(define_dilate, globals)));
   add("blobs", Co<ExpressionClosure>(new ExpressionClosure(define_blobs, globals)));
   add("surface", Co<ExpressionClosure>(new ExpressionClosure(define_surface, globals)));
@@ -446,6 +457,7 @@ void Environment::prime() {
   globals->add("center", (*this)["center"]);
   globals->add("coalesce", (*this)["coalesce"]);
   globals->add("fracture", (*this)["fracture"]);
+  globals->add("mirror", (*this)["mirror"]);
   globals->add("cos", (*this)["cos"]);
   globals->add("cross", (*this)["cross"]);
   globals->add("debug", (*this)["debug"]);

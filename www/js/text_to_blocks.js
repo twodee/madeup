@@ -294,7 +294,21 @@ function parse(peeker, workspace) {
         block = workspace.newBlock('procedures_callnoreturn');
         block.setFieldValue(id, 'NAME');
         var formals = getBlocklyProcedureFormals(id);
-        block.setProcedureParameters(formals, formals);
+
+        // I used to use setProcedureParameters, but Blockly
+        // moved that out of the API. Now we need a mutation.
+        // Baah.
+        var container = document.createElement('mutation'); 
+        formals.forEach(function(formal) {
+          var arg = document.createElement('arg'); 
+          arg.setAttribute('name', formal);
+          arg.setAttribute('paramId', formal);
+          container.appendChild(arg);
+        });
+        block.domToMutation(container);
+
+        // block.setProcedureParameters_(formals, formals);
+ 
         var i = 0;
         while (peeker.peek() == ' ') {
           peeker.get(); // eat space
@@ -496,17 +510,30 @@ function parse(peeker, workspace) {
     peeker.get(); // eat space
     var id = peeker.getToken();
     block = workspace.newBlock('procedures_defnoreturn');
+    console.log("block: " + block);
     block.setFieldValue(id, 'NAME');
     peeker.get(); // eat space
+    console.log(peeker.src);
     var formals = [];
-    while (peeker.peek() != '(') {
+    peeker.get(); // eat (
+    while (peeker.peek() == '(') {
+      peeker.get(); // eat (
       var formal = peeker.getToken();
+      console.log("formal: " + formal);
       formals.push(formal);
-      peeker.get(); // eat space
+      peeker.get(); // eat )
+      if (peeker.peek() == ' ') {
+        peeker.get(); // eat space
+      }
     }
+    peeker.get(); // eat )
+    peeker.get(); // eat space
+    console.log("formals: " + formals);
     block.arguments_ = formals;
     block.updateParams_();
     var body = parse(peeker, workspace);
+    console.log("block: " + block);
+    console.log("body: " + body);
     connectStatement(block, 'STACK', body);
   }
 
