@@ -300,12 +300,8 @@ void Environment::prime() {
 
   Co<ExpressionDefine> define_mirror(new ExpressionDefine("mirror", Co<Expression>(new ExpressionMirror())));
   define_mirror->addFormal("path");
-  define_mirror->addFormal("axisX");
-  define_mirror->addFormal("axisY");
-  define_mirror->addFormal("axisZ");
-  define_mirror->addFormal("pointX");
-  define_mirror->addFormal("pointY");
-  define_mirror->addFormal("pointZ");
+  define_mirror->addFormal("axis");
+  define_mirror->addFormal("point");
 
   Co<ExpressionDefine> define_dilate(new ExpressionDefine("dilate", Co<Expression>(new ExpressionDilate())));
   define_dilate->addFormal("path");
