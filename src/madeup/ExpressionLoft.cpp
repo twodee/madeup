@@ -78,8 +78,8 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
   vector<QVector3<int>> faces;
   vector<vector<QVector2<float>>> contours;
 
-  for (int pi = 0; pi < paths.size(); ++pi) {
-    for (int ni = 0; ni < paths[pi].size(); ++ni) {
+  for (unsigned int pi = 0; pi < paths.size(); ++pi) {
+    for (unsigned int ni = 0; ni < paths[pi].size(); ++ni) {
       positions.push_back(paths[pi][ni].position);
       colors.push_back(paths[pi][ni].rgb);
     }
@@ -91,7 +91,7 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
     } else {
       // Fit a plane to pass through this contour's point cloud.
       Eigen::MatrixXd cloud(paths[pi].size(), 3);;
-      for (int vi = 0; vi < paths[pi].size(); ++vi) {
+      for (unsigned int vi = 0; vi < paths[pi].size(); ++vi) {
         QVector3<float> &position = paths[pi][vi].position;
         cloud(vi, 0) = position[0];
         cloud(vi, 1) = position[1];
@@ -110,7 +110,7 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
       // Project each point onto the plane, align it with the Z axis, and then
       // throw away Z.
       vector<QVector2<float>> flattened_positions;
-      for (int vi = 0; vi < paths[pi].size(); ++vi) {
+      for (unsigned int vi = 0; vi < paths[pi].size(); ++vi) {
         QVector3<float> &position = paths[pi][vi].position;
         std::cout << "position: " << position << std::endl;
         std::cout << "plane.GetPoint(): " << plane.GetPoint() << std::endl;
@@ -130,14 +130,14 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
   }
 
   int npre = 0;
-  for (int pi = 0; pi < paths.size() - 1; ++pi) {
+  for (unsigned int pi = 0; pi < paths.size() - 1; ++pi) {
     int first_a = 0;
     int first_b = 0;
     float max_dot = -1;
 
     // Find closest-angle pair in paths n and n + 1. Those are our bonders.
-    for (int i0 = 0; i0 < paths[pi].size(); ++i0) {
-      for (int i1 = 0; i1 < paths[pi + 1].size(); ++i1) {
+    for (unsigned int i0 = 0; i0 < paths[pi].size(); ++i0) {
+      for (unsigned int i1 = 0; i1 < paths[pi + 1].size(); ++i1) {
         float dot = contours[pi][i0].Dot(contours[pi][i1]);
         if (dot > max_dot) {
           first_a = i0;
@@ -162,8 +162,8 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
     int npreb = npre + paths[pi].size();
     int last_a = first_a;
     int last_b = first_b;
-    int na = 0;
-    int nb = 0;
+    unsigned int na = 0;
+    unsigned int nb = 0;
 
     do {
       int next_a = (last_a + 1) % paths[pi].size();
@@ -409,7 +409,7 @@ Co<Expression> ExpressionLoft::evaluate(Environment &env) const {
 
   Co<Trimesh> mesh = Co<Trimesh>(new Trimesh(positions, faces));
   float *vcolor = mesh->AllocateVertexColors();
-  for (int i = 0; i < positions.size(); ++i) {
+  for (unsigned int i = 0; i < positions.size(); ++i) {
     vcolor[0] = colors[i][0];
     vcolor[1] = colors[i][1];
     vcolor[2] = colors[i][2];

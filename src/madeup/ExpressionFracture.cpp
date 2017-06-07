@@ -29,7 +29,7 @@ Co<Expression> ExpressionFracture::evaluate(Environment &env) const {
 
   if (length->toReal()) {
     Polyline<float> polyline(path.size(), 3 + 3 + 4, true); // TODO closed?
-    for (int i = 0; i < path.size(); ++i) {
+    for (unsigned int i = 0; i < path.size(); ++i) {
       memcpy(&polyline(i)[0], &path[i].position[0], sizeof(float) * 3);
       memcpy(&polyline(i)[3], &path[i].rgb[0], sizeof(float) * 3);
       polyline(i)[6] = path[i].outer_radius;
