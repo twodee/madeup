@@ -29,6 +29,7 @@ var preview = undefined;
 var isSourceDirty = false;
 var settings = new Settings();
 var lastBlocks = null;
+var badModelMessage = 'Uh oh. I tried to generate a model for you, but it is broken. This can happen for a bunch of reasons: some faces may be too small, some vertices may be duplicated, and the mesh boolean operations may just be fickle.';
 
 function hasWebGL() {
   try {
@@ -1233,7 +1234,7 @@ function onInterpret(data) {
     if (data.geometry_mode == GeometryMode.SURFACE) {
       var loader = new THREE.JSONLoader();
       try {
-        var model = loader.parse(JSON.parse(data['model']));
+        var model = loader.parse(JSON.parse(data['model'].replace(/NaN/gi, 0)));
 
         if (settings.get('showMode') == 'triangles' || settings.get('showMode') == 'shaded_triangles') {
           var solidMaterial;
@@ -1265,7 +1266,7 @@ function onInterpret(data) {
       } catch (err) {
         console.log(err);
         console.log(data['model']);
-        log('The geometry I got back had some funny stuff in it that I didn\'t know how to read.');
+        log(badModelMessage);
       }
     } else {
       var sphereGeometry = new THREE.SphereGeometry(settings.get('pathifyNodeSize'), 20, 20);
@@ -1275,7 +1276,7 @@ function onInterpret(data) {
       try {
         paths = JSON.parse(data['model']);
       } catch (err) {
-        log('The geometry I got back had some funny stuff in it that I didn\'t know how to read.');
+        log(badModelMessage);
       }
 
       allGeometry = new THREE.Geometry();
