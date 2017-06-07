@@ -898,6 +898,14 @@ function toggleGearMenu() {
   }
 }
 
+function resizeGearMenu() {
+  // If gear menu contents exceed its size, grow it.
+  var settingsWidth = $('ul#settings').width();
+  if (settingsWidth > $('#right').width()) {
+    $('#right').width($('ul#settings').width());
+  }
+}
+
 function logText() {
   if (!settings.get('isEditorText')) {
     var source = Blockly.Madeup.workspaceToCode(blocklyWorkspace);
@@ -927,17 +935,13 @@ function setFontSize(newSize) {
   $('#console')[0].style.fontSize = settings.get('fontSize') + 'px';
   $('ul#settings')[0].style.fontSize = (settings.get('fontSize') + 0) + 'px';
   $('#right input, #right select').css('font-size', newSize);
-
-  // If gear menu contents exceed its size, grow it.
-  var settingsWidth = $('ul#settings').width();
-  if (settingsWidth > $('#right').width()) {
-    $('#right').width($('ul#settings').width());
-  }
+  resizeGearMenu();
 }
 
 function showGearMenu() {
   $('#settings-button').fadeToggle(100, function() {
     $('#right').toggle('slide', {direction: 'right', duration: 500}, function() {
+      resizeGearMenu();
       resize();
       $('#right').css('overflow', 'visible');
       $('#close-settings-button').fadeToggle(500);
