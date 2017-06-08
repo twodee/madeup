@@ -28,9 +28,13 @@ Co<Expression> ExpressionCallWithNamedParameters::evaluate(Environment &env) con
   env.checkTimeout(getSourceLocation());
 
   Co<ExpressionClosure> closure = env[name];
+  /* std::cout << "getSource(): " << getSource() << std::endl; */
+  /* std::cout << "getSourceLocation(): " << getSourceLocation().toAnchor() << std::endl; */
+  /* std::cout << "closure->getSourceLocation(): " << closure->getSourceLocation().toAnchor() << std::endl; */
   if (closure.IsNull()) {
     throw MessagedException(getSourceLocation().toAnchor() + ": No function named " + name + " is defined.");
   }
+  /* closure->setSource(getSource(), getSourceLocation()); */
 
   Co<ExpressionDefine> define = closure->getDefine();
   Co<Environment> closure_env(new Environment(*closure->getEnvironment()));

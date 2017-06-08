@@ -14,7 +14,7 @@ ExpressionPush::ExpressionPush() :
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionPush::evaluate(Environment &env) const {
-  env.push();
+  env.getBookmarks().push({env.getTurtle(), env.getTransform()});
   return Co<Expression>(ExpressionUnit::getSingleton());
 }
 

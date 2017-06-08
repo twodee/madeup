@@ -86,12 +86,13 @@ Turtle Environment::turtle = {
          QVector3<float>(0.0f, 1.0f, 0.0f),
          QVector3<float>(0.0f, 0.0f, 1.0f))
 };
-stack<Turtle> Environment::previous_turtles;
+QMatrix4<float> xform;
+
+stack<State> Environment::bookmarks;
 vector<Node> Environment::run;
-Trimesh *Environment::shapes = NULL; //new Trimesh(0, 0);
+Trimesh *Environment::shapes = NULL;
 vector<vector<Turtle> > Environment::paths;
 GeometryMode::geometry_mode_t Environment::geometry_mode = GeometryMode::SURFACE;
-stack<QMatrix4<float> > Environment::xforms;
 int Environment::mode = MODE_ADD;
 
 /* ------------------------------------------------------------------------- */
@@ -129,9 +130,7 @@ void Environment::prime() {
   paths.clear();
   paths.push_back(vector<Turtle>());
 
-  xforms = std::stack<QMatrix4<float> >();
-  xforms.push(QMatrix4<float>(1.0f));
-
+  xform = QMatrix4<float>(1.0f);
   turtle = {
     QVector3<float>(0.0f),
     Camera(QVector3<float>(0.0f, 0.0f, 0.0f),
@@ -630,11 +629,11 @@ void Environment::move(float distance) {
 
   // Do we apply the transform to the offset between our old position and 
   // our new? No, not for the time being.
-  /* turtle.position += xforms.top() * offset; */
+  /* turtle.position += xform * offset; */
   turtle.position += offset;
 
   // DON'T DO THIS. Move is a relative command. We want to transform the offset.
-  /* turtle.position = xforms.top() * turtle.position; */
+  /* turtle.position = xform * turtle.position; */
 
   recordVertex();
   recordPreview();
@@ -644,7 +643,7 @@ void Environment::move(float distance) {
 
 void Environment::movex(float distance) {
   QVector3<float> offset(QVector4<float>(turtle.camera.GetTo() * distance, 0.0f));
-  turtle.position += xforms.top() * offset;
+  turtle.position += xform * offset;
 
   recordVertex();
   recordPreview();
@@ -653,7 +652,7 @@ void Environment::movex(float distance) {
 /* ------------------------------------------------------------------------- */
 
 void Environment::moveTo(float x, float y, float z) {
-  turtle.position = xforms.top() * QVector3<float>(x, y, z);
+  turtle.position = xform * QVector3<float>(x, y, z);
   recordVertex();
   recordPreview();
 }
@@ -661,35 +660,25 @@ void Environment::moveTo(float x, float y, float z) {
 /* ------------------------------------------------------------------------- */
 
 void Environment::scale(float x, float y, float z) {
-  QMatrix4<float> xform = xforms.top();
-  xforms.pop();
   xform = QMatrix4<float>::GetScale(x, y, z) * xform;
-  xforms.push(xform);
 }
 
 /* ------------------------------------------------------------------------- */
 
 void Environment::translate(float x, float y, float z) {
-  QMatrix4<float> xform = xforms.top();
-  xforms.pop();
   xform = QMatrix4<float>::GetTranslate(x, y, z) * xform;
-  xforms.push(xform);
 }
 
 /* ------------------------------------------------------------------------- */
 
 void Environment::rotate(float x, float y, float z, float degrees) {
-  QMatrix4<float> xform = xforms.top();
-  xforms.pop();
   xform = QMatrix4<float>::GetRotate(degrees, QVector3<float>(x, y, z)) * xform;
-  xforms.push(xform);
 }
 
 /* ------------------------------------------------------------------------- */
 
 void Environment::identity() {
-  xforms.pop();
-  xforms.push(QMatrix4<float>(1.0f));
+  xform = QMatrix4<float>(1.0f);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -790,7 +779,7 @@ void Environment::subtract() {
 
 Co<Trimesh> Environment::echo(Co<Trimesh> mesh) {
   Trimesh *trimesh(new Trimesh(*mesh));
-  *trimesh *= xforms.top();
+  *trimesh *= xform;
   return Co<Trimesh>(trimesh);
 }
 
@@ -799,7 +788,7 @@ Co<Trimesh> Environment::echo(Co<Trimesh> mesh) {
 void Environment::echo(const std::vector<Node> &path) {
   for (std::vector<Node>::const_iterator i = path.begin(); i != path.end(); ++i) {
     Node node = *i;
-    node.position = xforms.top() * node.position;
+    node.position = xform * node.position;
     Turtle path_turtle = {node.position, turtle.camera};
     paths[paths.size() - 1].push_back(path_turtle);
     run.push_back(node);
@@ -873,29 +862,6 @@ Trimesh *Environment::getMesh() {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::push() {
-  previous_turtles.push(turtle);
-  xforms.push(xforms.top());
-}
-
-/* ------------------------------------------------------------------------- */
-
-void Environment::pop() {
-  if (previous_turtles.size() == 0) {
-    throw MessagedException("Turtle stack is empty");
-  }
-
-  turtle = previous_turtles.top();
-  previous_turtles.pop();
-
-  if (xforms.size() == 0) {
-    throw MessagedException("Transform stack is empty");
-  }
-  xforms.pop();
-}
-
-/* ------------------------------------------------------------------------- */
-
 Co<Trimesh> Environment::polygon(bool is_flipped) {
   Co<Trimesh> trimesh(new Trimesh(0, 0));
   trimesh->AllocateVertexColors();
@@ -935,7 +901,7 @@ Co<Trimesh> Environment::polygon(bool is_flipped) {
         if (is_flipped) {
           trimesh->ReverseWinding();
         }
-        *trimesh *= xforms.top();
+        *trimesh *= xform;
       } catch (MessagedException e) {
         throw UnlocatedException("I tried turning your path into a polygon, but I couldn't. Do you have duplicated vertices, all your vertices in a line, or edges that cross over each other? Any of these spell geometric trouble.");
       }
@@ -998,7 +964,7 @@ Co<Trimesh> Environment::dowel(float twist, float max_bend) {
 
         trimesh = Co<Trimesh>(line->Dowel(nsides, radius, true, twist, max_bend));
         trimesh->MigrateVertexMetasToColors(1, 2, 3);
-        *trimesh *= xforms.top();
+        *trimesh *= xform;
 
         delete line;
         line = NULL;
@@ -1061,7 +1027,7 @@ Co<Trimesh> Environment::tube(float twist, float max_bend) {
         }
 
         trimesh = Co<Trimesh>(line->Dowel(nsides, radius, false, twist, max_bend));
-        *trimesh *= xforms.top();
+        *trimesh *= xform;
 
         delete line;
         line = NULL;
@@ -1087,7 +1053,7 @@ Co<Trimesh> Environment::tube(float twist, float max_bend) {
           }
 
           Trimesh *innermesh = line->Dowel(nsides, radius, false, twist, max_bend);
-          *innermesh *= xforms.top();
+          *innermesh *= xform;
           innermesh->ReverseWinding();
 
           delete line;
@@ -1243,7 +1209,7 @@ Co<Trimesh> Environment::revolve() {
         try {
           trimesh = Co<Trimesh>(line->Revolve(axis, nsides, degrees));
           trimesh->MigrateVertexMetasToColors(0, 1, 2);
-          *trimesh *= xforms.top();
+          *trimesh *= xform;
         } catch (MessagedException e) {
           throw UnlocatedException("I tried revolving your path, but I couldn't. Do you have duplicated vertices, all your vertices in a line, or edges that cross over each other? Any of these spell geometric trouble.");
         }
@@ -1288,7 +1254,7 @@ Co<Trimesh> Environment::extrude(const QVector3<float> &axis, float length) {
       }
 
       try {
-        trimesh = Co<Trimesh>(line->Extrude(axis, length));//, xforms.top()));
+        trimesh = Co<Trimesh>(line->Extrude(axis, length));//, xform));
         trimesh->MigrateVertexMetasToColors(0, 1, 2);
       } catch (MessagedException e) {
         throw UnlocatedException("I tried extruding your path, but I couldn't. Do you have duplicated vertices, all your vertices in a line, or edges that cross over each other? Any of these spell geometric trouble.");
@@ -1328,7 +1294,7 @@ Co<Trimesh> Environment::spheres() {
         color += 3;
       }
 
-      *sphere *= xforms.top();
+      *sphere *= xform;
       *sphere += run[i].position;
       *trimesh += *sphere;
     }
@@ -1360,7 +1326,7 @@ Co<Trimesh> Environment::boxes() {
         color += 3;
       }
 
-      *box *= xforms.top();
+      *box *= xform;
       *box += run[i].position;
       *trimesh += *box;
     }
@@ -1448,7 +1414,7 @@ Co<Trimesh> Environment::blobs(float grain, float iso) {
       field.GetIsocontour(iso, ntriangles, positions);
       trimesh = Co<Trimesh>(new Trimesh(ntriangles, positions));
       *trimesh += min;
-      *trimesh *= xforms.top();
+      *trimesh *= xform;
 
       delete[] positions;
     }
@@ -1503,7 +1469,7 @@ Co<Trimesh> Environment::surface(int width, int height) {
 
     trimesh = Co<Trimesh>(Trimesh::GetParametric(grid, false, false));
     trimesh->MigrateVertexMetasToColors(0, 1, 2);
-    *trimesh *= xforms.top();
+    *trimesh *= xform;
   }
 
   paths.push_back(vector<Turtle>());
@@ -1650,7 +1616,7 @@ void Environment::setTimeout(int max_seconds) {
 
 void Environment::reframe() {
   /* QMatrix4<float> xform = xforms.top(); */
-  xforms.pop();
+  /* xforms.pop(); */
   /* std::cout << "xform: " << xform << std::endl; */
   /* std::cout << "turtle.position: " << turtle.position << std::endl; */
   /* std::cout << "turtle.camera.GetViewMatrix(): " << turtle.camera.GetViewMatrix() << std::endl; */
@@ -1669,12 +1635,12 @@ void Environment::reframe() {
   /* std::cout << "view: " << view << std::endl; */
   /* QMatrix4<float> transform = turtle.camera.GetViewMatrix() * QMatrix4<float>::GetTranslate(-turtle.position[0], -turtle.position[1], -turtle.position[2]); */
   QMatrix4<float> transform = view * QMatrix4<float>::GetTranslate(-turtle.position[0], -turtle.position[1], -turtle.position[2]);
-  QMatrix4<float> xform = transform.GetOrthonormalInverse();
+  xform = transform.GetOrthonormalInverse();
   /* turtle.position = QVector3<float>(0.0f); */
   /* turtle.camera = Camera(QVector3<float>(0.0f, 0.0f, 0.0f), */
                          /* QVector3<float>(0.0f, 0.0f, 1.0f), */
                          /* QVector3<float>(0.0f, 1.0f, 0.0f)); */
-  xforms.push(xform);
+  /* xforms.push(xform); */
 }
 
 /* ------------------------------------------------------------------------- */
@@ -1692,7 +1658,19 @@ const std::vector<std::vector<Turtle> > Environment::getPaths() {
 /* ------------------------------------------------------------------------- */
 
 td::QMatrix4<float> Environment::getTransform() const {
-  return xforms.top();
+  return xform;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void Environment::setTurtle(const Turtle &turtle) {
+  this->turtle = turtle;
+}
+
+/* ------------------------------------------------------------------------- */
+
+std::stack<State> &Environment::getBookmarks() {
+  return bookmarks;
 }
 
 /* ------------------------------------------------------------------------- */

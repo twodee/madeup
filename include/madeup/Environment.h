@@ -38,6 +38,11 @@ struct Turtle {
   td::Camera camera;
 };
 
+struct State {
+  Turtle turtle;
+  td::QMatrix4<float> xform;
+};
+
 class ExpressionClosure;
 
 /* ------------------------------------------------------------------------- */
@@ -89,9 +94,6 @@ class Environment {
     void add();
     void subtract();
 
-    void push();
-    void pop();
-
     void checkTimeout(const SourceLocation &location);
 
     td::Trimesh *getMesh();
@@ -101,10 +103,12 @@ class Environment {
 
     float getVariableAsFloat(const std::string &id);
     const Turtle &getTurtle() const;
+    void setTurtle(const Turtle &turtle);
     void setTimeout(int max_seconds);
     std::vector<Node> popPath();
     static const std::vector<std::vector<Turtle> > getPaths();
     td::QMatrix4<float> getTransform() const;
+    std::stack<State> &getBookmarks();
 
   private:
     bool hasMoved() const;
@@ -117,11 +121,10 @@ class Environment {
     static const int MODE_SUBTRACT = 1;
 
     static Turtle turtle;
-    static stack<Turtle> previous_turtles;
     static vector<Node> run;
     static td::Trimesh *shapes;
     static std::vector<std::vector<Turtle> > paths;
-    static std::stack<td::QMatrix4<float> > xforms;
+    static std::stack<State> bookmarks;
     static GeometryMode::geometry_mode_t geometry_mode;
     static int mode;
 };

@@ -14,7 +14,12 @@ ExpressionPop::ExpressionPop() :
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionPop::evaluate(Environment &env) const {
-  env.pop();
+  if (env.getBookmarks().size() == 0) {
+    throw UnlocatedException("I tried popping, but I had no corresponding push to which to revert.");
+  }
+
+  env.setTurtle(env.getBookmarks().top().turtle);
+  env.getBookmarks().pop();
   return Co<Expression>(ExpressionUnit::getSingleton());
 }
 
