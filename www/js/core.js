@@ -11,6 +11,7 @@ var GeometryMode = Object.freeze({
   SURFACE: 'SURFACE'
 });
 
+var Range = null;
 var textEditor = null;
 var gearSections = ['file', 'mups', 'editor', 'pathify', 'solidify', 'camera', 'grid', 'tutorial', 'about'];
 var isDownloading = false;
@@ -376,7 +377,7 @@ $(document).ready(function() {
 
     textEditor = ace.edit("textEditor");
     textEditor.$blockScrolling = Infinity;
-    var Range = ace.require('ace/range').Range;
+    Range = ace.require('ace/range').Range;
 
     // Creates an undo manager implicitly.
     textEditor.setSession(ace.createEditSession('', 'ace/mode/madeup'));
