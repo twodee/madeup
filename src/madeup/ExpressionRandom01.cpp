@@ -23,7 +23,7 @@ Co<Expression> ExpressionRandom01::evaluate(Environment &env) const {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionRandom01::write(ostream &out) const {
-  out << "(random min max)";
+  out << "(random01)";
 }
 
 /* ------------------------------------------------------------------------- */

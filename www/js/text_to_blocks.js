@@ -111,6 +111,8 @@ function parse(peeker, workspace) {
       var mesh = parse(peeker, workspace);
       block = workspace.newBlock('madeup_echo');
       connectExpression(block, 'OBJECT', mesh);
+    } else if (id == 'path') {
+      block = workspace.newBlock('madeup_path');
     } else if (id == 'debug') {
       peeker.get(); // eat space
       var msg = parse(peeker, workspace);
@@ -145,6 +147,8 @@ function parse(peeker, workspace) {
       block = workspace.newBlock('madeup_random');
       connectExpression(block, 'MIN', min);
       connectExpression(block, 'MAX', max);
+    } else if (id == 'random01') {
+      block = workspace.newBlock('madeup_random01');
     } else if (id == 'atan2') {
       peeker.get(); // eat space
       var opposite = parse(peeker, workspace);
