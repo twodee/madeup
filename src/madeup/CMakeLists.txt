@@ -81,6 +81,7 @@ add_library(madeup
   ExpressionPrint.cpp
   ExpressionPush.cpp
   ExpressionRandom.cpp
+  ExpressionRandom01.cpp
   ExpressionReal.cpp
   ExpressionRealDivide.cpp
   ExpressionReframe.cpp

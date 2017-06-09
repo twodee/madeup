@@ -49,6 +49,7 @@
 #include "madeup/ExpressionPrint.h"
 #include "madeup/ExpressionPush.h"
 #include "madeup/ExpressionRandom.h"
+#include "madeup/ExpressionRandom01.h"
 #include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionReframe.h"
 #include "madeup/ExpressionReturn.h"
@@ -318,6 +319,8 @@ void Environment::prime() {
   define_random->addFormal("min");
   define_random->addFormal("max");
 
+  Co<ExpressionDefine> define_random01(new ExpressionDefine("random01", Co<Expression>(new ExpressionRandom01())));
+
   Co<ExpressionDefine> define_max(new ExpressionDefine("max", Co<Expression>(new ExpressionMax())));
   define_max->addFormal("a");
   define_max->addFormal("b");
@@ -420,6 +423,7 @@ void Environment::prime() {
   add("blobs", Co<ExpressionClosure>(new ExpressionClosure(define_blobs, globals)));
   add("surface", Co<ExpressionClosure>(new ExpressionClosure(define_surface, globals)));
   add("random", Co<ExpressionClosure>(new ExpressionClosure(define_random, globals)));
+  add("random01", Co<ExpressionClosure>(new ExpressionClosure(define_random01, globals)));
   add("sign", Co<ExpressionClosure>(new ExpressionClosure(define_sign, globals)));
   add("all", Co<ExpressionClosure>(new ExpressionClosure(define_all, globals)));
   add("any", Co<ExpressionClosure>(new ExpressionClosure(define_any, globals)));
@@ -481,6 +485,7 @@ void Environment::prime() {
   globals->add("print", (*this)["print"]);
   globals->add("push", (*this)["push"]);
   globals->add("random", (*this)["random"]);
+  globals->add("random01", (*this)["random01"]);
   globals->add("reframe", (*this)["reframe"]);
   globals->add("reverse", (*this)["reverse"]);
   globals->add("revolve", (*this)["revolve"]);
