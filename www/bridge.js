@@ -137,22 +137,30 @@ function platformSave(mup, source, mode, onSuccess) {
   }
 }
 
+function getData(url) {
+      xmlhttp = new XMLHttpRequest();
+      xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                              console.log(xmlhttp.responseText);
+                          }
+            }
+      xmlhttp.open('GET', url, true);
+      // var myToken = gapi.auth.getToken();
+      // xmlhttp.setRequestHeader('Authorization', 'Bearer ' + myToken.access_token);
+      console.log(gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token);
+      xmlhttp.setRequestHeader('Authorization', 'Bearer ' + gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token);
+      console.log("xmlhttp:", xmlhttp);
+      xmlhttp.send();
+}
+
 function platformLoad(mup, onSuccess) {
   if (isGoogled && mup.name != 'untitled') {
+    // Thanks to https://developers.google.com/drive/v3/web/manage-downloads. Ugh.
     promise = gapi.client.drive.files.get({
       fileId: mup.driveID,
-      fields: 'webContentLink'
+      alt: 'media'
     }).then(function(response) {
-      var url = response.result.webContentLink;
-      $.ajax({
-        url: url,
-        beforeSend: function (xhr) {
-					xhr.setRequestHeader('Authorization', 'Bearer ' + gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token);
-				},
-        success: function(file) {
-          onSuccess(file.source);
-        }
-      });
+      onSuccess(response.result.source);
     });
   } else {
 		var record = localStorage.getItem(mup.name);

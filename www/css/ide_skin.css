@@ -328,3 +328,8 @@ fieldset {
   margin-top: 5px;
   margin-bottom: 10px;
 }
+
+.panel-section-content > div.group {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
