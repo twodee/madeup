@@ -11,12 +11,19 @@ var GeometryMode = Object.freeze({
   SURFACE: 'SURFACE'
 });
 
+function Mup(name, modifiedTime, driveID) {
+  this.name = name;
+  this.driveID = driveID;
+  this.modifiedTime = modifiedTime;
+  this.isDirty = false;
+}
+
 var Range = null;
 var textEditor = null;
 var gearSections = ['file', 'mups', 'editor', 'pathify', 'solidify', 'camera', 'grid', 'tutorial', 'about'];
 var isDownloading = false;
 var initialized = false;
-var mupName = null;
+var mup = null;
 var overallScene;
 var modelScene;
 var glyphScene;
@@ -27,7 +34,6 @@ var allGeometry = undefined;
 var timeOfLatestRun = undefined;
 var tree = null;
 var preview = undefined;
-var isSourceDirty = false;
 var settings = new Settings();
 var lastBlocks = null;
 var badModelMessage = 'Uh oh. I tried to generate a model for you, but it is broken. This can happen for a bunch of reasons: some faces may be too small, some vertices may be duplicated, and the mesh boolean operations may just be fickle.';
@@ -133,7 +139,7 @@ var onMouseDown = (function() {
 // this, even though we're not leaving the page, so we add a special flag to
 // filter out these events.
 window.addEventListener('beforeunload', function(e) {
-  if (!isDownloading && mupName && isSourceDirty && needsUnsavedPrompt()) {
+  if (!isDownloading && mup.isDirty && needsUnsavedPrompt()) {
     var message = 'You have unsaved changes. Throw them away?';
     e.returnValue = message;
     return message;
@@ -145,7 +151,7 @@ window.addEventListener('beforeunload', function(e) {
 function onBlocksChanged() {
   var xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
   var currentBlocks = Blockly.Xml.domToText(xml);
-  isSourceDirty = lastBlocks != currentBlocks;
+  mup.isDirty = lastBlocks != currentBlocks;
   updateTitle();
   if (settings.get('isAutopathify')) {
     run(getSource(), GeometryMode.PATH);
@@ -195,14 +201,14 @@ function generateDownloadable(filename, text) {
 
 function exportScreenshot() {
   renderer.domElement.toBlob(function(blob) {
-    saveAs(blob, mupName + '.png');
+    saveAs(blob, mup.name + '.png');
   });
   return false;
 }
 
 function promptForSaveAs() {
   platformPromptForSaveAs(function(name) {
-    mupName = name;
+    mup.name = name;
     save();
     updateTitle();
   });
@@ -310,11 +316,10 @@ function Settings() {
 function updateTitle() {
   // The name won't be set in certain situations -- namely, when it's embedded.
   // Showing it as dirty makes no sense, because it's not a file.
-  if (mupName != null) {
-    document.title = (isSourceDirty ? '*' : '') + 'Madeup: ' + mupName;
-    document.title = (isSourceDirty ? '*' : '') + 'Madeup: ' + mupName;
+  if (mup.name != null) {
+    document.title = (mup.isDirty ? '*' : '') + 'Madeup: ' + mup.name;
   }
-  if (isSourceDirty) {
+  if (mup.isDirty) {
     $('#fileSave').prop('disabled', false);
     $('#fileSave').removeClass('unclickable').addClass('clickable');
     $('#dirty-suffix').text('*');
@@ -417,7 +422,7 @@ $(document).ready(function() {
         resize();
       }
 
-      load('untitled');
+      load(new Mup('untitled'));
     } else if (isPresenting) {
       showConsole(false);
       $('#left').width(375);
@@ -525,7 +530,7 @@ $(document).ready(function() {
     // Only save cookies if they were successfully loaded.
     $(window).unload(function() {
       syncSettings();
-      if (mupName && isSourceDirty && confirm('Save changes to ' + mupName + '?')) {
+      if (mup.isDirty && confirm('Save changes to ' + mup.name + '?')) {
         save();
       }
     });
@@ -778,7 +783,7 @@ $(document).ready(function() {
 
   enableDownload(false);
   $('#download').click(function() {
-    $('#tag').val(mupName);
+    $('#tag').val(mup.name);
     $('#source').val(getSource());
     $('#timestamp').val(new Date().getTime());
     isDownloading = true;
@@ -961,7 +966,7 @@ function hideGearMenu() {
 }
 
 function onEditorChange(delta) {
-  isSourceDirty = true;
+  mup.isDirty = true;
   updateTitle();
   enableDownload(false);
   if (preview) {
@@ -1109,8 +1114,8 @@ function switchEditors() {
   }
 }
 
-function load(mup) {
-  if (mupName && isSourceDirty && confirm('Save changes to ' + mupName + '?')) {
+function load(newMup) {
+  if (mup && mup.isDirty && confirm('Save changes to ' + mup.name + '?')) {
     save();
   }
 
@@ -1121,7 +1126,7 @@ function load(mup) {
     blocklyWorkspace.updateVariableList();
   }
 
-  mupName = mup;
+  mup = newMup;
 
   for (var i = 0; i < meshes.length; ++i) {
     modelScene.remove(meshes[i]);
@@ -1144,13 +1149,13 @@ function load(mup) {
     }
 
     // TODO toggle modes
-    isSourceDirty = false;
+    mup.isDirty = false;
     updateTitle();
   });
 }
 
 function save() {
-  if (mupName == null) {
+  if (mup.name == null) {
     promptForSaveAs();
   } else {
     updateTitle();
@@ -1165,9 +1170,10 @@ function save() {
       mode = 'blocks';
     }
 
-    platformSave(mupName, source, mode, function() {
-      isSourceDirty = false;
+    platformSave(mup, source, mode, function() {
+      mup.isDirty = false;
       updateTitle();
+			populateMupsList();
     });
   }
 

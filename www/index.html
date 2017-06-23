@@ -4,6 +4,7 @@
   <title>Madeup</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google-signin-client_id" content="1044882582652-7g4d00clc613n2ahn48neumroauv7tu2.apps.googleusercontent.com">
 
   <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
@@ -66,6 +67,8 @@
   <script src="js/keystrokes.js"></script>
   <script src="bridge.js"></script>
   <script src="js/core.js"></script>
+  <script src="repos/gapi.js"></script>
+  </script>
   <!-- /Unminified -->
 
   <!-- Minified -->
@@ -206,39 +209,49 @@
       <li id="panel-section-file">
         <span class="panel-section-label unselectable">File</span>
         <div class="panel-section-content">
+          <fieldset>
+            <legend>Save files</legend>
+            <div class="pretty circle primary">
+              <input type="radio" name="storage" id="storageLocal" value="local" checked="checked">
+              <label><i class="mdi mdi-check"></i> in browser</label>
+            </div><br>
+            <div class="pretty circle primary">
+              <input type="radio" name="storage" id="storageDrive" value="local" checked="checked">
+              <label><i class="mdi mdi-check"></i> on Google Drive</label>
+            </div>
+          </fieldset>
           <a href="#" id="fileSave" class="menu-link">Save</a><span id="dirty-suffix"></span><br/>
-          <a href="#" id="fileSaveAs" class="menu-link">Save as</a><br/>
-          <p></p>
-          <a href="#" id="fileClose" class="menu-link">Close</a><br/>
-          <p></p>
+          <a href="#" id="fileSaveAs" class="menu-link">Save as...</a><br/>
           <a href="#" id="magic" class="menu-link">Send to Chris</a><br/>
-          <p></p> 
+          <a href="#" id="fileClose" class="menu-link">Close</a><br/>
+          <a href="#" id="fileDelete" class="menu-link">Delete</a><br/>
           <a href="#" id="download" class="menu-link">Export OBJ</a><br/>
           <a href="#" id="exportScreenshot" class="menu-link">Export screenshot</a><br/>
-          <p></p> 
-          <a href="#" id="exportArchive" class="menu-link">Export archive</a><br/>
-          <a href="#" id="importArchive" class="menu-link">Import archive</a><br/>
-          <form id="importForm">
-            <input type="file" id="archive">
-            <a href="#" id="cancelImport" class="menu-link">Cancel import</a>
-          </form>
-          <p></p> 
-          <a href="#" id="fileDelete" class="menu-link">Delete</a><br/>
+          <div id="archiver">
+            <a href="#" id="exportArchive" class="menu-link">Export archive</a><br/>
+            <a href="#" id="importArchive" class="menu-link">Import archive</a><br/>
+            <form id="importForm">
+              <input type="file" id="archive">
+              <a href="#" id="cancelImport" class="menu-link">Cancel import</a>
+            </form>
+          </div>
         </div>
       </li>
 
       <li id="panel-section-mups">
         <span class="panel-section-label unselectable">Mups</span>
         <div class="panel-section-content">
-          Sort by
-          <div class="pretty circle primary">
-            <input type="radio" name="sortMupsBy" id="sortMupsByName" value="name" checked="checked">
-            <label><i class="mdi mdi-check"></i> name</label>
-          </div>
-          <div class="pretty circle primary">
-            <input type="radio" name="sortMupsBy" id="sortMupsByDate" value="date">
-            <label><i class="mdi mdi-check"></i> date</label>
-          </div><br>
+          <fieldset>
+            <legend>Sort by</legend>
+            <div class="pretty circle primary">
+              <input type="radio" name="sortMupsBy" id="sortMupsByName" value="name" checked="checked">
+              <label><i class="mdi mdi-check"></i> name</label>
+            </div><br>
+            <div class="pretty circle primary">
+              <input type="radio" name="sortMupsBy" id="sortMupsByDate" value="date">
+              <label><i class="mdi mdi-check"></i> date</label>
+            </div><br>
+          </fieldset>
           <div id="mups"></div>
         </div>
       </li>
@@ -250,30 +263,34 @@
             Text size: <a href="#" id="smaller" class="menu-link">smaller</a> or <a href="#" id="bigger" class="menu-link">bigger</a><br/>
           </div>
 
-          Editor:
-          <div class="pretty circle primary">
-            <input type="radio" name="editorMode" id="isEditorText" value="Text" checked="checked">
-            <label><i class="mdi mdi-check"></i> Text</label>
-          </div>
-          <div class="pretty circle primary">
-            <input type="radio" name="editorMode" id="isEditorBlocks" value="Blocks">
-            <label><i class="mdi mdi-check"></i> Blocks</label>
-          </div><br>
-
-          Colors:
-          <div class="pretty circle primary">
-            <input type="radio" name="theme" id="isDark" value="isDark" checked="checked">
-            <label><i class="mdi mdi-check"></i> Dark</label>
-          </div>
-          <div class="pretty circle primary">
-            <input type="radio" name="theme" id="isLight" value="isLight">
-            <label><i class="mdi mdi-check"></i> Light</label>
-          </div><br>
-
           <div class="pretty primary">
             <input type="checkbox" id="showConsole" checked>
             <label><i class="mdi mdi-check"></i> Show console</label>
           </div><br>
+
+          <fieldset>
+            <legend>Edit as</legend>
+            <div class="pretty circle primary">
+              <input type="radio" name="editorMode" id="isEditorText" value="Text" checked="checked">
+              <label><i class="mdi mdi-check"></i> text</label>
+            </div><br>
+            <div class="pretty circle primary">
+              <input type="radio" name="editorMode" id="isEditorBlocks" value="Blocks">
+              <label><i class="mdi mdi-check"></i> blocks</label>
+            </div><br>
+          </fieldset>
+
+          <fieldset>
+            <legend>Theme</legend>
+            <div class="pretty circle primary">
+              <input type="radio" name="theme" id="isDark" value="isDark" checked="checked">
+              <label><i class="mdi mdi-check"></i> dark</label>
+            </div><br>
+            <div class="pretty circle primary">
+              <input type="radio" name="theme" id="isLight" value="isLight">
+              <label><i class="mdi mdi-check"></i> light</label>
+            </div><br>
+          </fieldset>
         </div>
       </li>
 

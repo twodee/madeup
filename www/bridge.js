@@ -1,5 +1,5 @@
 function platformize() {
-  populateMupsList();
+  handleClientLoad();
 }
 
 function interpret(options, onSuccess, onError) {
@@ -68,21 +68,98 @@ function needsUnsavedPrompt() {
   return true;
 }
 
+function uploadFile(mup, text, onSuccess) {
+  var boundary = '-------314159265358979323846';
+  var delimiter = "\r\n--" + boundary + "\r\n";
+  var close_delim = "\r\n--" + boundary + "--";
+
+  var metadata = { 
+    description : 'Madeup source file',
+    mimeType: 'application/json'
+  };  
+
+  var multipartRequestBody =
+    delimiter +  'Content-Type: application/json\r\n\r\n' +
+    JSON.stringify(metadata) +
+    delimiter + 'Content-Type: application/json\r\n\r\n' +
+    text +
+    close_delim;
+
+  gapi.client.request({ 
+    'path': '/upload/drive/v3/files/' + mup.driveID,
+    'method': 'PATCH',
+    'params': {
+      fileId: mup.driveID,
+      uploadType: 'multipart'
+    },
+    'headers': {
+      'Content-Type': 'multipart/form-data; boundary="' + boundary + '"'
+    },
+    'body': multipartRequestBody 
+  }).execute(function(file) {
+    $('#message').html('I saved your program. It is precious! Find it later under <image src="images/gear.png" id="gear-in-console" width="' + settings.get('fontSize') + 'pt"> / Mups / ' + mup.name + '.');
+    onSuccess();
+  }); 
+}
+
 function platformSave(mup, source, mode, onSuccess) {
   var file = {
-    'mup' : mup,
+    'name' : mup.name,
     'mode' : mode,
     'updated_at' : new Date().toString(),
     'source' : source
   };
-  localStorage.setItem(mup, JSON.stringify(file));
-  $('#message').html('I saved your program. It is precious! Find it later under <image src="images/gear.png" id="gear-in-console" width="' + settings.get('fontSize') + 'pt"> / Mups / ' + mup + '.');
-  onSuccess();
+  var json = JSON.stringify(file);
+
+  if (isGoogled) {
+    return gapi.client.drive.files.list({
+      q: "name = '" + mup.name + "' and trashed = false and '" + driveDirectory.id + "' in parents"
+    }).then(function(files) {
+      var matches = files.result.files;
+      if (matches.length && matches.length > 0) {
+				mup.driveID = matches[0].id;
+        uploadFile(mup, json, onSuccess);
+      } else {
+        gapi.client.drive.files.create({
+          name: mup.name,
+          parents: [driveDirectory.id],
+          mimeType: 'text/plain'
+        }).then(function(res) {
+					mup.driveID = res.result.id;
+          uploadFile(mup, json, onSuccess);
+        });
+      }
+    });
+  } else {
+    localStorage.setItem(mup.name, json);
+    $('#message').html('I saved your program. It is precious! Find it later under <image src="images/gear.png" id="gear-in-console" width="' + settings.get('fontSize') + 'pt"> / Mups / ' + mup.name + '.');
+    onSuccess();
+  }
 }
 
 function platformLoad(mup, onSuccess) {
-  var source = JSON.parse(localStorage.getItem(mup)).source;
-  onSuccess(source);
+  if (isGoogled && mup.name != 'untitled') {
+    promise = gapi.client.drive.files.get({
+      fileId: mup.driveID,
+      fields: 'webContentLink'
+    }).then(function(response) {
+      var url = response.result.webContentLink;
+      $.ajax({
+        url: url,
+        success: function(file) {
+          onSuccess(file.source);
+        }
+      });
+    });
+  } else {
+		var record = localStorage.getItem(mup.name);
+		if (record == null) {
+			var source = '';
+		} else {
+			var source = JSON.parse(record).source;
+		}
+    onSuccess(source);
+  }
 }
 
 function platformPromptForSaveAs(onSuccess) {
@@ -93,30 +170,69 @@ function platformPromptForSaveAs(onSuccess) {
 }
 
 function populateMupsList() {
-  var list = '';
-
-  var keys = [];
-  for (var i = 0; i < localStorage.length; ++i) {
-    keys.push(localStorage.key(i));
-  }
-
-  if (settings.get('sortMupsBy') == 'date') {
-    keys.sort(function(key1, key2) {
-      var mup1 = JSON.parse(localStorage.getItem(key1));
-      var mup2 = JSON.parse(localStorage.getItem(key2));
-      return Date.parse(mup2.updated_at) - Date.parse(mup1.updated_at);
+  var promise = null;
+  if (isGoogled) {
+    promise = gapi.client.drive.files.list({
+      q: "'" + driveDirectory.id + "' in parents and trashed = false",
+      pageSize: 10,
+      fields: "nextPageToken, files(id, name, modifiedTime)"
+    }).then(function(response) {
+      var files = response.result.files;
+      var mups = [];
+      if (files && files.length > 0) {
+        for (var i = 0; i < files.length; i++) {
+          var file = files[i];
+          mups.push(new Mup(file.name, Date.parse(file.modifiedTime), file.id));
+        }
+      }
+      return mups;
     });
   } else {
-    keys = keys.sort();
+    promise = new Promise(function(resolve, reject) {
+      var mups = [];
+      for (var i = 0; i < localStorage.length; ++i) {
+        var key = localStorage.key(i);
+        if (key != 'untitled' && key != 'settings') {
+          var record = JSON.parse(localStorage.getItem(key));
+          var mup = new Mup(key, record.updated_at);
+          mups.push(mup);
+        }
+      }
+      resolve(mups);
+    });
   }
 
-  keys.forEach(function(key) {
-    if (key != 'untitled' && key != 'settings') {
-      list += '<a href="#" class="menu-link" onclick="load(\'' + key.replace(/'/g, '\\&#39;').replace(/"/g, '\\&quot;') + '\')">' + key + '</a><br/>';
-    }
-  });
+  promise.then(function(mups) {
+    mups.sort(getSorter());
 
-  $('#mups').html(list);
+    var list = $('#mups')[0];
+    list.innerHTML = '';
+
+    mups.forEach(function(mup) {
+      if (mup.name != 'untitled') {
+        var anchor = document.createElement('a');
+        anchor.style.cursor = 'pointer'; // no href, so cursor isn't default
+        anchor.onclick = function() {
+          load(mup);
+        };
+        anchor.appendChild(document.createTextNode(mup.name));
+        list.appendChild(anchor);
+        list.appendChild(document.createElement('br'));
+      }
+    });
+  });
+}
+
+function getSorter() {
+  if (settings.get('sortMupsBy') == 'date') {
+    return function(mup1, mup2) {
+      return Date.parse(mup2.modifiedTime) - Date.parse(mup1.modifiedTime);
+    };
+  } else {
+    return function(mup1, mup2) {
+      return mup1.name.charCodeAt(0) - mup2.name.charCodeAt(0);
+    };
+  }
 }
 
 $(document).ready(function() {
@@ -159,23 +275,36 @@ $(document).ready(function() {
   });
 
   $('#fileClose').click(function() {
-    if (mupName && isSourceDirty && confirm('Save changes to ' + mupName + '?')) {
+    if (mup && mup.name && mup.isDirty && confirm('Save changes to ' + mup.name + '?')) {
       save();
     }
-    load('untitled');
+    load(new Mup('untitled'));
   });
 
   $('#fileDelete').click(function() {
-    var ok = confirm('Delete ' + mupName + '?');
+    var ok = confirm('Delete ' + mup.name + '?');
     if (ok) {
       if (blocklyWorkspace) {
         blocklyWorkspace.clear();
         blocklyWorkspace.updateVariableList();
       }
-      localStorage.removeItem(mupName);
-      populateMupsList();
-      mupName = null;
-      load('untitled');
+
+      var promise = null;
+      if (isGoogled && mup.name != 'untitled') {
+        promise = gapi.client.drive.files.delete({
+          fileId: mup.driveID
+        });
+      } else {
+        promise = new Promise(function(resolve, reject) {
+          localStorage.removeItem(mup.name);
+          resolve();
+        });
+      }
+
+      promise.then(function() {
+        populateMupsList();
+        load(new Mup('untitled'));
+      });
     }
   });
 
@@ -185,3 +314,75 @@ $(document).ready(function() {
   });
 
 });
+
+var CLIENT_ID = '1044882582652-7g4d00clc613n2ahn48neumroauv7tu2.apps.googleusercontent.com';
+var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
+var SCOPES = 'https://www.googleapis.com/auth/drive.file';
+var isGoogled = false;
+var driveDirectory = null;
+
+function handleClientLoad() {
+  gapi.load('client:auth2', initClient);
+}
+
+function initClient() {
+  gapi.client.init({
+    discoveryDocs: DISCOVERY_DOCS,
+    clientId: CLIENT_ID,
+    scope: SCOPES
+  }).then(function() {
+    // Handle the initial sign-in state.
+		updateGoogleStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+
+    $('#storageLocal').click(function() {
+      gapi.auth2.getAuthInstance().signOut().then(function() {
+        updateGoogleStatus(false);
+      });
+    });
+
+    $('#storageDrive').click(function() {
+      gapi.auth2.getAuthInstance().signIn().then(function() {
+        updateGoogleStatus(true);
+      });
+    });
+  });
+}
+
+function updateGoogleStatus(isConnected) {
+	if (isConnected) {
+		$('#googleLogin').text('Use local storage');
+    $('#archiver').hide();
+    $('#storageDrive').prop('checked', true);
+		isGoogled = true;
+		appFolder().then(listGoogleMups);
+	} else {
+		$('#googleLogin').text('Use Google Drive');
+    $('#archiver').show();
+    $('#storageLocal').prop('checked', true);
+		isGoogled = false;
+		populateMupsList();
+	}
+}
+
+function listGoogleMups(parentDirectory) {
+  driveDirectory = parentDirectory;
+  populateMupsList();
+}
+
+function appFolder() {
+  return gapi.client.drive.files.list({
+    q: "name = 'mups' and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
+  }).then(function(files) {
+    var dir = files.result.files;
+    if (!dir.length) {
+      return gapi.client.drive.files.create({
+        name: 'mups',
+        mimeType: 'application/vnd.google-apps.folder'
+      }).then(function(res) {
+        return res.result;
+      });
+    } else {
+      return dir[0];
+    }
+  });
+}

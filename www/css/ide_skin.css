@@ -150,15 +150,6 @@ audio::-webkit-media-controls-enclosure {
   width: 100%;
 }
 
-.popupDropdown {
-  font-size: 30px;
-  background: transparent;
-  padding: 5px;
-  text-indent: 10px;
-  color: #ffffff;
-  -webkit-appearance: none;
-}
-
 .blocklyText, .blocklyHtmlInput, .blocklyTreeLabel {
   font-family: 'Kanit', sans-serif !important;
 }
@@ -330,4 +321,10 @@ ul#settings > li > .panel-section-content {
   width: 100%;
   height: 1000px;
   border: none;
+}
+
+fieldset {
+  border: 1px solid #666666;
+  margin-top: 5px;
+  margin-bottom: 10px;
 }

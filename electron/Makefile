@@ -2,7 +2,7 @@ JQUERY_UI_VERSION = 1.11.2
 
 all: libdeps ace/src-noconflict/mode-madeup.js
 
-libdeps: ace three-js jquery.js js-cookie jquery-ui blockly closure-library filesaver jquery_ui_touch_punch mousetrap meshline
+libdeps: ace three-js jquery.js js-cookie jquery-ui blockly closure-library filesaver jquery_ui_touch_punch mousetrap meshline gapi.js
 
 ace:
 	git clone --depth=1 https://github.com/ajaxorg/ace-builds.git ace
@@ -18,6 +18,9 @@ js-cookie:
 
 jquery.js:
 	curl -o jquery.js http://code.jquery.com/jquery-1.11.2.min.js 
+
+gapi.js:
+	curl -o $@ https://apis.google.com/js/api.js
 
 jquery-ui:
 	curl -o jquery-ui.zip http://jqueryui.com/resources/download/jquery-ui-$(JQUERY_UI_VERSION).zip

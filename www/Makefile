@@ -3,7 +3,7 @@ CSS = $(addprefix css/,ide_skin.css ide_skin_dark.css ide_skin_light.css)
 IMAGES = $(addprefix images/,favicon-16x16.png favicon-32x32.png pathify_icon.png solidify_icon.png fit.png gear.png close.png)
 SRC = forn index.php translate.php save.php interpret.php index.html bridge.js $(JS) $(CSS) $(IMAGES)
 DST = $(addprefix $(WWW_ROOT)/, $(SRC))
-DEPS = ace three-js jquery.js js-cookie jquery-ui blockly closure-library filesaver jquery_ui_touch_punch mousetrap meshline
+DEPS = ace gapi.js three-js jquery.js js-cookie jquery-ui blockly closure-library filesaver jquery_ui_touch_punch mousetrap meshline
 JQUERY_UI_VERSION = 1.12.1
 MINIFIED_DEPS = $(addprefix $(WWW_ROOT)/,deps.min.js mode-madeup.js theme-twilight.js theme-katzenmilch.js)
 DOCS = $(addsuffix .html,$(addprefix $(WWW_ROOT)/docs/html/,index sdowel ring star))
@@ -40,6 +40,10 @@ $(DST_BINARIES): $(MADEUP) $(TWODEE) $(MERP)
 $(WWW_ROOT)/repos/ace:
 	$(SUDO) git clone --depth=1 https://github.com/ajaxorg/ace-builds.git $@
 	$(SUDO) chmod -R a+rX $@
+
+$(WWW_ROOT)/repos/gapi.js:
+	$(SUDO) curl -o $@ https://apis.google.com/js/api.js
+	$(SUDO) chmod a+r $@
 
 $(WWW_ROOT)/repos/filesaver:
 	$(SUDO) git clone --depth=1 https://github.com/eligrey/FileSaver.js $@
@@ -87,7 +91,7 @@ $(WWW_ROOT)/repos/mousetrap:
 	$(SUDO) git clone --depth=1 https://github.com/ccampbell/mousetrap.git $@
 	$(SUDO) chmod -R a+rX $@
 
-$(WWW_ROOT)/deps.min.js: $(addprefix $(WWW_ROOT)/,repos/jquery.js repos/jquery-ui/jquery-ui.js repos/jquery_ui_touch_punch/jquery.ui.touch-punch.js repos/js-cookie/src/js.cookie.js repos/mousetrap/mousetrap.min.js repos/three-js/build/three.js repos/three-js/examples/js/controls/TrackballControls.js repos/meshline/src/THREE.MeshLine.js repos/filesaver/FileSaver.min.js repos/ace/src-noconflict/ace.js js/text_to_blocks.js js/core.js bridge.js)
+$(WWW_ROOT)/deps.min.js: $(addprefix $(WWW_ROOT)/,repos/gapi.js repos/jquery.js repos/jquery-ui/jquery-ui.js repos/jquery_ui_touch_punch/jquery.ui.touch-punch.js repos/js-cookie/src/js.cookie.js repos/mousetrap/mousetrap.min.js repos/three-js/build/three.js repos/three-js/examples/js/controls/TrackballControls.js repos/meshline/src/THREE.MeshLine.js repos/filesaver/FileSaver.min.js repos/ace/src-noconflict/ace.js js/text_to_blocks.js js/core.js bridge.js)
 	@echo uglifying...
 	cd $(WWW_ROOT) && $(SUDO) uglifyjs $^ > $@
 	$(SUDO) chmod a+r $@
