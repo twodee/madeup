@@ -146,6 +146,9 @@ function platformLoad(mup, onSuccess) {
       var url = response.result.webContentLink;
       $.ajax({
         url: url,
+        beforeSend: function (xhr) {
+					xhr.setRequestHeader('Authorization', 'Bearer ' + gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token);
+				},
         success: function(file) {
           onSuccess(file.source);
         }
