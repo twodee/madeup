@@ -146,7 +146,7 @@ function needsUnsavedPrompt() {
   return false;
 }
 
-function writeMup(mup, source, onSuccess) {
+function writeMup(path, source, onSuccess) {
   fs.writeFile(path, source, function(e) {
     log('I saved your program at ' + mup.name + '. It is precious!');
     onSuccess();
@@ -194,6 +194,6 @@ require('electron').ipcRenderer.on('saveAs', function(event, data) {
   promptForSaveAs();
 });
 
-require('electron').ipcRenderer.on('open', function(event, mup) {
-  load(mup);
+require('electron').ipcRenderer.on('open', function(event, path) {
+  load(new Mup(path));
 });

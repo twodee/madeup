@@ -135,6 +135,7 @@ function platformSave(mup, source, mode, onSuccess) {
     $('#message').html('I saved your program. It is precious! Find it later under <image src="images/gear.png" id="gear-in-console" width="' + settings.get('fontSize') + 'pt"> / Mups / ' + mup.name + '.');
     onSuccess();
   }
+  populateMupsList();
 }
 
 function getData(url) {
