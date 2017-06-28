@@ -161,7 +161,7 @@ function platformSave(mup, source, mode, onSuccess) {
       'updated_at' : new Date().toString(),
       'source' : source
     };
-    localStorage.setItem(path, JSON.stringify(file));
+    localStorage.setItem(mup.name, JSON.stringify(file));
     onSuccess();
   } else {
     writeMup(mup.name, source, onSuccess);
