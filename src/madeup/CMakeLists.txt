@@ -19,6 +19,7 @@ add_library(madeup
   ExpressionBoxes.cpp
   ExpressionCall.cpp
   ExpressionCallWithNamedParameters.cpp
+  ExpressionCamera.cpp
   ExpressionCenter.cpp
   ExpressionClosure.cpp
   ExpressionCoalesce.cpp
@@ -55,6 +56,7 @@ add_library(madeup
   ExpressionLesserOrEqual.cpp
   ExpressionLoft.cpp
   ExpressionLog.cpp
+  ExpressionLook.cpp
   ExpressionMagnitude.cpp
   ExpressionMax.cpp
   ExpressionMesh.cpp 

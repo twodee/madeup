@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "madeup/ExpressionArray.h"
+#include "madeup/ExpressionCamera.h"
 #include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionWhere.h"
 
@@ -98,6 +99,25 @@ Co<Expression> ExpressionUp::evaluate(Environment &env) const {
 
 void ExpressionUp::write(ostream &out) const {
   out << "(up)";
+}
+
+/* ------------------------------------------------------------------------- */
+
+ExpressionDirection::ExpressionDirection() :
+  Expression() {
+}
+
+/* ------------------------------------------------------------------------- */
+
+Co<Expression> ExpressionDirection::evaluate(Environment &env) const {
+  td::Camera camera = env.getTurtle().camera;
+  return Co<Expression>(new ExpressionCamera(camera));
+}
+
+/* ------------------------------------------------------------------------- */
+
+void ExpressionDirection::write(ostream &out) const {
+  out << "(direction)";
 }
 
 /* ------------------------------------------------------------------------- */

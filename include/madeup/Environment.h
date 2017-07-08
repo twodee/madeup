@@ -103,7 +103,7 @@ class Environment {
 
     float getVariableAsFloat(const std::string &id);
     const Turtle &getTurtle() const;
-    void setTurtle(const Turtle &turtle);
+    void setTurtle(const Turtle &turtle, bool is_recorded = false);
     void setTimeout(int max_seconds);
     std::vector<Node> popPath();
     static const std::vector<std::vector<Turtle> > getPaths();

@@ -55,6 +55,18 @@ class ExpressionUp : public Expression {
 
 /* ------------------------------------------------------------------------- */
 
+class ExpressionDirection : public Expression {
+  public:
+    ExpressionDirection();
+
+    td::Co<Expression> evaluate(Environment &env) const;
+    void write(ostream &out) const;
+
+  private:
+};
+
+/* ------------------------------------------------------------------------- */
+
 }
 
 #endif

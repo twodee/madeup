@@ -33,6 +33,7 @@
 #include "madeup/ExpressionInverseTangent.h"
 #include "madeup/ExpressionLoft.h"
 #include "madeup/ExpressionLog.h"
+#include "madeup/ExpressionLook.h"
 #include "madeup/ExpressionMagnitude.h"
 #include "madeup/ExpressionMax.h"
 #include "madeup/ExpressionMesh.h"
@@ -233,6 +234,10 @@ void Environment::prime() {
   Co<ExpressionDefine> define_forward(new ExpressionDefine("forward", Co<Expression>(new ExpressionForward())));
   Co<ExpressionDefine> define_right(new ExpressionDefine("right", Co<Expression>(new ExpressionRight())));
   Co<ExpressionDefine> define_up(new ExpressionDefine("up", Co<Expression>(new ExpressionUp())));
+  Co<ExpressionDefine> define_direction(new ExpressionDefine("direction", Co<Expression>(new ExpressionDirection())));
+
+  Co<ExpressionDefine> define_look(new ExpressionDefine("look", Co<Expression>(new ExpressionLook())));
+  define_look->addFormal("camera");
 
   Co<ExpressionDefine> define_reframe(new ExpressionDefine("reframe", Co<Expression>(new ExpressionReframe())));
 
@@ -401,6 +406,8 @@ void Environment::prime() {
   add("roll", Co<ExpressionClosure>(new ExpressionClosure(define_roll, globals)));
   add("debug", Co<ExpressionClosure>(new ExpressionClosure(define_debug, globals)));
   add("where", Co<ExpressionClosure>(new ExpressionClosure(define_where, globals)));
+  add("look", Co<ExpressionClosure>(new ExpressionClosure(define_look, globals)));
+  add("direction", Co<ExpressionClosure>(new ExpressionClosure(define_direction, globals)));
   add("forward", Co<ExpressionClosure>(new ExpressionClosure(define_forward, globals)));
   add("right", Co<ExpressionClosure>(new ExpressionClosure(define_right, globals)));
   add("up", Co<ExpressionClosure>(new ExpressionClosure(define_up, globals)));
@@ -513,7 +520,8 @@ void Environment::prime() {
   globals->add("tube", (*this)["tube"]);
   globals->add("up", (*this)["up"]);
   globals->add("where", (*this)["where"]);
-  globals->add("where", (*this)["where"]);
+  globals->add("look", (*this)["look"]);
+  globals->add("direction", (*this)["direction"]);
   globals->add("yaw", (*this)["yaw"]);
 }
 
@@ -1675,8 +1683,12 @@ td::QMatrix4<float> Environment::getTransform() const {
 
 /* ------------------------------------------------------------------------- */
 
-void Environment::setTurtle(const Turtle &turtle) {
+void Environment::setTurtle(const Turtle &turtle, bool is_recorded) {
   this->turtle = turtle;
+  if (is_recorded) {
+    recordVertex();
+    recordPreview();
+  }
 }
 
 /* ------------------------------------------------------------------------- */
