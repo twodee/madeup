@@ -44,6 +44,7 @@
 #include "madeup/ExpressionNormalize.h"
 #include "madeup/ExpressionPath.h"
 #include "madeup/ExpressionPitch.h"
+#include "madeup/ExpressionPolarTo.h"
 #include "madeup/ExpressionPolygon.h"
 #include "madeup/ExpressionPop.h"
 #include "madeup/ExpressionPrint.h"
@@ -249,6 +250,10 @@ void Environment::prime() {
   define_moveto->addFormal(z);
   define_moveto->splat("x", xyz_splats);
 
+  Co<ExpressionDefine> define_polarto(new ExpressionDefine("polarto", Co<Expression>(new ExpressionPolarTo())));
+  define_polarto->addFormal("radius");
+  define_polarto->addFormal("degrees");
+
   Co<ExpressionDefine> define_distort(new ExpressionDefine("distort", Co<Expression>(new ExpressionDistort())));
   define_distort->addFormal("f");
   define_distort->addFormal("mesh");
@@ -403,6 +408,7 @@ void Environment::prime() {
   add("move", Co<ExpressionClosure>(new ExpressionClosure(define_move, globals)));
   add("movex", Co<ExpressionClosure>(new ExpressionClosure(define_movex, globals)));
   add("moveto", Co<ExpressionClosure>(new ExpressionClosure(define_moveto, globals)));
+  add("polarto", Co<ExpressionClosure>(new ExpressionClosure(define_polarto, globals)));
   add("distort", Co<ExpressionClosure>(new ExpressionClosure(define_distort, globals)));
   add("scale", Co<ExpressionClosure>(new ExpressionClosure(define_scale, globals)));
   add("translate", Co<ExpressionClosure>(new ExpressionClosure(define_translate, globals)));
@@ -476,6 +482,7 @@ void Environment::prime() {
   globals->add("min", (*this)["min"]);
   globals->add("move", (*this)["move"]);
   globals->add("moveto", (*this)["moveto"]);
+  globals->add("polarto", (*this)["polarto"]);
   globals->add("movex", (*this)["movex"]);
   globals->add("normalize", (*this)["normalize"]);
   globals->add("path", (*this)["path"]);

@@ -75,6 +75,7 @@ add_library(madeup
   ExpressionOr.cpp
   ExpressionPath.cpp
   ExpressionPitch.cpp
+  ExpressionPolarTo.cpp
   ExpressionPolygon.cpp
   ExpressionPop.cpp
   ExpressionPower.cpp
