@@ -14,7 +14,7 @@ end
 dowel
 ]
 
-This algorithm accomplishes the task, but it places the origin (0, 0, 0) on the perimeter of the circle. What if you wanted the origin somewhere else? Trigonometry can help you, but only if you know it. In the meantime, you can use the `polarto` function.
+This algorithm accomplishes the task, but it places the origin (0, 0, 0) on the perimeter of the circle. What if you wanted the origin somewhere else---like in the middle of the circle? Trigonometry can help you, but only if you know it. In the meantime, you can use the `polarto` function.
 
 The function `polarto` expects two parameters: a radius and an angle. It plots a point on the perimeter of a circle with the given radius. The location of that point on the perimeter is determined by the angle. An angle of 0 puts the points on the X axis:
 
@@ -66,5 +66,17 @@ That's really repetitive. We can use a loop to march through these numbers:
 for angle through 360 by 45
   polarto 10, angle
 end
+dowel
+]
+
+We now have a very direct way of producing a circle in the XY plane whose center is (0, 0, 0). But what if we want the circle centered someplace else? Or facing a different direction? We can use `translate` to move the center and `rotate` to turn it. Here we generate a circle in the YZ plane by turning it 90 degrees about the Y axis:
+
+[mup
+rotate 0, 1, 0, 90
+for angle through 360 by 45
+  polarto 10, angle
+end
+identity
+
 dowel
 ]

@@ -532,7 +532,7 @@ dowel</div>
 </div>
 </p>
 
-<p class="grayblock">This algorithm accomplishes the task, but it places the origin (0, 0, 0) on the perimeter of the circle. What if you wanted the origin somewhere else? Trigonometry can help you, but only if you know it. In the meantime, you can use the <code>polarto</code> function.</p>
+<p class="grayblock">This algorithm accomplishes the task, but it places the origin (0, 0, 0) on the perimeter of the circle. What if you wanted the origin somewhere else&mdash;like in the middle of the circle? Trigonometry can help you, but only if you know it. In the meantime, you can use the <code>polarto</code> function.</p>
 
 <p class="grayblock">The function <code>polarto</code> expects two parameters: a radius and an angle. It plots a point on the perimeter of a circle with the given radius. The location of that point on the perimeter is determined by the angle. An angle of 0 puts the points on the X axis:</p>
 
@@ -598,6 +598,21 @@ dowel</div>
 end
 dowel</div>
   <div class="block-editor"><div class="s-expression">(block (for-through-by (call-with-names angle) (INTEGER 360) (INTEGER 45) (block (call polarto (INTEGER 10) (call-with-names angle)))) (call-with-names dowel))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">We now have a very direct way of producing a circle in the XY plane whose center is (0, 0, 0). But what if we want the circle centered someplace else? Or facing a different direction? We can use <code>translate</code> to move the center and <code>rotate</code> to turn it. Here we generate a circle in the YZ plane by turning it 90 degrees about the Y axis:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">rotate 0, 1, 0, 90
+for angle through 360 by 45
+  polarto 10, angle
+end
+identity
+
+dowel</div>
+  <div class="block-editor"><div class="s-expression">(block (call rotate (INTEGER 0) (INTEGER 1) (INTEGER 0) (INTEGER 90)) (for-through-by (call-with-names angle) (INTEGER 360) (INTEGER 45) (block (call polarto (INTEGER 10) (call-with-names angle)))) (call-with-names identity) (call-with-names dowel))
 </div></div>
 </div>
 </p>
