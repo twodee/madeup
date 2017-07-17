@@ -134,6 +134,14 @@ function parse(peeker, workspace) {
       connectExpression(block, 'X', x);
       connectExpression(block, 'Y', y);
       connectExpression(block, 'Z', z);
+    } else if (id == 'polarto') {
+      peeker.get(); // eat space
+      var radius = parse(peeker, workspace);
+      peeker.get(); // eat space
+      var angle = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_polarto');
+      connectExpression(block, 'RADIUS', radius);
+      connectExpression(block, 'ANGLE', angle);
     } else if (id == 'move') {
       peeker.get(); // eat space
       var x = parse(peeker, workspace);

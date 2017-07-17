@@ -1,0 +1,46 @@
+[let skin=madeupdocs]
+[let root=.]
+
+# Ring with `polarto`
+
+An [link to="ring.html" title="earlier lesson"] demonstrated how to make a ring using a sequence of `move`s and `yaw`s:
+
+[mup
+moveto 0, 0, 0
+repeat 10
+  move 2
+  yaw 36
+end
+dowel
+]
+
+This algorithm accomplishes the task, but it places the origin (0, 0, 0) on the perimeter of the circle. What if you wanted the origin somewhere else? Trigonometry can help you, but only if you know it. In the meantime, you can use the `polarto` function.
+
+The function `polarto` expects two parameters: a radius and an angle. It plots a point on the perimeter of a circle with the given radius. The location of that point on the perimeter is determined by the angle. An angle of 0 puts the points on the X axis:
+
+[mup
+polarto 1, 0
+polarto 2, 0
+polarto 3, 0
+polarto 4, 0
+]
+
+An angle of 45 spins the points counter-clockwise:
+
+[mup
+angle = 45
+polarto 1, angle
+polarto 2, angle
+polarto 3, angle
+polarto 4, angle
+]
+
+An angle of 90 puts the points on the Y axis:
+
+[mup
+angle = 90
+polarto 1, angle
+polarto 2, angle
+polarto 3, angle
+polarto 4, angle
+]

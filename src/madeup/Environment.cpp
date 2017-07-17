@@ -257,7 +257,7 @@ void Environment::prime() {
 
   Co<ExpressionDefine> define_polarto(new ExpressionDefine("polarto", Co<Expression>(new ExpressionPolarTo())));
   define_polarto->addFormal("radius");
-  define_polarto->addFormal("degrees");
+  define_polarto->addFormal("angle");
 
   Co<ExpressionDefine> define_distort(new ExpressionDefine("distort", Co<Expression>(new ExpressionDistort())));
   define_distort->addFormal("f");
