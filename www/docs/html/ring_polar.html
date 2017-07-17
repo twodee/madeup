@@ -15,25 +15,25 @@
   <script src="http://madeup.xyz/repos/blockly/blockly_compressed.js"></script>
   <script src="http://madeup.xyz/repos/blockly/blocks_compressed.js"></script>
   <script src="http://madeup.xyz/repos/blockly/madeup_compressed.js"></script>
-  <script src="http://madeup.xyz/repos/blockly/msg/js/en.js"></script>
+
+  <!-- <script src="http://madeup.xyz/repos/blockly/blockly_uncompressed.js"></script> -->
+  <!-- <script src="http://madeup.xyz/repos/blockly/blocks/logic.js"></script> -->
+  <!-- <script src="http://madeup.xyz/repos/blockly/blocks/loops.js"></script> -->
+  <!-- <script src="http://madeup.xyz/repos/blockly/blocks/math.js"></script> -->
+  <!-- <script src="http://madeup.xyz/repos/blockly/blocks/text.js"></script> -->
+  <!-- <script src="http://madeup.xyz/repos/blockly/blocks/lists.js"></script> -->
+  <!-- <script src="http://madeup.xyz/repos/blockly/blocks/colour.js"></script> -->
+  <!-- <script src="http://madeup.xyz/repos/blockly/blocks/variables.js"></script> -->
+  <!-- <script src="http://madeup.xyz/repos/blockly/blocks/procedures.js"></script> -->
+  <!-- <script src="http://madeup.xyz/repos/blockly/blocks/zmadeup.js"></script> -->
+  <!-- <script src="http://madeup.xyz/repos/blockly/generators/madeup.js"></script> -->
   <!-- <script src="http://madeup.xyz/deps.min.js"></script> -->
+  <script src="http://madeup.xyz/repos/blockly/msg/js/en.js"></script>
 
   <!-- <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css"> -->
   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
   <script src="http://madeup.xyz/repos/ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-  <!-- <script src="repos/blockly/blockly_uncompressed.js"></script> -->
-  <!-- <script src="repos/blockly/blocks/logic.js"></script> -->
-  <!-- <script src="repos/blockly/blocks/loops.js"></script> -->
-  <!-- <script src="repos/blockly/blocks/math.js"></script> -->
-  <!-- <script src="repos/blockly/blocks/text.js"></script> -->
-  <!-- <script src="repos/blockly/blocks/lists.js"></script> -->
-  <!-- <script src="repos/blockly/blocks/colour.js"></script> -->
-  <!-- <script src="repos/blockly/blocks/variables.js"></script> -->
-  <!-- <script src="repos/blockly/blocks/procedures.js"></script> -->
-  <!-- <script src="repos/blockly/blocks/zmadeup.js"></script> -->
-  <!-- <script src="repos/blockly/generators/madeup.js"></script> -->
-  <!-- <script src="repos/blockly/msg/js/en.js"></script> -->
   <script src="http://madeup.xyz/js/text_to_blocks.js"></script>
 
   <style>html {
@@ -291,10 +291,6 @@ footer {
 
 
 /* Custom CSS */
-#mode-switcher, #home {
-  display: none;
-}
-
 </style>
   <script>function autosize(id) {
   var element = document.getElementById(id);
@@ -519,120 +515,92 @@ document.addEventListener('DOMContentLoaded', function() {
   </header>
 
 
-<p class="grayblock"></p>
 
-<p class="grayblock">A lot of books introduce a tool by enumerating all of its features right away. We don't think that's a great way to learn. Instead, we introduce Madeup through a series of examples that we suggest you recreate as you follow along.</p>
+<h3>Ring with <code>polarto</code></h3>
 
-<ol>
-  <li><a href="sdowel.html">Make an S with <code>dowel</code></a></li>
-  <li><a href="ring.html">Make a ring with <code>dowel</code> and a loop</a></li>
-  <li><a href="star.html">Make a star with <code>extrude</code>, a loop, and a variable</a></li>
-  <li><a href="ring_polar.html">Make a ring with polarto</a></li>
-</ol>
+<p class="grayblock">An <a href="ring.html">earlier lesson</a> demonstrated how to make a ring using a sequence of <code>move</code>s and <code>yaw</code>s:</p>
 
-<p class="grayblock">Once you feel like you've gotten the hang of Madeup, you may be interested in learning more about a particular command:</p>
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">moveto 0, 0, 0
+repeat 10
+  move 2
+  yaw 36
+end
+dowel</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (repeat (INTEGER 10) (block (call move (INTEGER 2)) (call yaw (INTEGER 36)))) (call-with-names dowel))
+</div></div>
+</div>
+</p>
 
-<ul>
-  <li>Solidifiers <div>
-<ul>
-  <li>dowel</li>
-  <li>tube</li>
-  <li>box / boxes</li>
-  <li>sphere / spheres</li>
-  <li>extrude</li>
-  <li>revolve</li>
-  <li>polygon</li>
-  <li>surface</li>
-  <li>loft</li>
-  <li>path</li>
-  <li>forget</li>
-  <li>transform</li>
-  <li>echo</li>
-</ul>
-</div></li>
-  <li>Loops <div>
-<ul>
-  <li>repeat</li>
-  <li>repeat around</li>
-  <li>for</li>
-  <li>while</li>
-</ul>
-</div></li>
-  <li>Vertex variables <div>
-<ul>
-  <li>.rgb</li>
-  <li>.radius / .outerRadius</li>
-  <li>.innerRadius</li>
-  <li>.rgb</li>
-</ul>
-</div></li>
-  <li>Global variables <div>
-<ul>
-  <li>nsides</li>
-</ul>
-</div></li>
-  <li>Arrays <div>
-<ul>
-  <li>construction</li>
-  <li>operations</li>
-  <li>magnitude</li>
-  <li>dot</li>
-  <li>cross</li>
-  <li>normalize</li>
-  <li>size</li>
-</ul>
-</div></li>
-  <li>Math functions <div>
-<ul>
-  <li>random</li>
-  <li>atan</li>
-  <li>sin / cos / tan</li>
-  <li>asin / acos / atan</li>
-  <li>log</li>
-  <li>sign</li>
-  <li>abs</li>
-</ul>
-</div></li>
-  <li>Geometry functions <div>
-<ul>
-  <li>center</li>
-  <li>fracture</li>
-  <li>where</li>
-  <li>dilate</li>
-  <li>yaw</li>
-  <li>pitch</li>
-  <li>roll</li>
-  <li>moveto</li>
-  <li>move</li>
-  <li>movex</li>
-  <li>echo</li>
-  <li>path</li>
-  <li>rotate</li>
-  <li>scale</li>
-  <li>translate</li>
-  <li>identity</li>
-  <li>reframe</li>
-  <li>push</li>
-  <li>pop</li>
-  <li>coalesce</li>
-  <li>reverse</li>
-</ul>
-</div></li>
-  <li>IO functions <div>
-<ul>
-  <li>print</li>
-  <li>debug</li>
-</ul>
-</div></li>
-  <li>Logic <div>
-<ul>
-  <li>not</li>
-  <li>and / or</li>
-  <li>if then else</li>
-  <li>relational operators</li>
-</ul>
-</div></li>
-</ul>
+<p class="grayblock">This algorithm accomplishes the task, but it places the origin (0, 0, 0) on the perimeter of the circle. What if you wanted the origin somewhere else? Trigonometry can help you, but only if you know it. In the meantime, you can use the <code>polarto</code> function.</p>
+
+<p class="grayblock">The function <code>polarto</code> expects two parameters: a radius and an angle. It plots a point on the perimeter of a circle with the given radius. The location of that point on the perimeter is determined by the angle. An angle of 0 puts the points on the X axis:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">polarto 1, 0
+polarto 2, 0
+polarto 3, 0
+polarto 4, 0</div>
+  <div class="block-editor"><div class="s-expression">(block (call polarto (INTEGER 1) (INTEGER 0)) (call polarto (INTEGER 2) (INTEGER 0)) (call polarto (INTEGER 3) (INTEGER 0)) (call polarto (INTEGER 4) (INTEGER 0)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">An angle of 45 spins the points counter-clockwise:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">angle = 45
+polarto 1, angle
+polarto 2, angle
+polarto 3, angle
+polarto 4, angle</div>
+  <div class="block-editor"><div class="s-expression">(block (define-variable angle (INTEGER 45)) (call polarto (INTEGER 1) (call-with-names angle)) (call polarto (INTEGER 2) (call-with-names angle)) (call polarto (INTEGER 3) (call-with-names angle)) (call polarto (INTEGER 4) (call-with-names angle)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">An angle of 90 puts the points on the Y axis:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">angle = 90
+polarto 1, angle
+polarto 2, angle
+polarto 3, angle
+polarto 4, angle</div>
+  <div class="block-editor"><div class="s-expression">(block (define-variable angle (INTEGER 90)) (call polarto (INTEGER 1) (call-with-names angle)) (call polarto (INTEGER 2) (call-with-names angle)) (call polarto (INTEGER 3) (call-with-names angle)) (call polarto (INTEGER 4) (call-with-names angle)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">Suppose we want a bunch of points on a circle with radius 10. We could say this:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">polarto 10, 0
+polarto 10, 45
+polarto 10, 90
+polarto 10, 135
+polarto 10, 180
+polarto 10, 225
+polarto 10, 270
+polarto 10, 315
+polarto 10, 360
+dowel</div>
+  <div class="block-editor"><div class="s-expression">(block (call polarto (INTEGER 10) (INTEGER 0)) (call polarto (INTEGER 10) (INTEGER 45)) (call polarto (INTEGER 10) (INTEGER 90)) (call polarto (INTEGER 10) (INTEGER 135)) (call polarto (INTEGER 10) (INTEGER 180)) (call polarto (INTEGER 10) (INTEGER 225)) (call polarto (INTEGER 10) (INTEGER 270)) (call polarto (INTEGER 10) (INTEGER 315)) (call polarto (INTEGER 10) (INTEGER 360)) (call-with-names dowel))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">That's really repetitive. We can use a loop to march through these numbers:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">for angle through 360 by 45
+  polarto 10, angle
+end
+dowel</div>
+  <div class="block-editor"><div class="s-expression">(block (for-through-by (call-with-names angle) (INTEGER 360) (INTEGER 45) (block (call polarto (INTEGER 10) (call-with-names angle)))) (call-with-names dowel))
+</div></div>
+</div>
+</p>
   <footer><a id="home" href="index.html">Home</a></footer>
 </body>
 </html>

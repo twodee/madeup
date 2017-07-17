@@ -44,3 +44,27 @@ polarto 2, angle
 polarto 3, angle
 polarto 4, angle
 ]
+
+Suppose we want a bunch of points on a circle with radius 10. We could say this:
+
+[mup
+polarto 10, 0
+polarto 10, 45
+polarto 10, 90
+polarto 10, 135
+polarto 10, 180
+polarto 10, 225
+polarto 10, 270
+polarto 10, 315
+polarto 10, 360
+dowel
+]
+
+That's really repetitive. We can use a loop to march through these numbers:
+
+[mup
+for angle through 360 by 45
+  polarto 10, angle
+end
+dowel
+]
