@@ -540,16 +540,13 @@ function parse(peeker, workspace) {
     peeker.get(); // eat space
     var id = peeker.getToken();
     block = workspace.newBlock('procedures_defnoreturn');
-    console.log("block: " + block);
     block.setFieldValue(id, 'NAME');
     peeker.get(); // eat space
-    console.log(peeker.src);
     var formals = [];
     peeker.get(); // eat (
     while (peeker.peek() == '(') {
       peeker.get(); // eat (
       var formal = peeker.getToken();
-      console.log("formal: " + formal);
       formals.push(formal);
       peeker.get(); // eat )
       if (peeker.peek() == ' ') {
@@ -558,12 +555,9 @@ function parse(peeker, workspace) {
     }
     peeker.get(); // eat )
     peeker.get(); // eat space
-    console.log("formals: " + formals);
     block.arguments_ = formals;
     block.updateParams_();
     var body = parse(peeker, workspace);
-    console.log("block: " + block);
-    console.log("body: " + body);
     connectStatement(block, 'STACK', body);
   }
 
