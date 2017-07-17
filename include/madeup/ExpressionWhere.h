@@ -55,9 +55,9 @@ class ExpressionUp : public Expression {
 
 /* ------------------------------------------------------------------------- */
 
-class ExpressionDirection : public Expression {
+class ExpressionView : public Expression {
   public:
-    ExpressionDirection();
+    ExpressionView();
 
     td::Co<Expression> evaluate(Environment &env) const;
     void write(ostream &out) const;

@@ -103,21 +103,21 @@ void ExpressionUp::write(ostream &out) const {
 
 /* ------------------------------------------------------------------------- */
 
-ExpressionDirection::ExpressionDirection() :
+ExpressionView::ExpressionView() :
   Expression() {
 }
 
 /* ------------------------------------------------------------------------- */
 
-Co<Expression> ExpressionDirection::evaluate(Environment &env) const {
+Co<Expression> ExpressionView::evaluate(Environment &env) const {
   td::Camera camera = env.getTurtle().camera;
   return Co<Expression>(new ExpressionCamera(camera));
 }
 
 /* ------------------------------------------------------------------------- */
 
-void ExpressionDirection::write(ostream &out) const {
-  out << "(direction)";
+void ExpressionView::write(ostream &out) const {
+  out << "(view)";
 }
 
 /* ------------------------------------------------------------------------- */

@@ -167,23 +167,6 @@ THREE.Object3D.prototype.clear = function() {
   }
 }
 
-function getBlocklyProcedureFormals(name) {
-  // allProcedures gives back [procedures with return, procedures without
-  // return]. We only have the latter.
-
-  var procs = Blockly.Procedures.allProcedures(blocklyWorkspace)[0];
-  // TODO
-
-  // Find the procedure in the list with the given name.
-  for (var i = 0; i < procs.length; ++i) {
-    if (procs[i][0] == name) {
-      return procs[i][1];
-    }
-  }
-
-  throw 'No procedure named ' + name;
-}
-
 function enableDownload(enable) {
   if (enable) {
     $('#download').prop('disabled', false);

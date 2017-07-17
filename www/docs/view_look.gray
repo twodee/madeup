@@ -1,0 +1,76 @@
+[let skin=madeupdocs]
+[let root=.]
+
+# Saving and Restoring Views
+
+There are two ways to move in Madeup. You can move *relatively* using `move`, which jumps forward from your current location and heading. Or you can move *absolutely* using `moveto`, which jumps to an absolute location. How about with the turn commands? Can one turn relatively and absolutely? Well, it "turns" out that the turn commands `yaw`, `pitch`, and `roll` are all relative. They turn relative to your current heading.
+
+What if you want to exactly set the heading, just as `moveto` exactly sets the cursor's location? For example, maybe you've got a couple of paths that you need to walk from the same starting conditions. You traverse the first, but by the time you get around to traversing the second, you've lost the heading with which you started. It'd be great if we had a `turnto` command. Sadly, there is no such command, and there won't be.
+
+However, you can set up the heading you want, save it to a variable, and then restore it later. Let's see an example.
+
+Suppose we want to head off into the world and tilted 45 degrees. We establish our orientation:
+
+[mup
+moveto 0, 0, 0
+yaw 45
+pitch 45
+]
+
+Then we make an elbow shape that alters this initial heading. Let's write this as a function because we'll use it a couple of times:
+
+[mup
+to elbow
+  move 5
+  yaw 45
+  move 5
+  dowel
+end
+
+moveto 0, 0, 0
+yaw 45
+pitch 45
+elbow
+]
+
+Next we want to make an elbow just like the first, but shifted down a bit. We might try this:
+
+[mup
+to elbow
+  move 5
+  yaw 45
+  move 5
+  dowel
+end
+
+moveto 0, 0, 0
+yaw 45
+pitch 45
+elbow
+
+moveto 0, -3, 0
+elbow
+]
+
+But the second elbow isn't parallel to the first. We can fix this by saving the heading with the `view` function and restoring it later with the `look` function:
+
+[mup
+to elbow
+  move 5
+  yaw 45
+  move 5
+  dowel
+end
+
+moveto 0, 0, 0
+yaw 45
+pitch 45
+direction = view
+elbow
+
+moveto 0, -3, 0
+look direction
+elbow
+]
+
+That's the closest we'll get to a `turnto` function.

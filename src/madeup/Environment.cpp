@@ -234,7 +234,7 @@ void Environment::prime() {
   Co<ExpressionDefine> define_forward(new ExpressionDefine("forward", Co<Expression>(new ExpressionForward())));
   Co<ExpressionDefine> define_right(new ExpressionDefine("right", Co<Expression>(new ExpressionRight())));
   Co<ExpressionDefine> define_up(new ExpressionDefine("up", Co<Expression>(new ExpressionUp())));
-  Co<ExpressionDefine> define_direction(new ExpressionDefine("direction", Co<Expression>(new ExpressionDirection())));
+  Co<ExpressionDefine> define_view(new ExpressionDefine("view", Co<Expression>(new ExpressionView())));
 
   Co<ExpressionDefine> define_look(new ExpressionDefine("look", Co<Expression>(new ExpressionLook())));
   define_look->addFormal("camera");
@@ -407,7 +407,7 @@ void Environment::prime() {
   add("debug", Co<ExpressionClosure>(new ExpressionClosure(define_debug, globals)));
   add("where", Co<ExpressionClosure>(new ExpressionClosure(define_where, globals)));
   add("look", Co<ExpressionClosure>(new ExpressionClosure(define_look, globals)));
-  add("direction", Co<ExpressionClosure>(new ExpressionClosure(define_direction, globals)));
+  add("view", Co<ExpressionClosure>(new ExpressionClosure(define_view, globals)));
   add("forward", Co<ExpressionClosure>(new ExpressionClosure(define_forward, globals)));
   add("right", Co<ExpressionClosure>(new ExpressionClosure(define_right, globals)));
   add("up", Co<ExpressionClosure>(new ExpressionClosure(define_up, globals)));
@@ -521,7 +521,7 @@ void Environment::prime() {
   globals->add("up", (*this)["up"]);
   globals->add("where", (*this)["where"]);
   globals->add("look", (*this)["look"]);
-  globals->add("direction", (*this)["direction"]);
+  globals->add("view", (*this)["view"]);
   globals->add("yaw", (*this)["yaw"]);
 }
 

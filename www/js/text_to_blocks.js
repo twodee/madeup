@@ -281,6 +281,13 @@ function parse(peeker, workspace) {
       block = workspace.newBlock('madeup_' + id);
     } else if (id == 'where') {
       block = workspace.newBlock('madeup_where');
+    } else if (id == 'view') {
+      block = workspace.newBlock('madeup_view');
+    } else if (id == 'look') {
+      peeker.get(); // eat space
+      var view = parse(peeker, workspace);
+      block = workspace.newBlock('madeup_look');
+      connectExpression(block, 'VIEW', view);
     } else if (id == 'log') {
       peeker.get(); // eat space
       var base = parse(peeker, workspace);
@@ -316,7 +323,7 @@ function parse(peeker, workspace) {
       if (!Blockly.Procedures.isLegalName_(id, workspace)) {
         block = workspace.newBlock('procedures_callnoreturn');
         block.setFieldValue(id, 'NAME');
-        var formals = getBlocklyProcedureFormals(id);
+        var formals = getBlocklyProcedureFormals(workspace, id);
 
         // I used to use setProcedureParameters, but Blockly
         // moved that out of the API. Now we need a mutation.
