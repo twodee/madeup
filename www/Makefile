@@ -6,7 +6,7 @@ DST = $(addprefix $(WWW_ROOT)/, $(SRC))
 DEPS = ace gapi.js three-js jquery.js js-cookie jquery-ui blockly closure-library filesaver jquery_ui_touch_punch mousetrap meshline
 JQUERY_UI_VERSION = 1.12.1
 MINIFIED_DEPS = $(addprefix $(WWW_ROOT)/,deps.min.js mode-madeup.js theme-twilight.js theme-katzenmilch.js)
-DOCS = $(addsuffix .html,$(addprefix $(WWW_ROOT)/docs/html/,index sdowel ring star))
+DOCS = $(addsuffix .html,$(addprefix $(WWW_ROOT)/docs/html/,index sdowel ring star ring_polar))
 
 
 DST_BINARIES = $(WWW_ROOT)/$(notdir $(MERP))
