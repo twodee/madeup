@@ -16,6 +16,10 @@ if (array_key_exists('movie', $_REQUEST)) {
   $html = str_replace('var keystrokesMoviePrefix = null; // PHP', "var keystrokesMoviePrefix = '{$_REQUEST['movie']}';", $html);
 }
 
+if (array_key_exists('lesson', $_REQUEST)) {
+  $html = str_replace('var lesson = null; // PHP', "var lesson = '{$_REQUEST['lesson']}';", $html);
+}
+
 function comment($matches) {
   $lines = preg_replace('/^(.*)$/m', '<!-- \\1 -->', $matches[0]);
   return $lines;

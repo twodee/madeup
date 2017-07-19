@@ -33,7 +33,8 @@ var blocklyWorkspace = null;
 var allGeometry = undefined;
 var timeOfLatestRun = undefined;
 var tree = null;
-var preview = undefined;
+var autopathifyTask = undefined;
+var snapshotTask = undefined;
 var settings = new Settings();
 var lastBlocks = null;
 var badModelMessage = 'Uh oh. I tried to generate a model for you, but it is broken. This can happen for a bunch of reasons: some faces may be too small, some vertices may be duplicated, and the mesh boolean operations may just be fickle.';
@@ -147,16 +148,6 @@ window.addEventListener('beforeunload', function(e) {
     isDownloading = false;
   }
 });
-
-function onBlocksChanged() {
-  var xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
-  var currentBlocks = Blockly.Xml.domToText(xml);
-  mup.isDirty = lastBlocks != currentBlocks;
-  updateTitle();
-  if (settings.get('isAutopathify')) {
-    run(getSource(), GeometryMode.PATH);
-  }
-}
 
 THREE.Object3D.prototype.clear = function() {
   var children = this.children;
@@ -484,15 +475,13 @@ $(document).ready(function() {
     $('#nSecondsTillAutopathify').val(settings.get('nSecondsTillAutopathify'));
     $('#nSecondsTillAutopathify').change(function () {
       settings.set('nSecondsTillAutopathify', parseFloat(this.value));
-      if (!settings.get('isAutopathify')) return;
-      textEditor.getSession().off('change', onEditorChange);
-      if (preview) {
-        clearTimeout(preview); 
+
+      // Clear any pending.
+      if (autopathifyTask) {
+        clearTimeout(autopathifyTask); 
+        autopathifyTask = undefined;
       }
-      preview = undefined;
-      schedulePathify();
     });
-    schedulePathify();
 
     // Axes and grids
     var axes = "XYZ";
@@ -741,14 +730,12 @@ $(document).ready(function() {
 
     if (this.checked) {
       $('#nSecondsTillAutopathify').prop('disabled', false);
-      schedulePathify();
     } else {
       $('#nSecondsTillAutopathify').prop('disabled', true);
-      textEditor.getSession().off('change', onEditorChange);
-      if (preview) {
-        clearTimeout(preview); 
+      if (autopathifyTask) {
+        clearTimeout(autopathifyTask); 
+        autopathifyTask = undefined;
       }
-      preview = undefined;
     }
   });
 
@@ -948,22 +935,51 @@ function hideGearMenu() {
   });
 }
 
-function onEditorChange(delta) {
+// Only triggered when blocks editor is active.
+function onBlocksChanged() {
+  var xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
+  var currentBlocks = Blockly.Xml.domToText(xml);
+  mup.isDirty = lastBlocks != currentBlocks;
+  onSourceChanged();
+}
+
+// Only triggered when text editor is active.
+function onTextChanged(delta) {
   mup.isDirty = true;
-  updateTitle();
+  onSourceChanged();
+}
+
+// Triggered on change to blocks or text source.
+function onSourceChanged() {
   enableDownload(false);
-  if (preview) {
-    clearTimeout(preview); 
+  updateTitle();
+
+  if (autopathifyTask) {
+    clearTimeout(autopathifyTask); 
   }
+
   if (settings.get('isAutopathify')) {
-    preview = setTimeout(function() {
+    autopathifyTask = setTimeout(function() {
       run(getSource(), GeometryMode.PATH);
     }, settings.get('nSecondsTillAutopathify') * 1000);
   }
+
+  // If this is a recorded lesson, schedule a snapshot to be taken in a few
+  // seconds.
+  //
+  // The snapshot may get postponed if more events happen before the quantum.
+  // We don't want to record absolutely every keystroke.
+  if (snapshotTask) {
+    clearTimeout(snapshotTask); 
+  }
+
+  if (lesson != null) {
+    snapshotTask = setTimeout(recordSnapshot, 2 * 1000);
+  }
 }
 
-function schedulePathify() {
-  textEditor.getSession().on('change', onEditorChange);
+function recordSnapshot() {
+  console.log(getSource());
 }
 
 function setTheme(isDark) {
@@ -981,18 +997,7 @@ function setTheme(isDark) {
 }
 
 function setEditor(isText) {
-  if (blocklyWorkspace) {
-    blocklyWorkspace.removeChangeListener(onBlocksChanged);
-  }
-
   settings.set('isEditorText', isText);
-
-  // Update radio buttons to reflect current editor.
-  if (settings.get('isEditorText')) {
-    $("#isEditorText").prop('checked', true);
-  } else {
-    $("#isEditorBlocks").prop('checked', true);
-  }
 
   // We're heading to text.
   if (settings.get('isEditorText')) {
@@ -1075,9 +1080,24 @@ function setEditor(isText) {
     } else {
       switchEditors();
     }
-
   }
-
+ 
+  // We want to listen for change events in the editor for a few reasons: a
+  // change may need to trigger an autopathify task, and a change may need to
+  // be recorded if we're in experiment observation mode.
+  if (isText) {
+    textEditor.getSession().on('change', onTextChanged);
+    if (blocklyWorkspace) {
+      blocklyWorkspace.removeChangeListener(onBlocksChanged);
+    }
+    $("#isEditorText").prop('checked', true);
+  } else {
+    textEditor.getSession().off('change', onTextChanged);
+    if (blocklyWorkspace) {
+      blocklyWorkspace.addChangeListener(onBlocksChanged);
+    }
+    $("#isEditorBlocks").prop('checked', true);
+  }
 }
 
 function switchEditors() {
@@ -1091,10 +1111,6 @@ function switchEditors() {
 
   resize();
   window.dispatchEvent(new Event('resize'))
-
-  if (!settings.get('isEditorText') && blocklyWorkspace) {
-    blocklyWorkspace.addChangeListener(onBlocksChanged);
-  }
 }
 
 function load(newMup) {
@@ -1171,9 +1187,10 @@ function getSource() {
 }
 
 function run(source, mode, pingback) {
-  // If a preview is scheduled, clear it.
-  if (preview) {
-    clearTimeout(preview); 
+  // If an autopathify task is scheduled, unschedule it, as we have now met its
+  // demands.
+  if (autopathifyTask) {
+    clearTimeout(autopathifyTask); 
   }
 
   if (mode == GeometryMode.SURFACE) {
