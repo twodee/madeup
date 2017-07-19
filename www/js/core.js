@@ -979,7 +979,20 @@ function onSourceChanged() {
 }
 
 function recordSnapshot() {
-  console.log(getSource());
+  $.ajax({
+    type: 'POST',
+    url: 'snapshot.php',
+    data: JSON.stringify({
+      source: getSource(),
+      id: 'xx7'
+    }),
+    contentType: 'application/json; charset=utf-8',
+    success: function(data) {
+    },
+    error: function(e) {
+      console.log(e);
+    }
+  });
 }
 
 function setTheme(isDark) {
