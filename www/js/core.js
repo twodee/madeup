@@ -32,7 +32,6 @@ var meshes = [];
 var blocklyWorkspace = null;
 var allGeometry = undefined;
 var timeOfLatestRun = undefined;
-var tree = null;
 var autopathifyTask = undefined;
 var snapshotTask = undefined;
 var settings = new Settings();
@@ -291,7 +290,7 @@ function updateTitle() {
   // The name won't be set in certain situations -- namely, when it's embedded.
   // Showing it as dirty makes no sense, because it's not a file.
   if (mup.name != null) {
-    document.title = (mup.isDirty ? '*' : '') + 'Madeup: ' + mup.name;
+    document.title = (mup.isDirty ? '*' : '') + 'Madeup: ' + mup.name.replace(/^.*\//, '');
   }
   if (mup.isDirty) {
     $('#fileSave').prop('disabled', false);
@@ -519,7 +518,6 @@ $(document).ready(function() {
   });
 
   $('#cameraLeft').click(function() {
-    console.log('left');
     viewFrom(0, -1);
   });
 
@@ -836,6 +834,7 @@ $(document).ready(function() {
   Mousetrap.bind('esc', focusParent);
   Mousetrap.bind('ctrl+[', decreaseFontSize);
   Mousetrap.bind('ctrl+]', increaseFontSize);
+  Mousetrap.bind('ctrl+9', logAbtractSyntaxTree);
 
   // Form elements don't get events in the same way. We must explicitly bind.
   forEach(document.querySelectorAll('input, select, textarea'), function(i, element) {
@@ -851,6 +850,7 @@ $(document).ready(function() {
     mousetrap.bind('esc', focusParent);
     mousetrap.bind('ctrl+[', decreaseFontSize);
     mousetrap.bind('ctrl+]', increaseFontSize);
+    mousetrap.bind('ctrl+9', logAbtractSyntaxTree);
   });
 
   if (hasWebGL()) {
@@ -858,6 +858,17 @@ $(document).ready(function() {
     animate();
   }
 });
+
+function logAbtractSyntaxTree() {
+  textToAbstractSyntaxTree(getSource(),
+    function(data) {
+      console.log(data['tree']);
+    },
+    function() {
+      console.log('Failure. :(');
+    }
+  );
+}
 
 function pathify() {
   run(getSource(), GeometryMode.PATH);
@@ -1071,10 +1082,10 @@ function setEditor(isText) {
           'Convert to blocks': function() {
             blocklyWorkspace.clear();
             blocklyWorkspace.updateVariableList();
-            textToBlocks(source,
+            textToAbstractSyntaxTree(source,
               function(data) {
                 if (data['exit_status'] == 0) {
-                  tree = data['tree'];
+                  var tree = data['tree'];
                   parse(new Peeker(tree), blocklyWorkspace);
                 }
               },

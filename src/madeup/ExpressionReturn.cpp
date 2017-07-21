@@ -23,7 +23,9 @@ Co<Expression> ExpressionReturn::evaluate(Environment &env) const {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionReturn::write(ostream &out) const {
-  out << "(return e)";
+  out << "(return ";
+  e->write(out);
+  out << ")";
 }
 
 /* ------------------------------------------------------------------------- */

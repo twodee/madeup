@@ -21,6 +21,7 @@ class Lexer {
   private:
     Token makeToken(Token::token_t type);
     Token getToken();
+    Token getTokenAfterSpace();
     Token getTokenAfterSlash();
     Token getTokenAfterDot();
     Token getTokenAfterMinus();

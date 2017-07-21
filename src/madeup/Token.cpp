@@ -11,7 +11,8 @@ Token::Token(token_t type,
              const SourceLocation &location) :
   type(type),
   text(text),
-  location(location) {
+  location(location),
+  is_preceded_by_space(false) {
 }
 
 /* ------------------------------------------------------------------------- */
@@ -157,6 +158,18 @@ const std::string Token::getTypeString() const {
     default:
       return "???";
   }
+}
+
+/* ------------------------------------------------------------------------- */
+
+bool Token::isPrecededBySpace() const {
+  return is_preceded_by_space;
+}
+
+/* ------------------------------------------------------------------------- */
+
+bool Token::isPrecededBySpace(bool is) {
+  is_preceded_by_space = is;
 }
 
 /* ------------------------------------------------------------------------- */

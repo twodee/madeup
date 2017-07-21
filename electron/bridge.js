@@ -49,7 +49,7 @@ function interpret(options, onSuccess, onError) {
   });
 }
 
-function textToBlocks(text, onSuccess, onError) {
+function textToAbstractSyntaxTree(text, onSuccess, onError) {
   var tmpIn = tmp.fileSync();
 
   fs.writeFileSync(tmpIn.name, text);

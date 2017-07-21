@@ -74,11 +74,14 @@ class Token {
     const std::string getQuotedText() const;
     const SourceLocation &getLocation() const;
     const std::string getTypeString() const;
+    bool isPrecededBySpace() const;
+    bool isPrecededBySpace(bool is);
 
   private:
     token_t type; 
     std::string text;
     SourceLocation location;
+    bool is_preceded_by_space;
 };
 
 /* ------------------------------------------------------------------------- */

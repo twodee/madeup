@@ -74,16 +74,30 @@ Token Lexer::getToken() {
   location.start_column = location.end_column + 1;
   location.start_index = location.end_index + 1;
 
-  int c = in.get();
+  bool is_preceded_by_space = false;
+
+  int c = in.peek();
   while (isspace(c) && c != '\n') {
     ++location.start_column;
     ++location.start_index;
-    c = in.get();
+    in.get();
+    c = in.peek();
+    is_preceded_by_space = true;
   }
 
   // But end will get carried along the token's extent.
   location.end_column = location.start_column;
   location.end_index = location.start_index;
+
+  Token token = getTokenAfterSpace();
+  token.isPrecededBySpace(is_preceded_by_space);
+  return token;
+}
+
+/* ------------------------------------------------------------------------- */
+
+Token Lexer::getTokenAfterSpace() {
+  int c = in.get();
 
   if (c == EOF) {
     return Token(Token::END_OF_FILE, "END OF FILE", location);

@@ -801,7 +801,14 @@ void Parser::atom() {
     SourceLocation end_location = id_token.getLocation();
     std::string name = tokens[i].getText();
     ++i;
-    if (!isInExpressionFirst() || (isUp(Token::ID) && isUp(Token::COLON, 2))) {
+
+    // foo) or foo a:10 or f-b or f - b
+    if (!isInExpressionFirst() ||
+        (isUp(Token::ID) && isUp(Token::COLON, 2)) ||
+        (isUp(Token::MINUS) &&
+         i + 1 < tokens.size() &&
+         (tokens[i + 1].isPrecededBySpace() ||
+          (!tokens[i].isPrecededBySpace() && !tokens[i+1].isPrecededBySpace())))) {
       Co<ExpressionCallWithNamedParameters> call(new ExpressionCallWithNamedParameters(name));
       while (isUp(Token::ID) && isUp(Token::COLON, 2)) {
         std::string formal = tokens[i].getText();
@@ -814,70 +821,33 @@ void Parser::atom() {
       SourceLocation location(id_token.getLocation(), end_location);
       call->setSource(getSubsource(location), location);
       expressions.push(call);
-    } else {
+    }
+    
+    // We know there's a possible parameter
+    else {
+      Co<ExpressionCall> call(new ExpressionCall(name));
 
-      if (!isUp(Token::MINUS) && isInExpressionFirst()) {
-        Co<ExpressionCall> call(new ExpressionCall(name));
-
-        expressionLevel0();
-        Co<Expression> actual = popExpression();
-        call->addParameter(actual);
-        end_location = actual->getSourceLocation();
-        while (isUp(Token::COMMA)) {
-          ++i;
-          if (isInExpressionFirst()) {
-            expressionLevel0();
-            actual = popExpression();
-            call->addParameter(actual);
-            end_location = actual->getSourceLocation();
-          } else {
-            std::stringstream ss;
-            ss << tokens[i - 1].getLocation().toAnchor() << ": I found an extra comma lying around.";
-            throw MessagedException(ss.str());
-          }
-        }
-
-        SourceLocation location(id_token.getLocation(), end_location);
-        call->setSource(getSubsource(location), location);
-        expressions.push(call);
-      } else if (isUp(Token::MINUS)) {
-        ++i; // skip past -
-        expressionLevel0();
-        Co<Expression> e = popExpression();
-
-        // If we see a comma, then the minus should be applied to the first parameter and we have a call.
-        if (isUp(Token::COMMA)) {
-          Co<ExpressionCall> call(new ExpressionCall(name));
-
-          Co<Expression> actual(new ExpressionNegation(e));
+      expressionLevel0();
+      Co<Expression> actual = popExpression();
+      call->addParameter(actual);
+      end_location = actual->getSourceLocation();
+      while (isUp(Token::COMMA)) {
+        ++i;
+        if (isInExpressionFirst()) {
+          expressionLevel0();
+          actual = popExpression();
           call->addParameter(actual);
-          
           end_location = actual->getSourceLocation();
-          while (isUp(Token::COMMA)) {
-            ++i;
-            if (isInExpressionFirst()) {
-              expressionLevel0();
-              actual = popExpression();
-              call->addParameter(actual);
-              end_location = actual->getSourceLocation();
-            } else {
-              std::stringstream ss;
-              ss << tokens[i - 1].getLocation().toAnchor() << ": I found an extra comma lying around.";
-              throw MessagedException(ss.str());
-            }
-          }
-
-          SourceLocation location(id_token.getLocation(), end_location);
-          call->setSource(getSubsource(location), location);
-          expressions.push(call);
         } else {
-          pushExpression(new ExpressionDynamicMinus(name, e), id_token.getLocation(), e->getSourceLocation());
+          std::stringstream ss;
+          ss << tokens[i - 1].getLocation().toAnchor() << ": I found an extra comma lying around.";
+          throw MessagedException(ss.str());
         }
-
-        // yaw - foo
-        // if has a comma, definitely a call
-        // if no comma, create an ambiguous expr that's either a call or a subtraction
       }
+
+      SourceLocation location(id_token.getLocation(), end_location);
+      call->setSource(getSubsource(location), location);
+      expressions.push(call);
     }
   } else if (isUp(Token::FOR)) {
     Token for_token = tokens[i];

@@ -14,7 +14,7 @@ function interpret(options, onSuccess, onError) {
   });
 }
 
-function textToBlocks(text, onSuccess, onError) {
+function textToAbstractSyntaxTree(text, onSuccess, onError) {
   $.ajax({
     type: 'POST',
     url: 'translate.php',
