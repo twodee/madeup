@@ -108,35 +108,37 @@ function sendToChris(text) {
 }
 
 function configureDownloader() {
-  var form = $('#downloader')[0];
-
-  $('#downloader').submit(function(e) {
-    isDownloading = true;
-    var defaultPath = form.tag.value + '.obj';
-    interpret({
-      timestamp: form.timestamp.value,
-      source: form.source.value,
-      tag: form.tag.value,
-      extension: form.extension.value,
-      geometry_mode: form.geometry_mode.value,
-      shading_mode: form.shading_mode.value
-    }, function(data) {
-      fsdialog.showSaveDialog({
-        title: 'Save as...',
-        defaultPath: defaultPath
-      }, function(path) {
-        fs.writeFile(path, data.model, function(e) {
-          isDownloading = false;
-        });
-      });
-    }, function(errorMessage) {
-      console.log('Failure. :(');
-      isDownloading = false;
-    });
-
-    return false; // suppress page reload
-  });
 }
+
+  // var form = $('#downloader')[0];
+
+  // $('#downloader').submit(function(e) {
+    // isDownloading = true;
+    // var defaultPath = form.tag.value + '.obj';
+    // interpret({
+      // timestamp: form.timestamp.value,
+      // source: form.source.value,
+      // tag: form.tag.value,
+      // extension: form.extension.value,
+      // geometry_mode: form.geometry_mode.value,
+      // shading_mode: form.shading_mode.value
+    // }, function(data) {
+      // fsdialog.showSaveDialog({
+        // title: 'Save as...',
+        // defaultPath: defaultPath
+      // }, function(path) {
+        // fs.writeFile(path, data.model, function(e) {
+          // isDownloading = false;
+        // });
+      // });
+    // }, function(errorMessage) {
+      // console.log('Failure. :(');
+      // isDownloading = false;
+    // });
+
+    // return false; // suppress page reload
+  // });
+// }
 
 function takeScreenshot(path) {
   screenshot({filename: path});
@@ -196,4 +198,30 @@ require('electron').ipcRenderer.on('saveAs', function(event, data) {
 
 require('electron').ipcRenderer.on('open', function(event, path) {
   load(new Mup(path));
+});
+
+require('electron').ipcRenderer.on('export', function(event, data) {
+  interpret({
+    timestamp: new Date().getTime(),
+    source: getSource(),
+    extension: 'obj',
+    geometry_mode: GeometryMode.SURFACE,
+    shading_mode: settings.get('isFlatShaded') ? 'FLAT' : 'SMOOTH'
+  }, function(data) {
+    console.log(data);
+    fsdialog.showSaveDialog({
+      title: 'Save OBJ as...',
+      defaultPath: mup.name.replace(/\.[^.]*$/, '') + '.obj'
+    }, function(path) {
+      if (path) {
+        fs.writeFileSync(path, data.model);
+      }
+    });
+  }, function(errorMessage) {
+    console.log('Failure. :(');
+  });
+});
+
+require('electron').ipcRenderer.on('screenshot', function(event, data) {
+  exportScreenshot();
 });

@@ -97,6 +97,23 @@ app.on('ready', function() {
           type: 'separator'
         },
         {
+          label: 'Export OBJ...',
+          accelerator: 'CommandOrControl+E',
+          click(item, focusedWindow) {
+            focusedWindow.webContents.send('export');
+          },
+        },
+        {
+          label: 'Take Screenshot...',
+          accelerator: 'CommandOrControl+T',
+          click(item, focusedWindow) {
+            focusedWindow.webContents.send('screenshot');
+          },
+        },
+        {
+          type: 'separator'
+        },
+        {
           role: 'close'
         },
 			]
