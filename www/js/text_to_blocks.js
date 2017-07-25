@@ -134,12 +134,18 @@ function parse(peeker, workspace) {
       var x = parse(peeker, workspace);
       peeker.get(); // eat space
       var y = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var z = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_moveto');
-      connectExpression(block, 'X', x);
-      connectExpression(block, 'Y', y);
-      connectExpression(block, 'Z', z);
+      if (peeker.peek() == ' ') {
+        peeker.get(); // eat space
+        var z = parse(peeker, workspace);
+        block = workspace.newBlock('madeup_moveto');
+        connectExpression(block, 'X', x);
+        connectExpression(block, 'Y', y);
+        connectExpression(block, 'Z', z);
+      } else {
+        block = workspace.newBlock('madeup_moveto_xy');
+        connectExpression(block, 'X', x);
+        connectExpression(block, 'Y', y);
+      }
     } else if (id == 'polarto') {
       peeker.get(); // eat space
       var radius = parse(peeker, workspace);
