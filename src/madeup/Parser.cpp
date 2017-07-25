@@ -791,8 +791,6 @@ void Parser::atom() {
     Co<ExpressionDefineVariable> define;
     if (name == "seed") {
       pushExpression(new ExpressionDefineVariableSeed(name.c_str(), rhs), id_token.getLocation(), end_location);
-    /* } else if (name == ".radius") { */
-      /* pushExpression(new ExpressionDefineVariableRadius(name.c_str(), rhs), id_token.getLocation(), end_location); */
     } else {
       pushExpression(new ExpressionDefineVariable(name.c_str(), rhs), id_token.getLocation(), end_location);
     }
@@ -969,9 +967,20 @@ void Parser::atom() {
     if (!isUp(Token::RIGHT_CURLY_BRACE)) {
       do {
         ++i; // consume left curly or ,
+
+        // Allow newlines in array literals, 'cuz they crazy.
+        while (isUp(Token::NEWLINE)) {
+          ++i;
+        }
+
         expressionLevel0();
         items.push_back(popExpression());
       } while (isUp(Token::COMMA));
+    }
+ 
+    // Allow newlines in array literals, 'cuz they crazy.
+    while (isUp(Token::NEWLINE)) {
+      ++i;
     }
 
     if (isUp(Token::RIGHT_CURLY_BRACE)) {
