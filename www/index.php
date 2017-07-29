@@ -1,11 +1,16 @@
 <?php
 
-$use_minified = true;
+$use_minified = false;
 
 $html = file_get_contents('index.html');
 
 if (array_key_exists('src', $_REQUEST)) {
   $html = str_replace('var isEmbedded = false; // PHP', 'var isEmbedded = true;', $html);
+}
+
+if (strpos($_SERVER['HTTP_HOST'], 'to.madeup') !== false ||
+    (isset($_REQUEST['editor']) && strcmp($_REQUEST['editor'], 'blocks') == 0)) {
+  $html = str_replace('var isBlocksURL = false; // PHP', 'var isBlocksURL = true;', $html);
 }
 
 if (array_key_exists('isPresenting', $_REQUEST)) {
@@ -47,19 +52,6 @@ if (array_key_exists('movie', $_REQUEST)) {
     </div>
 EOF;
   $html = str_replace('PHP:KEYSTROKES', $div, $html);
-}
-
-if (strpos($_SERVER['HTTP_HOST'], 'to.madeup') !== false ||
-    (isset($_REQUEST['editor']) && strcmp($_REQUEST['editor'], 'blocks') == 0)) {
-  $div = <<<EOF
-    var isBlocky = true;
-    $(document).ready(function() {
-      setEditor(false);
-      showConsole(false);
-      resize();
-    });
-EOF;
-  $html = str_replace('var isBlocky = false; // PHP', $div, $html);
 }
 
 if (array_key_exists('src', $_REQUEST)) {

@@ -405,8 +405,8 @@ $(document).ready(function() {
       resize();
     }
 
-    if (!isEmbedded && !isBlocky && settings.has('fontSize')) {
-    } else if (isBlocky) {
+    if (!isEmbedded && !isBlocksURL && settings.has('fontSize')) {
+    } else if (isBlocksURL) {
       settings.set('fontSize', 24);
     } else if (isPresenting) {
       settings.set('fontSize', 28);
@@ -507,6 +507,12 @@ $(document).ready(function() {
     });
 
     platformize();
+
+    if (isBlocksURL) {
+      setEditor(false);
+      showConsole(false);
+      resize();
+    }
   });
 
   $('#smaller').click(decreaseFontSize);
@@ -1071,8 +1077,7 @@ function setEditor(isText) {
     }
 
     // Any text to convert to blocks?
-    var source = textEditor.getValue();
-    if (source.length > 0) {
+    if (textEditor != null && textEditor.getValue().length > 0) {
       $('<div title="Convert">Convert your text program to a blocks program?</div>').dialog({
         resizable: false,
         height: 'auto',
@@ -1082,7 +1087,7 @@ function setEditor(isText) {
           'Convert to blocks': function() {
             blocklyWorkspace.clear();
             blocklyWorkspace.updateVariableList();
-            textToAbstractSyntaxTree(source,
+            textToAbstractSyntaxTree(textEditor.getValue(),
               function(data) {
                 if (data['exit_status'] == 0) {
                   var tree = data['tree'];
@@ -1110,13 +1115,17 @@ function setEditor(isText) {
   // change may need to trigger an autopathify task, and a change may need to
   // be recorded if we're in experiment observation mode.
   if (isText) {
-    textEditor.getSession().on('change', onTextChanged);
+    if (textEditor) {
+      textEditor.getSession().on('change', onTextChanged);
+    }
     if (blocklyWorkspace) {
       blocklyWorkspace.removeChangeListener(onBlocksChanged);
     }
     $("#isEditorText").prop('checked', true);
   } else {
-    textEditor.getSession().off('change', onTextChanged);
+    if (textEditor) {
+      textEditor.getSession().off('change', onTextChanged);
+    }
     if (blocklyWorkspace) {
       blocklyWorkspace.addChangeListener(onBlocksChanged);
     }
@@ -1159,6 +1168,8 @@ function load(newMup) {
   platformLoad(mup, function(source) {
     var isText = source.charAt(0) != '<';
 
+    // Only load the source if the editor modalities match, or we allow
+    // modality switching.
     setEditor(isText);
     if (settings.get('isEditorText')) {
       textEditor.session.setValue(source, -1);
