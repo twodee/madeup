@@ -164,12 +164,12 @@ function platformLoad(mup, onSuccess) {
       onSuccess(response.result.source);
     });
   } else {
-		var record = localStorage.getItem(mup.name);
-		if (record == null) {
-			var source = '';
-		} else {
-			var source = JSON.parse(record).source;
-		}
+    var record = localStorage.getItem(mup.name);
+    if (record == null) {
+      var source = '';
+    } else {
+      var source = JSON.parse(record).source;
+    }
     onSuccess(source);
   }
 }
