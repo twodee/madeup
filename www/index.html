@@ -80,124 +80,7 @@
   <script>if (window.module) module = window.module;</script>
 </head>
 
-<body>
-  <!-- The Blockly toolbox __________________________________________________ -->
-  <xml id="toolbox" style="display: none">
-    <category name="Data">
-      <block type="madeup_integer"></block>
-      <block type="madeup_real"></block>
-      <block type="madeup_string"></block>
-      <block type="madeup_boolean"></block>
-      <block type="madeup_where"></block>
-      <block type="madeup_nothing"></block>
-    </category>
-    <category name="Variables" custom="VARIABLE"></category>
-    <category name="Functions" custom="PROCEDURE">
-      <block type="madeup_return"></block>
-    </category>
-    <category name="Math">
-      <block type="madeup_binary_arithmetic_operator"></block>
-      <block type="madeup_unary_operator"></block>
-      <block type="madeup_sincostan"></block>
-      <block type="madeup_inverse_sincostan"></block>
-      <block type="madeup_atan2"></block>
-      <block type="madeup_minmax"></block>
-      <block type="madeup_abs"></block>
-      <block type="madeup_sign"></block>
-      <block type="madeup_random"></block>
-      <block type="madeup_random01"></block>
-      <block type="madeup_log"></block>
-    </category>
-    <category name="Movement">
-      <block type="madeup_moveto_xy"></block>
-      <block type="madeup_moveto"></block>
-      <block type="madeup_move"></block>
-      <block type="madeup_polarto"></block>
-      <block type="madeup_turn"></block>
-      <block type="madeup_view"></block>
-      <block type="madeup_look"></block>
-      <block type="madeup_center"></block>
-      <block type="madeup_rotate"></block>
-      <block type="madeup_scale"></block>
-      <block type="madeup_translate"></block>
-      <block type="madeup_identity"></block>
-      <block type="madeup_reframe"></block>
-      <block type="madeup_push"></block>
-      <block type="madeup_pop"></block>
-      <block type="madeup_coalesce"></block>
-      <block type="madeup_dilate"></block>
-      <block type="madeup_reverse"></block>
-      <block type="madeup_mirror"></block>
-    </category>
-    <category name="Solidifiers">
-      <block type="madeup_spheres"></block>
-      <block type="madeup_boxes"></block>
-      <block type="madeup_dowel">
-        <value name="MAXBEND">
-          <shadow type="madeup_real">
-            <field name="REAL">360</field>
-          </shadow>
-        </value>
-      </block>
-      <block type="madeup_tube">
-        <value name="MAXBEND">
-          <shadow type="madeup_real">
-            <field name="REAL">360</field>
-          </shadow>
-        </value>
-      </block>
-      <block type="madeup_extrude"></block>
-      <block type="madeup_revolve"></block>
-      <block type="madeup_polygon"></block>
-      <block type="madeup_surface"></block>
-      <block type="madeup_loft"></block>
-      <block type="madeup_forget"></block>
-      <block type="madeup_path"></block>
-      <block type="madeup_echo"></block>
-      <block type="madeup_transform"></block>
-      <block type="madeup_mode_add"></block>
-      <block type="madeup_mode_subtract"></block>
-    </category>
-    <category name="Loops">
-      <block type="madeup_repeat"></block>
-      <block type="madeup_while"></block>
-      <block type="madeup_for_upper"></block>
-      <block type="madeup_for_upper_by"></block>
-      <block type="madeup_for_in"></block>
-      <block type="madeup_for_in_by"></block>
-      <block type="madeup_repeat_around"></block>
-    </category>
-    <category name="I/O">
-      <block type="madeup_print"></block>
-      <block type="madeup_debug"></block>
-    </category>
-    <category name="Logic">
-      <block type="madeup_binary_logic_operator"></block>
-      <block type="madeup_not"></block>
-      <block type="madeup_if_expr"></block>
-      <block type="madeup_if_statement"></block>
-      <block type="madeup_if_else_statement"></block>
-      <block type="madeup_relational_operator"></block>
-    </category>
-    <category name="Arrays">
-      <block type="madeup_array_literal"></block>
-      <block type="madeup_array_by"></block>
-      <block type="madeup_array_of"></block>
-      <block type="madeup_subscript"></block>
-      <block type="madeup_subrange"></block>
-      <block type="madeup_subscript_set"></block>
-      <block type="madeup_normalize"></block>
-      <block type="madeup_magnitude"></block>
-      <block type="madeup_cross"></block>
-      <block type="madeup_dot"></block>
-      <block type="madeup_size"></block>
-    </category>
-  </xml>
-
-  <!-- The layout _________________________________________________________ -->
-<div id="entire" style="z-index: 0">
-  <div id="left">
-    <div id="editorPane">
+<body><div id="entire" style="z-index: 0"><div id="left"><div id="editorPane">
       <div id="textEditor" class="mousetrap"></div>
       <div id="blocksEditor">
         <div id="blocksCanvas"></div>
@@ -451,6 +334,120 @@
 <script>
 // SRC:PHP
 </script>
+
+  <!-- The Blockly toolbox __________________________________________________ -->
+  <xml id="toolbox" style="display: none">
+    <category name="Data">
+      <block type="madeup_integer"></block>
+      <block type="madeup_real"></block>
+      <block type="madeup_string"></block>
+      <block type="madeup_boolean"></block>
+      <block type="madeup_where"></block>
+      <block type="madeup_nothing"></block>
+    </category>
+    <category name="Variables" custom="VARIABLE"></category>
+    <category name="Functions" custom="PROCEDURE">
+      <block type="madeup_return"></block>
+    </category>
+    <category name="Math">
+      <block type="madeup_binary_arithmetic_operator"></block>
+      <block type="madeup_unary_operator"></block>
+      <block type="madeup_sincostan"></block>
+      <block type="madeup_inverse_sincostan"></block>
+      <block type="madeup_atan2"></block>
+      <block type="madeup_minmax"></block>
+      <block type="madeup_abs"></block>
+      <block type="madeup_sign"></block>
+      <block type="madeup_random"></block>
+      <block type="madeup_random01"></block>
+      <block type="madeup_log"></block>
+    </category>
+    <category name="Movement">
+      <block type="madeup_moveto_xy"></block>
+      <block type="madeup_moveto"></block>
+      <block type="madeup_move"></block>
+      <block type="madeup_polarto"></block>
+      <block type="madeup_turn"></block>
+      <block type="madeup_view"></block>
+      <block type="madeup_look"></block>
+      <block type="madeup_center"></block>
+      <block type="madeup_rotate"></block>
+      <block type="madeup_scale"></block>
+      <block type="madeup_translate"></block>
+      <block type="madeup_identity"></block>
+      <block type="madeup_reframe"></block>
+      <block type="madeup_push"></block>
+      <block type="madeup_pop"></block>
+      <block type="madeup_coalesce"></block>
+      <block type="madeup_dilate"></block>
+      <block type="madeup_reverse"></block>
+      <block type="madeup_mirror"></block>
+    </category>
+    <category name="Solidifiers">
+      <block type="madeup_spheres"></block>
+      <block type="madeup_boxes"></block>
+      <block type="madeup_dowel">
+        <value name="MAXBEND">
+          <shadow type="madeup_real">
+            <field name="REAL">360</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="madeup_tube">
+        <value name="MAXBEND">
+          <shadow type="madeup_real">
+            <field name="REAL">360</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="madeup_extrude"></block>
+      <block type="madeup_revolve"></block>
+      <block type="madeup_polygon"></block>
+      <block type="madeup_surface"></block>
+      <block type="madeup_loft"></block>
+      <block type="madeup_forget"></block>
+      <block type="madeup_path"></block>
+      <block type="madeup_echo"></block>
+      <block type="madeup_transform"></block>
+      <block type="madeup_mode_add"></block>
+      <block type="madeup_mode_subtract"></block>
+    </category>
+    <category name="Loops">
+      <block type="madeup_repeat"></block>
+      <block type="madeup_while"></block>
+      <block type="madeup_for_upper"></block>
+      <block type="madeup_for_upper_by"></block>
+      <block type="madeup_for_in"></block>
+      <block type="madeup_for_in_by"></block>
+      <block type="madeup_repeat_around"></block>
+    </category>
+    <category name="I/O">
+      <block type="madeup_print"></block>
+      <block type="madeup_debug"></block>
+    </category>
+    <category name="Logic">
+      <block type="madeup_binary_logic_operator"></block>
+      <block type="madeup_not"></block>
+      <block type="madeup_if_expr"></block>
+      <block type="madeup_if_statement"></block>
+      <block type="madeup_if_else_statement"></block>
+      <block type="madeup_relational_operator"></block>
+    </category>
+    <category name="Arrays">
+      <block type="madeup_array_literal"></block>
+      <block type="madeup_array_by"></block>
+      <block type="madeup_array_of"></block>
+      <block type="madeup_subscript"></block>
+      <block type="madeup_subrange"></block>
+      <block type="madeup_subscript_set"></block>
+      <block type="madeup_normalize"></block>
+      <block type="madeup_magnitude"></block>
+      <block type="madeup_cross"></block>
+      <block type="madeup_dot"></block>
+      <block type="madeup_size"></block>
+    </category>
+  </xml>
+
 
 </body>
 </html>

@@ -32,10 +32,11 @@ body {
 }
 
 #entire {
-  float: left;
-  width: 100%;
-  padding: 0;
-  margin: 0;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
   /* background: #00FF00; */
 }
 
@@ -43,15 +44,15 @@ body {
   float: left;
   padding: 0;
   width: 420px;
-  height: auto;
+  height: 100%;
   z-index: 0;
 }
 
 #glcanvas canvas {
-  display: block;
   margin: 0;
   padding: 0;
   border: none;
+  display: block;
   overflow: hidden;
   -moz-user-select: none;
   -webkit-user-select: none;
@@ -63,13 +64,20 @@ body {
 }
 
 #glcanvas {
-  float: left;
-  width: auto;
+  /* Block display and hidden overflow are needed to keep the canvas from
+  wrapping below the floated editor to its left. This can happen when their
+  widths sum greater than the window --- which can happen when the window has a
+  fractional width because of zooming or some other craziness. */
+  display: block;
   overflow: hidden;
+
+  /* Relative positioning is needed to anchor the toolbar overlay. */
+  position: relative;
+
+  width: auto;
   margin: 0;
   padding: 0;
   border: none;
-  position: relative; /* needed to anchor toolbar */
 }
 
 #textEditor { 
@@ -91,10 +99,12 @@ body {
   font-family: 'Courier', 'Courier New', monospace;
   outline: none;
   height: 50px;
-  /* height: 0px; */
   overflow: auto;
   z-index: 1000;
-  /* visibility: hidden; */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 #message {

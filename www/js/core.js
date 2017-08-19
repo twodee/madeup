@@ -41,7 +41,7 @@ var badModelMessage = 'Uh oh. I tried to generate a model for you, but it is bro
 function hasWebGL() {
   try {
     var canvas = document.createElement("canvas");
-    return !!window.WebGLRenderingContext && (canvas.getContext("webgl") || canvas.getContext("experimental-webgl"));
+    return !!window.WebGLRenderingContext && (!!canvas.getContext("webgl") || !!canvas.getContext("experimental-webgl"));
   } catch(e) { 
     return false;
   } 
@@ -349,7 +349,7 @@ $(document).ready(function() {
   }
 
   // renderer isn't ready yet, so we need to wait for the window onload event.
-  $(window).load(function() {
+  $(window).on('load', function() {
     configureDownloader();
     restoreSettings(settings);
 
@@ -499,7 +499,7 @@ $(document).ready(function() {
     }
 
     // Only save cookies if they were successfully loaded.
-    $(window).unload(function() {
+    $(window).on('unload', function() {
       syncSettings();
       if (mup.isDirty && confirm('Save changes to ' + mup.name + '?')) {
         save();
@@ -803,9 +803,7 @@ $(document).ready(function() {
   $('#left').resizable({
     handles: "e",
     resize: function(event, ui) {
-      resize();
       window.dispatchEvent(new Event('resize'))
-      render();
     } 
   });
 
@@ -813,19 +811,14 @@ $(document).ready(function() {
     handles: "w",
     minWidth: 300,
     resize: function(event, ui) {
-      resize();
       window.dispatchEvent(new Event('resize'))
-      render();
     } 
   });
 
   $('#console').resizable({
     handles: "n",
     resize: function(event, ui) {
-      resize();
       window.dispatchEvent(new Event('resize'))
-      // Need this because console is relatively positioned.
-      $('#console').css('top', '0px');
     } 
   });
 
@@ -1521,7 +1514,7 @@ function resize() {
 
   controls.handleResize();
 
-  var nonChromeHeight = $(window).height() - $('#keystrokes').height();
+  var nonChromeHeight = $(window).height();
   var flexHeight = nonChromeHeight - $('#console').height();
 
   var rightWidth = 0;
@@ -1529,7 +1522,7 @@ function resize() {
     rightWidth = $('#right').outerWidth();
   }
 
-  var width = window.innerWidth - $('#left').width() - rightWidth;
+  var width = $(window).width() - $('#left').width() - rightWidth;
   $('#glcanvas').width(width);
   var height = window.innerHeight;
   if (renderer) renderer.setSize(width, nonChromeHeight);
@@ -1553,6 +1546,7 @@ function resize() {
   if (blocklyWorkspace) {
     Blockly.svgResize(blocklyWorkspace);
   }
+
 
   if (textEditor) {
     textEditor.resize();

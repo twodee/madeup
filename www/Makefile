@@ -61,7 +61,7 @@ $(WWW_ROOT)/repos/js-cookie:
 	$(SUDO) chmod -R a+rX $@
 
 $(WWW_ROOT)/repos/jquery.js:
-	$(SUDO) curl -o $@ http://code.jquery.com/jquery-1.11.2.min.js 
+	$(SUDO) curl -o $@ https://code.jquery.com/jquery-3.2.1.min.js
 	$(SUDO) chmod -R a+rX $@
 
 $(WWW_ROOT)/repos/jquery-ui:
