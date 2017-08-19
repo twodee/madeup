@@ -1,6 +1,6 @@
 <?php
 
-$use_minified = false;
+$use_minified = true;
 
 $html = file_get_contents('index.html');
 

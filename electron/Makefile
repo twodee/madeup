@@ -1,4 +1,4 @@
-JQUERY_UI_VERSION = 1.11.2
+JQUERY_UI_VERSION = 1.12.1
 
 all: libdeps ace/src-noconflict/mode-madeup.js
 
@@ -17,7 +17,7 @@ js-cookie:
 	git clone --depth=1 https://github.com/js-cookie/js-cookie.git js-cookie
 
 jquery.js:
-	curl -o jquery.js http://code.jquery.com/jquery-1.11.2.min.js 
+	curl -o jquery.js http://code.jquery.com/jquery-3.2.1.min.js 
 
 gapi.js:
 	curl -o $@ https://apis.google.com/js/api.js

@@ -1135,7 +1135,7 @@ function switchEditors() {
     $('#blocksEditor').show();
   }
 
-  resize();
+  // resize();
   window.dispatchEvent(new Event('resize'))
 }
 
@@ -1523,7 +1523,7 @@ function resize() {
   }
 
   var width = $(window).width() - $('#left').width() - rightWidth;
-  $('#glcanvas').width(width);
+  $('#glcanvas').css({left: $('#left').width(), right: rightWidth});
   var height = window.innerHeight;
   if (renderer) renderer.setSize(width, nonChromeHeight);
   camera.aspect = width / height;

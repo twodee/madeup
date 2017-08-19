@@ -71,10 +71,13 @@ body {
   display: block;
   overflow: hidden;
 
-  /* Relative positioning is needed to anchor the toolbar overlay. */
-  position: relative;
+  /* Non-static positioning is needed to anchor the toolbar overlay. */
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
 
-  width: auto;
   margin: 0;
   padding: 0;
   border: none;
