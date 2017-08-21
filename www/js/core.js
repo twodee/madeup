@@ -26,7 +26,10 @@ var initialized = false;
 var mup = null;
 var overallScene;
 var modelScene;
+var pointScene;
 var glyphScene;
+var raycaster;
+var mouse;
 var renderer, camera, controls;
 var meshes = [];
 var blocklyWorkspace = null;
@@ -921,7 +924,7 @@ function setFontSize(newSize) {
   textEditor.setFontSize(settings.get('fontSize'));
   $('#console')[0].style.fontSize = settings.get('fontSize') + 'px';
   $('ul#settings')[0].style.fontSize = (settings.get('fontSize') + 0) + 'px';
-  $('#right input, #right select').css('font-size', newSize);
+  $('#right input, #right select, #info3').css('font-size', newSize);
   resizeGearMenu();
 }
 
@@ -1261,6 +1264,9 @@ function onInterpret(data) {
     for (var i = 0; i < meshes.length; ++i) {
       modelScene.remove(meshes[i]);
     }
+    for (var i = pointScene.children.length - 1; i >= 0; --i) {
+      pointScene.remove(pointScene.children[i]);
+    }
     meshes = [];
 
     log(sansDebug);
@@ -1360,7 +1366,9 @@ function onInterpret(data) {
             node.position.x = nodeVertices[vi].x;
             node.position.y = nodeVertices[vi].y;
             node.position.z = nodeVertices[vi].z;
-            meshes.push(node);
+            // meshes.push(node);
+            node.xyz = nodeVertices[vi];
+            pointScene.add(node);
           }
         }
 
@@ -1396,7 +1404,6 @@ function onInterpret(data) {
           meshes[meshes.length] = new THREE.Mesh(g2, new THREE.MeshLambertMaterial({
             color: 0x0000ff,
           }));
-          modelScene.add(meshes[meshes.length - 1]);
         }
       }
     }
@@ -1622,8 +1629,14 @@ function init() {
   modelScene = new THREE.Scene();
   modelScene.matrixAutoUpdate = false;
 
+  pointScene = new THREE.Scene();
+  modelScene.add(pointScene);
+
   glyphScene = new THREE.Scene();
   modelScene.add(glyphScene);
+
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2();
 
   overallScene = new THREE.Scene();
   overallScene.add(modelScene);
@@ -1641,6 +1654,22 @@ function init() {
   camera.add(pointLight);
 
   window.addEventListener('resize', resize);
+  $(glcanvas).mousemove(function(e) {
+    var parent = glcanvas.offset();  
+    var x = e.pageX - parent.left;
+    var y = e.pageY - parent.top;
+    mouse.x = x / glcanvas.width() * 2 - 1;
+    mouse.y = -y / glcanvas.height() * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    var intersections = raycaster.intersectObjects(pointScene.children);
+    var message = '';
+    for (var i = 0; i < intersections.length; ++i) {
+      message += intersections[i].object.xyz.x + ', ' + intersections[i].object.xyz.y + ', ' + intersections[i].object.xyz.z + '\n';
+    }
+
+    $('#info3').text(message);
+  });
   initialized = true;
   resize();
 }

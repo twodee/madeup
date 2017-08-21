@@ -83,6 +83,14 @@ body {
   border: none;
 }
 
+#info3 {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  font-family: monospace;
+  white-space: pre-line;
+}
+
 #textEditor { 
   margin: 0px;
   height: 300px;
