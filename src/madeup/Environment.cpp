@@ -258,6 +258,13 @@ void Environment::prime() {
   Co<ExpressionDefine> define_polarto(new ExpressionDefine("polarto", Co<Expression>(new ExpressionPolarTo())));
   define_polarto->addFormal("radius");
   define_polarto->addFormal("angle");
+  FormalParameter origin("origin");
+  Co<ExpressionArray> origin_array = Co<ExpressionArray>(new ExpressionArray(3));
+  origin_array->setElement(0, Co<Expression>(new ExpressionReal(0.0f)));
+  origin_array->setElement(1, Co<Expression>(new ExpressionReal(0.0f)));
+  origin_array->setElement(2, Co<Expression>(new ExpressionReal(0.0f)));
+  origin.setDefaultValue(Co<Expression>(new ExpressionArrayReference(origin_array)));
+  define_polarto->addFormal(origin);
 
   Co<ExpressionDefine> define_distort(new ExpressionDefine("distort", Co<Expression>(new ExpressionDistort())));
   define_distort->addFormal("f");
