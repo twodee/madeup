@@ -301,6 +301,7 @@ ul#settings > li > .panel-section-content {
   top: 0;
   left: 0;
   right: 0;
+  display: none;
 }
 
 .menu-link {

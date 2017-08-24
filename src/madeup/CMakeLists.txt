@@ -1,3 +1,5 @@
+include_directories(${CMAKE_SOURCE_DIR}/include ${TWODEE_INCLUDE_DIRECTORIES})
+
 set(LIBMADEUP_SRC_EXTRAS)
 if(USE_IGL)
   list(APPEND LIBMADEUP_SRC_EXTRAS MeshBoolean.cpp)
@@ -121,8 +123,6 @@ add_library(madeup
   Parser.cpp
   ${LIBMADEUP_SRC_EXTRAS}
 )
-
-include_directories(madeup ${CMAKE_SOURCE_DIR}/include)
 
 if(USE_IGL)
   include_directories(

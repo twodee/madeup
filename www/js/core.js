@@ -516,6 +516,8 @@ $(document).ready(function() {
       showConsole(false);
       resize();
     }
+
+    $('#toolbar').css('display', 'block');
   });
 
   $('#smaller').click(decreaseFontSize);
@@ -1322,28 +1324,49 @@ function onInterpret(data) {
       allGeometry = new THREE.Geometry();
 
       for (var pi = 0; pi < paths.length; ++pi) {
-        var geometry = new THREE.Geometry();
+        var path = paths[pi];
+        var pathPositions = path.vertices;
  
-        var nodeVertices = [];
-        var iLastUnique = paths[pi].vertices.length - 1;
-        for (var i = paths[pi].vertices.length - 1; i > 0; --i) {
-          var curr = new THREE.Vector3(paths[pi].vertices[i][0], paths[pi].vertices[i][1], paths[pi].vertices[i][2]);
-          var prev = new THREE.Vector3(paths[pi].vertices[i - 1][0], paths[pi].vertices[i - 1][1], paths[pi].vertices[i - 1][2]);
-          if (!curr.equals(prev)) {
-            break;
-          } else {
-            --iLastUnique;
+        // Get a list of just the unique node positions. We don't really want
+        // duplicates in the glyph drawing and raycasting.
+        var nodePositions = [];
+        var geometry = new THREE.Geometry();
+        for (var i = 0; i < pathPositions.length; ++i) {
+          var position = new THREE.Vector3(pathPositions[i][0], pathPositions[i][1], pathPositions[i][2]);
+
+          geometry.vertices.push(position);
+          allGeometry.vertices.push(position);
+
+          var isUnique = true;
+          for (var ni = 0; isUnique && ni < nodePositions.length; ++ni) {
+            if (nodePositions[ni].equals(position)) {
+              isUnique = false;
+            }
+          }
+
+          if (isUnique) {
+            nodePositions.push(position);
           }
         }
 
-        for (var i = 0; i < paths[pi].vertices.length; ++i) {
-          var v = new THREE.Vector3(paths[pi].vertices[i][0], paths[pi].vertices[i][1], paths[pi].vertices[i][2]);
-          geometry.vertices.push(v);
-          if (!settings.get('showHeadings') || i < iLastUnique) {
-            nodeVertices.push(v);
+        // Remove the last item if that's where the arrowhead appears. We don't
+        // want a dot there.
+        if (settings.get('showHeadings') && pathPositions.length > 0) {
+          var last = pathPositions[pathPositions.length - 1];
+          var position = new THREE.Vector3(last[0], last[1], last[2]);
+          if (position.equals(nodePositions[nodePositions.length - 1])) {
+            nodePositions.pop();
           }
-          allGeometry.vertices.push(v);
         }
+
+        // Add the unique positions into the point cloud list.
+        for (var i = 0; i < nodePositions.length; ++i) {
+          var node = new THREE.Mesh(sphereGeometry, sphereMaterial);
+          node.position.copy(nodePositions[i]);
+          pointScene.add(node);
+        }
+
+        // Add glyphs to show each remaining point.
 
         var polyline = new MeshLine();
         polyline.setGeometry(geometry);
@@ -1359,22 +1382,10 @@ function onInterpret(data) {
           far: camera.far
         });
         meshes.push(new THREE.Mesh(polyline.geometry, lineMaterialColorNotDepth));
-        
-        if (settings.get('showPoints')) {
-          for (var vi = 0; vi < nodeVertices.length; ++vi) {
-            var node = new THREE.Mesh(sphereGeometry, sphereMaterial);
-            node.position.x = nodeVertices[vi].x;
-            node.position.y = nodeVertices[vi].y;
-            node.position.z = nodeVertices[vi].z;
-            // meshes.push(node);
-            node.xyz = nodeVertices[vi];
-            pointScene.add(node);
-          }
-        }
 
-        var nvertices = paths[pi].vertices.length;
+        var nvertices = pathPositions.length;
         if (settings.get('showHeadings') && nvertices > 0) {
-          var m = paths[pi].orientation;
+          var m = path.orientation;
           
           var g2 = new THREE.Geometry();
 
@@ -1395,15 +1406,16 @@ function onInterpret(data) {
           var mm = new THREE.Matrix4().set(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
           var mmm = new THREE.Matrix4().getInverse(mm);
           g2.applyMatrix(mmm);
-          var offset = new THREE.Vector3(paths[pi].vertices[paths[pi].vertices.length - 1][0], paths[pi].vertices[paths[pi].vertices.length - 1][1], paths[pi].vertices[paths[pi].vertices.length - 1][2]);
-          g2.applyMatrix(new THREE.Matrix4().makeTranslation(offset.x, offset.y, offset.z));
+          var offset = new THREE.Vector3(pathPositions[pathPositions.length - 1][0], pathPositions[pathPositions.length - 1][1], pathPositions[pathPositions.length - 1][2]);
 
           g2.computeFaceNormals();
           allGeometry.vertices = allGeometry.vertices.concat(g2.vertices);
 
-          meshes[meshes.length] = new THREE.Mesh(g2, new THREE.MeshLambertMaterial({
+          var cursorMesh = new THREE.Mesh(g2, new THREE.MeshLambertMaterial({
             color: 0x0000ff,
           }));
+          cursorMesh.position.copy(offset);
+          pointScene.add(cursorMesh);
         }
       }
     }
@@ -1665,10 +1677,19 @@ function init() {
     var intersections = raycaster.intersectObjects(pointScene.children);
     var message = '';
     for (var i = 0; i < intersections.length; ++i) {
-      message += intersections[i].object.xyz.x + ', ' + intersections[i].object.xyz.y + ', ' + intersections[i].object.xyz.z + '\n';
+      message += intersections[i].object.position.x + ', ' + intersections[i].object.position.y + ', ' + intersections[i].object.position.z + '\n';
     }
 
+    var oldMessage = $('#info3').text();
     $('#info3').text(message);
+
+    // If we are transition between no message and message, let's smooth out
+    // the entrance/exit.
+    if (message.length == 0 && oldMessage.length > 0) {
+      $('#info3').fadeOut(1000);
+    } else if (message.length > 0 && oldMessage.length == 0) {
+      $('#info3').fadeIn(1000);
+    }
   });
   initialized = true;
   resize();
