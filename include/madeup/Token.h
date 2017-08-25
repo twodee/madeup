@@ -75,7 +75,7 @@ class Token {
     const SourceLocation &getLocation() const;
     const std::string getTypeString() const;
     bool isPrecededBySpace() const;
-    bool isPrecededBySpace(bool is);
+    void isPrecededBySpace(bool is);
 
   private:
     token_t type; 

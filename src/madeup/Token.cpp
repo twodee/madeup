@@ -168,7 +168,7 @@ bool Token::isPrecededBySpace() const {
 
 /* ------------------------------------------------------------------------- */
 
-bool Token::isPrecededBySpace(bool is) {
+void Token::isPrecededBySpace(bool is) {
   is_preceded_by_space = is;
 }
 
