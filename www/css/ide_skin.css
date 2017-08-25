@@ -320,6 +320,10 @@ ul#settings > li > .panel-section-content {
   transform: translate(0, 20%);
 }
 
+#settings input[type="button"], #settings input[type="text"] {
+  margin: 5px auto;
+}
+
 #settings input[type="checkbox"] {
   background: none;
   color: black;

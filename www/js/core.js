@@ -663,8 +663,7 @@ $(document).ready(function() {
       removeGrid(d);
     }
 
-    var geometry = new THREE.Geometry();
-    for (var i = -settings.get('gridExtent'); i <= settings.get('gridExtent'); i += settings.get('gridSpacing')) {
+    function generateLines(i) {
       var a = new THREE.Vector3(0, 0, 0);
       var b = new THREE.Vector3(0, 0, 0);
       a.setComponent((d + 1) % 3, -settings.get('gridExtent'));
@@ -682,6 +681,15 @@ $(document).ready(function() {
       b.setComponent((d + 2) % 3, settings.get('gridExtent'));
       geometry.vertices.push(a);
       geometry.vertices.push(b);
+    }
+
+    var geometry = new THREE.Geometry();
+    for (var i = 0; i <= settings.get('gridExtent'); i += settings.get('gridSpacing')) {
+      generateLines(i);
+    }
+
+    for (var i = -settings.get('gridSpacing'); i >= -settings.get('gridExtent'); i -= settings.get('gridSpacing')) {
+      generateLines(i);
     }
 
     grids[d] = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({color: colors[d], linewidth: 1}));
@@ -713,8 +721,26 @@ $(document).ready(function() {
   $('#gridY').click(toggleGrid(1));
   $('#gridZ').click(toggleGrid(2));
 
-  $('#gridExtent').change(function() {
-    settings.set('gridExtent', parseFloat($(this).val()));
+  $('#fitGrid').click(function() {
+    if (allGeometry !== undefined) {
+      allGeometry.computeBoundingBox();
+      var bounds = allGeometry.boundingBox;
+      var maxStretch = Math.max(
+        Math.abs(bounds.min.x),
+        Math.abs(bounds.min.y),
+        Math.abs(bounds.min.z),
+        Math.abs(bounds.max.x),
+        Math.abs(bounds.max.y),
+        Math.abs(bounds.max.z)
+      );
+
+      settings.set('gridExtent', maxStretch);
+      $('#gridExtent').val(maxStretch);
+      onGridExtentChange();
+    }
+  });
+
+  function onGridExtentChange() {
     for (var d = 0; d < 3; ++d) {
       if (axes[d]) {
         generateAxis(d);
@@ -723,6 +749,11 @@ $(document).ready(function() {
         generateGrid(d);
       }
     }
+  }
+
+  $('#gridExtent').change(function() {
+    settings.set('gridExtent', parseFloat($(this).val()));
+    onGridExtentChange();
   });
 
   $('#gridSpacing').change(function() {
