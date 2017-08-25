@@ -684,12 +684,10 @@ $(document).ready(function() {
     }
 
     var geometry = new THREE.Geometry();
-    for (var i = 0; i <= settings.get('gridExtent'); i += settings.get('gridSpacing')) {
+    generateLines(0);
+    for (var i = settings.get('gridSpacing'); i <= settings.get('gridExtent'); i += settings.get('gridSpacing')) {
       generateLines(i);
-    }
-
-    for (var i = -settings.get('gridSpacing'); i >= -settings.get('gridExtent'); i -= settings.get('gridSpacing')) {
-      generateLines(i);
+      generateLines(-i);
     }
 
     grids[d] = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({color: colors[d], linewidth: 1}));
