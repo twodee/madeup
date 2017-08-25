@@ -301,6 +301,7 @@ ul#settings > li > .panel-section-content {
   top: 0;
   left: 0;
   right: 0;
+  display: none;
 }
 
 .menu-link {
@@ -317,6 +318,10 @@ ul#settings > li > .panel-section-content {
 
 #gear-in-console {
   transform: translate(0, 20%);
+}
+
+#settings input[type="button"], #settings input[type="text"] {
+  margin: 5px auto;
 }
 
 #settings input[type="checkbox"] {
