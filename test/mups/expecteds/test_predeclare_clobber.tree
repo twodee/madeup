@@ -1,1 +1,1 @@
-(block (define-variable b (INTEGER 5)) (define a (call-with-names b)) (define b (INTEGER 4)) (call print (== (call-with-names a) (INTEGER 4))))
+(block (define-variable b (INTEGER 5)) (define a () (block (call-with-names b))) (define b () (block (INTEGER 4))) (call print (== (call-with-names a) (INTEGER 4))))

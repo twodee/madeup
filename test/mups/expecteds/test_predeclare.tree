@@ -1,1 +1,1 @@
-(block (define double x (call times (INTEGER 2) (call-with-names x))) (define times a b (* (call-with-names a) (call-with-names b))) (call print (== (INTEGER 10) (call double (INTEGER 5)))))
+(block (define double ((x)) (block (call times (INTEGER 2) (call-with-names x)))) (define times ((a) (b)) (block (* (call-with-names a) (call-with-names b)))) (call print (== (INTEGER 10) (call double (INTEGER 5)))))

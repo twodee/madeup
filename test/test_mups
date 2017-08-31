@@ -33,7 +33,7 @@ function diffit {
 # ---------------------------------------------------------------------------- 
 
 mupsdir=@CMAKE_SOURCE_DIR@/test/mups
-merp=@CMAKE_RUNTIME_OUTPUT_DIRECTORY@/merp
+merp=./merp
 
 actual_out=/tmp/mup.out
 actual_err=/tmp/mup.err

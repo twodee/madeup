@@ -1,1 +1,1 @@
-(block (define-variable x (INTEGER 10)) (define f (define-variable x (INTEGER 30))) (call print (call-with-names x)) (call-with-names f) (call print (call-with-names x)))
+(block (define-variable x (INTEGER 10)) (define f () (define-variable x (INTEGER 30))) (call print (call-with-names x)) (call-with-names f) (call print (call-with-names x)))

@@ -1,1 +1,1 @@
-1(11-11): I found '=' in a single-line function definition, but I couldn't find a definition on its right-hand side.
+1(13-13): I found a linebreak in a place I didn't expect it.

@@ -1,4 +1,8 @@
 b = 5
-to a = b
-to b = 4
+to a
+  b
+end
+to b
+  4
+end
 print a == 4
