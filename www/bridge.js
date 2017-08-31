@@ -334,7 +334,15 @@ var isGoogled = false;
 var driveDirectory = null;
 
 function handleClientLoad() {
-  gapi.load('client:auth2', initClient);
+  gapi.load('client:auth2', {
+    callback: initClient,
+    onerror: onDriveFailed
+  });
+}
+
+function onDriveFailed(e) {
+  console.log(e);
+  updateGoogleStatus(false);
 }
 
 function initClient() {
@@ -342,22 +350,22 @@ function initClient() {
     discoveryDocs: DISCOVERY_DOCS,
     clientId: CLIENT_ID,
     scope: SCOPES
-  }).then(function() {
+  }).then(function(err) {
     // Handle the initial sign-in state.
 		updateGoogleStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
 
     $('#storageLocal').click(function() {
       gapi.auth2.getAuthInstance().signOut().then(function() {
         updateGoogleStatus(false);
-      });
+      }, onDriveFailed);
     });
 
     $('#storageDrive').click(function() {
       gapi.auth2.getAuthInstance().signIn().then(function() {
         updateGoogleStatus(true);
-      });
+      }, onDriveFailed);
     });
-  });
+  }, onDriveFailed);
 }
 
 function updateGoogleStatus(isConnected) {
