@@ -146,7 +146,7 @@ void Environment::prime() {
   Co<ExpressionClosure> radius_closure(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine(".radius", Co<Expression>(new ExpressionReal(0.5f)))), Environment()));
   add(".radius", radius_closure);
   add(".outerRadius", radius_closure);
-  add(".innerRadius", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine(".innerRadius", Co<Expression>(new ExpressionReal(0.5f)))), Environment())));
+  add(".innerRadius", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine(".innerRadius", Co<Expression>(new ExpressionReal(0.25f)))), Environment())));
   add(".energy", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("energy", Co<Expression>(new ExpressionReal(100.0f)))), Environment())));
   add(".halflife", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("halflife", Co<Expression>(new ExpressionReal(1.0f)))), Environment())));
   add("nsides", Co<ExpressionClosure>(new ExpressionClosure(Co<ExpressionDefine>(new ExpressionDefine("nsides", Co<Expression>(new ExpressionInteger(4)))), Environment())));
