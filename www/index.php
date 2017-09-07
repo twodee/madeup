@@ -56,9 +56,9 @@ EOF;
 
 if (array_key_exists('src', $_REQUEST)) {
   $src = str_replace(array("\r\n", "\n", "\r"), "\\n", $_REQUEST['src']);
-  $script = "textEditor.setValue('$src', 1);";
+  $script = "source0 = '$src';";
   if (!array_key_exists('runonload', $_REQUEST) || strcmp($_REQUEST['runonload'], 'true') == 0) {
-    $script .= "\nrun(getSource(), GeometryMode.SURFACE, fit)";
+    $script .= "\nisAutoSolidify = true;";
   }
   $html = str_replace('// SRC:PHP', $script, $html);
 }

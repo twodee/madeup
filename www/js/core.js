@@ -40,6 +40,8 @@ var snapshotTask = undefined;
 var settings = new Settings();
 var lastBlocks = null;
 var badModelMessage = 'Uh oh. I tried to generate a model for you, but it is broken. This can happen for a bunch of reasons: some faces may be too small, some vertices may be duplicated, and the mesh boolean operations may just be fickle.';
+var source0 = '';
+var isAutoSolidify = false;
 
 function hasWebGL() {
   try {
@@ -518,6 +520,14 @@ $(document).ready(function() {
     }
 
     $('#toolbar').css('display', 'block');
+
+    if (source0) {
+      textEditor.setValue(source0, 1);
+    }
+
+    if (isAutoSolidify) {
+      run(getSource(), GeometryMode.SURFACE, fit);
+    }
   });
 
   $('#smaller').click(decreaseFontSize);
