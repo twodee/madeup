@@ -331,7 +331,8 @@ function syncSettings() {
   persistSettings(settings);
 }
 
-$(document).ready(function() {
+// renderer isn't ready yet, so we need to wait for the window onload event.
+$(window).on('load', function() {
   $(document).tooltip({
     show: {
       effect: 'slideDown',
@@ -343,6 +344,11 @@ $(document).ready(function() {
     }
   });
 
+  if (hasWebGL()) {
+    init();
+    animate();
+  }
+
   // When we are embedded in an iframe, the wheel event will cause the
   // embedding context to scroll. That's not what we want, so we capture and
   // squelch any wheel events.
@@ -353,55 +359,55 @@ $(document).ready(function() {
     // TODO: confirm that this works as intended.
   }
 
-  // renderer isn't ready yet, so we need to wait for the window onload event.
-  $(window).on('load', function() {
-    configureDownloader();
-    restoreSettings(settings);
+  configureDownloader();
+  restoreSettings(settings);
 
-    textEditor = ace.edit("textEditor");
-    textEditor.$blockScrolling = Infinity;
-    Range = ace.require('ace/range').Range;
+  textEditor = ace.edit("textEditor");
+  textEditor.$blockScrolling = Infinity;
+  Range = ace.require('ace/range').Range;
 
-    // Creates an undo manager implicitly.
-    textEditor.setSession(ace.createEditSession('', 'ace/mode/madeup'));
+  // Creates an undo manager implicitly.
+  textEditor.setSession(ace.createEditSession('', 'ace/mode/madeup'));
 
-    textEditor.setTheme("ace/theme/twilight");
-    textEditor.setHighlightSelectedWord(false);
-    textEditor.setHighlightActiveLine(false);
-    textEditor.setOption("tabSize", 2);
-    textEditor.setOption("useSoftTabs", true);
+  textEditor.setTheme("ace/theme/twilight");
+  textEditor.setHighlightSelectedWord(false);
+  textEditor.setHighlightActiveLine(false);
+  textEditor.setOption("tabSize", 2);
+  textEditor.setOption("useSoftTabs", true);
 
-    // https://github.com/ajaxorg/ace/blob/master/lib/ace/commands/default_commands.js
-    // https://ace.c9.io/demo/keyboard_shortcuts.html
-    // textEditor.commands.removeCommand(['togglecomment', 'gotoline', 'showSettingsMenu']);
-    textEditor.commands.bindKey('ctrl-s', null);
-    textEditor.commands.bindKey('ctrl-/', null);
-    textEditor.commands.bindKey('ctrl-?', null);
-    textEditor.commands.bindKey('ctrl-shift-?', null);
-    textEditor.commands.bindKey('ctrl-shift-/', null);
-    textEditor.commands.bindKey('ctrl-,', null);
-    textEditor.commands.bindKey('ctrl-[', null);
-    textEditor.commands.bindKey('ctrl-]', null);
-    textEditor.commands.bindKey('ctrl-l', null);
-    textEditor.commands.bindKey('command-l', null);
-    textEditor.commands.bindKey('ctrl-\'', 'togglecomment');
+  // https://github.com/ajaxorg/ace/blob/master/lib/ace/commands/default_commands.js
+  // https://ace.c9.io/demo/keyboard_shortcuts.html
+  // textEditor.commands.removeCommand(['togglecomment', 'gotoline', 'showSettingsMenu']);
+  textEditor.commands.bindKey('ctrl-s', null);
+  textEditor.commands.bindKey('ctrl-/', null);
+  textEditor.commands.bindKey('ctrl-?', null);
+  textEditor.commands.bindKey('ctrl-shift-?', null);
+  textEditor.commands.bindKey('ctrl-shift-/', null);
+  textEditor.commands.bindKey('ctrl-,', null);
+  textEditor.commands.bindKey('ctrl-[', null);
+  textEditor.commands.bindKey('ctrl-]', null);
+  textEditor.commands.bindKey('ctrl-l', null);
+  textEditor.commands.bindKey('command-l', null);
+  textEditor.commands.bindKey('ctrl-\'', 'togglecomment');
 
-    $('#textEditor textarea').addClass('mousetrap');
+  $('#textEditor textarea').addClass('mousetrap');
 
-    if (!isEmbedded) {
-      if (settings.has('leftWidth')) {
-        $('#left').width(settings.get('leftWidth'));
-        resize();
-      }
+  if (!isEmbedded) {
+    if (settings.has('leftWidth')) {
+      $('#left').width(settings.get('leftWidth'));
+      resize();
+    }
 
-      if (settings.has('consoleHeight')) {
-        $('#console').height(settings.get('consoleHeight'));
-        $('#showConsole').prop('checked', $('#console').height() != 0);
-        resize();
-      }
+    if (settings.has('consoleHeight')) {
+      $('#console').height(settings.get('consoleHeight'));
+      $('#showConsole').prop('checked', $('#console').height() != 0);
+      resize();
+    }
 
-      load(new Mup('untitled'));
-    } else if (isPresenting) {
+    load(new Mup('untitled'));
+  } else {
+    mup = new Mup('untitled');
+    if (isPresenting) {
       showConsole(false);
       $('#left').width(375);
       resize();
@@ -409,126 +415,126 @@ $(document).ready(function() {
       $('#left').width(250);
       resize();
     }
+  }
 
-    if (!isEmbedded && !isBlocksURL && settings.has('fontSize')) {
-    } else if (isBlocksURL) {
-      settings.set('fontSize', 24);
-    } else if (isPresenting) {
-      settings.set('fontSize', 28);
-    } else {
-      settings.set('fontSize', 20);
-    }
-    setFontSize(settings.get('fontSize'));
+  if (!isEmbedded && !isBlocksURL && settings.has('fontSize')) {
+  } else if (isBlocksURL) {
+    settings.set('fontSize', 24);
+  } else if (isPresenting) {
+    settings.set('fontSize', 28);
+  } else {
+    settings.set('fontSize', 20);
+  }
+  setFontSize(settings.get('fontSize'));
 
-    $('#showHeadings').prop('checked', settings.get('showHeadings'));
-    $('#isFlatShaded').prop('checked', settings.get('isFlatShaded'));
-    $('#lightBothSides').prop('checked', settings.get('lightBothSides'));
-    $('#showPoints').prop('checked', settings.get('showPoints'));
-    $("#autopathify").prop('checked', settings.get('isAutopathify'));
-    $('#showMode').val(settings.get('showMode'));
-    $('#gridSpacing').val(settings.get('gridSpacing'));
-    $('#gridExtent').val(settings.get('gridExtent'));
+  $('#showHeadings').prop('checked', settings.get('showHeadings'));
+  $('#isFlatShaded').prop('checked', settings.get('isFlatShaded'));
+  $('#lightBothSides').prop('checked', settings.get('lightBothSides'));
+  $('#showPoints').prop('checked', settings.get('showPoints'));
+  $("#autopathify").prop('checked', settings.get('isAutopathify'));
+  $('#showMode').val(settings.get('showMode'));
+  $('#gridSpacing').val(settings.get('gridSpacing'));
+  $('#gridExtent').val(settings.get('gridExtent'));
 
-    $('#isAutorotate').prop('checked', settings.get('isAutorotate'));
-    enableAutorotate(settings.get('isAutorotate'));
+  $('#isAutorotate').prop('checked', settings.get('isAutorotate'));
+  enableAutorotate(settings.get('isAutorotate'));
 
-    if (settings.get('isEditorText')) {
-      $("#isEditorText").prop('checked', true);
-    } else {
-      $("#isEditorBlocks").prop('checked', true);
-    }
+  if (settings.get('isEditorText')) {
+    $("#isEditorText").prop('checked', true);
+  } else {
+    $("#isEditorBlocks").prop('checked', true);
+  }
 
-    if (settings.get('sortMupsBy') == 'date') {
-      $("#sortMupsByDate").prop('checked', true);
-    } else {
-      $("#sortMupsByName").prop('checked', true);
-    }
+  if (settings.get('sortMupsBy') == 'date') {
+    $("#sortMupsByDate").prop('checked', true);
+  } else {
+    $("#sortMupsByName").prop('checked', true);
+  }
 
-    setTheme(settings.get('isThemeDark'));
-    if (settings.get('isThemeDark')) {
-      $("#isDark").prop('checked', true);
-    } else {
-      $("#isLight").prop('checked', true);
-    }
+  setTheme(settings.get('isThemeDark'));
+  if (settings.get('isThemeDark')) {
+    $("#isDark").prop('checked', true);
+  } else {
+    $("#isLight").prop('checked', true);
+  }
 
-    $('#pathify-node-size').val(settings.get('pathifyNodeSize'));
-    $('#pathify-node-size')[0].oninput = function () {
-      settings.set('pathifyNodeSize', parseFloat(this.value));
-      run(getSource(), GeometryMode.PATH);
-    };
+  $('#pathify-node-size').val(settings.get('pathifyNodeSize'));
+  $('#pathify-node-size')[0].oninput = function () {
+    settings.set('pathifyNodeSize', parseFloat(this.value));
+    run(getSource(), GeometryMode.PATH);
+  };
 
-    // Line size
-    $('#pathify-line-size').val(settings.get('pathifyLineSize'));
-    $('#pathify-line-size')[0].oninput = function () {
-      settings.set('pathifyLineSize', parseFloat(this.value));
-      run(getSource(), GeometryMode.PATH);
-    };
+  // Line size
+  $('#pathify-line-size').val(settings.get('pathifyLineSize'));
+  $('#pathify-line-size')[0].oninput = function () {
+    settings.set('pathifyLineSize', parseFloat(this.value));
+    run(getSource(), GeometryMode.PATH);
+  };
 
-    // Showing gear menu?
-    if (settings.has('showGearMenu') && settings.get('showGearMenu')) {
-      showGearMenu();
-    }
+  // Showing gear menu?
+  if (settings.has('showGearMenu') && settings.get('showGearMenu')) {
+    showGearMenu();
+  }
 
-    gearSections.forEach(function(tag) {
-      var property = 'isOpen' + tag.charAt(0).toUpperCase() + tag.substring(1);
-      if (settings.has(property) && settings.get(property)) {
-        $('#panel-section-' + tag + ' > .panel-section-label').click();
-      }
-    });
-
-    $('#nSecondsTillAutopathify').val(settings.get('nSecondsTillAutopathify'));
-    $('#nSecondsTillAutopathify').change(function () {
-      settings.set('nSecondsTillAutopathify', parseFloat(this.value));
-
-      // Clear any pending.
-      if (autopathifyTask) {
-        clearTimeout(autopathifyTask); 
-        autopathifyTask = undefined;
-      }
-    });
-
-    // Axes and grids
-    var axes = "XYZ";
-    for (var i = 0; i < 3; ++i) {
-      var d = axes[i];
-
-      if (settings.get('showAxis' + d)) {
-        $('#axis' + d).prop('checked', true);
-        generateAxis(i);
-      }
-
-      if (settings.get('showGrid' + d)) {
-        $('#grid' + d).prop('checked', true);
-        generateGrid(i);
-      }
-    }
-
-    // Only save cookies if they were successfully loaded.
-    $(window).on('unload', function() {
-      syncSettings();
-      if (mup.isDirty && confirm('Save changes to ' + mup.name + '?')) {
-        save();
-      }
-    });
-
-    platformize();
-
-    if (isBlocksURL) {
-      setEditor(false);
-      showConsole(false);
-      resize();
-    }
-
-    $('#toolbar').css('display', 'block');
-
-    if (source0) {
-      textEditor.setValue(source0, 1);
-    }
-
-    if (isAutoSolidify) {
-      run(getSource(), GeometryMode.SURFACE, fit);
+  gearSections.forEach(function(tag) {
+    var property = 'isOpen' + tag.charAt(0).toUpperCase() + tag.substring(1);
+    if (settings.has(property) && settings.get(property)) {
+      $('#panel-section-' + tag + ' > .panel-section-label').click();
     }
   });
+
+  $('#nSecondsTillAutopathify').val(settings.get('nSecondsTillAutopathify'));
+  $('#nSecondsTillAutopathify').change(function () {
+    settings.set('nSecondsTillAutopathify', parseFloat(this.value));
+
+    // Clear any pending.
+    if (autopathifyTask) {
+      clearTimeout(autopathifyTask); 
+      autopathifyTask = undefined;
+    }
+  });
+
+  // Axes and grids
+  var axes = "XYZ";
+  for (var i = 0; i < 3; ++i) {
+    var d = axes[i];
+
+    if (settings.get('showAxis' + d)) {
+      $('#axis' + d).prop('checked', true);
+      generateAxis(i);
+    }
+
+    if (settings.get('showGrid' + d)) {
+      $('#grid' + d).prop('checked', true);
+      generateGrid(i);
+    }
+  }
+
+  // Only save cookies if they were successfully loaded.
+  $(window).on('unload', function() {
+    syncSettings();
+    if (mup.isDirty && confirm('Save changes to ' + mup.name + '?')) {
+      save();
+    }
+  });
+
+  platformize();
+
+  if (isBlocksURL) {
+    setEditor(false);
+    showConsole(false);
+    resize();
+  }
+
+  $('#toolbar').css('display', 'block');
+
+  if (source0) {
+    textEditor.setValue(source0, 1);
+  }
+
+  if (isAutoSolidify) {
+    run(getSource(), GeometryMode.SURFACE, fit);
+  }
 
   $('#smaller').click(decreaseFontSize);
   $('#bigger').click(increaseFontSize);
@@ -895,11 +901,6 @@ $(document).ready(function() {
     mousetrap.bind('ctrl+]', increaseFontSize);
     mousetrap.bind('ctrl+9', logAbtractSyntaxTree);
   });
-
-  if (hasWebGL()) {
-    init();
-    animate();
-  }
 });
 
 function logAbtractSyntaxTree() {
