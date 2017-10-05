@@ -273,6 +273,12 @@ ul#settings > li {
 }
 
 ul#settings > li > .panel-section-label {
+  /*
+   Users were wanting to click on the space after the label to expand the
+   section. So it got upgraded from inline to block.
+   */
+  display: block;
+
   text-transform: uppercase;
 }
 

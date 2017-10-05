@@ -333,6 +333,7 @@ function syncSettings() {
 
 // renderer isn't ready yet, so we need to wait for the window onload event.
 $(window).on('load', function() {
+  console.log("foo");
   $(document).tooltip({
     show: {
       effect: 'slideDown',
@@ -494,22 +495,6 @@ $(window).on('load', function() {
     }
   });
 
-  // Axes and grids
-  var axes = "XYZ";
-  for (var i = 0; i < 3; ++i) {
-    var d = axes[i];
-
-    if (settings.get('showAxis' + d)) {
-      $('#axis' + d).prop('checked', true);
-      generateAxis(i);
-    }
-
-    if (settings.get('showGrid' + d)) {
-      $('#grid' + d).prop('checked', true);
-      generateGrid(i);
-    }
-  }
-
   // Only save cookies if they were successfully loaded.
   $(window).on('unload', function() {
     syncSettings();
@@ -609,12 +594,14 @@ $(window).on('load', function() {
     }
   }
 
+  console.log("colors");
   var red = 0xB80000;
   var green = 0x006100;
   var blue = 0x0000FF;
   var colors = [red, green, blue];
   var axes = new Array(3);
   var grids = new Array(3);
+  console.log("foo");
 
   function generateAxis(d) {
     if (axes[d]) {
@@ -646,6 +633,8 @@ $(window).on('load', function() {
       far: camera.far
     });
     axes[d] = new THREE.Mesh(line.geometry, material);
+    console.log("glyphScene:", glyphScene);
+    console.log("axes:", axes);
     glyphScene.add(axes[d]);
     render();
   }
@@ -721,8 +710,8 @@ $(window).on('load', function() {
 
   function toggleGrid(d) {
     return function() {
-      var axes = "XYZ";
-      settings.set('showGrid' + axes.charAt(d), this.checked);
+      var labels = "XYZ";
+      settings.set('showGrid' + labels.charAt(d), this.checked);
       if (this.checked) {
         generateGrid(d);
       } else {
@@ -778,6 +767,22 @@ $(window).on('load', function() {
       }
     }
   });
+
+  // Axes and grids
+  var labels = "XYZ";
+  for (var i = 0; i < 3; ++i) {
+    var d = labels[i];
+
+    if (settings.get('showAxis' + d)) {
+      $('#axis' + d).prop('checked', true);
+      generateAxis(i);
+    }
+
+    if (settings.get('showGrid' + d)) {
+      $('#grid' + d).prop('checked', true);
+      generateGrid(i);
+    }
+  }
 
   $('#autopathify').click(function() {
     settings.set('isAutopathify', this.checked);
