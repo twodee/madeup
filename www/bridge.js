@@ -298,7 +298,7 @@ $(document).ready(function() {
     if (ok) {
       if (blocklyWorkspace) {
         blocklyWorkspace.clear();
-        blocklyWorkspace.updateVariableList();
+        blocklyWorkspace.updateVariableStore();
       }
 
       var promise = null;

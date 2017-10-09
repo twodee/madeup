@@ -333,7 +333,6 @@ function syncSettings() {
 
 // renderer isn't ready yet, so we need to wait for the window onload event.
 $(window).on('load', function() {
-  console.log("foo");
   $(document).tooltip({
     show: {
       effect: 'slideDown',
@@ -594,14 +593,12 @@ $(window).on('load', function() {
     }
   }
 
-  console.log("colors");
   var red = 0xB80000;
   var green = 0x006100;
   var blue = 0x0000FF;
   var colors = [red, green, blue];
   var axes = new Array(3);
   var grids = new Array(3);
-  console.log("foo");
 
   function generateAxis(d) {
     if (axes[d]) {
@@ -1116,7 +1113,7 @@ function setEditor(isText) {
           scaleSpeed: 1.2
         }
       });
-      blocklyWorkspace.updateVariableList();
+      blocklyWorkspace.updateVariableStore();
     }
 
     // Any text to convert to blocks?
@@ -1129,7 +1126,7 @@ function setEditor(isText) {
         buttons: {
           'Convert to blocks': function() {
             blocklyWorkspace.clear();
-            blocklyWorkspace.updateVariableList();
+            blocklyWorkspace.updateVariableStore();
             textToAbstractSyntaxTree(textEditor.getValue(),
               function(data) {
                 if (data['exit_status'] == 0) {
@@ -1198,31 +1195,36 @@ function load(newMup) {
   textEditor.setValue('');
   if (blocklyWorkspace) {
     blocklyWorkspace.clear();
-    blocklyWorkspace.updateVariableList();
+    blocklyWorkspace.updateVariableStore();
   }
 
   mup = newMup;
 
-  for (var i = 0; i < meshes.length; ++i) {
-    modelScene.remove(meshes[i]);
-  }
+  // Remove meshes and previews.
+  clearModel();
   if (renderer) render();
 
   platformLoad(mup, function(source) {
-    var isText = source.charAt(0) != '<';
+    var isText;
+    if (source.length == 0) {
+      isText = settings.get('isEditorText');
+    } else {
+      isText = source.charAt(0) != '<';
+    }
 
-    // Only load the source if the editor modalities match, or we allow
-    // modality switching.
     setEditor(isText);
     if (settings.get('isEditorText')) {
       textEditor.session.setValue(source, -1);
     } else {
       blocklyWorkspace.clear();
-      blocklyWorkspace.updateVariableList();
-      var xml = Blockly.Xml.textToDom(source);
-      Blockly.Xml.domToWorkspace(xml, blocklyWorkspace);
-      xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
-      lastBlocks = Blockly.Xml.domToText(xml);
+      // If source is blank, XML parse will fail.
+      if (source.length > 0) {
+        var xml = Blockly.Xml.textToDom(source);
+        Blockly.Xml.domToWorkspace(xml, blocklyWorkspace);
+        xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
+        lastBlocks = Blockly.Xml.domToText(xml);
+      }
+      // blocklyWorkspace.updateVariableStore(); TODO do I need this?
     }
 
     // TODO toggle modes
@@ -1295,6 +1297,16 @@ function run(source, mode, pingback) {
   });
 }
 
+function clearModel() {
+  for (var i = 0; i < meshes.length; ++i) {
+    modelScene.remove(meshes[i]);
+  }
+  for (var i = pointScene.children.length - 1; i >= 0; --i) {
+    pointScene.remove(pointScene.children[i]);
+  }
+  meshes = [];
+}
+
 function onInterpret(data) {
 
   // Only listen to responses to latest run.
@@ -1308,14 +1320,7 @@ function onInterpret(data) {
   }
 
   if (data['exit_status'] == 0) {
-    for (var i = 0; i < meshes.length; ++i) {
-      modelScene.remove(meshes[i]);
-    }
-    for (var i = pointScene.children.length - 1; i >= 0; --i) {
-      pointScene.remove(pointScene.children[i]);
-    }
-    meshes = [];
-
+    clearModel();
     log(sansDebug);
     
     if (data.geometry_mode == GeometryMode.SURFACE) {
