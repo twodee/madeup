@@ -127,18 +127,23 @@ var onMouseDown = (function() {
 // returns the names of all variables. Our builtin variables don't necessarily
 // appear in the workspace (yet), so we hijack this function and add them
 // manually.
-(function() {
-  var oldAllVariables = Blockly.Variables.allVariables;
-  Blockly.Variables.allVariables = function(root) {
-    var vars = oldAllVariables.call(this, root);
-    vars.push('nsides');
-    vars.push('.rgb');
-    vars.push('.radius');
-    vars.push('.innerRadius');
-    vars.push('.outerRadius');
-    return vars;
-  };
-})();
+// console.log("5555555555555555555555");
+// (function() {
+  // var oldAllVariables = Blockly.Variables.allVariables;
+  // Blockly.Variables.allVariables = function(root) {
+    // var vars = oldAllVariables.call(this, root);
+    // console.log("666666666666666666666");
+    // vars.push('nsides');
+    // vars.push('.rgb');
+    // vars.push('.radius');
+    // vars.push('.innerRadius');
+    // vars.push('.outerRadius');
+    // console.log("vars:", vars);
+    // return vars;
+  // };
+// })();
+
+
 
 // Warn on leaving the page if there are unsaved changes. Downloading triggers
 // this, even though we're not leaving the page, so we add a special flag to
@@ -1113,7 +1118,7 @@ function setEditor(isText) {
           scaleSpeed: 1.2
         }
       });
-      blocklyWorkspace.updateVariableStore();
+      clearWorkspace();
     }
 
     // Any text to convert to blocks?
@@ -1125,14 +1130,14 @@ function setEditor(isText) {
         modal: true,
         buttons: {
           'Convert to blocks': function() {
-            blocklyWorkspace.clear();
-            blocklyWorkspace.updateVariableStore();
+            clearWorkspace();
             textToAbstractSyntaxTree(textEditor.getValue(),
               function(data) {
                 if (data['exit_status'] == 0) {
                   var tree = data['tree'];
                   parse(new Peeker(tree), blocklyWorkspace);
                 }
+                ensureBuiltinVariables();
               },
               function() {
                 console.log('Failure. :(');
@@ -1149,6 +1154,8 @@ function setEditor(isText) {
     } else {
       switchEditors();
     }
+
+    ensureBuiltinVariables();
   }
  
   // We want to listen for change events in the editor for a few reasons: a
@@ -1194,8 +1201,9 @@ function load(newMup) {
   // Clear the editors so they don't try to get converted.
   textEditor.setValue('');
   if (blocklyWorkspace) {
-    blocklyWorkspace.clear();
-    blocklyWorkspace.updateVariableStore();
+    clearWorkspace();
+    // blocklyWorkspace.clear();
+    // blocklyWorkspace.updateVariableStore();
   }
 
   mup = newMup;
@@ -1216,7 +1224,7 @@ function load(newMup) {
     if (settings.get('isEditorText')) {
       textEditor.session.setValue(source, -1);
     } else {
-      blocklyWorkspace.clear();
+      clearWorkspace();
       // If source is blank, XML parse will fail.
       if (source.length > 0) {
         var xml = Blockly.Xml.textToDom(source);
@@ -1224,6 +1232,7 @@ function load(newMup) {
         xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
         lastBlocks = Blockly.Xml.domToText(xml);
       }
+      ensureBuiltinVariables();
       // blocklyWorkspace.updateVariableStore(); TODO do I need this?
     }
 
@@ -1743,6 +1752,21 @@ function init() {
   });
   initialized = true;
   resize();
+}
+
+function clearWorkspace() {
+  // console.trace("clear");
+  blocklyWorkspace.clear();
+}
+
+function ensureBuiltinVariables() {
+  ids = ['nsides', '.rgb', '.radius', '.innerRadius', '.outerRadius'];
+  for (var i = 0; i < ids.length; ++i) {
+    var id = ids[i];
+    if (blocklyWorkspace.getVariable(id) == null) {
+      blocklyWorkspace.createVariable(id);
+    }
+  }
 }
 
 function animate() {

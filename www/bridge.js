@@ -110,6 +110,7 @@ function platformSave(mup, source, mode, onSuccess) {
     'source' : source
   };
   var json = JSON.stringify(file);
+  console.log("json:", json);
 
   if (isGoogled) {
     return gapi.client.drive.files.list({
@@ -139,19 +140,19 @@ function platformSave(mup, source, mode, onSuccess) {
 }
 
 function getData(url) {
-      xmlhttp = new XMLHttpRequest();
-      xmlhttp.onreadystatechange = function() {
-                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                              console.log(xmlhttp.responseText);
-                          }
-            }
-      xmlhttp.open('GET', url, true);
-      // var myToken = gapi.auth.getToken();
-      // xmlhttp.setRequestHeader('Authorization', 'Bearer ' + myToken.access_token);
-      console.log(gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token);
-      xmlhttp.setRequestHeader('Authorization', 'Bearer ' + gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token);
-      console.log("xmlhttp:", xmlhttp);
-      xmlhttp.send();
+  xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+      console.log(xmlhttp.responseText);
+    }
+  }
+  xmlhttp.open('GET', url, true);
+  // var myToken = gapi.auth.getToken();
+  // xmlhttp.setRequestHeader('Authorization', 'Bearer ' + myToken.access_token);
+  console.log(gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token);
+  xmlhttp.setRequestHeader('Authorization', 'Bearer ' + gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token);
+  console.log("xmlhttp:", xmlhttp);
+  xmlhttp.send();
 }
 
 function platformLoad(mup, onSuccess) {
@@ -297,8 +298,9 @@ $(document).ready(function() {
     var ok = confirm('Delete ' + mup.name + '?');
     if (ok) {
       if (blocklyWorkspace) {
-        blocklyWorkspace.clear();
-        blocklyWorkspace.updateVariableStore();
+        clearWorkspace();
+        // blocklyWorkspace.clear();
+        // blocklyWorkspace.updateVariableStore();
       }
 
       var promise = null;
@@ -376,6 +378,10 @@ function updateGoogleStatus(isConnected) {
 		isGoogled = true;
 		appFolder().then(listGoogleMups);
 	} else {
+    // Signing out seems to mean something different than I expect. We want to
+    // completely disconnect from Google Drive when we're doing local storage.
+    gapi.auth2.getAuthInstance().disconnect();
+
 		$('#googleLogin').text('Use Google Drive');
     $('#archiver').show();
     $('#storageLocal').prop('checked', true);
