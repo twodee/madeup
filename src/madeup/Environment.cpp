@@ -1562,25 +1562,33 @@ std::string Environment::getPathsJSON() const {
 
   out << std::fixed;
   out << "[" << std::endl;
+  bool is_first = true;
   for (unsigned int pi = 0; pi < paths.size(); ++pi) {
-    out << "  {" << std::endl;
-    out << "    \"vertices\": [";
-    for (unsigned int vi = 0; vi < paths[pi].size(); ++vi) {
-      const QVector3<float> &position = paths[pi][vi].position;
-      out << "[" << position[0] << "," << position[1] << "," << position[2] << "]" << (vi == paths[pi].size() - 1 ? "" : ",");
+    if (paths[pi].size() > 0) {
+      if (is_first) {
+        is_first = false;
+      } else {
+        out << "," << std::endl;
+      }
+      out << "  {" << std::endl;
+      out << "    \"vertices\": [";
+      for (unsigned int vi = 0; vi < paths[pi].size(); ++vi) {
+        const QVector3<float> &position = paths[pi][vi].position;
+        out << "[" << position[0] << "," << position[1] << "," << position[2] << "]" << (vi == paths[pi].size() - 1 ? "" : ",");
+      }
+      out << "], " << std::endl;
+      out << "    \"orientation\": [";
+      if (paths[pi].size()) {
+        const Camera &camera = paths[pi][paths[pi].size() - 1].camera;
+        const QMatrix4<float> matrix = camera.GetViewMatrix();
+        out << matrix(0, 0) << "," << matrix(0, 1) << "," << matrix(0, 2) << "," << matrix(0, 3) << ","
+            << matrix(1, 0) << "," << matrix(1, 1) << "," << matrix(1, 2) << "," << matrix(1, 3) << ","
+            << matrix(2, 0) << "," << matrix(2, 1) << "," << matrix(2, 2) << "," << matrix(2, 3) << ","
+            << matrix(3, 0) << "," << matrix(3, 1) << "," << matrix(3, 2) << "," << matrix(3, 3);
+      }
+      out << "]" << std::endl;
+      out << "  }" << std::endl;
     }
-    out << "], " << std::endl;
-    out << "    \"orientation\": [";
-    if (paths[pi].size()) {
-      const Camera &camera = paths[pi][paths[pi].size() - 1].camera;
-      const QMatrix4<float> matrix = camera.GetViewMatrix();
-      out << matrix(0, 0) << "," << matrix(0, 1) << "," << matrix(0, 2) << "," << matrix(0, 3) << ","
-          << matrix(1, 0) << "," << matrix(1, 1) << "," << matrix(1, 2) << "," << matrix(1, 3) << ","
-          << matrix(2, 0) << "," << matrix(2, 1) << "," << matrix(2, 2) << "," << matrix(2, 3) << ","
-          << matrix(3, 0) << "," << matrix(3, 1) << "," << matrix(3, 2) << "," << matrix(3, 3);
-    }
-    out << "]" << std::endl;
-    out << "  }" << (pi == paths.size() - 1 ? "" : ",") << std::endl;
   }
   out << "]" << std::endl;
 
