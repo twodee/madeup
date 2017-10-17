@@ -1113,6 +1113,7 @@ function setEditor(isText) {
       blocklyWorkspace = Blockly.inject('blocksCanvas', {
         comments: false,
         toolbox: document.getElementById('toolbox'),
+        media: 'repos/blockly/media/',
         trashcan: true,
         zoom: {
           controls: true,
