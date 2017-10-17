@@ -32,6 +32,8 @@ var raycaster;
 var mouse;
 var renderer, camera, controls;
 var meshes = [];
+var lineMeshes = [];
+var lineEssences = [];
 var blocklyWorkspace = null;
 var allGeometry = undefined;
 var timeOfLatestRun = undefined;
@@ -42,6 +44,7 @@ var lastBlocks = null;
 var badModelMessage = 'Uh oh. I tried to generate a model for you, but it is broken. This can happen for a bunch of reasons: some faces may be too small, some vertices may be duplicated, and the mesh boolean operations may just be fickle.';
 var source0 = '';
 var isAutoSolidify = false;
+var axes = [null, null, null];
 
 function hasWebGL() {
   try {
@@ -50,6 +53,20 @@ function hasWebGL() {
   } catch(e) { 
     return false;
   } 
+}
+
+function getLineMaterial(width, color) {
+  return new MeshLineMaterial({
+    lineWidth: width,
+    color: new THREE.Color(color),
+    useMap: false,
+    useAlphaMap: false,
+    opacity: 1,
+    sizeAttenuation: false,
+    resolution: new THREE.Vector2(renderer.getSize().width, renderer.getSize().height),
+    near: camera.near,
+    far: camera.far
+  });
 }
 
 function restoreSettings(settings) {
@@ -602,7 +619,6 @@ $(window).on('load', function() {
   var green = 0x006100;
   var blue = 0x0000FF;
   var colors = [red, green, blue];
-  var axes = new Array(3);
   var grids = new Array(3);
 
   function generateAxis(d) {
@@ -617,33 +633,21 @@ $(window).on('load', function() {
     b.setComponent(d, settings.get('gridExtent'));
     geometry.vertices.push(a);
     geometry.vertices.push(b);
-    // axes[d] = new THREE.Line(geometry, new THREE.LineBasicMaterial({
-      // color: colors[d],
-      // linewidth: 5
-    // }), THREE.LineSegments);
-    var line = new MeshLine();
-    line.setGeometry(geometry);
-    var material = new MeshLineMaterial({
-      lineWidth: 0.1,
-      color: new THREE.Color(colors[d]),
-      useMap: false,
-      useAlphaMap: false,
-      opacity: 1,
-      sizeAttenuation: !false,
-      resolution: new THREE.Vector2(800, 600),
-      near: camera.near,
-      far: camera.far
-    });
-    axes[d] = new THREE.Mesh(line.geometry, material);
-    console.log("glyphScene:", glyphScene);
-    console.log("axes:", axes);
-    glyphScene.add(axes[d]);
+
+    axes[d] = {
+      geometry: geometry,
+      color: colors[d],
+      width: 4.0
+    };
+
+    clearLines();
+    generateLines();
     render();
   }
 
   function removeAxis(d) {
     if (axes[d]) {
-      glyphScene.remove(axes[d]);
+      glyphScene.remove(axes[d].mesh);
       axes[d] = null;
       render();
     }
@@ -806,6 +810,7 @@ $(window).on('load', function() {
   });
 
   $('#showPoints').click(function() {
+    clearPoints();
     settings.set('showPoints', this.checked);
     run(getSource(), GeometryMode.PATH);
   });
@@ -1306,14 +1311,36 @@ function run(source, mode, pingback) {
   });
 }
 
+function clearPoints() {
+  for (var i = pointScene.children.length - 1; i >= 0; --i) {
+    pointScene.remove(pointScene.children[i]);
+  }
+}
+
+function clearLines() {
+  for (var i = 0; i < lineMeshes.length; ++i) {
+    modelScene.remove(lineMeshes[i]);
+  }
+  lineMeshes = [];
+
+  for (var i = 0; i < 3; ++i) {
+    if (axes[i] && axes[i].mesh) {
+      glyphScene.remove(axes[i].mesh);
+    }
+  }
+
+  // We intentionally don't remove the underlying line geometries. We only
+  // want these old lines to be redrawn.
+}
+
 function clearModel() {
   for (var i = 0; i < meshes.length; ++i) {
     modelScene.remove(meshes[i]);
   }
-  for (var i = pointScene.children.length - 1; i >= 0; --i) {
-    pointScene.remove(pointScene.children[i]);
-  }
+  clearPoints();
+  clearLines();
   meshes = [];
+  lineEssences = [];
 }
 
 function onInterpret(data) {
@@ -1422,25 +1449,47 @@ function onInterpret(data) {
         for (var i = 0; i < nodePositions.length; ++i) {
           var node = new THREE.Mesh(sphereGeometry, sphereMaterial);
           node.position.copy(nodePositions[i]);
-          pointScene.add(node);
+          if (settings.get('showPoints')) {
+            pointScene.add(node);
+          }
         }
 
-        // Add glyphs to show each remaining point.
+        // Decimate line because MeshLine doesn't handle miters. We just add
+        // two more points to each line segment.
+        if (geometry.vertices.length > 1) {
+          var fracturedGeometry = new THREE.Geometry();
+          var vertices = geometry.vertices;
+  
+          // Add each line segments' starting vertex, plus another one epsilon
+          // away from it, plus another one epsilon away from the successor
+          // vertex.
+          for (var i = 0; i < vertices.length - 1; ++i) {
+            fracturedGeometry.vertices.push(vertices[i]);
+            var distance = vertices[i].distanceTo(vertices[i + 1]);
+            if (distance > 0.01) {
+              var direction = new THREE.Vector3();
+              direction.subVectors(vertices[i + 1], vertices[i]);
+              direction.normalize();
 
-        var polyline = new MeshLine();
-        polyline.setGeometry(geometry);
-        var lineMaterialColorNotDepth = new MeshLineMaterial({
-          lineWidth: settings.get('pathifyLineSize'),
-          color: new THREE.Color('#CC6600'),
-          useMap: false,
-          useAlphaMap: false,
-          opacity: 1,
-          sizeAttenuation: false,
-          resolution: new THREE.Vector2(800, 600),
-          near: camera.near,
-          far: camera.far
-        });
-        meshes.push(new THREE.Mesh(polyline.geometry, lineMaterialColorNotDepth));
+              var p = vertices[i].clone();
+              p.addScaledVector(direction, 0.005);
+              fracturedGeometry.vertices.push(p);
+
+              p = vertices[i + 1].clone();
+              p.addScaledVector(direction, -0.005);
+              fracturedGeometry.vertices.push(p);
+            }
+          }
+
+          // Add last one on.
+          fracturedGeometry.vertices.push(vertices[vertices.length - 1]);
+
+          lineEssences.push({
+            geometry: fracturedGeometry,
+            color: '#CC6600',
+            width: settings.get('pathifyLineSize')
+          });
+        }
 
         var nvertices = pathPositions.length;
         if (settings.get('showHeadings') && nvertices > 0) {
@@ -1482,12 +1531,39 @@ function onInterpret(data) {
     for (var mi = 0; mi < meshes.length; ++mi) {
       modelScene.add(meshes[mi]);
     }
+    generateLines();
 
     render();
   } else if (data['exit_status'] == 22) {
     log(data['stdout'] + '\nYour model was taking a long time to build. It felt like it was never going to finish! So, I stopped trying. Sorry.');
   } else {
     log(sansDebug);
+  }
+}
+
+function getLineMesh(lineEssence) {
+  var polyline = new MeshLine();
+  polyline.setGeometry(lineEssence.geometry);
+  var material = getLineMaterial(lineEssence.width, lineEssence.color);
+  var mesh = new THREE.Mesh(polyline.geometry, material);
+  return mesh;
+}
+
+function generateLines() {
+  for (var i = 0; i < lineEssences.length; ++i) {
+    var mesh = getLineMesh(lineEssences[i]);
+    lineMeshes.push(mesh);
+    modelScene.add(mesh);
+  }
+
+  for (var i = 0; i < 3; ++i) {
+    if (axes[i]) {
+      if (axes[i].mesh) {
+        glyphScene.remove(axes[i].mesh);
+      }
+      axes[i].mesh = getLineMesh(axes[i]);
+      glyphScene.add(axes[i].mesh);
+    }
   }
 }
 
@@ -1625,10 +1701,12 @@ function resize() {
     Blockly.svgResize(blocklyWorkspace);
   }
 
-
   if (textEditor) {
     textEditor.resize();
   }
+
+  clearLines();
+  generateLines();
 
   if (renderer) {
     render();
