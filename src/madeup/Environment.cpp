@@ -5,6 +5,7 @@
 #include "madeup/ExpressionAbsoluteValue.h"
 #include "madeup/ExpressionAll.h"
 #include "madeup/ExpressionAny.h"
+#include "madeup/ExpressionAppend.h"
 #include "madeup/ExpressionArray.h"
 #include "madeup/ExpressionBoolean.h"
 #include "madeup/ExpressionBlobs.h"
@@ -320,6 +321,10 @@ void Environment::prime() {
   define_mirror->addFormal("axis");
   define_mirror->addFormal("point");
 
+  Co<ExpressionDefine> define_append(new ExpressionDefine("append", Co<Expression>(new ExpressionAppend())));
+  define_append->addFormal("array");
+  define_append->addFormal("item");
+
   Co<ExpressionDefine> define_dilate(new ExpressionDefine("dilate", Co<Expression>(new ExpressionDilate())));
   define_dilate->addFormal("path");
   define_dilate->addFormal("length");
@@ -439,6 +444,7 @@ void Environment::prime() {
   add("coalesce", Co<ExpressionClosure>(new ExpressionClosure(define_coalesce, globals)));
   add("fracture", Co<ExpressionClosure>(new ExpressionClosure(define_fracture, globals)));
   add("mirror", Co<ExpressionClosure>(new ExpressionClosure(define_mirror, globals)));
+  add("append", Co<ExpressionClosure>(new ExpressionClosure(define_append, globals)));
   add("dilate", Co<ExpressionClosure>(new ExpressionClosure(define_dilate, globals)));
   add("blobs", Co<ExpressionClosure>(new ExpressionClosure(define_blobs, globals)));
   add("surface", Co<ExpressionClosure>(new ExpressionClosure(define_surface, globals)));
@@ -468,6 +474,7 @@ void Environment::prime() {
   globals->add("add", (*this)["add"]);
   globals->add("all", (*this)["all"]);
   globals->add("any", (*this)["any"]);
+  globals->add("append", (*this)["append"]);
   globals->add("asin", (*this)["asin"]);
   globals->add("atan", (*this)["atan"]);
   globals->add("atan2", (*this)["atan2"]);
@@ -494,6 +501,7 @@ void Environment::prime() {
   globals->add("magnitude", (*this)["magnitude"]);
   globals->add("max", (*this)["max"]);
   globals->add("min", (*this)["min"]);
+  globals->add("mirror", (*this)["mirror"]);
   globals->add("move", (*this)["move"]);
   globals->add("moveto", (*this)["moveto"]);
   globals->add("polarto", (*this)["polarto"]);

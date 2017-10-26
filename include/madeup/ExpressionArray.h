@@ -1,6 +1,8 @@
 #ifndef EXPRESSIONARRAY_H
 #define EXPRESSIONARRAY_H
 
+#include <vector>
+
 #include "madeup/Expression.h"
 #include "madeup/ExpressionInteger.h"
 #include "madeup/ExpressionUnit.h"
@@ -17,11 +19,11 @@ class ExpressionArray : public Expression {
     int getSize() const;
     td::Co<Expression> operator[](int i);
     void setElement(int i, td::Co<Expression> expr);
+    void append(td::Co<Expression> expr);
     void write(ostream &out) const;
 
   private:
-    td::Co<Expression> *elements;
-    int nelements;
+    std::vector<td::Co<Expression>> elements;
 };
 
 /* ------------------------------------------------------------------------- */

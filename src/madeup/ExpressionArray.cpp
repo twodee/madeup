@@ -11,11 +11,9 @@ namespace madeup {
 /* ------------------------------------------------------------------------- */
 
 ExpressionArray::ExpressionArray(int nelements, Co<Expression> fill) :
-  Expression(),
-  nelements(nelements) {
-  elements = new Co<Expression>[nelements];
+  Expression() {
   for (int i = 0; i < nelements; ++i) {
-    elements[i] = fill;
+    elements.push_back(fill);
   }
 }
 
@@ -28,13 +26,13 @@ Co<Expression> ExpressionArray::evaluate(Environment &env) const {
 /* ------------------------------------------------------------------------- */
 
 int ExpressionArray::getSize() const {
-  return nelements;
+  return elements.size();
 }
 
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionArray::operator[](int i) {
-  if (i < 0 || i >= nelements) {
+  if (i < 0 || i >= elements.size()) {
     throw MessagedException("ack!");
   }
   return elements[i];
@@ -48,9 +46,15 @@ void ExpressionArray::setElement(int i, Co<Expression> expr) {
 
 /* ------------------------------------------------------------------------- */
 
+void ExpressionArray::append(td::Co<Expression> expr) {
+  elements.push_back(expr); 
+}
+
+/* ------------------------------------------------------------------------- */
+
 void ExpressionArray::write(ostream &out) const {
   out << "(ARRAY";
-  for (int i = 0; i < nelements; ++i) {
+  for (int i = 0; i < elements.size(); ++i) {
     out << " ";
     elements[i]->write(out);
   }

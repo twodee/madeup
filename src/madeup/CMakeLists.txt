@@ -16,6 +16,7 @@ add_library(madeup
   ExpressionAll.cpp
   ExpressionAny.cpp
   ExpressionAnd.cpp
+  ExpressionAppend.cpp
   ExpressionArray.cpp
   ExpressionBlobs.cpp
   ExpressionBlock.cpp

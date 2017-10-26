@@ -545,9 +545,17 @@ $(window).on('load', function() {
   $('#smaller').click(decreaseFontSize);
   $('#bigger').click(increaseFontSize);
 
-  $('#fit-button').click(function() {
-    fit();
-    focusEditor();
+  $(function() {
+    var mouse = null;
+    $('#fit-button').mousedown(function(e) {
+      mouse = [e.clientX, e.clientY];
+    }).mouseup(function(e) {
+      var diff = [Math.abs(e.clientX - mouse[0]), Math.abs(e.clientY - mouse[1])];
+      if (diff[0] + diff[1] < 5) {
+        fit();
+        focusEditor();
+      }
+    });
   });
 
   $('#cameraLeft').click(function() {
