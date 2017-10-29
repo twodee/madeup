@@ -200,27 +200,32 @@ require('electron').ipcRenderer.on('open', function(event, path) {
   load(new Mup(path));
 });
 
-require('electron').ipcRenderer.on('export', function(event, data) {
-  interpret({
-    timestamp: new Date().getTime(),
-    source: getSource(),
-    extension: 'obj',
-    geometry_mode: GeometryMode.SURFACE,
-    shading_mode: settings.get('isFlatShaded') ? 'FLAT' : 'SMOOTH'
-  }, function(data) {
-    console.log(data);
-    fsdialog.showSaveDialog({
-      title: 'Save OBJ as...',
-      defaultPath: mup.name.replace(/\.[^.]*$/, '') + '.obj'
-    }, function(path) {
-      if (path) {
-        fs.writeFileSync(path, data.model);
-      }
+function export3D(extension) {
+  return function(event, data) {
+    interpret({
+      timestamp: new Date().getTime(),
+      source: getSource(),
+      extension: extension,
+      geometry_mode: GeometryMode.SURFACE,
+      shading_mode: settings.get('isFlatShaded') ? 'FLAT' : 'SMOOTH'
+    }, function(data) {
+      console.log(data);
+      fsdialog.showSaveDialog({
+        title: 'Save ' + extension.toUpperCase() + ' as...',
+        defaultPath: mup.name.replace(/\.[^.]*$/, '') + '.' + extension
+      }, function(path) {
+        if (path) {
+          fs.writeFileSync(path, data.model);
+        }
+      });
+    }, function(errorMessage) {
+      console.log('Failure. :(');
     });
-  }, function(errorMessage) {
-    console.log('Failure. :(');
-  });
-});
+  };
+}
+
+require('electron').ipcRenderer.on('exportOBJ', export3D('obj'));
+require('electron').ipcRenderer.on('exportSTL', export3D('stl'));
 
 require('electron').ipcRenderer.on('screenshot', function(event, data) {
   exportScreenshot();

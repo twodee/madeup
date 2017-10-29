@@ -30,7 +30,7 @@ if (isset($_REQUEST['source'])) {
 //   source: The Madeup source code to interpret.
 //   shading_mode: One of the shading modes recognized by the interpreter.
 //   geometry_mode: One of the geometry modes recognized by the interpreter.
-//   extension: One of json or obj.
+//   extension: One of json, stl, or obj.
 //   tag: The name of the model used for exporting.
 //   timestamp: Time request submitted.
 
@@ -47,7 +47,9 @@ $out['timestamp'] = $in['timestamp'];
 // The interpreter checks that shading_mode and geometry_mode are legal.
 // But we should check that the output path is legal -- that the extension
 // we are given hasn't been tampered with.
-if (!(strcmp($in['extension'], 'json') == 0 || strcmp($in['extension'], 'obj') == 0)) {
+if (strcmp($in['extension'], 'json') != 0 &&
+    strcmp($in['extension'], 'obj') != 0 &&
+    strcmp($in['extension'], 'stl') != 0) {
   $out['exit_status'] = 1;  
   $out['stdout'] = "I don't know {$in['extension']}. I only know how to output JSON and OBJ.";
   echo json_encode($out);
@@ -101,13 +103,13 @@ if (!(strcmp($in['extension'], 'json') == 0 || strcmp($in['extension'], 'obj') =
   exec($command, $lines, $tree_status);
   $out['tree'] = implode("\n", $lines);
 
-  if ($in['extension'] === 'obj' && $out['exit_status'] == 0) {
+  if (($in['extension'] === 'obj' || $in['extension'] === 'stl') && $out['exit_status'] == 0) {
     // We generate a file named after the model. But let's play it
     // safe and remove all the alphanumeric junk they try to feed
     // us.
     $tag = preg_replace("/\W/", '', $in['tag']);
 
-    // If nothing's left, we default to madeup.obj.
+    // If nothing's left, we default to madeup.extension.
     if (strcmp($tag, '') == 0) {
       $tag = 'madeup';
     }
@@ -117,7 +119,7 @@ if (!(strcmp($in['extension'], 'json') == 0 || strcmp($in['extension'], 'obj') =
     header("Content-Type: application/x-please-download-me");
     header("Content-Transfer-Encoding: Binary");
     header("Content-Length:" . filesize($out_path));
-    header("Content-Disposition: attachment; filename=$tag.obj");
+    header("Content-Disposition: attachment; filename=$tag.{$in['extension']}");
     readfile($out_path);
   } else {
     if (memory_get_usage() + 5 * filesize($out_path) > to_bytes(ini_get('memory_limit'))) {

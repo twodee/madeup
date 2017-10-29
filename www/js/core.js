@@ -186,11 +186,11 @@ THREE.Object3D.prototype.clear = function() {
 
 function enableDownload(enable) {
   if (enable) {
-    $('#download').prop('disabled', false);
-    $('#download').removeClass('unclickable').addClass('clickable');
+    $('.export3D').prop('disabled', false);
+    $('.export3D').removeClass('unclickable').addClass('clickable');
   } else {
-    $('#download').prop('disabled', true);
-    $('#download').removeClass('clickable').addClass('unclickable');
+    $('.export3D').prop('disabled', true);
+    $('.export3D').removeClass('clickable').addClass('unclickable');
   }
 }
 
@@ -826,7 +826,10 @@ $(window).on('load', function() {
   $('#exportScreenshot').click(exportScreenshot);
 
   enableDownload(false);
-  $('#download').click(function() {
+  $('.export3D').click(function() {
+    var id = this.id;
+    var type = id.substring(id.length - 3).toLowerCase();
+    $('#extension').val(type);
     $('#tag').val(mup.name);
     $('#source').val(getSource());
     $('#timestamp').val(new Date().getTime());
@@ -1123,6 +1126,7 @@ function setEditor(isText) {
         toolbox: document.getElementById('toolbox'),
         media: 'repos/blockly/media/',
         trashcan: true,
+        collapse: false,
         zoom: {
           controls: true,
           wheel: false,

@@ -189,6 +189,8 @@ int main(int argc, char **argv) {
           if (out_path.find_first_of('.') == std::string::npos ||
               out_path.find(".json") == out_path.length() - 5) {
             trimesh->WriteJSON(out_path);
+          } else if (out_path.find(".stl") == out_path.length() - 4) {
+            trimesh->WriteSTL(out_path);
           } else {
             trimesh->WriteObj(out_path);
           }

@@ -100,7 +100,14 @@ app.on('ready', function() {
           label: 'Export OBJ...',
           accelerator: 'CommandOrControl+E',
           click(item, focusedWindow) {
-            focusedWindow.webContents.send('export');
+            focusedWindow.webContents.send('exportOBJ');
+          },
+        },
+        {
+          label: 'Export STL...',
+          accelerator: 'CommandOrControl+L',
+          click(item, focusedWindow) {
+            focusedWindow.webContents.send('exportSTL');
           },
         },
         {
