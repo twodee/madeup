@@ -532,7 +532,7 @@ $(window).on('load', function() {
   } else if (isPresenting) {
     settings.set('fontSize', 28);
   } else {
-    settings.set('fontSize', 14);
+    settings.set('fontSize', 12);
   }
   setFontSize(settings.get('fontSize'));
 
