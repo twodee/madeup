@@ -3,6 +3,7 @@
 
 #include "madeup/Expression.h"
 #include "madeup/ExpressionArray.h"
+#include "madeup/ExpressionNodes.h"
 #include "madeup/ExpressionString.h"
 
 namespace madeup {
@@ -19,6 +20,7 @@ class ExpressionSubscript : public Expression {
     td::Co<ExpressionInteger> evaluateIndex(Environment &env) const;
     td::Co<ExpressionInteger> evaluateIndex(Environment &env, const ExpressionString *string_value) const;
     td::Co<ExpressionInteger> evaluateIndex(Environment &env, const ExpressionArrayReference *array_value) const;
+    td::Co<ExpressionInteger> evaluateIndex(Environment &env, const ExpressionNodes *path_value) const;
     void write(ostream &out) const;
     void assign(Environment &env, td::Co<Expression> value) const;
 

@@ -422,7 +422,7 @@ void Parser::expressionLevel10() {
         }
         pushExpression(new ExpressionDefineElement(base, subscript, rhs), base->getSourceLocation(), rhs->getSourceLocation());
       } else {
-        pushExpression(new ExpressionSubscript(base, subscript), base->getSourceLocation(), subscript->getSourceLocation());
+        pushExpression(new ExpressionSubscript(base, subscript), base->getSourceLocation(), tokens[i - 1].getLocation());
       }
     }
 
@@ -434,7 +434,7 @@ void Parser::expressionLevel10() {
 
       if (isUp(Token::RIGHT_BRACKET)) {
         ++i;
-        pushExpression(new ExpressionSubrange(base, subscript, subscript2), base->getSourceLocation(), subscript2->getSourceLocation());
+        pushExpression(new ExpressionSubrange(base, subscript, subscript2), base->getSourceLocation(), tokens[i - 1].getLocation());
       } else {
         std::stringstream ss;
         ss << subscript->getSourceLocation().toAnchor() << ": I didn't find a ']' where I expected one.";

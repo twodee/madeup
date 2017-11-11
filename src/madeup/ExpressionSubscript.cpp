@@ -1,5 +1,6 @@
 #include "madeup/ExpressionArray.h"
 #include "madeup/ExpressionInteger.h"
+#include "madeup/ExpressionReal.h"
 #include "madeup/ExpressionSubscript.h"
 #include "madeup/ExpressionString.h"
 
@@ -88,6 +89,30 @@ Co<ExpressionInteger> ExpressionSubscript::evaluateIndex(Environment &env,
 
 /* ------------------------------------------------------------------------- */
 
+Co<ExpressionInteger> ExpressionSubscript::evaluateIndex(Environment &env,
+                                                         const ExpressionNodes *path_value) const {
+  Co<ExpressionInteger> index_value = evaluateIndex(env);
+  int nnodes = path_value->getPath().size();
+
+  // Allow for negative indexing.
+  if (index_value->toInteger() < 0) {
+    index_value->setInteger(index_value->toInteger() + nnodes);
+  }
+  
+  if (index_value->toInteger() < 0 || index_value->toInteger() >= nnodes) {
+    std::stringstream ss;
+    ss << index_expression->getSourceLocation().toAnchor();
+    ss << ": I expect operator [] to be given a valid index. The path has " << nnodes;
+    ss << " elements, indexed 0 through " << (nnodes - 1) << ". ";
+    ss << index_expression->getSource() << " does not give me a valid index.";
+    throw MessagedException(ss.str());
+  }
+
+  return index_value;
+}
+
+/* ------------------------------------------------------------------------- */
+
 Co<Expression> ExpressionSubscript::evaluate(Environment &env) const {
   Co<Expression> base_value = evaluateBase(env);
 
@@ -104,6 +129,18 @@ Co<Expression> ExpressionSubscript::evaluate(Environment &env) const {
     Co<ExpressionInteger> index_value = evaluateIndex(env, string_value);
     std::string s = string_value->getString();
     return Co<Expression>(new ExpressionString(std::string() + s[index_value->toInteger()]));
+  }
+ 
+  // Try as a path.
+  ExpressionNodes *path_value = dynamic_cast<ExpressionNodes *>(base_value.GetPointer());
+  if (path_value) {
+    Co<ExpressionInteger> index_value = evaluateIndex(env, path_value);
+    Node node = path_value->getPath()[index_value->toInteger()];
+    vector<Co<Expression>> position;
+    for (int i = 0; i < 3; ++i) {
+      position.push_back(Co<Expression>(new ExpressionReal(node.position[i])));
+    }
+    return Co<Expression>(new ExpressionArrayLiteral(position))->evaluate(env);
   }
 
   throw MessagedException(base_expression->getSourceLocation().toAnchor() + ": I expect operator [] to be applied to an array or a string. " + base_expression->getSource() + " is neither.");

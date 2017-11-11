@@ -365,3 +365,8 @@ fieldset {
   margin-top: 10px;
   margin-bottom: 10px;
 }
+
+#slider-popup {
+  position: absolute;
+  z-index: 9999999;
+}

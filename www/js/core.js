@@ -55,6 +55,43 @@ function hasWebGL() {
   } 
 }
 
+// https://github.com/devuxd/SeeCodeRun/wiki/Ace-code-editor
+function showSlider(position, number, range) {
+  position.pageY += textEditor.renderer.lineHeight;
+  var div = document.getElementById('slider-popup');
+
+  // If div hasn't been displayed before, let's display it.
+  if (div === null) {
+    div = document.createElement('slider-popup');
+    div.setAttribute('id', 'slider-popup');
+    div.innerHTML = '<input type="range" id="varslider">';
+    document.body.appendChild(div);
+  }
+
+  div.style.left = (position.pageX - div.offsetWidth * 0.5) + 'px';
+  div.style.top = position.pageY + 'px';
+  div.style.display = 'block';
+
+  var slider = document.getElementById('varslider');
+  slider.min = number - 10;
+  slider.max = number + 10;
+  slider.step = number % 1 === 0 ? 1 : 'any';
+  slider.value = number;
+
+  slider.oninput = function(e) {
+    var doc = textEditor.getSession().getDocument();
+    if (number % 1 === 0) {
+      var value = parseInt(slider.value);
+      var replacement = '' + value;
+    } else {
+      var value = parseFloat(slider.value);
+      var replacement = value.toFixed(2);
+    }
+    doc.replace(range, replacement);
+    range.setEnd(range.end.row, range.start.column + replacement.length);
+  }
+}
+
 function getLineMaterial(width, color) {
   return new MeshLineMaterial({
     lineWidth: width,
@@ -411,6 +448,55 @@ $(window).on('load', function() {
   textEditor.commands.bindKey('ctrl-l', null);
   textEditor.commands.bindKey('command-l', null);
   textEditor.commands.bindKey('ctrl-\'', 'togglecomment');
+
+  textEditor.on('mousemove', function(e) {
+    var isSliderable = false;
+
+    var position = e.getDocumentPosition();
+    if (position) {
+      var range = textEditor.getSession().getWordRange(position.row, position.column);
+      var line = textEditor.getSession().getLine(position.row);
+
+      var left = line.substring(0, position.column);
+      var right = line.substring(position.column);
+
+      var patterns = [
+        [/\b(-?\d+\.\d+)$/, /^(\d*)/],
+        [/\b(-?\d+\.)$/, /^(\d+)/],
+        [/\b(-?\d+)$/, /^(\.\d+)/],
+        [/\b(-)$/, /^(\d+\.\d+)/],
+        [/\b()$/, /^(\d+\.\d+)/],
+        [/\b(-?\d+)$/, /^(\d+)/],
+        [/\b(-?\d+)$/, /^()/],
+        [/\b(-?)$/, /^(\d+)/],
+      ];
+
+      var preCursor = null;
+      var postCursor = null;
+      var i = 0;
+      while (i < patterns.length && (preCursor == null || postCursor == null)) {
+        preCursor = left.match(patterns[i][0]);
+        if (!left.match(/[A-Za-z_]$/)) {
+          postCursor = right.match(patterns[i][1]);
+        }
+        ++i;
+      }
+
+      if (preCursor && postCursor) {
+        var number = preCursor[1] + postCursor[1];
+        var range = new Range(position.row, position.column - preCursor[1].length, position.row, position.column + postCursor[1].length);
+        isSliderable = true;
+        showSlider(textEditor.renderer.textToScreenCoordinates(position), parseFloat(number), range);
+      }
+    }
+
+    if (!isSliderable) {
+      var div = document.getElementById('slider-popup');
+      if (div) {
+        div.style.display = 'none';
+      }
+    }
+  });
 
   $('#textEditor textarea').addClass('mousetrap');
 

@@ -1,5 +1,6 @@
 #include "madeup/ExpressionArray.h"
 #include "madeup/ExpressionClosure.h"
+#include "madeup/ExpressionNodes.h"
 #include "madeup/ExpressionSize.h"
 #include "madeup/ExpressionString.h"
 
@@ -31,6 +32,11 @@ Co<Expression> ExpressionSize::evaluate(Environment &env) const {
   ExpressionString *string_value = dynamic_cast<ExpressionString *>(list_value.GetPointer());
   if (string_value) {
     return Co<Expression>(new ExpressionInteger(string_value->getString().length()));
+  }
+
+  ExpressionNodes *path_value = dynamic_cast<ExpressionNodes *>(list_value.GetPointer());
+  if (path_value) {
+    return Co<Expression>(new ExpressionInteger(path_value->getPath().size()));
   }
 
   throw UnlocatedException("I expect function size to be applied to an array or a string. " + list_closure->getSource() + " is not an array.");
