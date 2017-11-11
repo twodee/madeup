@@ -450,6 +450,7 @@ $(window).on('load', function() {
   textEditor.commands.bindKey('ctrl-\'', 'togglecomment');
 
   textEditor.on('mousemove', function(e) {
+    return true;
     var isSliderable = false;
 
     var position = e.getDocumentPosition();
@@ -531,7 +532,7 @@ $(window).on('load', function() {
   } else if (isPresenting) {
     settings.set('fontSize', 28);
   } else {
-    settings.set('fontSize', 20);
+    settings.set('fontSize', 14);
   }
   setFontSize(settings.get('fontSize'));
 
