@@ -28,11 +28,17 @@ const std::vector<Node> &ExpressionNodes::getPath() const {
 td::Co<Expression> ExpressionNodes::center() const {
   QVector3<float> centroid(0.0f);
 
-  for (auto node : path) {
-    centroid += node.position;
+  if (path.size() > 1 && (path[0].position - path[path.size() - 1].position).GetLength() < 1.0e-3f) {
+    for (int i = 0; i < path.size() - 1; ++i) {
+      centroid += path[i].position;
+    }
+    centroid /= path.size() - 1;
+  } else {
+    for (auto node : path) {
+      centroid += node.position;
+    }
+    centroid /= path.size();
   }
-
-  centroid /= path.size();
 
   Co<ExpressionNodes> centered_nodes(new ExpressionNodes(path));
   for (auto &node : centered_nodes->path) {
