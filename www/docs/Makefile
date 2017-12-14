@@ -3,10 +3,10 @@ HTMLS := $(addprefix html/,$(addsuffix .html, $(DOCS)))
 
 all: html $(HTMLS)
 
-html/%.html: %.gray
-	gray generate html $< > $@
+html/%.html: %.gray Makefile
+	gray generate madeup $< > $@
 
-html:
+html: Makefile
 	mkdir -p html
 
 clean:
