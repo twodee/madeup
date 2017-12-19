@@ -963,36 +963,31 @@ void Parser::atom() {
   } else if (isUp(Token::LEFT_CURLY_BRACE)) {
     std::vector<Co<Expression> > items;
     Token left_bracket_token = tokens[i];
+    ++i; // consume {
 
-    if (!isUp(Token::RIGHT_CURLY_BRACE)) {
-      do {
-        ++i; // consume left curly or ,
+    while (!isUp(Token::RIGHT_CURLY_BRACE)) {
+      // Allow newlines in array literals, 'cuz they crazy.
+      while (isUp(Token::NEWLINE)) {
+        ++i;
+      }
 
-        // Allow newlines in array literals, 'cuz they crazy.
-        while (isUp(Token::NEWLINE)) {
-          ++i;
-        }
+      expressionLevel0();
+      items.push_back(popExpression());
 
-        expressionLevel0();
-        items.push_back(popExpression());
-      } while (isUp(Token::COMMA));
+      if (isUp(Token::COMMA)) {
+        ++i; // consume ,
+      } else if (!isUp(Token::RIGHT_CURLY_BRACE)) {
+        std::stringstream ss;
+        ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected }.";
+        throw MessagedException(ss.str());
+      }
     }
- 
-    // Allow newlines in array literals, 'cuz they crazy.
-    while (isUp(Token::NEWLINE)) {
-      ++i;
-    }
 
-    if (isUp(Token::RIGHT_CURLY_BRACE)) {
-      ExpressionArrayLiteral *array_literal = new ExpressionArrayLiteral(items);
-      SourceLocation location(left_bracket_token.getLocation(), tokens[i].getLocation());
-      pushExpression(array_literal, left_bracket_token.getLocation(), tokens[i].getLocation());
-      ++i;
-    } else {
-      std::stringstream ss;
-      ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected }.";
-      throw MessagedException(ss.str());
-    }
+    Token right_bracket_token = tokens[i];
+    ++i;
+
+    ExpressionArrayLiteral *array_literal = new ExpressionArrayLiteral(items);
+    pushExpression(array_literal, left_bracket_token.getLocation(), right_bracket_token.getLocation());
 
   } else if (isUp(Token::RETURN)) {
     Token return_token = tokens[i];

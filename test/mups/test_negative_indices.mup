@@ -1,0 +1,5 @@
+a = {1, 2, 3, 4}
+debug a[-1] == 4
+debug a[-2] == 3
+debug a[-3] == 2
+debug a[-4] == 1

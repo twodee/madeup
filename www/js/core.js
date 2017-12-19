@@ -18,6 +18,8 @@ function Mup(name, modifiedTime, driveID) {
   this.isDirty = false;
 }
 
+var docEditors = [];
+var docWorkspaces = [];
 var Range = null;
 var textEditor = null;
 var gearSections = ['file', 'mups', 'editor', 'pathify', 'solidify', 'camera', 'grid', 'tutorial', 'about'];
@@ -960,6 +962,12 @@ $(window).on('load', function() {
     $(this).next().slideToggle(200);
   });
 
+  $('#panel-section-tutorial > .panel-section-label').click(function() {
+    $('#panel-section-tutorial > .panel-section-content').load('docs/html/ring.html', function() {
+      docify();
+    });
+  });
+
   $('#left').resizable({
     handles: "e",
     resize: function(event, ui) {
@@ -1074,6 +1082,9 @@ function decreaseFontSize() {
 function setFontSize(newSize) {
   settings.set('fontSize', newSize);
   textEditor.setFontSize(settings.get('fontSize'));
+  docEditors.forEach(function(editor) {
+    editor.setFontSize(settings.get('fontSize'));
+  });
   $('#console')[0].style.fontSize = settings.get('fontSize') + 'px';
   $('ul#settings')[0].style.fontSize = (settings.get('fontSize') + 0) + 'px';
   $('#right input, #right select, #info3').css('font-size', newSize);
@@ -1172,6 +1183,10 @@ function setTheme(isDark) {
 
   $('link[title="theme"]').attr('href', settings.get('isThemeDark') ? 'css/ide_skin_dark.css' : 'css/ide_skin_light.css');
   textEditor.setTheme(settings.get('isThemeDark') ? 'ace/theme/twilight' : 'ace/theme/katzenmilch');
+
+  docEditors.forEach(function(editor) {
+    editor.setTheme(settings.get('isThemeDark') ? 'ace/theme/twilight' : 'ace/theme/katzenmilch');
+  });
 }
 
 function setEditor(isText) {
@@ -1289,9 +1304,11 @@ function switchEditors() {
   if (settings.get('isEditorText')) {
     $('#blocksEditor').hide();
     $('#textEditor').show();
+    docsToText();
   } else {
     $('#textEditor').hide();
     $('#blocksEditor').show();
+    docsToBlocks();
   }
 
   // resize();
@@ -1958,4 +1975,87 @@ function render() {
 
 function focusEditor() {
   textEditor.focus();
+}
+
+function docsToText() {
+  var switchers = document.querySelectorAll('.mup-switcher');
+  switchers.forEach(function(switcher) {
+    var textEditor = switcher.children[0];
+    var blocksEditor = switcher.children[1];
+    textEditor.style.display = 'block';
+    blocksEditor.style.display = 'none';
+  });
+}
+
+function docsToBlocks() {
+  var switchers = document.querySelectorAll('.mup-switcher');
+  switchers.forEach(function(switcher) {
+    var textEditor = switcher.children[0];
+    var blocksEditor = switcher.children[1];
+    textEditor.style.display = 'none';
+    blocksEditor.style.display = 'block';
+    docWorkspaces.forEach(function(workspace) {
+      Blockly.svgResize(workspace);
+    });
+  });
+}
+
+// document.addEventListener('DOMContentLoaded', function() {
+function docify() {
+  docEditors = [];
+  docWorkspaces = [];
+
+  // Inject Ace editors on all the code snippets.
+  var editors = document.querySelectorAll('.text-editor');
+  editors.forEach(function(editor) {
+    var editor = ace.edit(editor);
+    docEditors.push(editor);
+    editor.$blockScrolling = Infinity;
+    editor.renderer.$cursorLayer.element.style.display = "none";
+    editor.setTheme(settings.get('isThemeDark') ? 'ace/theme/twilight' : 'ace/theme/katzenmilch');
+    editor.getSession().setMode("ace/mode/madeup");
+    editor.setOptions({
+      maxLines: 15,
+      showPrintMargin: false,
+      highlightActiveLine: false,
+      highlightGutterLine: false,
+      readOnly: true,
+      fontSize: settings.get('fontSize')
+    });
+    editor.renderer.setScrollMargin(10, 10);
+  });
+
+  // Inject Blockly workspaces on all the code snippets.
+  var switchers = document.querySelectorAll('.mup-switcher');
+  switchers.forEach(function(switcher) {
+    var textEditor = switcher.children[0];
+    var blocksEditor = switcher.children[1];
+
+    var workspace = Blockly.inject(blocksEditor, {
+      comments: false,
+      toolbox: false,
+      trashcan: false,
+      readOnly: true,
+      scrollbars: false,
+      zoom: false
+    });
+
+    // Fit the container exactly around the blocks.
+    var sExpression = blocksEditor.firstElementChild.innerHTML;
+    parse(new Peeker(sExpression), workspace);
+    var metrics = workspace.getMetrics();
+    blocksEditor.style.height = metrics.contentHeight + 'px';
+    blocksEditor.style.width = metrics.contentWidth + 'px';
+    Blockly.svgResize(workspace);
+
+    blocksEditor.style.display = 'none';
+
+    docWorkspaces.push(workspace);
+  });
+
+  if (settings.get('isEditorText')) {
+    docsToText();
+  } else {
+    docsToBlocks();
+  }
 }
