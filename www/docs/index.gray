@@ -6,11 +6,11 @@ display: none
 
 A lot of books introduce a tool by enumerating all of its features right away. We don't think that's a great way to learn. Instead, we introduce Madeup through a series of examples that we suggest you recreate as you follow along.
 
-1. [link to="sdowel.html" title="Make an S with <code>dowel</code>"]
-1. [link to="ring.html" title="Make a ring with <code>dowel</code> and a loop"]
-1. [link to="star.html" title="Make a star with <code>extrude</code>, a loop, and a variable"]
-1. [link to="ring_polar.html" title="Make a ring with <code>polarto</code>"]
-1. [link to="view_look.html" title="Saving and restoring views"]
+1. [link to="docs/html/sdowel.html" title="Make an S with <code>dowel</code>"]
+1. [link to="docs/html/ring.html" title="Make a ring with <code>dowel</code> and a loop"]
+1. [link to="docs/html/star.html" title="Make a star with <code>extrude</code>, a loop, and a variable"]
+1. [link to="docs/html/ring_polar.html" title="Make a ring with <code>polarto</code>"]
+1. [link to="docs/html/view_look.html" title="Saving and restoring views"]
 
 Once you feel like you've gotten the hang of Madeup, you may be interested in learning more about a particular command:
 

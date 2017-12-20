@@ -1,6 +1,8 @@
 [let skin=madeupdocs]
 [let root=.]
 
+[link to="docs/html/index.html" title="back"]
+
 # Ring
 
 In this lesson, we'll walk a circular path and turn it into a ring. Let's start as before by moving the 3D cursor to the origin:

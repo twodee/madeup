@@ -5,6 +5,8 @@ height: 20px
 [let skin=madeupdocs]
 [let root=.]
 
+[link to="docs/html/index.html" title="back"]
+
 # S
 
 Let's make something in Madeup! Most Madeup programs involve a lot of moving and turning through 3D space. The letter S has a lot of turns in it, so let's make an S.
@@ -150,4 +152,4 @@ dowel maxBend:5
 
 Note that `nsides` has to get set before the `dowel` command to have any effect.
 
-You did it! If you want to print your model, click [image src=../../images/gear.png style=gear] */ File / Export OBJ*. Save the file and then import it in your printer's slicing software.
+You did it! If you want to print your model, click [image src=images/gear.png style=gear] */ File / Export OBJ*. Save the file and then import it in your printer's slicing software.

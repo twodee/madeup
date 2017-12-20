@@ -963,9 +963,11 @@ $(window).on('load', function() {
   });
 
   $('#panel-section-tutorial > .panel-section-label').click(function() {
-    $('#panel-section-tutorial > .panel-section-content').load('docs/html/ring.html', function() {
-      docify();
-    });
+    if ($('#panel-section-tutorial > .panel-section-content').is(':empty')) {
+      $('#panel-section-tutorial > .panel-section-content').load('docs/html/index.html', function() {
+        docify();
+      });
+    }
   });
 
   $('#left').resizable({
@@ -2058,4 +2060,14 @@ function docify() {
   } else {
     docsToBlocks();
   }
+
+  // Switch all anchor elements to load.
+  $('#panel-section-tutorial > .panel-section-content a').each(function(index, anchor) {
+    anchor.onclick = function() {
+      $('#panel-section-tutorial > .panel-section-content').load(anchor.href, function() {
+        docify();
+      });
+      return false;
+    };
+  });
 }

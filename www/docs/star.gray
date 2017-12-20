@@ -1,6 +1,8 @@
 [let skin=madeupdocs]
 [let root=.]
 
+[link to="docs/html/index.html" title="back"]
+
 # Star
 
 In this lesson, we'll walk a star-shaped path and extend it into the scene with the `extrude` solidifier.
