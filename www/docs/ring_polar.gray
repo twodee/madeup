@@ -1,8 +1,6 @@
 [let skin=madeupdocs]
 [let root=.]
 
-[link to="docs/html/index.html" title="back"]
-
 # Ring with `polarto`
 
 An [link to="docs/html/ring.html" title="earlier lesson"] demonstrated how to make a ring using a sequence of `move`s and `yaw`s:

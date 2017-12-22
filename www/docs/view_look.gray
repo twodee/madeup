@@ -1,8 +1,6 @@
 [let skin=madeupdocs]
 [let root=.]
 
-[link to="docs/html/index.html" title="back"]
-
 # Saving and Restoring Views
 
 There are two ways to move in Madeup. You can move *relatively* using `move`, which jumps forward from your current location and heading. Or you can move *absolutely* using `moveto`, which jumps to an absolute location. How about with the turn commands? Can one turn relatively and absolutely? Well, it "turns" out that the turn commands `yaw`, `pitch`, and `roll` are all relative. They turn relative to your current heading.

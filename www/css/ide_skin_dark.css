@@ -75,3 +75,7 @@ ul#settings > li > .panel-section-label {
 ul#settings > li > .panel-section-label:hover {
   color: #DDDD00;
 }
+
+#panel-section-tutorial > .panel-section-content a {
+  color: rgb(255, 200, 100);
+}

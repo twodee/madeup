@@ -2062,9 +2062,15 @@ function docify() {
   }
 
   // Switch all anchor elements to load.
-  $('#panel-section-tutorial > .panel-section-content a').each(function(index, anchor) {
+  var docsSelector = '#panel-section-tutorial > .panel-section-content';
+  $(docsSelector + ' a').each(function(index, anchor) {
     anchor.onclick = function() {
-      $('#panel-section-tutorial > .panel-section-content').load(anchor.href, function() {
+      $(docsSelector).load(anchor.href, function() {
+        if (!anchor.href.endsWith('docs/html/index.html')) {
+          var html = '<a href="docs/html/index.html" class="toc">back to index</a>';
+          $(docsSelector).prepend(html);
+          $(docsSelector).append(html);
+        }
         docify();
       });
       return false;
