@@ -977,9 +977,15 @@ void Parser::atom() {
       if (isUp(Token::COMMA)) {
         ++i; // consume ,
       } else if (!isUp(Token::RIGHT_CURLY_BRACE)) {
-        std::stringstream ss;
-        ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected }.";
-        throw MessagedException(ss.str());
+        while (isUp(Token::NEWLINE)) {
+          ++i;
+        }
+
+        if (!isUp(Token::RIGHT_CURLY_BRACE)) {
+          std::stringstream ss;
+          ss << tokens[i].getLocation().toAnchor() << ": I found " << tokens[i].getQuotedText() << " in a place where I expected }.";
+          throw MessagedException(ss.str());
+        }
       }
     }
 

@@ -44,8 +44,8 @@ Co<Expression> ExpressionMin::evaluate(Environment &env) const {
     } else if (!b_number) {
       throw MessagedException(b_closure->getSourceLocation().toAnchor() + ": I expect function min to be given a number. That thing you gave it wasn't a number.");
     } else {
-      float a = a_integer->toReal();
-      float b = b_integer->toReal();
+      float a = a_number->toReal();
+      float b = b_number->toReal();
       return Co<Expression>(new ExpressionReal(a < b ? a : b));
     }
   }
