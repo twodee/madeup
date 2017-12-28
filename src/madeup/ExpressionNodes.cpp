@@ -29,7 +29,7 @@ td::Co<Expression> ExpressionNodes::center() const {
   QVector3<float> centroid(0.0f);
 
   if (path.size() > 1 && (path[0].position - path[path.size() - 1].position).GetLength() < 1.0e-3f) {
-    for (int i = 0; i < path.size() - 1; ++i) {
+    for (unsigned int i = 0; i < path.size() - 1; ++i) {
       centroid += path[i].position;
     }
     centroid /= path.size() - 1;

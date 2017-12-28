@@ -32,7 +32,7 @@ int ExpressionArray::getSize() const {
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionArray::operator[](int i) {
-  if (i < 0 || i >= elements.size()) {
+  if (i < 0 || (unsigned int) i >= elements.size()) {
     throw MessagedException("ack!");
   }
   return elements[i];
@@ -54,7 +54,7 @@ void ExpressionArray::append(td::Co<Expression> expr) {
 
 void ExpressionArray::write(ostream &out) const {
   out << "(ARRAY";
-  for (int i = 0; i < elements.size(); ++i) {
+  for (int i = 0; (unsigned int) i < elements.size(); ++i) {
     out << " ";
     elements[i]->write(out);
   }
