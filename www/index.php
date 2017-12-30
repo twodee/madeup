@@ -4,7 +4,7 @@ $use_minified = true;
 
 $html = file_get_contents('index.html');
 
-if (array_key_exists('src', $_REQUEST)) {
+if (array_key_exists('embed', $_REQUEST) && strcmp($_REQUEST['embed'], 'true') == 0) {
   $html = str_replace('var isEmbedded = false; // PHP', 'var isEmbedded = true;', $html);
 }
 
@@ -56,6 +56,7 @@ EOF;
 
 if (array_key_exists('src', $_REQUEST)) {
   $src = str_replace(array("\r\n", "\n", "\r"), "\\n", $_REQUEST['src']);
+  $src = str_replace("'", "\\'", $src);
   $script = "source0 = '$src';";
   if (!array_key_exists('runonload', $_REQUEST) || strcmp($_REQUEST['runonload'], 'true') == 0) {
     $script .= "\nisAutoSolidify = true;";

@@ -44,7 +44,6 @@ var snapshotTask = undefined;
 var settings = new Settings();
 var lastBlocks = null;
 var badModelMessage = 'Uh oh. I tried to generate a model for you, but it is broken. This can happen for a bunch of reasons: some faces may be too small, some vertices may be duplicated, and the mesh boolean operations may just be fickle.';
-var source0 = '';
 var isAutoSolidify = false;
 var axes = [null, null, null];
 
@@ -501,6 +500,15 @@ $(window).on('load', function() {
     }
   });
 
+  if (isEmbedded) {
+    $('#breakout').show();
+  }
+
+  // Preloads are forced to be text for the time being.
+  if (source0) {
+    settings.set('isEditorText', true);
+  }
+
   $('#textEditor textarea').addClass('mousetrap');
 
   if (!isEmbedded) {
@@ -515,7 +523,11 @@ $(window).on('load', function() {
       resize();
     }
 
-    load(new Mup('untitled'));
+    if (source0) {
+      mup = new Mup('untitled');
+    } else {
+      load(new Mup('untitled'));
+    }
   } else {
     mup = new Mup('untitled');
     if (isPresenting) {
@@ -954,6 +966,13 @@ $(window).on('load', function() {
     syncSettings();
     run(getSource(), GeometryMode.PATH);
     focusEditor();
+  });
+
+  $('#breakout').click(function() {
+    // I tried using $.post for this, but the new window didn't show
+    // the source or URL correctly.
+    $('#breakout-form input[name=src]').val(getSource());
+    $('#breakout-form').submit();
   });
 
   $('#settings-button').click(showGearMenu);

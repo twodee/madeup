@@ -26,6 +26,7 @@
     var keystrokesMoviePrefix = null; // PHP
     var madeupPrefix = 'http://madeup.xyz'; // PHP
     var lesson = null; // PHP
+    var source0 = '';
   </script>
 
   <!-- Blockly dependencies -->
@@ -101,6 +102,7 @@
       <div class="quick-button" id="settings-button" title="Settings (Control ?)"><img src="images/gear.png" class="unselectable"></div>
     </div>
     <div id="info3"></div>
+    <div id="breakout">view on madeup.xyz</div>
   </div>
 
   <div id="right">
@@ -341,6 +343,12 @@
   <input id="shading_mode" type="text" value="SMOOTH" name="shading_mode"/>
   <input id="timestamp" type="text" name="timestamp"/>
   <textarea id="source" name="source"></textarea>
+</form>
+
+<form id="breakout-form" action="http://madeup.xyz" method="post" target="_blank">
+  <input name="src" type="hidden">
+  <input name="runonload" type="hidden" value="true">
+  <input name="embed" type="hidden" value="false">
 </form>
 
 <!-- Source Loader ________________________________________________________ -->
