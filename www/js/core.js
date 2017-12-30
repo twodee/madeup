@@ -671,6 +671,8 @@ $(window).on('load', function() {
     viewFrom(2, 1);
   });
 
+  $('#squareport').click(squareport);
+
   $('input[type=radio][name=editorMode]').change(function() {
     var editorMode = $(this).val();
     setEditor(editorMode != "Blocks");
@@ -1830,6 +1832,18 @@ function resize() {
   if (renderer) {
     render();
   }
+}
+
+function squareport() {
+  var height = window.innerHeight;
+  var rightWidth = 0;
+  if ($('#right').css('display') != 'none') {
+    rightWidth = $('#right').outerWidth();
+  }
+
+  var leftover = $(window).width() - height - rightWidth;
+  $('#left').width(leftover);
+  resize();
 }
 
 function highlight(startIndex, stopIndex) {
