@@ -94,7 +94,7 @@ add_custom_target (
 
 add_custom_target (
   docs
-  COMMAND make
+  COMMAND make WWW_ROOT=${WWW_ROOT} SUDO=${SUDO}
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs
 )
 

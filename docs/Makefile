@@ -13,9 +13,9 @@ html/%.html: %.md header.html footer.html Makefile tohtml html/css/coderay.css m
 	./tohtml $*.md > $@
 
 wwwdocs: check
-	sudo mkdir -p $(WWW_ROOT)/docs
-	sudo cp -r html/* $(WWW_ROOT)/docs
-	sudo chmod -R a+rX $(WWW_ROOT)/docs
+	$(SUDO) mkdir -p $(WWW_ROOT)/docs
+	$(SUDO) cp -r html/* $(WWW_ROOT)/docs
+	$(SUDO) chmod -R g+rX $(WWW_ROOT)/docs
 
 clean:
 	rm -f html/*.html
