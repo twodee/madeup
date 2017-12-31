@@ -1,0 +1,25 @@
+f1 = 8.6
+f2 = 9.1
+
+i1 = 3
+i2 = 4
+
+debug |(min f1, f2) - f1| < 0.001
+debug |(max f1, f2) - f2| < 0.001
+debug (min i1, i2) == i1
+debug (max i1, i2) == i2
+
+debug |(min f1, i1) - i1| < 0.001
+debug |(min f1, i2) - i2| < 0.001
+debug |(max f1, i1) - f1| < 0.001
+debug |(max f1, i2) - f1| < 0.001
+
+debug |(min i1, f1) - i1| < 0.001
+debug |(min i2, f1) - i2| < 0.001
+debug |(max i1, f1) - f1| < 0.001
+debug |(max i2, f1) - f1| < 0.001
+
+debug |(min i1, f2) - i1| < 0.001
+debug |(min i2, f2) - i2| < 0.001
+debug |(max i1, f2) - f2| < 0.001
+debug |(max i2, f2) - f2| < 0.001

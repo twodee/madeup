@@ -1,0 +1,23 @@
+a = {
+  1,
+  2,
+  3
+}
+debug a[0] == 1
+debug a[1] == 2
+debug a[2] == 3
+
+to printAll l
+  print l
+end
+
+printAll {5, 10, 
+20}
+
+printAll {{1, 2, 3},
+{4,
+5,
+6},
+{7, 8,
+9}
+}

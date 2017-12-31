@@ -1,0 +1,16 @@
+|(min f1, f2) - f1| < 0.001: true
+|(max f1, f2) - f2| < 0.001: true
+(min i1, i2) == i1: true
+(max i1, i2) == i2: true
+|(min f1, i1) - i1| < 0.001: true
+|(min f1, i2) - i2| < 0.001: true
+|(max f1, i1) - f1| < 0.001: true
+|(max f1, i2) - f1| < 0.001: true
+|(min i1, f1) - i1| < 0.001: true
+|(min i2, f1) - i2| < 0.001: true
+|(max i1, f1) - f1| < 0.001: true
+|(max i2, f1) - f1| < 0.001: true
+|(min i1, f2) - i1| < 0.001: true
+|(min i2, f2) - i2| < 0.001: true
+|(max i1, f2) - f2| < 0.001: true
+|(max i2, f2) - f2| < 0.001: true
