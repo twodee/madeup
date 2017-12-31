@@ -100,6 +100,8 @@ Co<Expression> ExpressionTrimesh::evaluate(Environment &env) const {
     color[2] = rgb[2];
   }
 
+  *mesh *= env.getTransform();
+
   return Co<Expression>(new ExpressionMesh(mesh));
 }
 
