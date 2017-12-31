@@ -69,6 +69,7 @@
 #include "madeup/ExpressionTangent.h"
 #include "madeup/ExpressionTransform.h"
 #include "madeup/ExpressionTranslate.h"
+#include "madeup/ExpressionTrimesh.h"
 #include "madeup/ExpressionTube.h"
 #include "madeup/ExpressionWhere.h"
 #include "madeup/ExpressionYaw.h"
@@ -369,6 +370,10 @@ void Environment::prime() {
   define_dowel->addFormal(twist);
   define_dowel->addFormal(maxBend);
 
+  Co<ExpressionDefine> define_trimesh(new ExpressionDefine("trimesh", Co<Expression>(new ExpressionTrimesh())));
+  define_trimesh->addFormal("vertices");
+  define_trimesh->addFormal("faces");
+
   Co<ExpressionDefine> define_tube(new ExpressionDefine("tube", Co<Expression>(new ExpressionTube())));
   define_tube->addFormal(twist);
   define_tube->addFormal(maxBend);
@@ -456,6 +461,7 @@ void Environment::prime() {
   add("max", Co<ExpressionClosure>(new ExpressionClosure(define_max, globals)));
   add("min", Co<ExpressionClosure>(new ExpressionClosure(define_min, globals)));
   add("dowel", Co<ExpressionClosure>(new ExpressionClosure(define_dowel, globals)));
+  add("trimesh", Co<ExpressionClosure>(new ExpressionClosure(define_trimesh, globals)));
   add("tube", Co<ExpressionClosure>(new ExpressionClosure(define_tube, globals)));
   add("polygon", Co<ExpressionClosure>(new ExpressionClosure(define_polygon, globals)));
   add("sphere", Co<ExpressionClosure>(new ExpressionClosure(define_spheres, globals)));
@@ -491,6 +497,7 @@ void Environment::prime() {
   globals->add("distort", (*this)["distort"]);
   globals->add("dot", (*this)["dot"]);
   globals->add("dowel", (*this)["dowel"]);
+  globals->add("trimesh", (*this)["trimesh"]);
   globals->add("echo", (*this)["echo"]);
   globals->add("extrude", (*this)["extrude"]);
   globals->add("forget", (*this)["forget"]);
@@ -1525,7 +1532,7 @@ std::vector<Node> Environment::popPath() {
 
 void Environment::forget() {
   // Erase last preview path.
-  paths.pop_back();
+  /* paths.pop_back(); */
 
   paths.push_back(vector<Turtle>());
   run.clear();

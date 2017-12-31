@@ -114,6 +114,7 @@ add_library(madeup
   ExpressionTangent.cpp
   ExpressionTranslate.cpp
   ExpressionTransform.cpp
+  ExpressionTrimesh.cpp
   ExpressionTube.cpp
   ExpressionUnit.cpp
   ExpressionUnknown.cpp
