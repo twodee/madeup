@@ -1,0 +1,73 @@
+[let skin=madeupdocs]
+[let root=.]
+[style id=screenshot
+width: 100%
+background-color: white
+]
+
+# Knots
+
+There are a few different things we call knots. We measure a boat's speed in knots, and we tie our shoelaces in knots. But there's also the mathematical knot. When you take a circular path and deform it, you've got yourself a mathematical knot. Like these:
+
+[image src=docs/html/images/knot_table.png style=screenshot]
+
+The most important characteristic of a knot is that it is a *closed* path---forming a complete circuit with no breaks and looping back to where it started.
+
+There's a snack that we eat that is a bit like a knot. It's crunchy and covered in salt.
+[hide title="What is it?"
+[block
+A pretzel looks a bit like a knot. But it is not a closed path. You can see the ends:
+
+[image src=docs/html/images/pretzel_dough.jpg style=screenshot]
+
+Photo courtesy of [link to="https://flic.kr/p/QycmFf" title="Kevin Lawver"].
+]
+]
+
+# Endless Knot
+
+Your challenge is to use Madeup to program the *endless knot*, a knot that originates in Asia and is used to symbolize eternity. It looks like this:
+
+[image src=docs/html/images/endless_knot_path.png style=screenshot]
+
+The name is misleading, as all knots are endless.
+
+However, there is something different about this knot compared to the ones shown above.
+
+[hide title="What is it?"
+This knot has sharp bends. That's okay. It's still a knot as long as it returns to where it started. But what's the angle of these bends?
+]
+
+Code up the path, and then use the `dowel` command to solidify it:
+
+[mup
+dowel maxBend:360
+]
+
+If you think you have an idea for how to complete this knot, I advise you to skip over the Suggestions section. Just start making it!
+
+It's a good idea to talk with your classmates about how they made their endless knots. But don't just copy their code. Go draw pictures together and talk through the shape.
+
+Read on only if you get stuck. 
+
+# Suggestions
+
+A good way to start coding up a path is to situate yourself with the `moveto` command. We can put ourselves at the origin (0, 0) with this code:
+
+[mup
+moveto 0, 0
+]
+
+From there we can wind our way around the knot with just two commands.
+
+The first is `yaw`, which needs to know how many degrees to turn. A positive number will make a right turn, and a negative number will make a left turn. For example, here's how we turn 45 degrees to the right:
+
+[mup
+yaw 45
+]
+
+The second is `move`, which needs to know how far to go in the current direction. For example, here's how we move 10 units forward:
+
+[mup
+move 10
+]

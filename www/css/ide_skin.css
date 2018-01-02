@@ -408,3 +408,7 @@ fieldset {
   text-align: right;
   width: 100%;
 }
+
+.toggler {
+  text-decoration: underline;
+}

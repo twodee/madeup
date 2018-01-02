@@ -76,6 +76,14 @@ ul#settings > li > .panel-section-label:hover {
   color: #DDDD00;
 }
 
-#panel-section-tutorial > .panel-section-content a {
+.toggler, #panel-section-tutorial > .panel-section-content a {
   color: rgb(255, 200, 100);
+}
+
+#panel-section-tutorial > .panel-section-content h3 {
+  color: rgb(255, 200, 0);
+}
+
+#panel-section-tutorial > .panel-section-content h3:not(:first-child) {
+  margin-top: 3em;
 }

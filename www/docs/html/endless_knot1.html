@@ -1,0 +1,78 @@
+
+
+
+
+<h3>Knots</h3>
+
+<p class="grayblock">There are a few different things we call knots. We measure a boat's speed in knots, and we tie our shoelaces in knots. But there's also the mathematical knot. When you take a circular path and deform it, you've got yourself a mathematical knot. Like these:</p>
+
+<img src="./docs/html/images/knot_table.png" style="width: 100%; background-color: white;">
+
+<p class="grayblock">The most important characteristic of a knot is that it is a <em>closed</em> path&mdash;forming a complete circuit with no breaks and looping back to where it started.</p>
+
+<p class="grayblock">There's a snack that we eat that is a bit like a knot. It's crunchy and covered in salt.</p>
+<span class="toggler">What is it?</span><div class="togglee"><div>
+A pretzel looks a bit like a knot. But it is not a closed path. You can see the ends:
+
+<img src="./docs/html/images/pretzel_dough.jpg" style="width: 100%; background-color: white;">
+
+<p class="grayblock">Photo courtesy of <a href="https://flic.kr/p/QycmFf">Kevin Lawver</a>.</p>
+</div></div>
+
+<h3>Endless Knot</h3>
+
+<p class="grayblock">Your challenge is to use Madeup to program the <em>endless knot</em>, a knot that originates in Asia and is used to symbolize eternity. It looks like this:</p>
+
+<img src="./docs/html/images/endless_knot_path.png" style="width: 100%; background-color: white;">
+
+<p class="grayblock">The name is misleading, as all knots are endless.</p>
+
+<p class="grayblock">However, there is something different about this knot compared to the ones shown above.</p>
+
+<span class="toggler">What is it?</span><div class="togglee">This knot has sharp bends. That's okay. It's still a knot as long as it returns to where it started. But what's the angle of these bends?</div>
+
+<p class="grayblock">Code up the path, and then use the <code>dowel</code> command to solidify it:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">dowel maxBend:360</div>
+  <div class="block-editor"><div class="s-expression">(block (call-with-names dowel maxBend (INTEGER 360)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">If you think you have an idea for how to complete this knot, I advise you to skip over the Suggestions section. Just start making it!</p>
+
+<p class="grayblock">It's a good idea to talk with your classmates about how they made their endless knots. But don't just copy their code. Go draw pictures together and talk through the shape.</p>
+
+<p class="grayblock">Read on only if you get stuck. </p>
+
+<h3>Suggestions</h3>
+
+<p class="grayblock">A good way to start coding up a path is to situate yourself with the <code>moveto</code> command. We can put ourselves at the origin (0, 0) with this code:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">moveto 0, 0</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">From there we can wind our way around the knot with just two commands.</p>
+
+<p class="grayblock">The first is <code>yaw</code>, which needs to know how many degrees to turn. A positive number will make a right turn, and a negative number will make a left turn. For example, here's how we turn 45 degrees to the right:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">yaw 45</div>
+  <div class="block-editor"><div class="s-expression">(block (call yaw (INTEGER 45)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">The second is <code>move</code>, which needs to know how far to go in the current direction. For example, here's how we move 10 units forward:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">move 10</div>
+  <div class="block-editor"><div class="s-expression">(block (call move (INTEGER 10)))
+</div></div>
+</div>
+</p>

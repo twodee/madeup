@@ -985,7 +985,8 @@ $(window).on('load', function() {
 
   $('#panel-section-tutorial > .panel-section-label').click(function() {
     if ($('#panel-section-tutorial > .panel-section-content').is(':empty')) {
-      $('#panel-section-tutorial > .panel-section-content').load('docs/html/index.html', function() {
+      // $('#panel-section-tutorial > .panel-section-content').load('docs/html/index.html', function() {
+      $('#panel-section-tutorial > .panel-section-content').load('docs/html/endless_knot1.html', function() {
         docify();
       });
     }
@@ -2108,5 +2109,16 @@ function docify() {
       });
       return false;
     };
+  });
+
+  $(function() {
+    $('.togglee').css('display', 'none');
+    $('.toggler').click(function() {
+      if ($(this).next().css('display') == 'none') {
+        $(this).next().slideDown();
+      } else {
+        $(this).next().slideUp();
+      }
+    });
   });
 }
