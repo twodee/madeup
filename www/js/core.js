@@ -18,6 +18,8 @@ function Mup(name, modifiedTime, driveID) {
   this.isDirty = false;
 }
 
+var now = new Date();
+var sessionID = Math.random().toString(36).substr(2, 9) + '_' + now.toISOString();
 var docEditors = [];
 var docWorkspaces = [];
 var Range = null;
@@ -572,8 +574,7 @@ $(window).on('load', function() {
   };
 
   // Showing gear menu?
-  console.log("settings.get('showGearMenu'):", settings.get('showGearMenu'));
-  if (settings.has('showGearMenu') && settings.get('showGearMenu')) {
+  if (!lesson && settings.has('showGearMenu') && settings.get('showGearMenu')) {
     showGearMenu();
   }
 
@@ -1184,7 +1185,8 @@ function recordSnapshot() {
     url: 'snapshot.php',
     data: JSON.stringify({
       source: getSource(),
-      id: 'xx7'
+      lesson: lesson,
+      id: sessionID
     }),
     contentType: 'application/json; charset=utf-8',
     success: function(data) {
