@@ -1003,12 +1003,9 @@ $(window).on('load', function() {
   });
 
   if (lesson) {
-    // setTimeout(function() {
-      showGearMenu();
-      // setTimeout(function() {
+      showGearMenu(function() {
         $('#panel-section-lesson .panel-section-label').click();
-      // }, 3000);
-    // }, 3000);
+      });
   } else {
     $('#panel-section-lesson').hide();
   }
@@ -1114,7 +1111,7 @@ function setFontSize(newSize) {
   resizeGearMenu();
 }
 
-function showGearMenu() {
+function showGearMenu(callback) {
   if ($('#right').css('display') == 'none') {
     $('#settings-button').fadeToggle(100, function() {
       $('#right').toggle('slide', {direction: 'right', duration: 500}, function() {
@@ -1122,6 +1119,9 @@ function showGearMenu() {
         resize();
         $('#right').css('overflow', 'visible');
         $('#close-settings-button').fadeToggle(500);
+        if (callback) {
+          callback();
+        }
       });
     });
   }
@@ -2068,6 +2068,8 @@ function docify() {
   forEach(switchers, function(i, switcher) {
     var textEditor = switcher.children[0];
     var blocksEditor = switcher.children[1];
+
+    $(blocksEditor.children).slice(1).remove();
 
     var workspace = Blockly.inject(blocksEditor, {
       comments: false,
