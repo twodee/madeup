@@ -22,7 +22,7 @@ var docEditors = [];
 var docWorkspaces = [];
 var Range = null;
 var textEditor = null;
-var gearSections = ['file', 'mups', 'editor', 'pathify', 'solidify', 'camera', 'grid', 'tutorial', 'about'];
+var gearSections = ['file', 'mups', 'editor', 'pathify', 'solidify', 'camera', 'grid', 'tutorial', 'lesson', 'about'];
 var isDownloading = false;
 var initialized = false;
 var mup = null;
@@ -176,29 +176,6 @@ var onMouseDown = (function() {
 
   return onMouseDown;
 })();
-
-// Prime Blockly with some builtin variables. There's no API exposed for this,
-// but Blockly.Variables.allVariables walks the blocks in the workspace and
-// returns the names of all variables. Our builtin variables don't necessarily
-// appear in the workspace (yet), so we hijack this function and add them
-// manually.
-// console.log("5555555555555555555555");
-// (function() {
-  // var oldAllVariables = Blockly.Variables.allVariables;
-  // Blockly.Variables.allVariables = function(root) {
-    // var vars = oldAllVariables.call(this, root);
-    // console.log("666666666666666666666");
-    // vars.push('nsides');
-    // vars.push('.rgb');
-    // vars.push('.radius');
-    // vars.push('.innerRadius');
-    // vars.push('.outerRadius');
-    // console.log("vars:", vars);
-    // return vars;
-  // };
-// })();
-
-
 
 // Warn on leaving the page if there are unsaved changes. Downloading triggers
 // this, even though we're not leaving the page, so we add a special flag to
@@ -985,8 +962,15 @@ $(window).on('load', function() {
 
   $('#panel-section-tutorial > .panel-section-label').click(function() {
     if ($('#panel-section-tutorial > .panel-section-content').is(':empty')) {
-      // $('#panel-section-tutorial > .panel-section-content').load('docs/html/index.html', function() {
-      $('#panel-section-tutorial > .panel-section-content').load('docs/html/endless_knot1.html', function() {
+      $('#panel-section-tutorial > .panel-section-content').load('docs/html/index.html', function() {
+        docify();
+      });
+    }
+  });
+
+  $('#panel-section-lesson > .panel-section-label').click(function() {
+    if ($('#panel-section-lesson > .panel-section-content').is(':empty')) {
+      $('#panel-section-lesson > .panel-section-content').load('docs/html/' + lesson + '.html', function() {
         docify();
       });
     }
@@ -1013,6 +997,17 @@ $(window).on('load', function() {
       window.dispatchEvent(new Event('resize'))
     } 
   });
+
+  if (lesson) {
+    // setTimeout(function() {
+      showGearMenu();
+      // setTimeout(function() {
+        $('#panel-section-lesson .panel-section-label').click();
+      // }, 3000);
+    // }, 3000);
+  } else {
+    $('#panel-section-lesson').hide();
+  }
 
   Mousetrap.bind('ctrl+s', save);
   Mousetrap.bind('ctrl+shift+s', promptForSaveAs);
@@ -1116,14 +1111,16 @@ function setFontSize(newSize) {
 }
 
 function showGearMenu() {
-  $('#settings-button').fadeToggle(100, function() {
-    $('#right').toggle('slide', {direction: 'right', duration: 500}, function() {
-      resizeGearMenu();
-      resize();
-      $('#right').css('overflow', 'visible');
-      $('#close-settings-button').fadeToggle(500);
+  if ($('#settings-button').is(':visible')) {
+    $('#settings-button').fadeToggle(100, function() {
+      $('#right').toggle('slide', {direction: 'right', duration: 500}, function() {
+        resizeGearMenu();
+        resize();
+        $('#right').css('overflow', 'visible');
+        $('#close-settings-button').fadeToggle(500);
+      });
     });
-  });
+  }
 }
 
 function hideGearMenu() {
@@ -2015,7 +2012,7 @@ function focusEditor() {
 
 function docsToText() {
   var switchers = document.querySelectorAll('.mup-switcher');
-  switchers.forEach(function(switcher) {
+  forEach(switchers, function(i, switcher) {
     var textEditor = switcher.children[0];
     var blocksEditor = switcher.children[1];
     textEditor.style.display = 'block';
@@ -2025,7 +2022,7 @@ function docsToText() {
 
 function docsToBlocks() {
   var switchers = document.querySelectorAll('.mup-switcher');
-  switchers.forEach(function(switcher) {
+  forEach(switchers, function(i, switcher) {
     var textEditor = switcher.children[0];
     var blocksEditor = switcher.children[1];
     textEditor.style.display = 'none';
@@ -2043,8 +2040,8 @@ function docify() {
 
   // Inject Ace editors on all the code snippets.
   var editors = document.querySelectorAll('.text-editor');
-  editors.forEach(function(editor) {
-    var editor = ace.edit(editor);
+  forEach(editors, function(i, element) {
+    var editor = ace.edit(element);
     docEditors.push(editor);
     editor.$blockScrolling = Infinity;
     editor.renderer.$cursorLayer.element.style.display = "none";
@@ -2063,7 +2060,7 @@ function docify() {
 
   // Inject Blockly workspaces on all the code snippets.
   var switchers = document.querySelectorAll('.mup-switcher');
-  switchers.forEach(function(switcher) {
+  forEach(switchers, function(i, switcher) {
     var textEditor = switcher.children[0];
     var blocksEditor = switcher.children[1];
 

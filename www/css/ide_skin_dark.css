@@ -80,10 +80,10 @@ ul#settings > li > .panel-section-label:hover {
   color: rgb(255, 200, 100);
 }
 
-#panel-section-tutorial > .panel-section-content h3 {
+.doccopy h3 {
   color: rgb(255, 200, 0);
 }
 
-#panel-section-tutorial > .panel-section-content h3:not(:first-child) {
+.doccopy h3:not(:first-child) {
   margin-top: 3em;
 }

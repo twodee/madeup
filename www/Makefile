@@ -6,13 +6,13 @@ DST = $(addprefix $(WWW_ROOT)/, $(SRC))
 DEPS = ace gapi.js three-js jquery.js js-cookie jquery-ui blockly closure-library filesaver jquery_ui_touch_punch mousetrap meshline
 JQUERY_UI_VERSION = 1.12.1
 MINIFIED_DEPS = $(addprefix $(WWW_ROOT)/,deps.min.js mode-madeup.js theme-twilight.js theme-katzenmilch.js)
-DOCS = $(addprefix $(WWW_ROOT)/,$(wildcard docs/html/*.html))
+DOCS = $(addprefix $(WWW_ROOT)/,$(wildcard docs/html/*.html) $(wildcard docs/html/images/*))
 
 DST_BINARIES = $(WWW_ROOT)/$(notdir $(MERP))
 
 .PHONY: madeup check
 
-all: check $(DST) $(WWW_ROOT)/docs/html $(DOCS) $(WWW_ROOT)/repos/ace/src-noconflict/mode-madeup.js $(DST_BINARIES) $(MINIFIED_DEPS)
+all: check $(DST) $(WWW_ROOT)/docs/html $(WWW_ROOT)/docs/html/images $(DOCS) $(DOCIMAGES) $(WWW_ROOT)/repos/ace/src-noconflict/mode-madeup.js $(DST_BINARIES) $(MINIFIED_DEPS)
 
 check:
 	@if [ -z "$(WWW_ROOT)" ]; then \
@@ -24,8 +24,11 @@ libdeps: $(WWW_ROOT)/repos $(addprefix $(WWW_ROOT)/repos/, $(DEPS))
 
 init: libdeps madeup all
 
-$(WWW_ROOT)/docs/html:
-	mkdir -p $(WWW_ROOT)/docs/html
+$(WWW_ROOT)/docs/html $(WWW_ROOT)/docs/html/images:
+	$(SUDO) mkdir -p $(WWW_ROOT)/docs/html
+	$(SUDO) chmod g+rX $(WWW_ROOT)/docs/html
+	$(SUDO) mkdir -p $(WWW_ROOT)/docs/html/images
+	$(SUDO) chmod g+rX $(WWW_ROOT)/docs/html/images
 
 $(WWW_ROOT)/docs/html/%: docs/html/%
 	@echo cp -r $< $@

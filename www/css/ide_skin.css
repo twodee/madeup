@@ -412,3 +412,8 @@ fieldset {
 .toggler {
   text-decoration: underline;
 }
+
+/* Why isn't this working? I had to do this in Javascript. */
+#panel-section-lesson {
+  display: none;
+}
