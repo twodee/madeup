@@ -71,3 +71,7 @@ The second is `move`, which needs to know how far to go in the current direction
 [mup
 move 10
 ]
+
+# Next
+
+Look at the code you wrote to make this knot. Does it feel repetitive? Probably. When we meet in person, we'll look at another, simpler way to code this path. You're probably thinking, "We'll use a loop!" Nope, sorry. We're going to use something else.

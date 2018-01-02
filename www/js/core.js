@@ -572,13 +572,16 @@ $(window).on('load', function() {
   };
 
   // Showing gear menu?
+  console.log("settings.get('showGearMenu'):", settings.get('showGearMenu'));
   if (settings.has('showGearMenu') && settings.get('showGearMenu')) {
     showGearMenu();
   }
 
   gearSections.forEach(function(tag) {
     var property = 'isOpen' + tag.charAt(0).toUpperCase() + tag.substring(1);
+    console.log("property:", property);
     if (settings.has(property) && settings.get(property)) {
+      console.log("on");
       $('#panel-section-' + tag + ' > .panel-section-label').click();
     }
   });
@@ -1111,7 +1114,7 @@ function setFontSize(newSize) {
 }
 
 function showGearMenu() {
-  if ($('#settings-button').is(':visible')) {
+  if ($('#right').css('display') == 'none') {
     $('#settings-button').fadeToggle(100, function() {
       $('#right').toggle('slide', {direction: 'right', duration: 500}, function() {
         resizeGearMenu();
