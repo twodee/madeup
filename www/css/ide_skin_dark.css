@@ -83,7 +83,3 @@ ul#settings > li > .panel-section-label:hover {
 .doccopy h3 {
   color: rgb(255, 200, 0);
 }
-
-.doccopy h3:not(:first-child) {
-  margin-top: 3em;
-}

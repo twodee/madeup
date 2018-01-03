@@ -417,3 +417,7 @@ fieldset {
 #panel-section-lesson {
   display: none;
 }
+
+.doccopy h3:not(:first-of-type) {
+  margin-top: 3em;
+}
