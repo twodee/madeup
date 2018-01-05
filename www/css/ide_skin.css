@@ -419,6 +419,6 @@ fieldset {
   display: none;
 }
 
-.doccopy h3:not(:first-child) {
+.doccopy h3:not(:first-of-type) {
   margin-top: 3em;
 }
