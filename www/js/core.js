@@ -965,7 +965,9 @@ $(window).on('load', function() {
 
   $('ul#settings > li > .panel-section-label').click(function() {
     $(this).toggleClass('open-panel-section-label');
-    $(this).next().slideToggle(200);
+    $(this).next().slideToggle(200, function() {
+      refreshBlocklyWorkspaces();
+    });
   });
 
   $('#panel-section-tutorial > .panel-section-label').click(function() {
@@ -973,6 +975,8 @@ $(window).on('load', function() {
       $('#panel-section-tutorial > .panel-section-content').load('docs/html/index.html', function() {
         docify();
       });
+    } else {
+      docify();
     }
   });
 
@@ -981,6 +985,8 @@ $(window).on('load', function() {
       $('#panel-section-lesson > .panel-section-content').load('docs/html/' + lesson + '.html', function() {
         docify();
       });
+    } else {
+      docify();
     }
   });
 
@@ -2029,25 +2035,26 @@ function docsToText() {
   });
 }
 
+function refreshBlocklyWorkspaces() {
+  docWorkspaces.forEach(function(workspace) {
+    Blockly.svgResize(workspace);
+  });
+}
+
 function docsToBlocks() {
-  console.log("docsToBlocks");
   var switchers = document.querySelectorAll('.mup-switcher');
   forEach(switchers, function(i, switcher) {
-    console.log("switcher:", switcher);
     var textEditor = switcher.children[0];
     var blocksEditor = switcher.children[1];
     textEditor.style.display = 'none';
     blocksEditor.style.display = 'block';
-    docWorkspaces.forEach(function(workspace) {
-      Blockly.svgResize(workspace);
-    });
   });
+  refreshBlocklyWorkspaces();
+  resizeGearMenu();
 }
 
 // document.addEventListener('DOMContentLoaded', function() {
 function docify() {
-  console.log("docify");
-
   docEditors = [];
   docWorkspaces = [];
 
@@ -2093,12 +2100,11 @@ function docify() {
     var sExpression = blocksEditor.firstElementChild.innerHTML;
     parse(new Peeker(sExpression), workspace);
     var metrics = workspace.getMetrics();
-    console.log("metrics:", metrics);
     blocksEditor.style.height = metrics.contentHeight + 'px';
     blocksEditor.style.width = metrics.contentWidth + 'px';
     Blockly.svgResize(workspace);
 
-    blocksEditor.style.display = 'none';
+    // blocksEditor.style.display = 'none';
 
     docWorkspaces.push(workspace);
   });
