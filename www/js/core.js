@@ -2029,6 +2029,7 @@ function docsToText() {
   var switchers = document.querySelectorAll('.mup-switcher');
   forEach(switchers, function(i, switcher) {
     var textEditor = switcher.children[0];
+    $(textEditor).height(150 + 'px');
     var blocksEditor = switcher.children[1];
     textEditor.style.display = 'block';
     blocksEditor.style.display = 'none';
@@ -2076,6 +2077,7 @@ function docify() {
       fontSize: settings.get('fontSize')
     });
     editor.renderer.setScrollMargin(10, 10);
+    editor.resize();
   });
 
   // Inject Blockly workspaces on all the code snippets.
@@ -2104,7 +2106,7 @@ function docify() {
     blocksEditor.style.width = metrics.contentWidth + 'px';
     Blockly.svgResize(workspace);
 
-    // blocksEditor.style.display = 'none';
+    blocksEditor.style.display = 'none';
 
     docWorkspaces.push(workspace);
   });
