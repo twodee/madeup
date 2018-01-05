@@ -411,9 +411,14 @@ fieldset {
 
 .toggler {
   text-decoration: underline;
+  cursor: pointer;
 }
 
 /* Why isn't this working? I had to do this in Javascript. */
 #panel-section-lesson {
   display: none;
+}
+
+.doccopy h3:not(:first-child) {
+  margin-top: 3em;
 }

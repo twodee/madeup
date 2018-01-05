@@ -580,9 +580,7 @@ $(window).on('load', function() {
 
   gearSections.forEach(function(tag) {
     var property = 'isOpen' + tag.charAt(0).toUpperCase() + tag.substring(1);
-    console.log("property:", property);
     if (settings.has(property) && settings.get(property)) {
-      console.log("on");
       $('#panel-section-' + tag + ' > .panel-section-label').click();
     }
   });
@@ -956,8 +954,14 @@ $(window).on('load', function() {
     $('#breakout-form').submit();
   });
 
-  $('#settings-button').click(showGearMenu);
-  $('#close-settings-button').click(hideGearMenu);
+  // This isn't UFW. jQuery will send a parameter to the callback. I
+  // don't want that parameter in this case.
+  $('#settings-button').click(function() {
+    showGearMenu();
+  });
+  $('#close-settings-button').click(function() {
+    hideGearMenu();
+  });
 
   $('ul#settings > li > .panel-section-label').click(function() {
     $(this).toggleClass('open-panel-section-label');
@@ -1174,7 +1178,7 @@ function onSourceChanged() {
     clearTimeout(snapshotTask); 
   }
 
-  if (lesson != null) {
+  if (lesson != null && isSnapshot) {
     snapshotTask = setTimeout(recordSnapshot, 2 * 1000);
   }
 }
@@ -2026,8 +2030,10 @@ function docsToText() {
 }
 
 function docsToBlocks() {
+  console.log("docsToBlocks");
   var switchers = document.querySelectorAll('.mup-switcher');
   forEach(switchers, function(i, switcher) {
+    console.log("switcher:", switcher);
     var textEditor = switcher.children[0];
     var blocksEditor = switcher.children[1];
     textEditor.style.display = 'none';
@@ -2040,6 +2046,8 @@ function docsToBlocks() {
 
 // document.addEventListener('DOMContentLoaded', function() {
 function docify() {
+  console.log("docify");
+
   docEditors = [];
   docWorkspaces = [];
 
@@ -2069,6 +2077,7 @@ function docify() {
     var textEditor = switcher.children[0];
     var blocksEditor = switcher.children[1];
 
+    // Purge old workspace.
     $(blocksEditor.children).slice(1).remove();
 
     var workspace = Blockly.inject(blocksEditor, {
@@ -2084,6 +2093,7 @@ function docify() {
     var sExpression = blocksEditor.firstElementChild.innerHTML;
     parse(new Peeker(sExpression), workspace);
     var metrics = workspace.getMetrics();
+    console.log("metrics:", metrics);
     blocksEditor.style.height = metrics.contentHeight + 'px';
     blocksEditor.style.width = metrics.contentWidth + 'px';
     Blockly.svgResize(workspace);

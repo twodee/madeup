@@ -1,6 +1,6 @@
 <?php
 
-$use_minified = true;
+$use_minified = false;
 
 $html = file_get_contents('index.html');
 
@@ -23,6 +23,9 @@ if (array_key_exists('movie', $_REQUEST)) {
 
 if (array_key_exists('lesson', $_REQUEST)) {
   $html = str_replace('var lesson = null; // PHP', "var lesson = '{$_REQUEST['lesson']}';", $html);
+  if (!array_key_exists('nosnaps', $_REQUEST)) {
+    $html = str_replace('var isSnapshot = false; // PHP', "var isSnapshot = true;", $html);
+  }
 }
 
 function comment($matches) {
