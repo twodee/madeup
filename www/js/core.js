@@ -1032,6 +1032,7 @@ $(window).on('load', function() {
   Mousetrap.bind('ctrl+[', decreaseFontSize);
   Mousetrap.bind('ctrl+]', increaseFontSize);
   Mousetrap.bind('ctrl+9', logAbtractSyntaxTree);
+  Mousetrap.bind('ctrl+4', squareport);
 
   // Form elements don't get events in the same way. We must explicitly bind.
   forEach(document.querySelectorAll('input, select, textarea'), function(i, element) {
@@ -1048,6 +1049,7 @@ $(window).on('load', function() {
     mousetrap.bind('ctrl+[', decreaseFontSize);
     mousetrap.bind('ctrl+]', increaseFontSize);
     mousetrap.bind('ctrl+9', logAbtractSyntaxTree);
+    mousetrap.bind('ctrl+4', squareport);
   });
 });
 
@@ -1390,8 +1392,14 @@ function load(newMup) {
         xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
         lastBlocks = Blockly.Xml.domToText(xml);
       }
+
+      // Wipe away variables that aren't in use. Blockly used to do this
+      // automatically. We only do this on load, as removing variables during a
+      // coding session can lead to unwanted surprises.
+      blocklyWorkspace.updateVariableStore(true);
+
+      // But the builtin variables should always be around.
       ensureBuiltinVariables();
-      // blocklyWorkspace.updateVariableStore(); TODO do I need this?
     }
 
     // TODO toggle modes
