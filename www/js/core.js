@@ -372,16 +372,19 @@ function syncSettings() {
 
 // renderer isn't ready yet, so we need to wait for the window onload event.
 $(window).on('load', function() {
-  $(document).tooltip({
-    show: {
-      effect: 'slideDown',
-      delay: 2000
-    },
-    position: {
-      my: 'center top',
-      at: 'center bottom'
-    }
+  $('.quick-button').forEach(function(button) {
+    console.log(button.title);
   });
+  // $(document).tooltip({
+    // show: {
+      // effect: 'slideDown',
+      // delay: 2000
+    // },
+    // position: {
+      // my: 'center top',
+      // at: 'center bottom'
+    // }
+  // });
 
   if (hasWebGL()) {
     init();
@@ -625,17 +628,25 @@ $(window).on('load', function() {
   $('#smaller').click(decreaseFontSize);
   $('#bigger').click(increaseFontSize);
 
-  $(function() {
-    var mouse = null;
-    $('#fit-button').mousedown(function(e) {
-      mouse = [e.clientX, e.clientY];
-    }).mouseup(function(e) {
-      var diff = [Math.abs(e.clientX - mouse[0]), Math.abs(e.clientY - mouse[1])];
-      if (diff[0] + diff[1] < 5) {
-        fit();
-        focusEditor();
-      }
+  var mouse = null;
+  function softClick(selector, callback) {
+    $(function() {
+      $(selector).mousedown(function(e) {
+        mouse = [e.clientX, e.clientY];
+        console.log("mouse:", mouse);
+      }).mouseup(function(e) {
+        var diff = [Math.abs(e.clientX - mouse[0]), Math.abs(e.clientY - mouse[1])];
+        console.log("diff:", diff);
+        if (diff[0] + diff[1] < 5) {
+          callback();
+        }
+      });
     });
+  }
+
+  softClick('#fit-button', function() {
+    fit();
+    focusEditor();
   });
 
   $('#cameraLeft').click(function() {
@@ -935,13 +946,13 @@ $(window).on('load', function() {
     sendToChris(source);
   });
 
-  $('#solidify-button').click(function() {
+  softClick('#solidify-button', function() {
     syncSettings();
     run(getSource(), GeometryMode.SURFACE);
     focusEditor();
   });
 
-  $('#pathify-button').click(function() {
+  softClick('#pathify-button', function() {
     syncSettings();
     run(getSource(), GeometryMode.PATH);
     focusEditor();
@@ -956,10 +967,10 @@ $(window).on('load', function() {
 
   // This isn't UFW. jQuery will send a parameter to the callback. I
   // don't want that parameter in this case.
-  $('#settings-button').click(function() {
+  softClick('#settings-button', function() {
     showGearMenu();
   });
-  $('#close-settings-button').click(function() {
+  softClick('#close-settings-button', function() {
     hideGearMenu();
   });
 
@@ -1001,6 +1012,10 @@ $(window).on('load', function() {
     handles: "w",
     minWidth: 300,
     resize: function(event, ui) {
+      // Mobile was setting left on this right-anchored element. Not sure why that issue didn't
+      // manifest itself on desktop. We cancel out the assignment and leave left floating. The
+      // resize should only change the width.
+      $(this).css('left', 'auto');
       window.dispatchEvent(new Event('resize'))
     } 
   });

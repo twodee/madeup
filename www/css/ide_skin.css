@@ -258,6 +258,7 @@ on the ul cut off the absolutely positioned X box.
   width: 300px;
   position: absolute;
   right: 0;
+  /* left: auto !important; */
   top: 0;
   bottom: 0;
 }
