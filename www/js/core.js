@@ -372,8 +372,10 @@ function syncSettings() {
 
 // renderer isn't ready yet, so we need to wait for the window onload event.
 $(window).on('load', function() {
-  $('.quick-button').forEach(function(button) {
-    console.log(button.title);
+  $('.quick-button').each(function(i, button) {
+    // console.log(button.title);
+    $(button).append('<div class="tooltip">' + button.title + '</div>');
+    $(button).removeAttr('title');
   });
   // $(document).tooltip({
     // show: {
@@ -1834,7 +1836,6 @@ function log(message) {
       return '';
     }
   });
-
 
   $('#console #message').html(linkMessage.replace(/\n/g, '<br/>'));
 }

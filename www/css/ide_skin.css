@@ -217,6 +217,7 @@ audio::-webkit-media-controls-enclosure {
 .quick-button {
   float: left;
   margin-top: 10px;
+  position: relative;
 }
 
 #settings-button {
@@ -452,4 +453,23 @@ fieldset {
 
 .doccopy h3:not(:first-of-type) {
   margin-top: 3em;
+}
+
+.tooltip {
+  /* background-color: gray; */
+  color: black;
+  font-family: sans-serif;
+  padding: 3px;
+  position: absolute;
+  visibility: hidden;
+  text-align: center;
+  left: 50%;
+  transform: translate(-50%, 0);
+  opacity: 0;
+  transition: opacity 1s ease 0.5s;
+}
+
+.quick-button:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
 }
