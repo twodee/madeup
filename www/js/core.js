@@ -377,16 +377,6 @@ $(window).on('load', function() {
     $(button).append('<div class="tooltip">' + button.title + '</div>');
     $(button).removeAttr('title');
   });
-  // $(document).tooltip({
-    // show: {
-      // effect: 'slideDown',
-      // delay: 2000
-    // },
-    // position: {
-      // my: 'center top',
-      // at: 'center bottom'
-    // }
-  // });
 
   if (hasWebGL()) {
     init();
@@ -435,44 +425,54 @@ $(window).on('load', function() {
   textEditor.commands.bindKey('ctrl-\'', 'togglecomment');
 
   textEditor.on('mousemove', function(e) {
-    return true;
     var isSliderable = false;
 
     var position = e.getDocumentPosition();
-    if (position) {
-      var range = textEditor.getSession().getWordRange(position.row, position.column);
-      var line = textEditor.getSession().getLine(position.row);
+    if ((e.domEvent.shiftKey || e.domEvent.altKey) && position) {
+      var tokenPosition = textEditor.renderer.textToScreenCoordinates(position);
+      if (Math.abs(tokenPosition.pageX - e.clientX) < 10) {
+        var range = textEditor.getSession().getWordRange(position.row, position.column);
+        var line = textEditor.getSession().getLine(position.row);
 
-      var left = line.substring(0, position.column);
-      var right = line.substring(position.column);
+        var left = line.substring(0, position.column);
+        var right = line.substring(position.column);
+        // console.log("left: [" + left + "]");
+        // console.log("right:", right);
 
-      var patterns = [
-        [/\b(-?\d+\.\d+)$/, /^(\d*)/],
-        [/\b(-?\d+\.)$/, /^(\d+)/],
-        [/\b(-?\d+)$/, /^(\.\d+)/],
-        [/\b(-)$/, /^(\d+\.\d+)/],
-        [/\b()$/, /^(\d+\.\d+)/],
-        [/\b(-?\d+)$/, /^(\d+)/],
-        [/\b(-?\d+)$/, /^()/],
-        [/\b(-?)$/, /^(\d+)/],
-      ];
+        var patterns = [
+          [/\b(-?\d+\.\d+)$/, /^(\d*)/],
+          [/\b(-?\d+\.)$/, /^(\d+)/],
+          [/\b(-?\d+)$/, /^(\.\d+)/],
+          [/\b(-)$/, /^(\d+\.\d+)/],
+          [/\b()$/, /^(\d+\.\d+)/],
+          [/(?:\b|\W)()$/, /^(-?\d+)/],
+          [/\b(-?\d+)$/, /^(\d+)/],
+          [/\b(-?\d+)$/, /^()/],
+          [/\b(-?)$/, /^(\d+)/],
+        ];
 
-      var preCursor = null;
-      var postCursor = null;
-      var i = 0;
-      while (i < patterns.length && (preCursor == null || postCursor == null)) {
-        preCursor = left.match(patterns[i][0]);
-        if (!left.match(/[A-Za-z_]$/)) {
-          postCursor = right.match(patterns[i][1]);
+        var preCursor = null;
+        var postCursor = null;
+        var i = 0;
+        while (i < patterns.length && (preCursor == null || postCursor == null)) {
+          preCursor = left.match(patterns[i][0]);
+          // console.log("i:", i);
+          // console.log("preCursor:", preCursor);
+          if (!left.match(/[A-Za-z_]$/)) {
+            postCursor = right.match(patterns[i][1]);
+            // console.log("postCursor:", postCursor);
+          }
+          ++i;
         }
-        ++i;
-      }
+        // console.log("final preCursor:", preCursor);
+        // console.log("final postCursor:", postCursor);
 
-      if (preCursor && postCursor) {
-        var number = preCursor[1] + postCursor[1];
-        var range = new Range(position.row, position.column - preCursor[1].length, position.row, position.column + postCursor[1].length);
-        isSliderable = true;
-        showSlider(textEditor.renderer.textToScreenCoordinates(position), parseFloat(number), range);
+        if (preCursor && postCursor) {
+          var number = preCursor[1] + postCursor[1];
+          var range = new Range(position.row, position.column - preCursor[1].length, position.row, position.column + postCursor[1].length);
+          isSliderable = true;
+          showSlider(textEditor.renderer.textToScreenCoordinates(position), parseFloat(number), range);
+        }
       }
     }
 
