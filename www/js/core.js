@@ -73,7 +73,7 @@ function showSlider(position, number, range) {
 
   div.style.left = (position.pageX - div.offsetWidth * 0.5) + 'px';
   div.style.top = position.pageY + 'px';
-  div.style.display = 'block';
+  div.style.opacity = 1;
 
   var slider = document.getElementById('varslider');
   slider.min = number - 10;
@@ -373,7 +373,6 @@ function syncSettings() {
 // renderer isn't ready yet, so we need to wait for the window onload event.
 $(window).on('load', function() {
   $('.quick-button').each(function(i, button) {
-    // console.log(button.title);
     $(button).append('<div class="tooltip">' + button.title + '</div>');
     $(button).removeAttr('title');
   });
@@ -424,63 +423,90 @@ $(window).on('load', function() {
   textEditor.commands.bindKey('command-l', null);
   textEditor.commands.bindKey('ctrl-\'', 'togglecomment');
 
-  textEditor.on('mousemove', function(e) {
+  function hideSlider() {
+    var div = document.getElementById('slider-popup');
+    if (div) {
+      div.style.opacity = 0;
+    }
+    focusEditor();
+  }
+
+  function detectSlider(position) {
     var isSliderable = false;
+    var tokenPosition = textEditor.renderer.textToScreenCoordinates(position);
+    var range = textEditor.getSession().getWordRange(position.row, position.column);
+    var line = textEditor.getSession().getLine(position.row);
 
-    var position = e.getDocumentPosition();
-    if ((e.domEvent.shiftKey || e.domEvent.altKey) && position) {
-      var tokenPosition = textEditor.renderer.textToScreenCoordinates(position);
-      if (Math.abs(tokenPosition.pageX - e.clientX) < 10) {
-        var range = textEditor.getSession().getWordRange(position.row, position.column);
-        var line = textEditor.getSession().getLine(position.row);
+    if (position.column < line.length) {
+      var left = line.substring(0, position.column);
+      var right = line.substring(position.column);
 
-        var left = line.substring(0, position.column);
-        var right = line.substring(position.column);
-        // console.log("left: [" + left + "]");
-        // console.log("right:", right);
+      var patterns = [
+        [/((\b|-?)\d+\.\d+)$/, /^(\d*)/],
+        [/((\b|-?)\d+\.)$/, /^(\d+)/],
+        [/((\b|-?)\d+)$/, /^(\d*\.\d+)/],
+        [/(-)$/, /^(\d+\.\d+)/],
+        [/\b()$/, /^(\d+\.\d+)/],
+        [/((-?|\b)\d+)$/, /^(\d+)/],
+        [/((-?|\b)\d+)$/, /^()/],
+        [/((-?|\b))$/, /^(\d+)/],
+        [/(?:^|\b|\W)()$/, /^(-?\d+(?:\.\d+)?)/], // for |54
+      ];
 
-        var patterns = [
-          [/\b(-?\d+\.\d+)$/, /^(\d*)/],
-          [/\b(-?\d+\.)$/, /^(\d+)/],
-          [/\b(-?\d+)$/, /^(\.\d+)/],
-          [/\b(-)$/, /^(\d+\.\d+)/],
-          [/\b()$/, /^(\d+\.\d+)/],
-          [/(?:\b|\W)()$/, /^(-?\d+)/],
-          [/\b(-?\d+)$/, /^(\d+)/],
-          [/\b(-?\d+)$/, /^()/],
-          [/\b(-?)$/, /^(\d+)/],
-        ];
-
-        var preCursor = null;
-        var postCursor = null;
-        var i = 0;
-        while (i < patterns.length && (preCursor == null || postCursor == null)) {
-          preCursor = left.match(patterns[i][0]);
-          // console.log("i:", i);
-          // console.log("preCursor:", preCursor);
-          if (!left.match(/[A-Za-z_]$/)) {
-            postCursor = right.match(patterns[i][1]);
-            // console.log("postCursor:", postCursor);
-          }
-          ++i;
+      var preCursor = null;
+      var postCursor = null;
+      var i = 0;
+      while (i < patterns.length && (preCursor == null || postCursor == null)) {
+        console.log("i:", i);
+        preCursor = left.match(patterns[i][0]);
+        if (!left.match(/[A-Za-z_]$/)) {
+          postCursor = right.match(patterns[i][1]);
         }
-        // console.log("final preCursor:", preCursor);
-        // console.log("final postCursor:", postCursor);
+        ++i;
+      }
 
-        if (preCursor && postCursor) {
-          var number = preCursor[1] + postCursor[1];
-          var range = new Range(position.row, position.column - preCursor[1].length, position.row, position.column + postCursor[1].length);
-          isSliderable = true;
-          showSlider(textEditor.renderer.textToScreenCoordinates(position), parseFloat(number), range);
-        }
+      if (preCursor && postCursor) {
+        var number = preCursor[1] + postCursor[1];
+        var range = new Range(position.row, position.column - preCursor[1].length, position.row, position.column + postCursor[1].length);
+        isSliderable = true;
+        
+        var pixelC = textEditor.renderer.textToScreenCoordinates(position);
+        var pixelA = textEditor.renderer.textToScreenCoordinates({row: position.row, column: position.column - preCursor[1].length});
+        var pixelB = textEditor.renderer.textToScreenCoordinates({row: position.row, column: position.column + postCursor[1].length});
+
+        var middle = {pageX: (pixelA.pageX + pixelB.pageX) * 0.5, pageY: pixelA.pageY};
+        showSlider(middle, parseFloat(number), range);
       }
     }
 
     if (!isSliderable) {
-      var div = document.getElementById('slider-popup');
-      if (div) {
-        div.style.display = 'none';
-      }
+      hideSlider();
+    }
+  }
+
+  var position;
+  textEditor.textInput.getElement().addEventListener('keydown', function(e) {
+    if (e.altKey) {
+      detectSlider(position);
+    }
+  }, false);
+
+  textEditor.textInput.getElement().addEventListener('keyup', function(e) {
+    hideSlider();
+  }, false);
+
+  $(document).keyup(function(e) {
+    if (e.key == 'Alt') {
+      hideSlider();
+    }
+  });
+
+  textEditor.on('mousemove', function(e) {
+    position = e.getDocumentPosition();
+    if (e.domEvent.altKey) {
+      detectSlider(position);
+    } else {
+      hideSlider();
     }
   });
 
@@ -635,10 +661,8 @@ $(window).on('load', function() {
     $(function() {
       $(selector).mousedown(function(e) {
         mouse = [e.clientX, e.clientY];
-        console.log("mouse:", mouse);
       }).mouseup(function(e) {
         var diff = [Math.abs(e.clientX - mouse[0]), Math.abs(e.clientY - mouse[1])];
-        console.log("diff:", diff);
         if (diff[0] + diff[1] < 5) {
           callback();
         }
