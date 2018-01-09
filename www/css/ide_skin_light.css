@@ -83,3 +83,7 @@ ul#settings > li > .panel-section-label:hover {
 .doccopy h3 {
   color: rgb(200, 100, 0);
 }
+
+.doccopy h4 {
+  color: rgb(150, 50, 0);
+}

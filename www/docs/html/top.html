@@ -1,0 +1,84 @@
+
+
+
+
+<h3>Revolving</h3>
+
+<p class="grayblock">In this lesson, we're going to make a spinning top using the <code>revolve</code> solidifier. Let's see the core ideas first with a box, and then you can take those ideas and build your own little merry-go-round for bugs.</p>
+
+<h4>Box</h4>
+
+<p class="grayblock">Consider this path, coded in Madeup:</p>
+
+<img src="./docs/html/images/box_cross.png" style="width: 100%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em;">
+
+<p class="grayblock">What commands do you suppose were used to trace it?</p>
+
+<p class="grayblock">Before reading on, recreate this path with a Madeup program that you write. I suggest that you follow these steps:</p>
+
+<ol>
+  <li>Draw the path on graph paper, following the lines of the grid. Draw directly on the lines, not in the empty space between lines.</li>
+  <li>Number the vertical lines, with the left-most at 0. The one to its right is 1, and then 2, and then 3, and so on.</li>
+  <li>Number the horizontal lines, with the bottom-most at 0. The one above it is 1, and then 2, and then 3, and so on.</li>
+  <li>Using the numbered lines, determine the x- and y-coordinates of each black dot&mdash;or <em>vertex</em>&mdash;and write the coordinates next to each dot.</li>
+  <li>In Madeup, craft a sequence of <code>moveto</code> commands using those coordinate pairs.</li>
+</ol>
+
+<p class="grayblock">Now let's imagine the vertical line you labeled 0. This line is called the <em>y-axis</em>. Here it is in green:</p>
+
+<img src="./docs/html/images/box_cross_y.png" style="width: 100%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em;">
+
+<p class="grayblock">What would happen if we spun the path around this y-axis? This would:</p>
+
+<img src="./docs/html/images/box_cross_revolved_10.png" style="width: 100%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em;">
+
+<p class="grayblock">I didn't spin very much. Only 10 degrees. I used the <code>revolve</code> command to do it:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">revolve 0, 1, 0, 10</div>
+  <div class="block-editor"><div class="s-expression">(block (call revolve (INTEGER 0) (INTEGER 1) (INTEGER 0) (INTEGER 10)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">What do these numbers mean? Revolving requires two pieces of information:</p>
+
+<ul>
+  <li>Which line or axis we want to spin around. The axis is represented by the first three numbers, which are x-, y-, and z-coordinates. (0, 1, 0) means the y-axis, as only the y-coordinate isn't 0.</li>
+  <li>How many degrees we want to spin. Here we spin 10 degrees.</li>
+</ul>
+
+<p class="grayblock">Add the <code>revolve</code> command after all of your <code>moveto</code> commands. Does it solidify?</p>
+
+<p class="grayblock">Let's see what happens when we gradually increase the number of degrees:</p>
+
+<img src="./docs/html/images/revolve_cube_200ms_patrol.gif" style="width: 100%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em;">
+
+<p class="grayblock">That's revolution. It's what Earth does around the sun. Who knew boxes could be made by spinning?</p>
+
+<p class="grayblock">When the walls close up at the end, how many degrees have we spun?</p>
+
+<p class="grayblock">If you've got a box, let's keep going. If not, check your work, talk to your classmates, or give it a break while your mind processes.</p>
+
+<h4>Top</h4>
+
+<p class="grayblock">Your task is to design a top. As with the box, start by drawing the <em>cross section</em> on graph paper. There is no right or wrong answer for what this should look like. But to make sure we can print your top on our printers, aim for something with this overall shape:</p>
+
+<img src="./docs/html/images/top_cross.png" style="width: 100%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em;">
+
+<p class="grayblock">Our printers can't print objects that aren't well supported. A top is a prime example of an object that is not well supported. They tend to fall over, right? It's magic when they don't.</p>
+
+<p class="grayblock">To print this, we'll turn it upside down. It's extremely important that the stem be at the same height as the outermost brim. That way both of these surfaces touch the printer's build platform and support the rest of the object.</p>
+
+<p class="grayblock">Once you've got the cross section on graph paper, find the xy-coordinates for each vertex and code up the path with <code>moveto</code> commands. Add your <code>revolve</code> around the y-axis. How's it look?</p>
+
+<p class="grayblock">When you revolve it, you'll find that it's pretty square. To make the revolution more circular, add the following at the very start of your program, before any <code>moveto</code> commands:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">nsides = 5</div>
+  <div class="block-editor"><div class="s-expression">(block (define-variable nsides (INTEGER 5)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">Bump the number up until your top is satisfyingly round.</p>

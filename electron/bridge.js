@@ -10,6 +10,8 @@ var localStorage = new LocalStorage(require('os').homedir() + '/.madeup');
 function platformize() {
   $('#panel-section-file').remove();  
   $('#panel-section-mups').remove();  
+
+  lesson = 'top';
 }
 
 function interpret(options, onSuccess, onError) {

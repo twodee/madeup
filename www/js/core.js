@@ -604,11 +604,6 @@ $(window).on('load', function() {
     run(getSource(), GeometryMode.PATH);
   };
 
-  // Showing gear menu?
-  if (!lesson && settings.has('showGearMenu') && settings.get('showGearMenu')) {
-    showGearMenu();
-  }
-
   gearSections.forEach(function(tag) {
     var property = 'isOpen' + tag.charAt(0).toUpperCase() + tag.substring(1);
     if (settings.has(property) && settings.get(property)) {
@@ -636,6 +631,13 @@ $(window).on('load', function() {
   });
 
   platformize();
+ 
+  // Showing gear menu?
+  console.log("show gear menu");
+  if (!lesson && settings.has('showGearMenu') && settings.get('showGearMenu')) {
+    console.log("yes");
+    showGearMenu();
+  }
 
   if (isBlocksURL) {
     setEditor(false);
@@ -1053,10 +1055,11 @@ $(window).on('load', function() {
     } 
   });
 
+  console.log("lesson:", lesson);
   if (lesson) {
-      showGearMenu(function() {
-        $('#panel-section-lesson .panel-section-label').click();
-      });
+    showGearMenu(function() {
+      $('#panel-section-lesson .panel-section-label').click();
+    });
   } else {
     $('#panel-section-lesson').hide();
   }
