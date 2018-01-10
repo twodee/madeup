@@ -64,11 +64,11 @@ Your task is to design a top. As with the box, start by drawing the *cross secti
 
 [image src=docs/html/images/top_cross.png style=screenshot]
 
-Our printers can't print objects that aren't well supported. A top is a prime example of an object that is not well supported. They tend to fall over, right? It's magic when they don't.
+Our printers can't print objects that aren't well-supported. A top is a prime example of an object that is not well-supported. They tend to fall over, right? It's magic when they don't.
 
 To print this, we'll turn it upside down. It's extremely important that the stem be at the same height as the outermost brim. That way both of these surfaces touch the printer's build platform and support the rest of the object.
 
-Once you've got the cross section on graph paper, find the xy-coordinates for each vertex and code up the path with `moveto` commands. Add your `revolve` around the y-axis. How's it look?
+Once you've got the cross section on graph paper, find the xy-coordinates for each vertex and code up the path with `moveto` commands. Add your `revolve` around the y-axis. How does it look?
 
 When you revolve it, you'll find that it's pretty square. To make the revolution more circular, add the following at the very start of your program, before any `moveto` commands:
 
