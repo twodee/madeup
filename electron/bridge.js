@@ -11,7 +11,7 @@ function platformize() {
   $('#panel-section-file').remove();  
   $('#panel-section-mups').remove();  
 
-  lesson = 'top';
+  // lesson = 'top';
 }
 
 function interpret(options, onSuccess, onError) {
@@ -183,7 +183,12 @@ function platformPromptForSaveAs(onSuccess) {
 function platformLoad(mup, onSuccess) {
   var source = null;
   if (mup.name == 'untitled') {
-    source = JSON.parse(localStorage.getItem(mup.name)).source;
+    var fetched = localStorage.getItem('untitled');
+    if (fetched == null) {
+      source = '';
+    } else {
+      source = JSON.parse(localStorage.getItem(mup.name)).source;
+    }
   } else {
     source = fs.readFileSync(mup.name).toString();
   }
