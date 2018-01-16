@@ -20,9 +20,15 @@ function interpret(options, onSuccess, onError) {
 
   fs.writeFileSync(tmpIn.name, options.source);
 
+  var match = /^--\s*timeout\s*=\s*(\d+)/.exec(options.source);
+  var timeout = 100;
+  if (match) {
+    timeout = match[1]; 
+  }
+
   var
     spawn = require('child_process').spawn,
-    merp = spawn('../build/merp', ['--timeout', '100', '--shading', options.shading_mode, '--geometry', options.geometry_mode, '-o', tmpOut.name, tmpIn.name]);
+    merp = spawn('../build/merp', ['--timeout', timeout, '--shading', options.shading_mode, '--geometry', options.geometry_mode, '-o', tmpOut.name, tmpIn.name]);
 
   var out = {};
   out.stdout = '';
