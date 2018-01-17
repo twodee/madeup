@@ -18,17 +18,29 @@
 
 <ol>
   <li>Draw the path on graph paper, following the lines of the grid. Draw directly on the lines, not in the empty space between lines.</li>
-  <li>Number the vertical lines, with the left-most at 0. The one to its right is 1, and then 2, and then 3, and so on.</li>
-  <li>Number the horizontal lines, with the bottom-most at 0. The one above it is 1, and then 2, and then 3, and so on.</li>
-  <li>Using the numbered lines, determine the x- and y-coordinates of each black dot&mdash;or <em>vertex</em>&mdash;and write the coordinates next to each dot.</li>
-  <li>In Madeup, craft a sequence of <code>moveto</code> commands using those coordinate pairs.</li>
+  <li>Number the vertical lines of the grid, with the left-most that you drew on labeled 0. The one to its right is 1, and then 2, and then 3, and so on.</li>
+  <li>Number the horizontal lines, with the bottom-most that you drew on labeled 0. The one above it is 1, and then 2, and then 3, and so on.</li>
+  <li>Using the numbered lines, determine the x- and y-coordinates of each black dot&mdash;or <em>vertex</em>&mdash;and write the coordinates next to each dot. <span class="toggler">When you've got something, compare your solution to our example.</span><div class="togglee"><img src="./docs/html/images/box_cross_labeled.png" style="width: 100%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em;">Our numbers may be different. That's okay.</div></li>
+  <li>In Madeup, craft a sequence of <code>moveto</code> commands using those coordinate pairs. <span class="toggler">Only peek at our solution if you get stuck.</span><div class="togglee"><div class="mup-switcher">
+  <div class="text-editor">moveto 0, 0
+moveto 5, 0
+moveto 5, 5
+moveto 5, 4
+moveto 1, 1
+moveto 0, 1</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0)) (call moveto (INTEGER 5) (INTEGER 0)) (call moveto (INTEGER 5) (INTEGER 5)) (call moveto (INTEGER 5) (INTEGER 4)) (call moveto (INTEGER 1) (INTEGER 1)) (call moveto (INTEGER 0) (INTEGER 1)))
+</div></div>
+</div>
+ Again, our numbers may be different, but the overall structure should be the same.</div></li>
 </ol>
 
-<p class="grayblock">Now let's imagine the vertical line you labeled 0. This line is called the <em>y-axis</em>. Here it is in green:</p>
+<p class="grayblock">Now let's consider the vertical line you labeled 0. This line is called the <em>y-axis</em>. Here it is in green:</p>
 
 <img src="./docs/html/images/box_cross_y.png" style="width: 100%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em;">
 
-<p class="grayblock">What would happen if we spun the path around this y-axis? This would:</p>
+<p class="grayblock">What would happen if we spun the path around this y-axis?</p>
+
+<p class="grayblock">This would happen:</p>
 
 <img src="./docs/html/images/box_cross_revolved_10.png" style="width: 100%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em;">
 
@@ -41,7 +53,7 @@
 </div>
 </p>
 
-<p class="grayblock">What do these numbers mean? Revolving requires two pieces of information:</p>
+<p class="grayblock">What do those numbers after <code>revolve</code> mean? Revolving needs two pieces of information from us in order to do its job:</p>
 
 <ul>
   <li>Which line or axis we want to spin around. The axis is represented by the first three numbers, which are x-, y-, and z-coordinates. (0, 1, 0) means the y-axis, as only the y-coordinate isn't 0.</li>
@@ -58,7 +70,7 @@
 
 <p class="grayblock">When the walls close up at the end, how many degrees have we spun?</p>
 
-<p class="grayblock">If you've got a box, let's keep going. If not, check your work, talk to your classmates, or give it a break while your mind processes.</p>
+<p class="grayblock">If you've got a box, let's keep going. If not, check your work, talk to your classmates, or give it a break while your mind tries to figure out what went wrong.</p>
 
 <h4>Top</h4>
 
@@ -66,7 +78,7 @@
 
 <img src="./docs/html/images/top_cross.png" style="width: 100%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em;">
 
-<p class="grayblock">Our printers can't print objects that aren't well-supported. A top is a prime example of an object that is not well-supported. They tend to fall over, right? It's magic when they don't.</p>
+<p class="grayblock">Our printers can't print objects that aren't well-supported. A top is a prime example of an object that is not well-supported. They tend to fall over, right? What makes them magic is when they don't.</p>
 
 <p class="grayblock">To print this, we'll turn it upside down. It's extremely important that the stem be at the same height as the outermost brim. That way both of these surfaces touch the printer's build platform and support the rest of the object.</p>
 
