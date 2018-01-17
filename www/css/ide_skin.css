@@ -455,6 +455,11 @@ fieldset {
   margin-top: 3em;
 }
 
+.togglee .mup-switcher {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
 .tooltip {
   /* background-color: gray; */
   color: black;

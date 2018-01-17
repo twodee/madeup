@@ -633,9 +633,7 @@ $(window).on('load', function() {
   platformize();
  
   // Showing gear menu?
-  console.log("show gear menu");
   if (!lesson && settings.has('showGearMenu') && settings.get('showGearMenu')) {
-    console.log("yes");
     showGearMenu();
   }
 
@@ -2131,6 +2129,20 @@ function docify() {
     editor.resize();
   });
 
+  function resizeBlocklyDocs() {
+    var switchers = document.querySelectorAll('.mup-switcher');
+    forEach(switchers, function(i, switcher) {
+      var blocksEditor = switcher.children[1];
+      var workspace = docWorkspaces[i];
+
+      // Fit the container exactly around the blocks.
+      var metrics = workspace.getMetrics();
+      blocksEditor.style.height = metrics.contentHeight + 'px';
+      blocksEditor.style.width = metrics.contentWidth + 'px';
+      Blockly.svgResize(workspace);
+    });
+  }
+
   // Inject Blockly workspaces on all the code snippets.
   var switchers = document.querySelectorAll('.mup-switcher');
   forEach(switchers, function(i, switcher) {
@@ -2188,7 +2200,9 @@ function docify() {
     $('.togglee').css('display', 'none');
     $('.toggler').click(function() {
       if ($(this).next().css('display') == 'none') {
-        $(this).next().slideDown();
+        $(this).next().slideDown(400, function() {
+          resizeBlocklyDocs();
+        });
       } else {
         $(this).next().slideUp();
       }
