@@ -435,9 +435,9 @@ fieldset {
   margin-top: 3em;
 }
 
-.togglee .mup-switcher {
-  margin-top: 1em;
-  margin-bottom: 1em;
+.mup-switcher {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 .tooltip {
@@ -457,4 +457,24 @@ fieldset {
 .quick-button:hover .tooltip {
   visibility: visible;
   opacity: 1;
+}
+
+ul.gray-todo {
+  list-style-type: none;
+}
+
+ul.gray-todo li {
+  position: relative;
+}
+
+/*
+ We want to checkbox's right edge to be left of the enclosing li. Right will
+ set the child's right edge against the parent's right. Then we add 100% margin
+ on the right to push it all the way left.
+ */
+.gray-todo-checkbox {
+  position: absolute;
+  right: 5px;
+  margin-right: 100%;
+  top: 2px;
 }

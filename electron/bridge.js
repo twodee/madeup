@@ -11,7 +11,7 @@ function platformize() {
   $('#panel-section-file').remove();  
   $('#panel-section-mups').remove();  
 
-  lesson = 'top';
+  lesson = 'maze';
 }
 
 function interpret(options, onSuccess, onError) {

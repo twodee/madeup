@@ -1,0 +1,103 @@
+
+
+
+
+<h3>Maze</h3>
+
+<p class="grayblock">Mazes have fascinated humans for a long time. They show up everywhere: in Greek mythology, in British gardens, and in American cornfields. Let's make one for others to get lost in. But we won't use minotaurs or hedges to builds ours. We'll use some numbers and a 3D printer.</p>
+
+<p class="grayblock">Let's start with an example. For the time being, try to match the example exactly. Later on, you will make a maze that's completely your own.</p>
+
+<h4>On Paper</h4>
+
+<p class="grayblock">Grab a piece of graph paper, a pen, and some markers. Then follow these steps:</p>
+
+<ol>
+  <li>On the graph paper, let's draw the outer walls of our maze like this: <img src="./docs/html/images/maze/outline.jpg" style="width: 100%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em; display: block;"> Since this is our first maze, we'll stick to a simple square shape.</li>
+  <li>Add passages to the maze by drawing along the lines of the graph paper's grid. Let's go with these passages: <img src="./docs/html/images/maze/passages.jpg" style="width: 100%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em; display: block;"> I know&mdash;it's too easy. Notice how two of the lines pass through the outer perimeter. These will be the entrance and exit.</li>
+  <li>Mark the bends and endpoints of the passages with little circles to make them easier to see. Like this: <img src="./docs/html/images/maze/vertices.jpg" style="width: 100%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em; display: block;"> We'll call each bend a <em>vertex</em>. Say it out loud.</li>
+  <li>Number both the horizontal and the vertical lines of the graph paper. Make the bottom-left corner of the outer perimeter the <em>origin</em>. The origin is the location on the grid whose x-coordinate is 0 and whose y-coordinate is 0. The end result should look something like this: <img src="./docs/html/images/maze/numbered_lines.jpg" style="width: 100%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em; display: block;"> The horizontal numbers are the x-coordinates. The vertical numbers are the y-coordinates.</li>
+  <li>Label each vertex with its x- and y-coordinates: <img src="./docs/html/images/maze/coordinates.jpg" style="width: 100%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em; display: block;"></li>
+  <li>Highlight each "run" of your passages in a different color. A run is a stretch of passage that has a starting vertex and an ending vertex, but it never doubles back on itself. In our example, there are exactly two such runs: <img src="./docs/html/images/maze/polylines.jpg" style="width: 100%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em; display: block;"> There are several ways to break these passages into runs. Pick one.</li>
+</ol>
+
+<h4>In Madeup</h4>
+
+<p class="grayblock">Now we've got a feel for our maze, and we have some numbers. Let's head to Madeup and start coding up our paths by following these steps:</p>
+
+<ol>
+  <li>Trace out the outer walls. We begin with <code>moveto</code> and then <code>move</code> and <code>yaw</code> our way around: <div class="mup-switcher">
+  <div class="text-editor">moveto 0, 0
+repeat 4
+  move 4
+  yaw 90
+end</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0)) (repeat (INTEGER 4) (block (call move (INTEGER 4)) (call yaw (INTEGER 90)))))
+</div></div>
+</div>
+</li>
+  <li>Thicken this perimeter into a slab with <code>extrude</code>. Let's thicken along the negative z-axis, which is (0, 0, -1), and let's just make it 1 unit thick: <div class="mup-switcher">
+  <div class="text-editor">extrude 0, 0, -1, 1</div>
+  <div class="block-editor"><div class="s-expression">(block (call extrude (INTEGER 0) (INTEGER 0) (INTEGER -1) (INTEGER 1)))
+</div></div>
+</div>
+ Hit the solidify button. You should see a really boring maze!</li>
+  <li>On to the passages. For each run, we'll create a dowel that visits the vertices using a sequence a <code>moveto</code> commands. Look at your graph. The pink run visits (-1, 3), (2, 3), (2, 2), (3, 2), and (3, 3). Our <code>moveto</code>s, then, look like this: <div class="mup-switcher">
+  <div class="text-editor">moveto -1, 3
+moveto 2, 3
+moveto 2, 2
+moveto 3, 2
+moveto 3, 3
+dowel</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER -1) (INTEGER 3)) (call moveto (INTEGER 2) (INTEGER 3)) (call moveto (INTEGER 2) (INTEGER 2)) (call moveto (INTEGER 3) (INTEGER 2)) (call moveto (INTEGER 3) (INTEGER 3)) (call-with-names dowel))
+</div></div>
+</div>
+ Place these at the end of your program, after the <code>extrude</code> command.</li>
+  <li>The yellow run visits (2, 2), (1, 2), (1, 1), (3, 1), and (3, -1). Our <code>moveto</code>s look like this: <div class="mup-switcher">
+  <div class="text-editor">moveto 2, 2
+moveto 1, 2
+moveto 1, 1
+moveto 3, 1
+moveto 3, -1
+dowel</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 2) (INTEGER 2)) (call moveto (INTEGER 1) (INTEGER 2)) (call moveto (INTEGER 1) (INTEGER 1)) (call moveto (INTEGER 3) (INTEGER 1)) (call moveto (INTEGER 3) (INTEGER -1)) (call-with-names dowel))
+</div></div>
+</div>
+</li>
+  <li>If you hit solidify now, what do you see? Solid passages? Yeah, we don't want that. The passages should be hollowed out from the extruded slab. Normally when we create new solids, they are added to the existing shapes. To have the dowels take away from the existing shapes, we insert the <code>subtract</code> command: <div class="mup-switcher">
+  <div class="text-editor">subtract</div>
+  <div class="block-editor"><div class="s-expression">(block (call-with-names subtract))
+</div></div>
+</div>
+ Place a <code>subtract</code> right after your <code>extrude</code> but before your first run's <code>moveto</code>. Hit solidify and you should see hollowed out passages. Woo!</li>
+</ol>
+
+<p class="grayblock">You now have an absurdly easy maze. You could put a little marble in one of the breaks in the wall and roll it around to the other break.</p>
+
+<p class="grayblock">But let's add one extra little twist. Let's hide the passages completely! Let's move the slab so it completely surrounds the dowels by using a different <code>moveto</code> command, one that takes in a third number for the z-coordinate. Replace the slab's <code>moveto</code>, which should be at the very beginning of your program, with this 3D version:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">moveto 0, 0, 0.5</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (REAL 0.5)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">Now all we have to do is print this. We will be famous.</p>
+
+<h4>Your Turn</h4>
+
+<p class="grayblock">It's time for you to make your own maze. We want to do the same steps as we did above, but this time you will draw your own slab and passages. Here's a summary of the steps we took:</p>
+
+<ul class="gray-todo">
+  <li><input type="checkbox" class="gray-todo-checkbox">On graph paper, draw the slab's outline. It doesn't have to be a 4x4 square.</li>
+  <li><input type="checkbox" class="gray-todo-checkbox">Draw lines marking the passages. Make sure at least two of lines pass through the slab's outline.</li>
+  <li><input type="checkbox" class="gray-todo-checkbox">Mark the vertices.</li>
+  <li><input type="checkbox" class="gray-todo-checkbox">Number the lines of the grid.</li>
+  <li><input type="checkbox" class="gray-todo-checkbox">Label each vertex with its x- and y-coordinates.</li>
+  <li><input type="checkbox" class="gray-todo-checkbox">Color each run in your passages a unique color.</li>
+  <li><input type="checkbox" class="gray-todo-checkbox">In Madeup, trace out and <code>extrude</code> your slab. Start with <code>moveto 0, 0</code>&mdash;at least initially.</li>
+  <li><input type="checkbox" class="gray-todo-checkbox">Trace out and <code>dowel</code> each line.</li>
+  <li><input type="checkbox" class="gray-todo-checkbox">Add in <code>subtract</code> to hollow out the passages.</li>
+  <li><input type="checkbox" class="gray-todo-checkbox">Switch the slab to <code>moveto 0, 0, 0.5</code> to create the blind maze.</li>
+</ul>

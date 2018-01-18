@@ -1,0 +1,85 @@
+[let skin=madeupdocs]
+[let root=.]
+[style id=screenshot
+width: 100%
+background-color: white
+margin-top: 0.5em
+margin-bottom: 0.5em
+display: block
+]
+
+# Maze
+
+Mazes have fascinated humans for a long time. They show up everywhere: in Greek mythology, in British gardens, and in American cornfields. Let's make one for others to get lost in. But we won't use minotaurs or hedges to builds ours. We'll use some numbers and a 3D printer.
+
+Let's start with an example. For the time being, try to match the example exactly. Later on, you will make a maze that's completely your own.
+
+## On Paper
+
+Grab a piece of graph paper, a pen, and some markers. Then follow these steps:
+
+1. On the graph paper, let's draw the outer walls of our maze like this: [image src="docs/html/images/maze/outline.jpg" style=screenshot] Since this is our first maze, we'll stick to a simple square shape.
+2. Add passages to the maze by drawing along the lines of the graph paper's grid. Let's go with these passages: [image src="docs/html/images/maze/passages.jpg" style=screenshot] I know---it's too easy. Notice how two of the lines pass through the outer perimeter. These will be the entrance and exit.
+3. Mark the bends and endpoints of the passages with little circles to make them easier to see. Like this: [image src="docs/html/images/maze/vertices.jpg" style=screenshot] We'll call each bend a *vertex*. Say it out loud.
+4. Number both the horizontal and the vertical lines of the graph paper. Make the bottom-left corner of the outer perimeter the *origin*. The origin is the location on the grid whose x-coordinate is 0 and whose y-coordinate is 0. The end result should look something like this: [image src="docs/html/images/maze/numbered_lines.jpg" style=screenshot] The horizontal numbers are the x-coordinates. The vertical numbers are the y-coordinates.
+5. Label each vertex with its x- and y-coordinates: [image src="docs/html/images/maze/coordinates.jpg" style=screenshot]
+6. Highlight each "run" of your passages in a different color. A run is a stretch of passage that has a starting vertex and an ending vertex, but it never doubles back on itself. In our example, there are exactly two such runs: [image src="docs/html/images/maze/polylines.jpg" style=screenshot] There are several ways to break these passages into runs. Pick one.
+
+## In Madeup
+
+Now we've got a feel for our maze, and we have some numbers. Let's head to Madeup and start coding up our paths by following these steps:
+
+1. Trace out the outer walls. We begin with `moveto` and then `move` and `yaw` our way around: [mup
+moveto 0, 0
+repeat 4
+  move 4
+  yaw 90
+end
+]
+2. Thicken this perimeter into a slab with `extrude`. Let's thicken along the negative z-axis, which is (0, 0, -1), and let's just make it 1 unit thick: [mup
+extrude 0, 0, -1, 1
+] Hit the solidify button. You should see a really boring maze!
+3. On to the passages. For each run, we'll create a dowel that visits the vertices using a sequence a `moveto` commands. Look at your graph. The pink run visits (-1, 3), (2, 3), (2, 2), (3, 2), and (3, 3). Our `moveto`s, then, look like this: [mup
+moveto -1, 3
+moveto 2, 3
+moveto 2, 2
+moveto 3, 2
+moveto 3, 3
+dowel
+] Place these at the end of your program, after the `extrude` command.
+4. The yellow run visits (2, 2), (1, 2), (1, 1), (3, 1), and (3, -1). Our `moveto`s look like this: [mup
+moveto 2, 2
+moveto 1, 2
+moveto 1, 1
+moveto 3, 1
+moveto 3, -1
+dowel
+]
+5. If you hit solidify now, what do you see? Solid passages? Yeah, we don't want that. The passages should be hollowed out from the extruded slab. Normally when we create new solids, they are added to the existing shapes. To have the dowels take away from the existing shapes, we insert the `subtract` command: [mup
+subtract
+] Place a `subtract` right after your `extrude` but before your first run's `moveto`. Hit solidify and you should see hollowed out passages. Woo!
+
+You now have an absurdly easy maze. You could put a little marble in one of the breaks in the wall and roll it around to the other break.
+
+But let's add one extra little twist. Let's hide the passages completely! Let's move the slab so it completely surrounds the dowels by using a different `moveto` command, one that takes in a third number for the z-coordinate. Replace the slab's `moveto`, which should be at the very beginning of your program, with this 3D version:
+
+[mup
+moveto 0, 0, 0.5
+]
+
+Now all we have to do is print this. We will be famous.
+
+## Your Turn
+
+It's time for you to make your own maze. We want to do the same steps as we did above, but this time you will draw your own slab and passages. Here's a summary of the steps we took:
+
+_ On graph paper, draw the slab's outline. It doesn't have to be a 4x4 square.
+_ Draw lines marking the passages. Make sure at least two of lines pass through the slab's outline.
+_ Mark the vertices.
+_ Number the lines of the grid.
+_ Label each vertex with its x- and y-coordinates.
+_ Color each run in your passages a unique color.
+_ In Madeup, trace out and `extrude` your slab. Start with `moveto 0, 0`---at least initially.
+_ Trace out and `dowel` each line.
+_ Add in `subtract` to hollow out the passages.
+_ Switch the slab to `moveto 0, 0, 0.5` to create the blind maze.
