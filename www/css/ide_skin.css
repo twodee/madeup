@@ -125,14 +125,14 @@ body {
 }
 
 /* Fattens the handle for resizing the console. Needed because the textEditor seems 
-   to snarf up its size of the boundary. */
+   to snarf up its side of the boundary. */
 #console > .ui-resizable-n {
   top: 0px;
   height: 20px;
 }
 
-#left > .ui-resizable-e {
-  right: 0px;
+#glcanvas > .ui-resizable-w {
+  left: 0px;
   width: 20px;
 }
 
@@ -140,26 +140,6 @@ body {
   left: -10px;
   width: 20px;
 }
-
-/* .ui-resizable-handle { */
-	 /* position: absolute; */
-	 /* font-size: 0.1px; */
-	 /* display: block; */
-	 /* margin: 15px 5px; */
- /* } */
-
-/* .ui-resizable-e { */
-  /* height: 32px; */
-  /* width: 32px; */
-/* } */
-
-
-/* .ui-resizable-e { */
-  /* width: 12px; */
-  /* height: 12px; */
-  /* right: 3px; */
-  /* bottom: 3px; */
-/* } */
 
 .srclink:link {
 }

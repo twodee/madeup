@@ -1027,11 +1027,13 @@ $(window).on('load', function() {
     }
   });
 
+  // I don't think I should need this anymore, but the console blows out
+  // of #left when I remove it.
   $('#left').resizable({
     handles: "e",
     resize: function(event, ui) {
       window.dispatchEvent(new Event('resize'))
-    } 
+    }
   });
 
   $('#right').resizable({
@@ -1053,7 +1055,21 @@ $(window).on('load', function() {
     } 
   });
 
-  console.log("lesson:", lesson);
+  // Handles on #left interfered with scrollbars. So, we put the
+  // handles on the canvas and have it resize left. Goofy, I know.
+  var originalLeftWidth = null;
+  $('#glcanvas').resizable({
+    handles: "w",
+    start: function(event, ui) {
+      originalLeftWidth = $('#left').width();
+    },
+    resize: function(event, ui) {
+      var diff = ui.originalSize.width - ui.size.width;
+      $('#left').width(originalLeftWidth + diff);
+      window.dispatchEvent(new Event('resize'))
+    } 
+  });
+
   if (lesson) {
     showGearMenu(function() {
       $('#panel-section-lesson .panel-section-label').click();
