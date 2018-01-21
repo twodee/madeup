@@ -263,6 +263,7 @@ function Settings() {
   pairs.gridSpacing = new Setting(1.0);
   pairs.gridExtent = new Setting(10.0);
 
+  pairs.isSpecular = new Setting(true);
   pairs.isFlatShaded = new Setting(true);
   pairs.isAutorotate = new Setting(false);
   pairs.isEditorText = new Setting(true);
@@ -562,6 +563,7 @@ $(window).on('load', function() {
 
   $('#showHeadings').prop('checked', settings.get('showHeadings'));
   $('#isFlatShaded').prop('checked', settings.get('isFlatShaded'));
+  $('#isSpecular').prop('checked', settings.get('isSpecular'));
   $('#lightBothSides').prop('checked', settings.get('lightBothSides'));
   $('#showPoints').prop('checked', settings.get('showPoints'));
   $("#autopathify").prop('checked', settings.get('isAutopathify'));
@@ -722,6 +724,10 @@ $(window).on('load', function() {
 
   $('#isFlatShaded').click(function() {
     settings.set('isFlatShaded', this.checked);
+  });
+
+  $('#isSpecular').click(function() {
+    settings.set('isSpecular', this.checked);
   });
 
   $('#isAutorotate').click(function() {
@@ -1597,10 +1603,21 @@ function onInterpret(data) {
           material.side = THREE.DoubleSide;
           meshes[0] = THREE.SceneUtils.createMultiMaterialObject(model.geometry, material);
         } else {
-          var frontMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: settings.get('showMode') == 'wireframe', wireframeLinewidth: 5, side: THREE.FrontSide});
+          var frontMaterial;
           var backMaterial;
+
+          if (settings.get('isSpecular')) {
+            frontMaterial = new THREE.MeshPhongMaterial({vertexColors: THREE.VertexColors, wireframe: settings.get('showMode') == 'wireframe', wireframeLinewidth: 5, side: THREE.FrontSide});
+          } else {
+            frontMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: settings.get('showMode') == 'wireframe', wireframeLinewidth: 5, side: THREE.FrontSide});
+          }
+
           if (settings.get('lightBothSides')) {
-            backMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: settings.get('showMode') == 'wireframe', wireframeLinewidth: 5, side: THREE.BackSide});
+            if (settings.get('isSpecular')) {
+              backMaterial = new THREE.MeshPhongMaterial({vertexColors: THREE.VertexColors, wireframe: settings.get('showMode') == 'wireframe', wireframeLinewidth: 5, side: THREE.BackSide});
+            } else {
+              backMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors, wireframe: settings.get('showMode') == 'wireframe', wireframeLinewidth: 5, side: THREE.BackSide});
+            }
           } else {
             backMaterial = new THREE.MeshBasicMaterial({color: 0x000000, wireframe: settings.get('showMode') == 'wireframe', wireframeLinewidth: 5, side: THREE.BackSide});
           }
