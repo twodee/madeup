@@ -2045,6 +2045,9 @@ function init() {
   pointLight.position.x = 90;
   pointLight.position.y = 150;
   pointLight.position.z = 100;
+  // pointLight.position.x = 9;
+  // pointLight.position.y = 15;
+  // pointLight.position.z = 10;
 
   // add to the scene
   camera.add(pointLight);

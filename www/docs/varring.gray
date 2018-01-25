@@ -1,0 +1,78 @@
+[let skin=madeupdocs]
+[let root=.]
+
+# Variables
+
+In the last lesson, we designed a decagon with the help of a `repeat` loop:
+
+[mup
+moveto 0, 0
+repeat 10
+  move 2
+  yaw 36
+end
+dowel
+]
+
+Those were good days, when we built that shape. But now, we decide that we want the ring to be thicker.
+
+## Radius
+
+To do that, we can adjust the dowel's radius. We do this by setting the `.radius` variable at the very beginning of our program:
+
+[mup
+.radius = 1
+moveto 0, 0
+repeat 10
+  move 2
+  yaw 36
+end
+dowel
+]
+
+Try this. You'll need to drag the setter block down from the *Variables* menu. Click on the drop-down menu and select the `.radius` variable.
+
+A variable is like a box with a name on it. We can put a new value in the box by setting it:
+
+[mup
+.radius = 1
+]
+
+Internally, Madeup pulls the value out of this box when it constructs a dowel.
+
+The `.radius` variable is built into Madeup. We can also make our own.
+
+## Ngon
+
+When we coded the ring with a changing number of sides, we had to change two things: the number in our `repeat` and the angle we turned. These two pieces of information are actually very much linked together. If there are 6 sides, the angle is 60. If 3, the angle is 120. If 4, 90. If 5, 72. And so on. We can establish this relation and simplify our code with a variable.
+
+In the *Variables* menu, click *Create Variable* and name it `n`. Add a setter for it at the beginning of your program:
+
+[mup
+n = 4
+]
+
+Add another variable named `angle`. Set it using some math:
+
+[mup
+angle = 360 / n
+]
+
+See how we used `n` there? You can find its block under *Variables*.
+
+If we change `n` now, `angle` will automatically get the right value. That's the beauty of variables!
+
+Update the rest of the program to refer to `n` and `angle`:
+
+[mup
+n = 4
+angle = 360 / n
+moveto 0, 0
+repeat n
+  move 2
+  yaw angle
+end
+dowel
+]
+
+Try changing `n`. Nice, huh?

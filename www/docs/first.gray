@@ -1,0 +1,135 @@
+[let skin=madeupdocs]
+[let root=.]
+[style id=screenshot
+width: 100%
+background-color: white
+margin-top: 0.5em
+margin-bottom: 0.5em
+display: block
+]
+[style id=icon
+width: 72px
+margin: 0.5em auto
+display: block
+]
+
+# Welcome
+
+Welcome to Madeup, a tool for making shapes with code. To make a shape, you need to do two things:
+
+1. Trace out lines in 3D space with various commands to move and turn.
+2. Solidify the lines into printable objects with various solidifier commands.
+
+Let's dive immediately into an example.
+
+## Dowel
+
+Imagine you're riding on top of a turtle. You can tell the turtle to go forward or to turn---it's very obedient. Let's have it trace out the shape of the letter S.
+
+We start by situating ourselves somewhere in the world with a `moveto` command:
+
+[mup
+moveto 0, 0
+]
+
+Where we start isn't very important. I chose the (0, 0)---which we call the *origin*---because it is simple.
+
+Add this block to your own program. You'll find `moveto` under the *Movement* menu. You'll find numbers under the *Data* menu. Once you've added these, you should see an arrow in the middle of your 3D scene pointing up.
+
+## Camera
+
+If you drag on the scene, you'll see the arrow rotate. If you use two fingers, you'll shift the scene. If you pinch or scroll, you'll zoom in and out. Try it.
+
+Then hit the *Fit* button to reset the camera:
+
+[image src=images/fit.png style=icon]
+
+You'll want to hit this button a lot as you write Madeup programs. It can be hard to reason about space when it's all topsy-turvy.
+
+## Tracing a Path
+
+Let's start at the bottom-left corner of the S and work our way to the top. We start by turning so that we face along the bottom segment of the S. Add a `yaw` command---which is also in the *Movement* menu---at the end of your program:
+
+[mup
+yaw 90
+]
+
+The `yaw` command is used to turn left and right. There's also `pitch` for turning up or down, and `roll` for turning over. We want `yaw` here.
+
+You should see the arrow point right. If not, hit *Fit* to reset the camera.
+
+Let's step along the bottom segment with the `move` command. Let's say the S is 2 units wide. We take 2 steps like this:
+
+[mup
+move 2
+]
+
+At this point, we head up. But we need to turn left first. To do that, we add another `yaw` and feed it a negative number:
+
+[mup
+yaw -90
+]
+
+And then we head up with another `move` command:
+
+[mup
+move 2
+]
+
+Got the idea? You finish the tracing. Come back once you've got a complete path that looks like an S.
+
+[hide title="If you get really stuck, you can check out my solution."
+[mup
+moveto 0, 0
+yaw 90
+move 2
+yaw -90
+move 2
+yaw -90
+move 2
+yaw 90
+move 2
+yaw 90
+move 2
+]
+]
+
+## Solidifying
+
+Once your path is complete, hit the *Solidify* button:
+
+[image src=images/solidify_icon.png style=icon]
+
+You should see nothing, because we haven't indicated how we want the path to turn into a solid. To show the path again, hit the *Pathify* button:
+
+[image src=images/pathify_icon.png style=icon]
+
+There are many ways to turn a path into a solid. Let's start by thickening the path into a dowel. Under the *Solidifiers* menu, find the `dowel` command and drag it to the end of your program:
+
+[mup
+dowel
+]
+
+Now hit *Solidify*. Is that better?
+
+The S is quite blocky. Let's smooth out the bends by adjusting the maximum bend value:
+
+[mup
+dowel maxBend:10
+]
+
+This change will chop the single instantaneous 90-degree bend into nine gradual 10-degree bends.
+
+Now, let's throw away the `dowel` and replace it with tube:
+
+[mup
+tube maxBend:10
+]
+
+How does that look? If we could find some food-grade plastic, we could design custom drinking straws.
+
+## Saving
+
+You have just written your first Madeup program. You traced out a path and solidified it! I think we should save your work to commemorate this pivotal moment.
+
+In the right-menu, which you are reading right now, scroll up to *File*. His *Save As* and name your program something meaningful, like "s tube". Scroll down to *Mups*. You should see your program listed. You can open a previously saved program by clicking on its name under *Mups*.

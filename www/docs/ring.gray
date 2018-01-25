@@ -3,18 +3,24 @@
 
 # Ring
 
-In this lesson, we'll walk a circular path and turn it into a ring. Let's start as before by moving the 3D cursor to the origin:
+In this lesson, we'll walk a circular path and turn it into a ring. Let's start as before by moving the cursor to the origin:
 
 [mup
-moveto 0, 0, 0
+moveto 0, 0
 ]
 
 We won't make an exact circle. We'll approximate one, starting with a four-sided "circle." Let's walk along one of its four sides and then turn to face the next side. How far do we want to turn? Well, how many degrees are in a circle? How many turns will we make?
 
-There are 360 degrees in a circle and 4 turns in this first approximation. Therefore, each turn will have to be 90 degrees---because 360 / 4 is 90. So, here's the first leg of our four-sided journey:
+There are 360 degrees in a circle and 4 turns in this first approximation.
+
+[hide title="On each turn, how much will we yaw?"
+We're turning a total of 360 degrees and we're doing it in 4 turns. Therefore, each turn will have to be 90 degrees---because 360 chunked into 4 groups is 90.
+]
+
+So, here's the first leg of our four-sided journey:
 
 [mup
-moveto 0, 0, 0
+moveto 0, 0
 
 move 2
 yaw 90
@@ -23,7 +29,7 @@ yaw 90
 The second leg is a lot like the first:
 
 [mup
-moveto 0, 0, 0
+moveto 0, 0
 
 move 2
 yaw 90
@@ -32,10 +38,10 @@ move 2
 yaw 90
 ]
 
-So's the third:
+So's the third. To save yourself some time in the blocks editor, long-press on the original blocks and select *Duplicate* to achieve this:
 
 [mup
-moveto 0, 0, 0
+moveto 0, 0
 
 move 2
 yaw 90
@@ -50,7 +56,7 @@ yaw 90
 And the fourth:
 
 [mup
-moveto 0, 0, 0
+moveto 0, 0
 
 move 2
 yaw 90
@@ -68,7 +74,7 @@ yaw 90
 Was that fun? Or annoying? If you thought doing the same thing over and over again was annoying, I have good news for you! We can add a `repeat` loop to make a chunk of code happen again and again:
 
 [mup
-moveto 0, 0, 0
+moveto 0, 0
 repeat 4
   move 2
   yaw 90
@@ -79,32 +85,32 @@ We just need to tell `repeat` how many times to go around. 0 means never, 1 mean
 
 You're probably thinking that that's not much of a circle. You're right. Let's improve our approximation. Let's try a hexagon instead. What needs to change?
 
-We want to repeat the move-yaw combination 6 times, so let's change the count we give to `repeat`. We also need to change the angle to 360 / 60 = 6.
-
-[mup
-moveto 0, 0, 0
+[hide title="Try solving it on your own before examining my solution."
+We want to repeat the move-yaw combination 6 times, so let's change the count we give to `repeat`. We also need to change the angle to 360 / 60 = 6. [mup
+moveto 0, 0
 repeat 6
   move 2
   yaw 60
 end
 ]
+]
 
 We can smooth it out even more. Suppose we approximate a circle with 10 sides. What angle will we turn?
 
-360 / 10 = 36, so we end up with:
-
-[mup
-moveto 0, 0, 0
+[hide title="How does your solution compare to mine?"
+360 / 10 = 36, so we end up with: [mup
+moveto 0, 0
 repeat 10
   move 2
   yaw 36
 end
 ]
+]
 
 A decagon is close enough to a circle for our tastes. Now thicken the path using `dowel`:
 
 [mup
-moveto 0, 0, 0
+moveto 0, 0
 repeat 10
   move 2
   yaw 36

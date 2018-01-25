@@ -1,0 +1,96 @@
+
+
+
+<h3>Variables</h3>
+
+<p class="grayblock">In the last lesson, we designed a decagon with the help of a <code>repeat</code> loop:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">moveto 0, 0
+repeat 10
+  move 2
+  yaw 36
+end
+dowel</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0)) (repeat (INTEGER 10) (block (call move (INTEGER 2)) (call yaw (INTEGER 36)))) (call-with-names dowel))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">Those were good days, when we built that shape. But now, we decide that we want the ring to be thicker.</p>
+
+<h4>Radius</h4>
+
+<p class="grayblock">To do that, we can adjust the dowel's radius. We do this by setting the <code>.radius</code> variable at the very beginning of our program:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">.radius = 1
+moveto 0, 0
+repeat 10
+  move 2
+  yaw 36
+end
+dowel</div>
+  <div class="block-editor"><div class="s-expression">(block (define-variable .radius (INTEGER 1)) (call moveto (INTEGER 0) (INTEGER 0)) (repeat (INTEGER 10) (block (call move (INTEGER 2)) (call yaw (INTEGER 36)))) (call-with-names dowel))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">Try this. You'll need to drag the setter block down from the <em>Variables</em> menu. Click on the drop-down menu and select the <code>.radius</code> variable.</p>
+
+<p class="grayblock">A variable is like a box with a name on it. We can put a new value in the box by setting it:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">.radius = 1</div>
+  <div class="block-editor"><div class="s-expression">(block (define-variable .radius (INTEGER 1)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">Internally, Madeup pulls the value out of this box when it constructs a dowel.</p>
+
+<p class="grayblock">The <code>.radius</code> variable is built into Madeup. We can also make our own.</p>
+
+<h4>Ngon</h4>
+
+<p class="grayblock">When we coded the ring with a changing number of sides, we had to change two things: the number in our <code>repeat</code> and the angle we turned. These two pieces of information are actually very much linked together. If there are 6 sides, the angle is 60. If 3, the angle is 120. If 4, 90. If 5, 72. And so on. We can establish this relation and simplify our code with a variable.</p>
+
+<p class="grayblock">In the <em>Variables</em> menu, click <em>Create Variable</em> and name it <code>n</code>. Add a setter for it at the beginning of your program:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">n = 4</div>
+  <div class="block-editor"><div class="s-expression">(block (define-variable n (INTEGER 4)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">Add another variable named <code>angle</code>. Set it using some math:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">angle = 360 / n</div>
+  <div class="block-editor"><div class="s-expression">(block (define-variable angle (/ (INTEGER 360) (call-with-names n))))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">See how we used <code>n</code> there? You can find its block under <em>Variables</em>.</p>
+
+<p class="grayblock">If we change <code>n</code> now, <code>angle</code> will automatically get the right value. That's the beauty of variables!</p>
+
+<p class="grayblock">Update the rest of the program to refer to <code>n</code> and <code>angle</code>:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">n = 4
+angle = 360 / n
+moveto 0, 0
+repeat n
+  move 2
+  yaw angle
+end
+dowel</div>
+  <div class="block-editor"><div class="s-expression">(block (define-variable n (INTEGER 4)) (define-variable angle (/ (INTEGER 360) (call-with-names n))) (call moveto (INTEGER 0) (INTEGER 0)) (repeat (call-with-names n) (block (call move (INTEGER 2)) (call yaw (call-with-names angle)))) (call-with-names dowel))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">Try changing <code>n</code>. Nice, huh?</p>

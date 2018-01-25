@@ -1,0 +1,152 @@
+
+
+
+
+
+<h3>Welcome</h3>
+
+<p class="grayblock">Welcome to Madeup, a tool for making shapes with code. To make a shape, you need to do two things:</p>
+
+<ol>
+  <li>Trace out lines in 3D space with various commands to move and turn.</li>
+  <li>Solidify the lines into printable objects with various solidifier commands.</li>
+</ol>
+
+<p class="grayblock">Let's dive immediately into an example.</p>
+
+<h4>Dowel</h4>
+
+<p class="grayblock">Imagine you're riding on top of a turtle. You can tell the turtle to go forward or to turn&mdash;it's very obedient. Let's have it trace out the shape of the letter S.</p>
+
+<p class="grayblock">We start by situating ourselves somewhere in the world with a <code>moveto</code> command:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">moveto 0, 0</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">Where we start isn't very important. I chose the (0, 0)&mdash;which we call the <em>origin</em>&mdash;because it is simple.</p>
+
+<p class="grayblock">Add this block to your own program. You'll find <code>moveto</code> under the <em>Movement</em> menu. You'll find numbers under the <em>Data</em> menu. Once you've added these, you should see an arrow in the middle of your 3D scene pointing up.</p>
+
+<h4>Camera</h4>
+
+<p class="grayblock">If you drag on the scene, you'll see the arrow rotate. If you use two fingers, you'll shift the scene. If you pinch or scroll, you'll zoom in and out. Try it.</p>
+
+<p class="grayblock">Then hit the <em>Fit</em> button to reset the camera:</p>
+
+<img src="./images/fit.png" style="width: 72px; margin: 0.5em auto; display: block;">
+
+<p class="grayblock">You'll want to hit this button a lot as you write Madeup programs. It can be hard to reason about space when it's all topsy-turvy.</p>
+
+<h4>Tracing a Path</h4>
+
+<p class="grayblock">Let's start at the bottom-left corner of the S and work our way to the top. We start by turning so that we face along the bottom segment of the S. Add a <code>yaw</code> command&mdash;which is also in the <em>Movement</em> menu&mdash;at the end of your program:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">yaw 90</div>
+  <div class="block-editor"><div class="s-expression">(block (call yaw (INTEGER 90)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">The <code>yaw</code> command is used to turn left and right. There's also <code>pitch</code> for turning up or down, and <code>roll</code> for turning over. We want <code>yaw</code> here.</p>
+
+<p class="grayblock">You should see the arrow point right. If not, hit <em>Fit</em> to reset the camera.</p>
+
+<p class="grayblock">Let's step along the bottom segment with the <code>move</code> command. Let's say the S is 2 units wide. We take 2 steps like this:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">move 2</div>
+  <div class="block-editor"><div class="s-expression">(block (call move (INTEGER 2)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">At this point, we head up. But we need to turn left first. To do that, we add another <code>yaw</code> and feed it a negative number:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">yaw -90</div>
+  <div class="block-editor"><div class="s-expression">(block (call yaw (INTEGER -90)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">And then we head up with another <code>move</code> command:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">move 2</div>
+  <div class="block-editor"><div class="s-expression">(block (call move (INTEGER 2)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">Got the idea? You finish the tracing. Come back once you've got a complete path that looks like an S.</p>
+
+<span class="toggler">If you get really stuck, you can check out my solution.</span><div class="togglee"><div class="mup-switcher">
+  <div class="text-editor">moveto 0, 0
+yaw 90
+move 2
+yaw -90
+move 2
+yaw -90
+move 2
+yaw 90
+move 2
+yaw 90
+move 2</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0)) (call yaw (INTEGER 90)) (call move (INTEGER 2)) (call yaw (INTEGER -90)) (call move (INTEGER 2)) (call yaw (INTEGER -90)) (call move (INTEGER 2)) (call yaw (INTEGER 90)) (call move (INTEGER 2)) (call yaw (INTEGER 90)) (call move (INTEGER 2)))
+</div></div>
+</div>
+</div>
+
+<h4>Solidifying</h4>
+
+<p class="grayblock">Once your path is complete, hit the <em>Solidify</em> button:</p>
+
+<img src="./images/solidify_icon.png" style="width: 72px; margin: 0.5em auto; display: block;">
+
+<p class="grayblock">You should see nothing, because we haven't indicated how we want the path to turn into a solid. To show the path again, hit the <em>Pathify</em> button:</p>
+
+<img src="./images/pathify_icon.png" style="width: 72px; margin: 0.5em auto; display: block;">
+
+<p class="grayblock">There are many ways to turn a path into a solid. Let's start by thickening the path into a dowel. Under the <em>Solidifiers</em> menu, find the <code>dowel</code> command and drag it to the end of your program:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">dowel</div>
+  <div class="block-editor"><div class="s-expression">(block (call-with-names dowel))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">Now hit <em>Solidify</em>. Is that better?</p>
+
+<p class="grayblock">The S is quite blocky. Let's smooth out the bends by adjusting the maximum bend value:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">dowel maxBend:10</div>
+  <div class="block-editor"><div class="s-expression">(block (call-with-names dowel maxBend (INTEGER 10)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">This change will chop the single instantaneous 90-degree bend into nine gradual 10-degree bends.</p>
+
+<p class="grayblock">Now, let's throw away the <code>dowel</code> and replace it with tube:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">tube maxBend:10</div>
+  <div class="block-editor"><div class="s-expression">(block (call-with-names tube maxBend (INTEGER 10)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">How does that look? If we could find some food-grade plastic, we could design custom drinking straws.</p>
+
+<h4>Saving</h4>
+
+<p class="grayblock">You have just written your first Madeup program. You traced out a path and solidified it! I think we should save your work to commemorate this pivotal moment.</p>
+
+<p class="grayblock">In the right-menu, which you are reading right now, scroll up to <em>File</em>. His <em>Save As</em> and name your program something meaningful, like "s tube". Scroll down to <em>Mups</em>. You should see your program listed. You can open a previously saved program by clicking on its name under <em>Mups</em>.</p>
