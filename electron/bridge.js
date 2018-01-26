@@ -11,7 +11,7 @@ function platformize() {
   $('#panel-section-file').remove();  
   $('#panel-section-mups').remove();  
 
-  lesson = 'varring';
+  lesson = 'ring';
 }
 
 function interpret(options, onSuccess, onError) {

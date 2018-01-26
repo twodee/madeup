@@ -1414,7 +1414,23 @@ function switchEditors() {
   }
 
   // resize();
-  window.dispatchEvent(new Event('resize'))
+  window.dispatchEvent(new Event('resize'));
+}
+
+function resizeBlocklyDocs() {
+  var switchers = document.querySelectorAll('.mup-switcher');
+  forEach(switchers, function(i, switcher) {
+    var blocksEditor = switcher.children[1];
+    var workspace = docWorkspaces[i];
+
+    workspace.render();
+
+    // Fit the container exactly around the blocks.
+    var metrics = workspace.getMetrics();
+    blocksEditor.style.height = metrics.contentHeight + 'px';
+    blocksEditor.style.width = metrics.contentWidth + 'px';
+    Blockly.svgResize(workspace);
+  });
 }
 
 function load(newMup) {
@@ -2165,20 +2181,6 @@ function docify() {
     editor.resize();
   });
 
-  function resizeBlocklyDocs() {
-    var switchers = document.querySelectorAll('.mup-switcher');
-    forEach(switchers, function(i, switcher) {
-      var blocksEditor = switcher.children[1];
-      var workspace = docWorkspaces[i];
-
-      // Fit the container exactly around the blocks.
-      var metrics = workspace.getMetrics();
-      blocksEditor.style.height = metrics.contentHeight + 'px';
-      blocksEditor.style.width = metrics.contentWidth + 'px';
-      Blockly.svgResize(workspace);
-    });
-  }
-
   // Inject Blockly workspaces on all the code snippets.
   var switchers = document.querySelectorAll('.mup-switcher');
   forEach(switchers, function(i, switcher) {
@@ -2200,6 +2202,8 @@ function docify() {
     // Fit the container exactly around the blocks.
     var sExpression = blocksEditor.firstElementChild.innerHTML;
     parse(new Peeker(sExpression), workspace);
+
+    // If this code runs when display: none, bad sizing happens.
     var metrics = workspace.getMetrics();
     blocksEditor.style.height = metrics.contentHeight + 'px';
     blocksEditor.style.width = metrics.contentWidth + 'px';
@@ -2233,8 +2237,7 @@ function docify() {
   });
 
   $(function() {
-    $('.togglee').css('display', 'none');
-    $('.toggler').click(function() {
+    $('.toggler').off('click').click(function() {
       if ($(this).next().css('display') == 'none') {
         $(this).next().slideDown(400, function() {
           resizeBlocklyDocs();

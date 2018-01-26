@@ -1,9 +1,131 @@
 
 
 
-<h3>Variables</h3>
+<h3>Ring</h3>
 
-<p class="grayblock">In the last lesson, we designed a decagon with the help of a <code>repeat</code> loop:</p>
+<p class="grayblock">In this lesson, we'll walk a circular path and turn it into a ring. Let's start as before by moving the cursor to the origin:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">moveto 0, 0</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">We won't make an exact circle. We'll approximate one, starting with a four-sided "circle." Let's walk along one of its four sides and then turn to face the next side. How far do we want to turn? Well, how many degrees are in a circle? How many turns will we make?</p>
+
+<p class="grayblock">There are 360 degrees in a circle and 4 turns in this first approximation.</p>
+
+<span class="toggler">On each turn, how much will we yaw?</span><div class="togglee">We're turning a total of 360 degrees and we're doing it in 4 turns. Therefore, each turn will have to be 90 degrees&mdash;because 360 chunked into 4 groups is 90.</div>
+
+<p class="grayblock">So, here's the first leg of our four-sided journey:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">moveto 0, 0
+
+move 2
+yaw 90</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0)) (call move (INTEGER 2)) (call yaw (INTEGER 90)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">The second leg is a lot like the first:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">moveto 0, 0
+
+move 2
+yaw 90
+
+move 2
+yaw 90</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0)) (call move (INTEGER 2)) (call yaw (INTEGER 90)) (call move (INTEGER 2)) (call yaw (INTEGER 90)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">So's the third. To save yourself some time in the blocks editor, long-press on the original blocks and select <em>Duplicate</em> to achieve this:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">moveto 0, 0
+
+move 2
+yaw 90
+
+move 2
+yaw 90
+
+move 2
+yaw 90</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0)) (call move (INTEGER 2)) (call yaw (INTEGER 90)) (call move (INTEGER 2)) (call yaw (INTEGER 90)) (call move (INTEGER 2)) (call yaw (INTEGER 90)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">And the fourth:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">moveto 0, 0
+
+move 2
+yaw 90
+
+move 2
+yaw 90
+
+move 2
+yaw 90
+
+move 2
+yaw 90</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0)) (call move (INTEGER 2)) (call yaw (INTEGER 90)) (call move (INTEGER 2)) (call yaw (INTEGER 90)) (call move (INTEGER 2)) (call yaw (INTEGER 90)) (call move (INTEGER 2)) (call yaw (INTEGER 90)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">Was that fun? Or annoying? If you thought doing the same thing over and over again was annoying, I have good news for you! We can add a <code>repeat</code> loop to make a chunk of code happen again and again:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">moveto 0, 0
+repeat 4
+  move 2
+  yaw 90
+end</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0)) (repeat (INTEGER 4) (block (call move (INTEGER 2)) (call yaw (INTEGER 90)))))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">We just need to tell <code>repeat</code> how many times to go around. 0 means never, 1 means once, and so on. Notice how the code to repeat nests inside of the <code>repeat</code>.</p>
+
+<p class="grayblock">You're probably thinking that that's not much of a circle. You're right. Let's improve our approximation. Let's try a hexagon instead. What needs to change?</p>
+
+<span class="toggler">Try solving it on your own before examining my solution.</span><div class="togglee">We want to repeat the move-yaw combination 6 times, so let's change the count we give to <code>repeat</code>. We also need to change the angle to 360 / 60 = 6. <div class="mup-switcher">
+  <div class="text-editor">moveto 0, 0
+repeat 6
+  move 2
+  yaw 60
+end</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0)) (repeat (INTEGER 6) (block (call move (INTEGER 2)) (call yaw (INTEGER 60)))))
+</div></div>
+</div>
+</div>
+
+<p class="grayblock">We can smooth it out even more. Suppose we approximate a circle with 10 sides. What angle will we turn?</p>
+
+<span class="toggler">How does your solution compare to mine?</span><div class="togglee">360 / 10 = 36, so we end up with: <div class="mup-switcher">
+  <div class="text-editor">moveto 0, 0
+repeat 10
+  move 2
+  yaw 36
+end</div>
+  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0)) (repeat (INTEGER 10) (block (call move (INTEGER 2)) (call yaw (INTEGER 36)))))
+</div></div>
+</div>
+</div>
+
+<p class="grayblock">A decagon is close enough to a circle for our tastes. Now thicken the path using <code>dowel</code>:</p>
 
 <p class="grayblock"><div class="mup-switcher">
   <div class="text-editor">moveto 0, 0
@@ -17,4 +139,4 @@ dowel</div>
 </div>
 </p>
 
-<p class="grayblock">Those were good days, when we built that shape. But now, we decide that we want the ring to be thicker.</p>
+<p class="grayblock">Loops make it very easy to tweak the number of sides. Thanks, <code>repeat</code>! Thanks, <code>repeat</code>!</p>

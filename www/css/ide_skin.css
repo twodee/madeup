@@ -422,6 +422,10 @@ fieldset {
   width: 100%;
 }
 
+.togglee {
+  display: none;
+}
+
 .toggler {
   text-decoration: underline;
   cursor: pointer;
