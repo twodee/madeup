@@ -5,10 +5,11 @@ if(USE_IGL)
   list(APPEND LIBMADEUP_SRC_EXTRAS MeshBoolean.cpp)
 endif()
 
-include_directories(${TWODEE_INCLUDE_DIRECTORIES} ${CMAKE_SOURCE_DIR}/include)
+include_directories(${TWODEE_INCLUDE_DIRECTORIES} ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/open-simplex-noise-in-c)
 
 add_library(madeup
   STATIC
+  ../../../open-simplex-noise-in-c/open-simplex-noise.c
   Environment.cpp
   Expression.cpp
   ExpressionAbsoluteValue.cpp
@@ -75,6 +76,7 @@ add_library(madeup
   ExpressionMultiply.cpp
   ExpressionNegation.cpp
   ExpressionNodes.cpp
+  ExpressionNoise.cpp
   ExpressionNormalize.cpp
   ExpressionNot.cpp
   ExpressionNotEqual.cpp

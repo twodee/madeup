@@ -43,6 +43,7 @@
 #include "madeup/ExpressionMove.h"
 #include "madeup/ExpressionMoveX.h"
 #include "madeup/ExpressionMoveTo.h"
+#include "madeup/ExpressionNoise.h"
 #include "madeup/ExpressionNormalize.h"
 #include "madeup/ExpressionPath.h"
 #include "madeup/ExpressionPitch.h"
@@ -249,6 +250,10 @@ void Environment::prime() {
   Co<ExpressionDefine> define_movex(new ExpressionDefine("movex", Co<Expression>(new ExpressionMoveX())));
   define_movex->addFormal("length");
 
+  Co<ExpressionDefine> define_noise(new ExpressionDefine("noise", Co<Expression>(new ExpressionNoise())));
+  define_noise->addFormal("x");
+  define_noise->addFormal("y");
+
   Co<ExpressionDefine> define_moveto(new ExpressionDefine("moveto", Co<Expression>(new ExpressionMoveTo())));
   define_moveto->addFormal("x");
   define_moveto->addFormal("y");
@@ -432,6 +437,7 @@ void Environment::prime() {
   add("move", Co<ExpressionClosure>(new ExpressionClosure(define_move, globals)));
   add("movex", Co<ExpressionClosure>(new ExpressionClosure(define_movex, globals)));
   add("moveto", Co<ExpressionClosure>(new ExpressionClosure(define_moveto, globals)));
+  add("noise", Co<ExpressionClosure>(new ExpressionClosure(define_noise, globals)));
   add("polarto", Co<ExpressionClosure>(new ExpressionClosure(define_polarto, globals)));
   add("distort", Co<ExpressionClosure>(new ExpressionClosure(define_distort, globals)));
   add("scale", Co<ExpressionClosure>(new ExpressionClosure(define_scale, globals)));
@@ -513,6 +519,7 @@ void Environment::prime() {
   globals->add("moveto", (*this)["moveto"]);
   globals->add("polarto", (*this)["polarto"]);
   globals->add("movex", (*this)["movex"]);
+  globals->add("noise", (*this)["noise"]);
   globals->add("normalize", (*this)["normalize"]);
   globals->add("path", (*this)["path"]);
   globals->add("pitch", (*this)["pitch"]);

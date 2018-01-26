@@ -27,8 +27,8 @@ if (USE_MAGICK)
 endif(USE_MAGICK)
 
 if (USE_DEBUG AND CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-  set(CMAKE_C_FLAGS "-pedantic -Wall -std=c99")
-  set(CMAKE_CXX_FLAGS "-pedantic -Wall -std=c++11")
+  set(CMAKE_C_FLAGS "-pedantic -Wall -Wno-keyword-macro -std=c99")
+  set(CMAKE_CXX_FLAGS "-pedantic -Wall -Wno-keyword-macro -std=c++11")
 
   if (USE_DEBUG)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
