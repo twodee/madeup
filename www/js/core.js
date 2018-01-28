@@ -1213,7 +1213,7 @@ function hideGearMenu() {
 }
 
 // Only triggered when blocks editor is active.
-function onBlocksChanged() {
+function onBlocksChanged(e) {
   var xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
   var currentBlocks = Blockly.Xml.domToText(xml);
   mup.isDirty = lastBlocks != currentBlocks;
@@ -1464,7 +1464,13 @@ function load(newMup) {
     if (settings.get('isEditorText')) {
       textEditor.session.setValue(source, -1);
     } else {
+      // Generally, block events set the dirty flag, but load events must not
+      // do so. The events are fired asynchronously, but they get queued up by
+      // the code here. To disable that, we temporarily turn off events.
+      Blockly.Events.disable();
+
       clearWorkspace();
+ 
       // If source is blank, XML parse will fail.
       if (source.length > 0) {
         var xml = Blockly.Xml.textToDom(source);
@@ -1478,6 +1484,8 @@ function load(newMup) {
       // coding session can lead to unwanted surprises.
       blocklyWorkspace.updateVariableStore(true);
 
+      Blockly.Events.enable();
+
       // But the builtin variables should always be around.
       ensureBuiltinVariables();
     }
@@ -1485,7 +1493,12 @@ function load(newMup) {
     // TODO toggle modes
     mup.isDirty = false;
     updateTitle();
+
+    // Generate preview, if necessary.
+    onSourceChanged();
   });
+
+
 }
 
 function save() {
@@ -2104,6 +2117,8 @@ function clearWorkspace() {
 }
 
 function ensureBuiltinVariables() {
+  // Don't generate events for these variable creations.
+  Blockly.Events.disable();
   ids = ['nsides', '.rgb', '.radius', '.innerRadius', '.outerRadius'];
   for (var i = 0; i < ids.length; ++i) {
     var id = ids[i];
@@ -2111,6 +2126,7 @@ function ensureBuiltinVariables() {
       blocklyWorkspace.createVariable(id);
     }
   }
+  Blockly.Events.enable();
 }
 
 function animate() {
