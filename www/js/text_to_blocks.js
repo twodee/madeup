@@ -310,7 +310,7 @@ function parse(peeker, workspace) {
       block = workspace.newBlock('madeup_inverse_sincostan');
       block.setFieldValue(id, 'FUNCTION');
       connectExpression(block, 'RATIO', ratio);
-    } else if (id == 'identity' || id == 'reframe' || id == 'push' || id == 'pop' || id == 'reverse') {
+    } else if (id == 'identity' || id == 'reframe' || id == 'push' || id == 'pop' || id == 'reverse' || id == 'home') {
       block = workspace.newBlock('madeup_' + id);
     } else if (id == 'where') {
       block = workspace.newBlock('madeup_where');

@@ -1520,6 +1520,7 @@ function save() {
     platformSave(mup, source, mode, function() {
       mup.isDirty = false;
       updateTitle();
+      populateMupsList();
     });
   }
 
