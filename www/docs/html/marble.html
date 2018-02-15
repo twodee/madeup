@@ -1,0 +1,29 @@
+
+
+
+
+<h3>Marble Spinner</h3>
+
+<p class="grayblock">Imagine a hamster wheel with a hamster inside, making it spin. You could watch this for hours. And you do.</p>
+
+<p class="grayblock">Now, take away the hamster and put a marble in its place. The wheel no longer spins on its own. You reach down and flick the wheel. It spins for a bit and stops. You flick again. And again. And again. Finally you take out the wheel and shake it back and forth to keep the marble going around.  </p>
+
+<p class="grayblock">What a pleasant dream.</p>
+
+<p class="grayblock">But then you wake, and there's no hamster and no wheel. But curiously, there's a marble in your hand. To keep the dream alive, you decide to design and print your own wheel.</p>
+
+<p class="grayblock">Let's say it looked something like this:</p>
+
+<p class="grayblock"><iframe scrolling="auto" src="https://sketchfab.com/models/2092425b71af41d5acdd92991bcaac58/embed" width="100%" height="400" id="spinner" frameborder="0"></iframe></p>
+
+<p class="grayblock">Your challenge is this:</p>
+
+<ol>
+  <li>On graph paper, sketch out the cross section of the wheel you see above. The cross section is the shape you'd see if you cut the wheel in half. For example, consider this model: <iframe scrolling="auto" src="https://sketchfab.com/models/2b5b6897ab694f54be6c18804fb5c3c2/embed" width="100%" height="400" id="triring" frameborder="0"></iframe> The cross section of this model is a triangle: <img src="./docs/html/images/triring_cross_section.png" style="width: 75%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em; margin-left: auto; margin-right: auto; display: block;"> What does the cross section of the wheel look like? To make measurements easier, draw directly on the lines of the grid. Compare your sketch with others' before moving on.</li>
+  <li>In Madeup, trace out your cross section sketch with a single <code>moveto</code> and many <code>move</code>s and <code>yaw</code>s.</li>
+  <li>Revolve your cross section around the y-axis&mdash;which is (0, 1, 0). How many degrees do you want to spin?</li>
+  <li>If the solidified model doesn't have a hole in the middle, you probably need to shift it to the right a bit by increasing the x-coordinate of your initial <code>moveto</code>.</li>
+  <li>If the solidified model is more square than round, you probably need to increase its number of sides. Drag in a <code>set</code> block from the Variables menu, and set variable <code>nsides</code> to something more than the default of 4.</li>
+</ol>
+
+<p class="grayblock">How's it look?</p>
