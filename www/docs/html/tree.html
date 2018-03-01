@@ -1,0 +1,30 @@
+
+
+
+
+<h3>Tree of Revolution</h3>
+
+<p class="grayblock">Behold. This is the Tree of Revolution:</p>
+
+<p class="grayblock"><iframe scrolling="auto" src="https://sketchfab.com/models/cf7fb3c080b14cc0b160ebdda1397d29/embed" width="100%" height="400" id="treesolid" frameborder="0"></iframe></p>
+
+<p class="grayblock">Your first challenge is this:</p>
+
+<ol>
+  <li>Don't start by coding. We do our worst thinking at the computer. Instead, on graph paper, sketch out the cross section of the tree you see above. The cross section is the shape you'd see if you cut the tree in half. <span class="toggler">If you get stuck, feel free to check out an example.</span><div class="togglee"><img src="./docs/html/images/tree/cross.png" style="width: 75%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em; margin-left: auto; margin-right: auto; display: block;"></div> Yours probably won't look identical. That's good. It's your tree.</li>
+  <li>Draw a vertical line down the middle of the cross section. This is the y-axis.</li>
+  <li>Erase or ignore the left half of the cross section. We don't need it. Because the shape is symmetric, figuring out the right side is enough.</li>
+  <li>Draw a horizontal line so that the trunk snugly rests on it. This is the x-axis. <span class="toggler">Compare your axes to the example.</span><div class="togglee"><img src="./docs/html/images/tree/axes.png" style="width: 75%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em; margin-left: auto; margin-right: auto; display: block;"></div></li>
+  <li>Label the point where the base of the tree trunk crosses the y-axis as (0, 0). This means it has x-coordinate 0 and y-coordinate 0. It is the <em>origin</em>.</li>
+  <li>Write down the coordinates of each remaining corner&mdash;or vertex&mdash;of the tree by counting the distance between each vertex and the axes. The horizontal distance is the x-coordinate. The vertical distance is the y-coordinate. <span class="toggler">Compare your coordinates to the example.</span><div class="togglee"><img src="./docs/html/images/tree/coordinates.png" style="width: 75%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em; margin-left: auto; margin-right: auto; display: block;"></div> Again, your numbers won't be the same, but they should follow the same general pattern.</li>
+</ol>
+
+<p class="grayblock">Your second challenge is to take your cross section into Madeup and model your tree:</p>
+
+<ol>
+  <li>Starting out at (0, 0), trace out your cross section with a sequence of <code>moveto</code> commands. In other lessons we've used <code>move</code> and <code>yaw</code>. We could use them here too, but finding the appropriate lengths for <code>move</code> is tricky.</li>
+  <li>Use the <code>revolve</code> solidifier to revolve your cross section around the y-axis&mdash;which is (0, 1, 0). How many degrees do you want to spin?</li>
+  <li>The solidified model is more square than round, and you may want to increase its number of sides. Drag in a <code>set</code> block from the Variables menu and place it somewhere before your <code>revolve</code>. Set the variable <code>nsides</code> to something more than the default of 4.</li>
+</ol>
+
+<p class="grayblock">How's it look?</p>

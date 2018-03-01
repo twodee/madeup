@@ -1,0 +1,40 @@
+[let skin=madeupdocs]
+[let root=.]
+[style id=screenshot
+width: 75%
+background-color: white
+margin-top: 0.5em
+margin-bottom: 0.5em
+margin-left: auto
+margin-right: auto
+display: block
+]
+
+# Tree of Revolution
+
+Behold. This is the Tree of Revolution:
+
+[frame src="https://sketchfab.com/models/cf7fb3c080b14cc0b160ebdda1397d29/embed" width=100% height=400 id=treesolid]
+
+Your first challenge is this:
+
+1. Don't start by coding. We do our worst thinking at the computer. Instead, on graph paper, sketch out the cross section of the tree you see above. The cross section is the shape you'd see if you cut the tree in half. [hide title="If you get stuck, feel free to check out an example."
+[image src=docs/html/images/tree/cross.png style=screenshot]
+] Yours probably won't look identical. That's good. It's your tree.
+2. Draw a vertical line down the middle of the cross section. This is the y-axis.
+3. Erase or ignore the left half of the cross section. We don't need it. Because the shape is symmetric, figuring out the right side is enough.
+4. Draw a horizontal line so that the trunk snugly rests on it. This is the x-axis. [hide title="Compare your axes to the example."
+[image src=docs/html/images/tree/axes.png style=screenshot]
+]
+5. Label the point where the base of the tree trunk crosses the y-axis as (0, 0). This means it has x-coordinate 0 and y-coordinate 0. It is the *origin*.
+6. Write down the coordinates of each remaining corner---or vertex---of the tree by counting the distance between each vertex and the axes. The horizontal distance is the x-coordinate. The vertical distance is the y-coordinate. [hide title="Compare your coordinates to the example."
+[image src=docs/html/images/tree/coordinates.png style=screenshot]
+] Again, your numbers won't be the same, but they should follow the same general pattern.
+
+Your second challenge is to take your cross section into Madeup and model your tree:
+
+1. Starting out at (0, 0), trace out your cross section with a sequence of `moveto` commands. In other lessons we've used `move` and `yaw`. We could use them here too, but finding the appropriate lengths for `move` is tricky.
+2. Use the `revolve` solidifier to revolve your cross section around the y-axis---which is (0, 1, 0). How many degrees do you want to spin?
+3. The solidified model is more square than round, and you may want to increase its number of sides. Drag in a `set` block from the Variables menu and place it somewhere before your `revolve`. Set the variable `nsides` to something more than the default of 4.
+
+How's it look?
