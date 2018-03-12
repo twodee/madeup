@@ -1,4 +1,4 @@
-DOCS := index sdowel ring star ring_polar view_look endless_knot1 top maze first varring marble tree
+DOCS := index sdowel ring star ring_polar view_look endless_knot1 top maze first varring marble tree blinky
 HTMLS := $(addprefix html/,$(addsuffix .html, $(DOCS)))
 
 all: html $(HTMLS)

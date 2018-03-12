@@ -1,0 +1,78 @@
+[let skin=madeupdocs]
+[let root=.]
+[style id=screenshot
+width: 75%
+background-color: white
+margin-top: 0.5em
+margin-bottom: 0.5em
+margin-left: auto
+margin-right: auto
+display: block
+]
+
+# Blinky
+
+Pac-Man was a very popular arcade game designed by Toru Iwatani in Japan. Have you ever played it? There's a maze with lots of little pellets in it. 240 to be exact. There's also a little yellow circle with a mouth that goes around and eats all the pellets. That's Pac-Man, and you get to control him. Eating pellets is pretty easy, so what makes the game challenging? Ghosts. If Pac-Man touches one of them, he loses a life.
+
+To get good at Pac-Man, you must get good at moving around in space. And that's our job in Madeup too. So, to celebrate the importance of space in both Pac-Man and Madeup, we will create a Pac-Man ghost in Madeup.
+
+## Observe Blinky
+
+There are actually four ghosts in Pac-Man, and they each behave a little differently and are a different color. We will create Blinky, the red ghost. He's the lead, and he's the only ghost that was programmed to actively chase Pac-Man.
+
+Eventually we are going to write code, but all great works of art start with observation. Let's stare at him for exactly one minute. Trace him with your eyes. Internalize his shape. 
+
+[image src=docs/html/images/blinky/sprite.png style=screenshot]
+
+Now, what did you observe? What can you say about Blinky's anatomy? Write down your observations somewhere. Writing makes us better thinkers. Author E.M. Forster said, "How can I tell what I think till I see what I say?"
+
+[hide title="Once you've observed, compare your list to what I noticed." | block
+- Here's got a curved head.
+- He's got a zigzag bottom.
+- He's got two eyes.
+- He's red.
+- He's blocky or pixelated.
+- Apart from his eyes, he's symmetric. The right half of his body is the same as his left, but mirrored.
+]
+
+## Draw Blinky
+
+Our next task is to draw Blinky on graph paper. Each of his pixels should be one cell on your graph paper. Ignore his eyes for the time being.
+
+Since Blinky is symmetric, we only have to draw one half of his body. Let's draw only the right half:
+
+[image src=docs/html/images/blinky/outline.png style=screenshot]
+
+## Measure Blinky
+
+Once you've got Blinky plotted, write down the xy-coordinates for his topmost point. How many squares separate that point from the thick vertical line---the y-axis? That number is the x-coordinate. How many squares separate that point from the thick horizontal line---the x-axis? That number is the y-coordinate.
+
+[hide title="Compare your answer to mine."
+I got (0, 14).
+]
+
+That's the only vertex whose coordinates we need.
+
+Now, consider the topmost line segment of Blinky's body.
+
+[hide title="How long is it?"
+Two squares.
+]
+
+Write the segment's length down next to it. Then go on to the next line segment, measure it, and write down its length. Do this for all the lines of his perimeter. There are 21 segments in all.
+
+[hide title="Compare your list to mine."
+2, 1, 2, 1, 1, 1, 1, 3, 1, 8, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1
+]
+
+## Program Blinky
+
+Now that we've got all of Blinky's measurements taken, let's use Madeup to trace out his outline. Start on the top with a `moveto` using the xy-coordinates you found earlier. After that, use only `move`s and `yaw`s to wind around his perimeter, stopping at the bottom.
+
+Once you've got his right half, we'll add his left half with a new command that I will show you when we meet. The suspense!
+
+If you can't wait for that, feel free to trace out the left half much like you did the right half. Then you can extrude him along the z-axis:
+
+[mup
+extrude 0, 0, 1, 3
+]
