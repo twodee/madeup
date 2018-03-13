@@ -189,16 +189,16 @@ function parse(peeker, workspace) {
       block = workspace.newBlock('madeup_coalesce');
       connectExpression(block, 'THRESHOLD', threshold);
     } else if (id == 'mirror') {
-      peeker.get(); // eat space
-      var path = parse(peeker, workspace);
+      // peeker.get(); // eat space
+      // var path = parse(peeker, workspace);
       peeker.get(); // eat space
       var axis = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var point = parse(peeker, workspace);
+      // peeker.get(); // eat space
+      // var point = parse(peeker, workspace);
       block = workspace.newBlock('madeup_mirror');
-      connectExpression(block, 'PATH', path);
+      // connectExpression(block, 'PATH', path);
       connectExpression(block, 'AXIS', axis);
-      connectExpression(block, 'POINT', point);
+      // connectExpression(block, 'POINT', point);
     } else if (id == 'center') {
       peeker.get(); // eat space
       var object = parse(peeker, workspace);

@@ -323,9 +323,21 @@ void Environment::prime() {
   define_fracture->addFormal("path");
 
   Co<ExpressionDefine> define_mirror(new ExpressionDefine("mirror", Co<Expression>(new ExpressionMirror())));
-  define_mirror->addFormal("path");
   define_mirror->addFormal("axis");
-  define_mirror->addFormal("point");
+  {
+    FormalParameter path("path");
+    path.setDefaultValue(Co<Expression>(new ExpressionPath()));
+    define_mirror->addFormal(path);
+
+    Co<ExpressionArray> pivot_array = Co<ExpressionArray>(new ExpressionArray(3));
+    pivot_array->setElement(0, Co<Expression>(new ExpressionReal(0.0f)));
+    pivot_array->setElement(1, Co<Expression>(new ExpressionReal(0.0f)));
+    pivot_array->setElement(2, Co<Expression>(new ExpressionReal(0.0f)));
+
+    FormalParameter pivot("pivot");
+    pivot.setDefaultValue(Co<Expression>(new ExpressionArrayReference(pivot_array)));
+    define_mirror->addFormal(pivot);
+  }
 
   Co<ExpressionDefine> define_append(new ExpressionDefine("append", Co<Expression>(new ExpressionAppend())));
   define_append->addFormal("array");
