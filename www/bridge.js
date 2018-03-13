@@ -127,13 +127,17 @@ function platformSave(mup, source, mode, onSuccess) {
           mimeType: 'text/plain'
         }).then(function(res) {
 					mup.driveID = res.result.id;
-          uploadFile(mup, json, onSuccess);
+          uploadFile(mup, json, function() {
+            populateMupsList();
+            onSuccess();
+          });
         });
       }
     });
   } else {
     localStorage.setItem(mup.name, json);
     $('#message').html('I saved your program. It is precious! Find it later under <image src="images/gear.png" id="gear-in-console" width="' + settings.get('fontSize') + 'pt"> / Mups / ' + mup.name + '.');
+    populateMupsList();
     onSuccess();
   }
 }
