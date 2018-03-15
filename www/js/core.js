@@ -627,7 +627,7 @@ $(window).on('load', function() {
   // Only save cookies if they were successfully loaded.
   $(window).on('unload', function() {
     syncSettings();
-    if (mup.isDirty && confirm('Save changes to ' + mup.name + '?')) {
+    if (mup.isDirty && confirm('Save changes to ' + mup.name + ' before leaving?')) {
       save();
     }
   });
@@ -1214,10 +1214,10 @@ function hideGearMenu() {
 
 // Only triggered when blocks editor is active.
 function onBlocksChanged(e) {
-  var xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
-  var currentBlocks = Blockly.Xml.domToText(xml);
-  mup.isDirty = lastBlocks != currentBlocks;
-  onSourceChanged();
+  if (e.recordUndo) {
+    mup.isDirty = true;
+    onSourceChanged();
+  }
 }
 
 // Only triggered when text editor is active.
@@ -1477,6 +1477,7 @@ function load(newMup) {
         Blockly.Xml.domToWorkspace(xml, blocklyWorkspace);
         xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
         lastBlocks = Blockly.Xml.domToText(xml);
+        console.log("first lastBlocks:", lastBlocks);
       }
 
       // Wipe away variables that aren't in use. Blockly used to do this
