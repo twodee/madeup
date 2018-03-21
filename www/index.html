@@ -394,7 +394,14 @@
       <block type="madeup_log"></block>
     </category>
     <category name="Movement">
-      <block type="madeup_moveto_xy"></block>
+      <!-- <block type="madeup_moveto_xy"></block> -->
+      <block type="madeup_moveto">
+        <mutation>
+          <defaults>
+            <default id="z" enabled="false"></default>
+          </defaults>
+        </mutation>
+      </block>
       <block type="madeup_moveto"></block>
       <block type="madeup_move"></block>
       <block type="madeup_polarto"></block>
@@ -419,22 +426,28 @@
       <block type="madeup_spheres"></block>
       <block type="madeup_boxes"></block>
       <block type="madeup_dowel">
-        <value name="MAXBEND">
-          <shadow type="madeup_real">
-            <field name="REAL">360</field>
-          </shadow>
-        </value>
+        <mutation>
+          <defaults>
+            <default id="maxBend" enabled="false"></default>
+          </defaults>
+        </mutation>
       </block>
       <block type="madeup_tube">
-        <value name="MAXBEND">
-          <shadow type="madeup_real">
-            <field name="REAL">360</field>
-          </shadow>
-        </value>
+        <mutation>
+          <defaults>
+            <default id="maxBend" enabled="false"></default>
+          </defaults>
+        </mutation>
       </block>
       <block type="madeup_extrude"></block>
       <block type="madeup_revolve"></block>
-      <block type="madeup_polygon"></block>
+      <block type="madeup_polygon">
+        <mutation>
+          <defaults>
+            <default id="flip" enabled="false"></default>
+          </defaults>
+        </mutation>
+      </block>
       <block type="madeup_surface"></block>
       <block type="madeup_loft"></block>
       <block type="madeup_forget"></block>

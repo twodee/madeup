@@ -1118,6 +1118,7 @@ $(window).on('load', function() {
 });
 
 function logAbtractSyntaxTree() {
+  console.log("raw source:", getSource());
   textToAbstractSyntaxTree(getSource(),
     function(data) {
       console.log(data['tree']);
@@ -1474,10 +1475,36 @@ function load(newMup) {
       // If source is blank, XML parse will fail.
       if (source.length > 0) {
         var xml = Blockly.Xml.textToDom(source);
+        var isMadeupRegex = new RegExp('^madeup_');
+        console.log("xml:", xml);
+
+        // Fix case for backward compatibility.
+        // block with type madeup_*
+        //   field name=CAPS  | value name=CAPS
+        function normalizeCase(root, isParentMadeup) {
+          if (isParentMadeup && (root.nodeName === 'field' || root.nodeName === 'value' || root.nodeName == 'statement')) {
+            var oldName = root.getAttribute('name');
+            if (oldName.toUpperCase() == 'MAXBEND') {
+              root.setAttribute('name', 'maxBend');
+            } else {
+              root.setAttribute('name', oldName.toLowerCase());
+            }
+          }
+
+          var isRootMadeup = root.nodeName === 'block' && isMadeupRegex.test(root.getAttribute('type'));
+
+          // Recurse on children.
+          var child = root.firstElementChild;
+          while (child) {
+            normalizeCase(child, isRootMadeup);
+            child = child.nextElementSibling;
+          }
+        }
+        normalizeCase(xml, false);
+
         Blockly.Xml.domToWorkspace(xml, blocklyWorkspace);
         xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
         lastBlocks = Blockly.Xml.domToText(xml);
-        console.log("first lastBlocks:", lastBlocks);
       }
 
       // Wipe away variables that aren't in use. Blockly used to do this
