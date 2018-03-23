@@ -512,11 +512,15 @@ function parse(peeker, workspace) {
     while (peeker.peek() == '(') {
       peeker.get(); // eat (
       var formal = peeker.getToken();
+      console.log("formal:", formal);
       formals.push(formal);
-      peeker.get(); // eat )
       if (peeker.peek() == ' ') {
         peeker.get(); // eat space
+        var defaultActual = parse(peeker, workspace);
+        defaultActual.dispose();
+        console.error('Default parameters not supported in blocks yet.');
       }
+      peeker.get(); // eat )
     }
     peeker.get(); // eat )
     peeker.get(); // eat space
