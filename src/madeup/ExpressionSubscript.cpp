@@ -161,7 +161,7 @@ Co<Expression> ExpressionSubscript::getIndex() const {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionSubscript::write(ostream &out) const {
-  out << "(SUBSCRIPT ";
+  out << "(subscript ";
   base_expression->write(out);
   out << " ";
   index_expression->write(out);

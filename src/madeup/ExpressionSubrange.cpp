@@ -140,7 +140,7 @@ Co<Expression> ExpressionSubrange::getIndex(int i) const {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionSubrange::write(ostream &out) const {
-  out << "(SUBRANGE ";
+  out << "(subrange ";
   base_expression->write(out);
   out << " ";
   index_expressions[0]->write(out);

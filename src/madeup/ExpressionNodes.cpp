@@ -51,7 +51,7 @@ td::Co<Expression> ExpressionNodes::center() const {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionNodes::write(ostream &out) const {
-  out << "(TURTLES)";
+  out << "(turtles)";
 }
 
 /* ------------------------------------------------------------------------- */

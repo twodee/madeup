@@ -384,16 +384,16 @@ void Environment::prime() {
   maxBend.setDefaultValue(Co<Expression>(new ExpressionInteger(360)));
 
   Co<ExpressionDefine> define_dowel(new ExpressionDefine("dowel", Co<Expression>(new ExpressionDowel())));
-  define_dowel->addFormal(twist);
   define_dowel->addFormal(maxBend);
+  define_dowel->addFormal(twist);
 
   Co<ExpressionDefine> define_trimesh(new ExpressionDefine("trimesh", Co<Expression>(new ExpressionTrimesh())));
   define_trimesh->addFormal("vertices");
   define_trimesh->addFormal("faces");
 
   Co<ExpressionDefine> define_tube(new ExpressionDefine("tube", Co<Expression>(new ExpressionTube())));
-  define_tube->addFormal(twist);
   define_tube->addFormal(maxBend);
+  define_tube->addFormal(twist);
 
   Co<ExpressionDefine> define_polygon(new ExpressionDefine("polygon", Co<Expression>(new ExpressionPolygon())));
   FormalParameter flip("flip");

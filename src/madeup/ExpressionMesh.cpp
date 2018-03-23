@@ -25,7 +25,7 @@ Co<Trimesh> ExpressionMesh::toMesh() const {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionMesh::write(ostream &out) const {
-  out << "(MESH)";
+  out << "(mesh)";
 }
 
 /* ------------------------------------------------------------------------- */

@@ -27,7 +27,7 @@ string ExpressionString::getString() const {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionString::write(ostream &out) const {
-  out << "(STRING " << value << ")";
+  out << "(string " << value << ")";
 }
 
 /* ------------------------------------------------------------------------- */

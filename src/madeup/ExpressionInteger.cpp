@@ -38,7 +38,7 @@ float ExpressionInteger::toReal() const {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionInteger::write(ostream &out) const {
-  out << "(INTEGER " << value << ")";
+  out << "(integer " << value << ")";
 }
 
 /* ------------------------------------------------------------------------- */

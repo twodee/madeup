@@ -18,19 +18,6 @@ ExpressionDowel::ExpressionDowel() :
 /* ------------------------------------------------------------------------- */
 
 Co<Expression> ExpressionDowel::evaluate(Environment &env) const {
-  // Get twist.
-  Co<ExpressionClosure> twist_closure = env["twist"];
-  if (twist_closure.IsNull()) {
-    throw MessagedException(getSourceLocation().toAnchor() + ": I expect function dowel to be given a parameter named twist, but no twist was given.");
-  }
-
-  Co<Expression> twist_value = twist_closure->evaluate(env);
-  ExpressionNumber *twist_number = dynamic_cast<ExpressionNumber *>(twist_value.GetPointer());
-  if (!twist_number) {
-    throw MessagedException(twist_value->getSourceLocation().toAnchor() + ": I expect function dowel to be given a numeric twist value, but what you gave isn't a number.");
-  }
-  float twist = twist_number->toReal();
-
   // Get roundedness.
   Co<ExpressionClosure> max_bend_closure = env["maxBend"];
   if (max_bend_closure.IsNull()) {
@@ -43,6 +30,19 @@ Co<Expression> ExpressionDowel::evaluate(Environment &env) const {
     throw MessagedException(max_bend_value->getSourceLocation().toAnchor() + ": I expect function dowel to be given a numeric maxBend value, but what you gave isn't a number.");
   }
   float max_bend = max_bend_number->toReal();
+
+  // Get twist.
+  Co<ExpressionClosure> twist_closure = env["twist"];
+  if (twist_closure.IsNull()) {
+    throw MessagedException(getSourceLocation().toAnchor() + ": I expect function dowel to be given a parameter named twist, but no twist was given.");
+  }
+
+  Co<Expression> twist_value = twist_closure->evaluate(env);
+  ExpressionNumber *twist_number = dynamic_cast<ExpressionNumber *>(twist_value.GetPointer());
+  if (!twist_number) {
+    throw MessagedException(twist_value->getSourceLocation().toAnchor() + ": I expect function dowel to be given a numeric twist value, but what you gave isn't a number.");
+  }
+  float twist = twist_number->toReal();
 
   // Emit dowel.
   try {

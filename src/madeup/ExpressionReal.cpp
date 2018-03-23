@@ -34,7 +34,7 @@ int ExpressionReal::toInteger() const {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionReal::write(ostream &out) const {
-  out << "(REAL " << value << ")";
+  out << "(real " << value << ")";
 }
 
 /* ------------------------------------------------------------------------- */

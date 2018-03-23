@@ -86,14 +86,10 @@ int ExpressionBlock::getLength() const {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionBlock::write(ostream &out) const {
-  out << "(block ";
-  vector<Co<Expression> >::const_iterator i = statements.begin();
-  if (i != statements.end()) {
+  out << "(block";
+  for (vector<Co<Expression> >::const_iterator i = statements.begin(); i != statements.end(); ++i) {
+    out << " ";
     (*i)->write(out);
-    for (++i; i != statements.end(); ++i) {
-      out << " ";
-      (*i)->write(out);
-    }
   }
   out << ")";
 }

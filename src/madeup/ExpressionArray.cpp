@@ -53,7 +53,7 @@ void ExpressionArray::append(td::Co<Expression> expr) {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionArray::write(ostream &out) const {
-  out << "(ARRAY";
+  out << "(array";
   for (int i = 0; (unsigned int) i < elements.size(); ++i) {
     out << " ";
     elements[i]->write(out);
@@ -76,7 +76,7 @@ Co<Expression> ExpressionArrayReference::evaluate(Environment &env) const {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionArrayReference::write(ostream &out) const {
-  out << "(ARRAYREF ";
+  out << "(arrayref ";
   array_expression->write(out);
   out << ")";
 }
@@ -113,7 +113,7 @@ Co<Expression> ExpressionArrayLiteral::evaluate(Environment &env) const {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionArrayLiteral::write(ostream &out) const {
-  out << "(ARRAYLITERAL";
+  out << "(arrayliteral";
   for (unsigned int i = 0; i < items.size(); ++i) {
     out << " ";
     items[i]->write(out);
@@ -150,7 +150,7 @@ Co<Expression> ExpressionArrayConstructor::evaluate(Environment &env) const {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionArrayConstructor::write(ostream &out) const {
-  out << "(MAKEARRAY ";
+  out << "(makearray ";
   length_expression->write(out);
   out << " ";
   fill_expression->write(out);

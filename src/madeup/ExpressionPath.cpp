@@ -20,7 +20,7 @@ Co<Expression> ExpressionPath::evaluate(Environment &env) const {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionPath::write(ostream &out) const {
-  out << "(PATH)";
+  out << "(path)";
 }
 
 /* ------------------------------------------------------------------------- */

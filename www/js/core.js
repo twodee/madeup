@@ -458,7 +458,6 @@ $(window).on('load', function() {
       var postCursor = null;
       var i = 0;
       while (i < patterns.length && (preCursor == null || postCursor == null)) {
-        console.log("i:", i);
         preCursor = left.match(patterns[i][0]);
         if (!left.match(/[A-Za-z_]$/)) {
           postCursor = right.match(patterns[i][1]);
@@ -605,13 +604,6 @@ $(window).on('load', function() {
     settings.set('pathifyLineSize', parseFloat(this.value));
     run(getSource(), GeometryMode.PATH);
   };
-
-  gearSections.forEach(function(tag) {
-    var property = 'isOpen' + tag.charAt(0).toUpperCase() + tag.substring(1);
-    if (settings.has(property) && settings.get(property)) {
-      $('#panel-section-' + tag + ' > .panel-section-label').click();
-    }
-  });
 
   $('#nSecondsTillAutopathify').val(settings.get('nSecondsTillAutopathify'));
   $('#nSecondsTillAutopathify').change(function () {
@@ -1033,6 +1025,13 @@ $(window).on('load', function() {
     }
   });
 
+  gearSections.forEach(function(tag) {
+    var property = 'isOpen' + tag.charAt(0).toUpperCase() + tag.substring(1);
+    if (settings.has(property) && settings.get(property)) {
+      $('#panel-section-' + tag + ' > .panel-section-label').click();
+    }
+  });
+
   // I don't think I should need this anymore, but the console blows out
   // of #left when I remove it.
   $('#left').resizable({
@@ -1442,7 +1441,10 @@ function load(newMup) {
   // Clear the editors so they don't try to get converted.
   textEditor.setValue('');
   if (blocklyWorkspace) {
+    Blockly.Events.disable();
     clearWorkspace();
+    Blockly.Events.enable();
+    blocklyWorkspace.clearUndo();
     // blocklyWorkspace.clear();
     // blocklyWorkspace.updateVariableStore();
   }
@@ -1476,7 +1478,6 @@ function load(newMup) {
       if (source.length > 0) {
         var xml = Blockly.Xml.textToDom(source);
         var isMadeupRegex = new RegExp('^madeup_');
-        console.log("xml:", xml);
 
         // Fix case for backward compatibility.
         // block with type madeup_*
@@ -1491,7 +1492,8 @@ function load(newMup) {
             }
           }
 
-          var isRootMadeup = root.nodeName === 'block' && isMadeupRegex.test(root.getAttribute('type'));
+          var isRootMadeup = (root.nodeName === 'block' || root.nodeName === 'shadow') &&
+                             isMadeupRegex.test(root.getAttribute('type'));
 
           // Recurse on children.
           var child = root.firstElementChild;
@@ -1501,6 +1503,65 @@ function load(newMup) {
           }
         }
         normalizeCase(xml, false);
+
+        // Insert mutation on blocks with defaults but which don't have any
+        // values connected.
+        function ensureDefaults(root) {
+          // if block has defaults on config, but either no mutation element
+          // or a mutation with no defaults 
+
+          if (root.nodeName == 'block' || root.nodeName == 'shadow') {
+            var type = root.getAttribute('type');
+
+            if (type &&
+                blockDefinitions.hasOwnProperty(type) &&
+                blockDefinitions[type].config.hasOwnProperty('args0') &&
+                hasOptionalParameters(blockDefinitions[type].config.args0)) {
+              // Determine what values/statements it really has.
+              var connectedInputs = [];
+              var child = root.firstElementChild;
+              var defaults = null;
+              var mutation = null;
+              while (child) {
+                if (child.nodeName == 'value' || child.nodeName == 'statement') {
+                  connectedInputs.push(child.getAttribute('name'));
+                } else if (child.nodeName == 'mutation') {
+                  mutation = child;
+                  var submutations = mutation.getElementsByTagName('defaults');
+                  if (submutations.length > 0) {
+                    defaults = submutations[0];
+                  }
+                }
+                child = child.nextElementSibling;
+              }
+
+              if (defaults === null) {
+                if (mutation === null) {
+                  mutation = document.createElement("mutation");
+                  root.appendChild(mutation);
+                }
+
+                defaults = document.createElement("defaults");
+                var args0 = blockDefinitions[type].config.args0;
+                for (var i = 0; i < args0.length; ++i) {
+                  var defaultParameter = document.createElement("default");
+                  defaultParameter.setAttribute('id', args0[i].name);
+                  defaultParameter.setAttribute('enabled', connectedInputs.includes(args0[i].name));
+                  defaults.appendChild(defaultParameter);
+                }
+                mutation.appendChild(defaults);
+              }
+            }
+          }
+
+          // Recurse on children.
+          var child = root.firstElementChild;
+          while (child) {
+            ensureDefaults(child);
+            child = child.nextElementSibling;
+          }
+        }
+        ensureDefaults(xml);
 
         Blockly.Xml.domToWorkspace(xml, blocklyWorkspace);
         xml = Blockly.Xml.workspaceToDom(blocklyWorkspace);
@@ -1512,10 +1573,10 @@ function load(newMup) {
       // coding session can lead to unwanted surprises.
       blocklyWorkspace.updateVariableStore(true);
 
-      Blockly.Events.enable();
-
       // But the builtin variables should always be around.
       ensureBuiltinVariables();
+
+      Blockly.Events.enable();
     }
 
     // TODO toggle modes
@@ -2140,7 +2201,6 @@ function init() {
 }
 
 function clearWorkspace() {
-  // console.trace("clear");
   blocklyWorkspace.clear();
 }
 

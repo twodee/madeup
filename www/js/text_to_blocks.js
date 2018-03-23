@@ -4,14 +4,16 @@ function connectExpression(block, connectionName, expressionBlock) {
 }
 
 function connectStatement(block, connectionName, expressionBlock) {
-  setStatementExpression(expressionBlock, false);
-  block.getInput(connectionName).connection.connect(expressionBlock.previousConnection);
+  if (expressionBlock) {
+    setStatementExpression(expressionBlock, false);
+    block.getInput(connectionName).connection.connect(expressionBlock.previousConnection);
+  }
 }
 
 function Peeker(src) {
+  console.log("src:", src);
   this.i = 0;
   this.src = src;
-  console.log("src:", src);
   this.peek = function() {
     return this.src.charAt(this.i);
   };
@@ -69,11 +71,28 @@ function Peeker(src) {
   };
 }
 
+var sidToBlockType = {};
+for (type in blockDefinitions) {
+  if (blockDefinitions.hasOwnProperty(type)) {
+    var config = blockDefinitions[type].config;
+    if (config.hasOwnProperty('sid')) {
+      if (Array.isArray(config.sid)) {
+        config.sid.forEach(function(sid) {
+          sidToBlockType[sid] = type;
+        });
+      } else {
+        sidToBlockType[config.sid] = type;
+      }
+    }
+  }
+}
+
 function parse(peeker, workspace) {
   var block = null;
 
   // assert '('
   if (peeker.peek() != '(') {
+    console.trace();
     console.log('expecting (, but saw ' + peeker.peek());
     return null;
   } else {
@@ -99,260 +118,118 @@ function parse(peeker, workspace) {
     }
   }
 
-  else if (token == 'call' || token == 'call-with-names') {
+  else if (token == 'call-with-names') {
     peeker.get(); // eat space
     id = peeker.getToken();
-    if (id == 'print') {
-      peeker.get(); // eat space
-      var msg = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_print');
-      connectExpression(block, 'message', msg);
-    } else if (id == 'echo') {
-      peeker.get(); // eat space
-      var mesh = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_echo');
-      connectExpression(block, 'object', mesh);
-    } else if (id == 'transform') {
-      peeker.get(); // eat space
-      var mesh = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_transform');
-      connectExpression(block, 'object', mesh);
-    } else if (id == 'path') {
-      block = workspace.newBlock('madeup_path');
-    } else if (id == 'debug') {
-      peeker.get(); // eat space
-      var msg = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_debug');
-      connectExpression(block, 'message', msg);
-    } else if (id == 'sign') {
-      peeker.get(); // eat space
-      var x = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_sign');
-      connectExpression(block, 'x', x);
-    } else if (id == 'moveto') {
-      peeker.get(); // eat space
-      var x = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var y = parse(peeker, workspace);
-      if (peeker.peek() == ' ') {
-        peeker.get(); // eat space
-        var z = parse(peeker, workspace);
-        block = workspace.newBlock('madeup_moveto');
-        connectExpression(block, 'x', x);
-        connectExpression(block, 'y', y);
-        connectExpression(block, 'z', z);
-      } else {
-        block = workspace.newBlock('madeup_moveto_xy');
-        connectExpression(block, 'x', x);
-        connectExpression(block, 'y', y);
+
+    var isBuiltin = sidToBlockType.hasOwnProperty(id);
+    if (isBuiltin) {
+      var type = sidToBlockType[id];
+      var config = blockDefinitions[type].config;
+      block = workspace.newBlock(type);
+
+      if (Array.isArray(config.sid)) {
+        block.setFieldValue(id, 'function'); 
       }
-    } else if (id == 'polarto') {
-      peeker.get(); // eat space
-      var radius = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var angle = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_polarto');
-      connectExpression(block, 'radius', radius);
-      connectExpression(block, 'angle', angle);
-    } else if (id == 'move') {
-      peeker.get(); // eat space
-      var x = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_move');
-      connectExpression(block, 'distance', x);
-    } else if (id == 'random') {
-      peeker.get(); // eat space
-      var min = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var max = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_random');
-      connectExpression(block, 'min', min);
-      connectExpression(block, 'max', max);
-    } else if (id == 'random01') {
-      block = workspace.newBlock('madeup_random01');
-    } else if (id == 'atan2') {
-      peeker.get(); // eat space
-      var opposite = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var adjacent = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_atan2');
-      connectExpression(block, 'opposite', opposite);
-      connectExpression(block, 'adjacent', adjacent);
-    } else if (id == 'yaw' || id == 'roll' || id == 'pitch') {
-      peeker.get(); // eat space
-      var degrees = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_turn');
-      block.setFieldValue(id, 'function');
-      connectExpression(block, 'degrees', degrees);
-    } else if (id == 'coalesce') {
-      peeker.get(); // eat space
-      var threshold = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_coalesce');
-      connectExpression(block, 'threshold', threshold);
-    } else if (id == 'mirror') {
-      peeker.get(); // eat space
-      var axis = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var path = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var point = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_mirror');
-      connectExpression(block, 'axis', axis);
-      connectExpression(block, 'path', path);
-      connectExpression(block, 'point', point);
-    } else if (id == 'center') {
-      peeker.get(); // eat space
-      var object = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_center');
-      connectExpression(block, 'object', object);
-    } else if (id == 'dilate') {
-      peeker.get(); // eat space
-      var path = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var distance = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_dilate');
-      connectExpression(block, 'path', path);
-      connectExpression(block, 'distance', distance);
-    } else if (id == 'translate' || id == 'scale') {
-      peeker.get(); // eat space
-      var x = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var y = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var z = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_' + id);
-      connectExpression(block, 'x', x);
-      connectExpression(block, 'y', y);
-      connectExpression(block, 'z', z);
-    } else if (id == 'spheres' || id == 'forget' || id == 'boxes' || id == 'polygon') {
-      block = workspace.newBlock('madeup_' + id);
-    } else if (id == 'add' || id == 'subtract') {
-      block = workspace.newBlock('madeup_mode_' + id);
-    } else if (id == 'revolve') {
-      peeker.get(); // eat space
-      var x = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var y = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var z = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var degrees = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_revolve');
-      connectExpression(block, 'x', x);
-      connectExpression(block, 'y', y);
-      connectExpression(block, 'z', z);
-      connectExpression(block, 'degrees', degrees);
-    } else if (id == 'extrude') {
-      peeker.get(); // eat space
-      var x = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var y = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var z = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var length = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_extrude');
-      connectExpression(block, 'x', x);
-      connectExpression(block, 'y', y);
-      connectExpression(block, 'z', z);
-      connectExpression(block, 'length', length);
-    } else if (id == 'surface') {
-      peeker.get(); // eat space
-      var columns = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var rows = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_surface');
-      connectExpression(block, 'columns', columns);
-      connectExpression(block, 'rows', rows);
-    } else if (id == 'dowel' || id == 'tube') {
-      var maxBend;
-      if (peeker.peek() == ' ') {
-        peeker.get(); // eat space
-        peeker.getToken(); // TODO consume maxBend
-        peeker.get(); // eat space
-        maxBend = parse(peeker, workspace);
-      } else {
-        maxBend = workspace.newBlock('madeup_integer');
-        maxBend.setFieldValue(360, 'integer');
-        maxBend.initSvg();
-        maxBend.render();
+
+      if (config.hasOwnProperty('args0')) {
+        var formals = config.args0.filter(function(formal) {
+          return formal.type == 'input_value' || formal.type == 'input_statement';
+        });
+
+        // Connect any specified parameters.
+        var formalsPresent = [];
+        while (peeker.peek() == ' ') {
+          peeker.get(); // eat space
+          var formal = peeker.getToken();
+          formalsPresent.push(formal);
+          peeker.get(); // eat space
+          var actual = parse(peeker, workspace);
+          connectExpression(block, formal, actual);
+        }
+
+        // Remove any unspecified default parameters.
+        formals.forEach(function(formal) {
+          if (formal.hasOwnProperty('default') && !formalsPresent.includes(formal.name)) {
+            block.enableParameter(formal.name, false);
+          }
+        });
       }
-      block = workspace.newBlock('madeup_' + id);
-      connectExpression(block, 'maxbend', maxBend);
-    } else if (id == 'loft') {
-      var paths;
-      peeker.get(); // eat space
-      paths = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_loft');
-      connectExpression(block, 'paths', paths);
-    } else if (id == 'rotate') {
-      peeker.get(); // eat space
-      var x = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var y = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var z = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var degrees = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_' + id);
-      connectExpression(block, 'x', x);
-      connectExpression(block, 'y', y);
-      connectExpression(block, 'z', z);
-      connectExpression(block, 'degrees', degrees);
-    } else if (id == 'sin' || id == 'cos' || id == 'tan') {
-      peeker.get(); // eat space
-      var degrees = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_sincostan');
-      block.setFieldValue(id, 'function');
-      connectExpression(block, 'degrees', degrees);
-    } else if (id == 'asin' || id == 'acos' || id == 'atan') {
-      peeker.get(); // eat space
-      var ratio = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_inverse_sincostan');
-      block.setFieldValue(id, 'function');
-      connectExpression(block, 'ratio', ratio);
-    } else if (id == 'identity' || id == 'reframe' || id == 'push' || id == 'pop' || id == 'reverse' || id == 'home') {
-      block = workspace.newBlock('madeup_' + id);
-    } else if (id == 'where') {
-      block = workspace.newBlock('madeup_where');
-    } else if (id == 'view') {
-      block = workspace.newBlock('madeup_view');
-    } else if (id == 'look') {
-      peeker.get(); // eat space
-      var view = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_look');
-      connectExpression(block, 'view', view);
-    } else if (id == 'log') {
-      peeker.get(); // eat space
-      var base = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var x = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_log');
-      connectExpression(block, 'base', base);
-      connectExpression(block, 'x', x);
-    } else if (id == 'min' || id == 'max') {
-      peeker.get(); // eat space
-      var a = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var b = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_minmax');
-      block.setFieldValue(id, 'function');
-      connectExpression(block, 'a', a);
-      connectExpression(block, 'b', b);
-    } else if (id == 'normalize' || id == 'magnitude') {
-      peeker.get(); // eat space
-      var v = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_' + id);
-      connectExpression(block, 'vector', v);
-    } else if (id == 'cross' || id == 'dot') {
-      peeker.get(); // eat space
-      var a = parse(peeker, workspace);
-      peeker.get(); // eat space
-      var b = parse(peeker, workspace);
-      block = workspace.newBlock('madeup_' + id);
-      connectExpression(block, 'a', a);
-      connectExpression(block, 'b', b);
     } else {
-      // is it a variable or a function?
+      if (!Blockly.Procedures.isLegalName_(id, workspace)) {
+        block = workspace.newBlock('procedures_callnoreturn');
+        block.setFieldValue(id, 'NAME');
+        var formals = getBlocklyProcedureFormals(workspace, id);
+        var formalToPosition = {};
+
+        // I used to use setProcedureParameters, but Blockly
+        // moved that out of the API. Now we need a mutation.
+        // Baah.
+        var container = document.createElement('mutation'); 
+        formals.forEach(function(formal, i) {
+          var arg = document.createElement('arg'); 
+          arg.setAttribute('name', formal);
+          arg.setAttribute('paramId', formal);
+          container.appendChild(arg);
+          formalToPosition[formal] = i;
+        });
+        block.domToMutation(container);
+ 
+        // Connect any specified parameters.
+        while (peeker.peek() == ' ') {
+          peeker.get(); // eat space
+          var formal = peeker.getToken();
+          peeker.get(); // eat space
+          var actual = parse(peeker, workspace);
+          connectExpression(block, 'ARG' + formalToPosition[formal], actual);
+        }
+      } else {
+        block = workspace.newBlock('variables_get');
+        block.setFieldValue(id, 'VAR');
+      }
+    }
+  }
+
+  else if (token == 'call') {
+    peeker.get(); // eat space
+    id = peeker.getToken();
+
+    var isBuiltin = sidToBlockType.hasOwnProperty(id);
+    if (isBuiltin) {
+      var type = sidToBlockType[id];
+      var config = blockDefinitions[type].config;
+      block = workspace.newBlock(type);
+
+      if (Array.isArray(config.sid)) {
+        block.setFieldValue(id, 'function'); 
+      }
+
+      if (config.hasOwnProperty('args0')) {
+        var i = 0;
+
+        var args = config.args0.filter(function(arg) {
+          return arg.type == 'input_value' || arg.type == 'input_statement';
+        });
+
+        // Connect any specified parameters.
+        while (i < args.length && peeker.peek() == ' ') {
+          var arg = args[i];
+          peeker.get(); // eat space
+          var actual = parse(peeker, workspace);
+          connectExpression(block, arg.name, actual);
+          ++i;
+        }
+
+        // Remove any unspecified default parameters.
+        while (i < args.length) {
+          var arg = args[i];
+          if (arg.hasOwnProperty('default')) {
+            block.enableParameter(arg.name, false);
+          }
+          ++i;
+        }
+      }
+    } else {
       if (!Blockly.Procedures.isLegalName_(id, workspace)) {
         block = workspace.newBlock('procedures_callnoreturn');
         block.setFieldValue(id, 'NAME');
@@ -376,7 +253,7 @@ function parse(peeker, workspace) {
         while (peeker.peek() == ' ') {
           peeker.get(); // eat space
           var actualBlock = parse(peeker, workspace);
-          connectExpression(block, 'arg' + i, actualBlock);
+          connectExpression(block, 'ARG' + i, actualBlock);
           ++i;
         }
       } else {
@@ -390,8 +267,6 @@ function parse(peeker, workspace) {
     peeker.get(); // eat space
     var value = parse(peeker, workspace);
     block = workspace.newBlock('madeup_return');
-    console.log("value:", value);
-    console.log("block:", block);
     connectExpression(block, 'value', value);
   }
 
@@ -648,7 +523,7 @@ function parse(peeker, workspace) {
     block.arguments_ = formals;
     block.updateParams_();
     var body = parse(peeker, workspace);
-    connectStatement(block, 'stack', body);
+    connectStatement(block, 'STACK', body);
   }
 
   else if (token == 'define-variable') {
@@ -805,6 +680,7 @@ function parse(peeker, workspace) {
 
   // assert ')'
   if (peeker.peek() != ')') {
+    console.trace();
     throw 'expecting ) but saw ' + peeker.peek();
   } else {
     peeker.get();

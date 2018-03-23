@@ -26,7 +26,7 @@ bool ExpressionBoolean::toBoolean() const {
 /* ------------------------------------------------------------------------- */
 
 void ExpressionBoolean::write(ostream &out) const {
-  out << "(BOOLEAN " << (value ? "true" : "false") << ")";
+  out << "(boolean " << (value ? "true" : "false") << ")";
 }
 
 /* ------------------------------------------------------------------------- */
