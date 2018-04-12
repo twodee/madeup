@@ -22,7 +22,7 @@
   <div class="text-editor">moveto 0, 0, 0
 
 move 10</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (call move (INTEGER 10)))
+  <div class="block-editor"><div class="s-expression">(block (call moveto (integer 0) (integer 0) (integer 0)) (call move (integer 10)))
 </div></div>
 </div>
 </p>
@@ -35,7 +35,7 @@ move 10</div>
 move 10
 yaw 122
 move 10</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (call move (INTEGER 10)) (call yaw (INTEGER 122)) (call move (INTEGER 10)))
+  <div class="block-editor"><div class="s-expression">(block (call moveto (integer 0) (integer 0) (integer 0)) (call move (integer 10)) (call yaw (integer 122)) (call move (integer 10)))
 </div></div>
 </div>
 </p>
@@ -55,7 +55,7 @@ move 10
 yaw 122
 move 10
 yaw -50</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (call move (INTEGER 10)) (call yaw (INTEGER 122)) (call move (INTEGER 10)) (call yaw (INTEGER -50)))
+  <div class="block-editor"><div class="s-expression">(block (call moveto (integer 0) (integer 0) (integer 0)) (call move (integer 10)) (call yaw (integer 122)) (call move (integer 10)) (call yaw (integer -50)))
 </div></div>
 </div>
 </p>
@@ -71,7 +71,7 @@ repeat 1
   move 10
   yaw -50
 end</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (repeat (INTEGER 1) (block (call move (INTEGER 10)) (call yaw (INTEGER 122)) (call move (INTEGER 10)) (call yaw (INTEGER -50)))))
+  <div class="block-editor"><div class="s-expression">(block (call moveto (integer 0) (integer 0) (integer 0)) (repeat (integer 1) (block (call move (integer 10)) (call yaw (integer 122)) (call move (integer 10)) (call yaw (integer -50)))))
 </div></div>
 </div>
 </p>
@@ -91,7 +91,7 @@ repeat 5
 end
 
 extrude 0, 0, 1, 6</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (repeat (INTEGER 5) (block (call move (INTEGER 10)) (call yaw (INTEGER 122)) (call move (INTEGER 10)) (call yaw (INTEGER -50)))) (call extrude (INTEGER 0) (INTEGER 0) (INTEGER 1) (INTEGER 6)))
+  <div class="block-editor"><div class="s-expression">(block (call moveto (integer 0) (integer 0) (integer 0)) (repeat (integer 5) (block (call move (integer 10)) (call yaw (integer 122)) (call move (integer 10)) (call yaw (integer -50)))) (call extrude (integer 0) (integer 0) (integer 1) (integer 6)))
 </div></div>
 </div>
 </p>
@@ -116,7 +116,7 @@ repeat 5
 end
 
 extrude 0, 0, 1, 6</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (define-variable angle (INTEGER 144)) (repeat (INTEGER 5) (block (call move (INTEGER 10)) (call yaw (call-with-names angle)) (call move (INTEGER 10)) (call yaw (INTEGER -50)))) (call extrude (INTEGER 0) (INTEGER 0) (INTEGER 1) (INTEGER 6)))
+  <div class="block-editor"><div class="s-expression">(block (call moveto (integer 0) (integer 0) (integer 0)) (define-variable angle (integer 144)) (repeat (integer 5) (block (call move (integer 10)) (call yaw (call-with-names angle)) (call move (integer 10)) (call yaw (integer -50)))) (call extrude (integer 0) (integer 0) (integer 1) (integer 6)))
 </div></div>
 </div>
 </p>
@@ -135,7 +135,7 @@ repeat 5
 end
 
 extrude 0, 0, 1, 6</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (define-variable angle (INTEGER 144)) (repeat (INTEGER 5) (block (call move (INTEGER 10)) (call yaw (call-with-names angle)) (call move (INTEGER 10)) (call yaw (- (INTEGER 72) (call-with-names angle))))) (call extrude (INTEGER 0) (INTEGER 0) (INTEGER 1) (INTEGER 6)))
+  <div class="block-editor"><div class="s-expression">(block (call moveto (integer 0) (integer 0) (integer 0)) (define-variable angle (integer 144)) (repeat (integer 5) (block (call move (integer 10)) (call yaw (call-with-names angle)) (call move (integer 10)) (call yaw (- (integer 72) (call-with-names angle))))) (call extrude (integer 0) (integer 0) (integer 1) (integer 6)))
 </div></div>
 </div>
 </p>

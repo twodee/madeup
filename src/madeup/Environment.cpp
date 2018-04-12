@@ -1551,7 +1551,7 @@ std::vector<Node> Environment::popPath() {
 
 void Environment::forget() {
   // Erase last preview path.
-  /* paths.pop_back(); */
+  paths.pop_back();
 
   paths.push_back(vector<Turtle>());
   run.clear();

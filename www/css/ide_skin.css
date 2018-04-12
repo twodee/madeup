@@ -181,6 +181,10 @@ audio::-webkit-media-controls-enclosure {
   width: 100%;
 }
 
+.blocklyWidgetDiv .goog-menuitem-content {
+  font-size: 150%;
+}
+
 .blocklyText, .blocklyHtmlInput, .blocklyTreeLabel {
   font-family: 'Kanit', sans-serif !important;
 }

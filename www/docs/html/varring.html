@@ -12,7 +12,7 @@ repeat 10
   yaw 36
 end
 dowel</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0)) (repeat (INTEGER 10) (block (call move (INTEGER 2)) (call yaw (INTEGER 36)))) (call-with-names dowel))
+  <div class="block-editor"><div class="s-expression">(block (call moveto (integer 0) (integer 0)) (repeat (integer 10) (block (call move (integer 2)) (call yaw (integer 36)))) (call-with-names dowel))
 </div></div>
 </div>
 </p>
@@ -31,7 +31,7 @@ repeat 10
   yaw 36
 end
 dowel</div>
-  <div class="block-editor"><div class="s-expression">(block (define-variable .radius (INTEGER 1)) (call moveto (INTEGER 0) (INTEGER 0)) (repeat (INTEGER 10) (block (call move (INTEGER 2)) (call yaw (INTEGER 36)))) (call-with-names dowel))
+  <div class="block-editor"><div class="s-expression">(block (define-variable .radius (integer 1)) (call moveto (integer 0) (integer 0)) (repeat (integer 10) (block (call move (integer 2)) (call yaw (integer 36)))) (call-with-names dowel))
 </div></div>
 </div>
 </p>
@@ -42,7 +42,7 @@ dowel</div>
 
 <p class="grayblock"><div class="mup-switcher">
   <div class="text-editor">.radius = 1</div>
-  <div class="block-editor"><div class="s-expression">(block (define-variable .radius (INTEGER 1)))
+  <div class="block-editor"><div class="s-expression">(block (define-variable .radius (integer 1)))
 </div></div>
 </div>
 </p>
@@ -59,7 +59,7 @@ dowel</div>
 
 <p class="grayblock"><div class="mup-switcher">
   <div class="text-editor">n = 4</div>
-  <div class="block-editor"><div class="s-expression">(block (define-variable n (INTEGER 4)))
+  <div class="block-editor"><div class="s-expression">(block (define-variable n (integer 4)))
 </div></div>
 </div>
 </p>
@@ -68,7 +68,7 @@ dowel</div>
 
 <p class="grayblock"><div class="mup-switcher">
   <div class="text-editor">angle = 360 / n</div>
-  <div class="block-editor"><div class="s-expression">(block (define-variable angle (/ (INTEGER 360) (call-with-names n))))
+  <div class="block-editor"><div class="s-expression">(block (define-variable angle (/ (integer 360) (call-with-names n))))
 </div></div>
 </div>
 </p>
@@ -88,7 +88,7 @@ repeat n
   yaw angle
 end
 dowel</div>
-  <div class="block-editor"><div class="s-expression">(block (define-variable n (INTEGER 4)) (define-variable angle (/ (INTEGER 360) (call-with-names n))) (call moveto (INTEGER 0) (INTEGER 0)) (repeat (call-with-names n) (block (call move (INTEGER 2)) (call yaw (call-with-names angle)))) (call-with-names dowel))
+  <div class="block-editor"><div class="s-expression">(block (define-variable n (integer 4)) (define-variable angle (/ (integer 360) (call-with-names n))) (call moveto (integer 0) (integer 0)) (repeat (call-with-names n) (block (call move (integer 2)) (call yaw (call-with-names angle)))) (call-with-names dowel))
 </div></div>
 </div>
 </p>

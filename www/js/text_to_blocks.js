@@ -12,6 +12,7 @@ function connectStatement(block, connectionName, expressionBlock) {
 
 function Peeker(src) {
   console.log("src:", src);
+  console.trace();
   this.i = 0;
   this.src = src;
   this.peek = function() {
@@ -199,6 +200,7 @@ function parse(peeker, workspace) {
       var type = sidToBlockType[id];
       var config = blockDefinitions[type].config;
       block = workspace.newBlock(type);
+      console.log("config:", config);
 
       if (Array.isArray(config.sid)) {
         block.setFieldValue(id, 'function'); 
@@ -210,11 +212,14 @@ function parse(peeker, workspace) {
         var args = config.args0.filter(function(arg) {
           return arg.type == 'input_value' || arg.type == 'input_statement';
         });
+        console.log("args:", args);
 
         // Connect any specified parameters.
         while (i < args.length && peeker.peek() == ' ') {
           var arg = args[i];
-          peeker.get(); // eat space
+          console.log("arg:", arg);
+          var eaten = peeker.get(); // eat space
+          console.log("eaten:", eaten);
           var actual = parse(peeker, workspace);
           connectExpression(block, arg.name, actual);
           ++i;

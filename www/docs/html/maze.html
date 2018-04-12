@@ -32,13 +32,13 @@ repeat 4
   move 4
   yaw 90
 end</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0)) (repeat (INTEGER 4) (block (call move (INTEGER 4)) (call yaw (INTEGER 90)))))
+  <div class="block-editor"><div class="s-expression">(block (call moveto (integer 0) (integer 0)) (repeat (integer 4) (block (call move (integer 4)) (call yaw (integer 90)))))
 </div></div>
 </div>
 </li>
   <li>Thicken this perimeter into a slab with <code>extrude</code>. Let's thicken along the negative z-axis, which is (0, 0, -1), and let's just make it 1 unit thick: <div class="mup-switcher">
   <div class="text-editor">extrude 0, 0, -1, 1</div>
-  <div class="block-editor"><div class="s-expression">(block (call extrude (INTEGER 0) (INTEGER 0) (INTEGER -1) (INTEGER 1)))
+  <div class="block-editor"><div class="s-expression">(block (call extrude (integer 0) (integer 0) (integer -1) (integer 1)))
 </div></div>
 </div>
  Hit the solidify button. You should see a really boring maze!</li>
@@ -49,7 +49,7 @@ moveto 2, 2
 moveto 3, 2
 moveto 3, 3
 dowel</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER -1) (INTEGER 3)) (call moveto (INTEGER 2) (INTEGER 3)) (call moveto (INTEGER 2) (INTEGER 2)) (call moveto (INTEGER 3) (INTEGER 2)) (call moveto (INTEGER 3) (INTEGER 3)) (call-with-names dowel))
+  <div class="block-editor"><div class="s-expression">(block (call moveto (integer -1) (integer 3)) (call moveto (integer 2) (integer 3)) (call moveto (integer 2) (integer 2)) (call moveto (integer 3) (integer 2)) (call moveto (integer 3) (integer 3)) (call-with-names dowel))
 </div></div>
 </div>
  Place these at the end of your program, after the <code>extrude</code> command.</li>
@@ -60,7 +60,7 @@ moveto 1, 1
 moveto 3, 1
 moveto 3, -1
 dowel</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 2) (INTEGER 2)) (call moveto (INTEGER 1) (INTEGER 2)) (call moveto (INTEGER 1) (INTEGER 1)) (call moveto (INTEGER 3) (INTEGER 1)) (call moveto (INTEGER 3) (INTEGER -1)) (call-with-names dowel))
+  <div class="block-editor"><div class="s-expression">(block (call moveto (integer 2) (integer 2)) (call moveto (integer 1) (integer 2)) (call moveto (integer 1) (integer 1)) (call moveto (integer 3) (integer 1)) (call moveto (integer 3) (integer -1)) (call-with-names dowel))
 </div></div>
 </div>
 </li>
@@ -78,7 +78,7 @@ dowel</div>
 
 <p class="grayblock"><div class="mup-switcher">
   <div class="text-editor">moveto 0, 0, 0.5</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (REAL 0.5)))
+  <div class="block-editor"><div class="s-expression">(block (call moveto (integer 0) (integer 0) (real 0.5)))
 </div></div>
 </div>
 </p>

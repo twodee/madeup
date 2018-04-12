@@ -69,33 +69,32 @@ Co<Expression> ExpressionMirror::evaluate(Environment &env) const {
   vector<Node> mirrored_path;
   for (vector<Node>::const_iterator i = path.begin(); i != path.end(); ++i) {
     Node new_node = *i;
-    new_node.position = new_node.position;
     mirrored_path.push_back(new_node);
   }
-  std::cout << "mirrored_path.size(): " << mirrored_path.size() << std::endl;
 
   for (vector<Node>::const_reverse_iterator i = path.rbegin(); i != path.rend(); ++i) {
     Node new_node = *i;
     new_node.position = new_node.position.Reflect(axis, pivot);
-#if 0
-    if (i == path.rbegin()) {
-      std::cout << "new_node: " << new_node.position << std::endl;
-      if ((i != path.rbegin() && i != --path.rend()) ||
-          (i == path.rbegin() && new_node.position.GetDistanceTo(mirrored_path[mirrored_path.size() - 1].position) > 1.0e-3f) ||
-          (i == --path.rend() && new_node.position.GetDistanceTo(mirrored_path[0].position) > 1.0e-3f)) {
-        std::cout << "keeping" << std::endl;
-      } else {
-        std::cout << "skipping" << std::endl;
-      }
-    }
-#endif
-    if ((i != path.rbegin() && i != --path.rend()) ||
-        (i == path.rbegin() && new_node.position.GetDistanceTo(mirrored_path[mirrored_path.size() - 1].position) > 1.0e-3f) ||
-        (i == --path.rend() && new_node.position.GetDistanceTo(mirrored_path[0].position) > 1.0e-3f)) {
-      mirrored_path.push_back(new_node);
-    }
+    mirrored_path.push_back(new_node);
   }
-  std::cout << "mirrored_path.size(): " << mirrored_path.size() << std::endl;
+
+  // Eliminate the middle elements if they coalesce.
+  vector<Node>::iterator fore = mirrored_path.begin() + (path.size() - 1);
+  vector<Node>::iterator aft = fore + 1;
+  if (fore->position.GetDistanceTo(aft->position) < 1.0e-3f) {
+    mirrored_path.erase(mirrored_path.erase(fore));
+  }
+ 
+  // Eliminate the first and last elements if they coalesce. But we
+  // need to insert a dummy copy of the second node to maintain the
+  // loop.
+  fore = mirrored_path.end() - 1;
+  aft = mirrored_path.begin();
+  if (fore->position.GetDistanceTo(aft->position) < 1.0e-3f) {
+    mirrored_path.erase(fore);
+    mirrored_path.erase(aft);
+    mirrored_path.push_back(*mirrored_path.begin());
+  }
 
   return Co<Expression>(new ExpressionNodes(mirrored_path));
 }

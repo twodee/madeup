@@ -12,7 +12,7 @@ repeat 10
   yaw 36
 end
 dowel</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (repeat (INTEGER 10) (block (call move (INTEGER 2)) (call yaw (INTEGER 36)))) (call-with-names dowel))
+  <div class="block-editor"><div class="s-expression">(block (call moveto (integer 0) (integer 0) (integer 0)) (repeat (integer 10) (block (call move (integer 2)) (call yaw (integer 36)))) (call-with-names dowel))
 </div></div>
 </div>
 </p>
@@ -26,7 +26,7 @@ dowel</div>
 polarto 2, 0
 polarto 3, 0
 polarto 4, 0</div>
-  <div class="block-editor"><div class="s-expression">(block (call polarto (INTEGER 1) (INTEGER 0)) (call polarto (INTEGER 2) (INTEGER 0)) (call polarto (INTEGER 3) (INTEGER 0)) (call polarto (INTEGER 4) (INTEGER 0)))
+  <div class="block-editor"><div class="s-expression">(block (call polarto (integer 1) (integer 0)) (call polarto (integer 2) (integer 0)) (call polarto (integer 3) (integer 0)) (call polarto (integer 4) (integer 0)))
 </div></div>
 </div>
 </p>
@@ -39,7 +39,7 @@ polarto 1, angle
 polarto 2, angle
 polarto 3, angle
 polarto 4, angle</div>
-  <div class="block-editor"><div class="s-expression">(block (define-variable angle (INTEGER 45)) (call polarto (INTEGER 1) (call-with-names angle)) (call polarto (INTEGER 2) (call-with-names angle)) (call polarto (INTEGER 3) (call-with-names angle)) (call polarto (INTEGER 4) (call-with-names angle)))
+  <div class="block-editor"><div class="s-expression">(block (define-variable angle (integer 45)) (call polarto (integer 1) (call-with-names angle)) (call polarto (integer 2) (call-with-names angle)) (call polarto (integer 3) (call-with-names angle)) (call polarto (integer 4) (call-with-names angle)))
 </div></div>
 </div>
 </p>
@@ -52,7 +52,7 @@ polarto 1, angle
 polarto 2, angle
 polarto 3, angle
 polarto 4, angle</div>
-  <div class="block-editor"><div class="s-expression">(block (define-variable angle (INTEGER 90)) (call polarto (INTEGER 1) (call-with-names angle)) (call polarto (INTEGER 2) (call-with-names angle)) (call polarto (INTEGER 3) (call-with-names angle)) (call polarto (INTEGER 4) (call-with-names angle)))
+  <div class="block-editor"><div class="s-expression">(block (define-variable angle (integer 90)) (call polarto (integer 1) (call-with-names angle)) (call polarto (integer 2) (call-with-names angle)) (call polarto (integer 3) (call-with-names angle)) (call polarto (integer 4) (call-with-names angle)))
 </div></div>
 </div>
 </p>
@@ -70,7 +70,7 @@ polarto 10, 270
 polarto 10, 315
 polarto 10, 360
 dowel</div>
-  <div class="block-editor"><div class="s-expression">(block (call polarto (INTEGER 10) (INTEGER 0)) (call polarto (INTEGER 10) (INTEGER 45)) (call polarto (INTEGER 10) (INTEGER 90)) (call polarto (INTEGER 10) (INTEGER 135)) (call polarto (INTEGER 10) (INTEGER 180)) (call polarto (INTEGER 10) (INTEGER 225)) (call polarto (INTEGER 10) (INTEGER 270)) (call polarto (INTEGER 10) (INTEGER 315)) (call polarto (INTEGER 10) (INTEGER 360)) (call-with-names dowel))
+  <div class="block-editor"><div class="s-expression">(block (call polarto (integer 10) (integer 0)) (call polarto (integer 10) (integer 45)) (call polarto (integer 10) (integer 90)) (call polarto (integer 10) (integer 135)) (call polarto (integer 10) (integer 180)) (call polarto (integer 10) (integer 225)) (call polarto (integer 10) (integer 270)) (call polarto (integer 10) (integer 315)) (call polarto (integer 10) (integer 360)) (call-with-names dowel))
 </div></div>
 </div>
 </p>
@@ -82,7 +82,7 @@ dowel</div>
   polarto 10, angle
 end
 dowel</div>
-  <div class="block-editor"><div class="s-expression">(block (for-through-by (call-with-names angle) (INTEGER 360) (INTEGER 45) (block (call polarto (INTEGER 10) (call-with-names angle)))) (call-with-names dowel))
+  <div class="block-editor"><div class="s-expression">(block (for-through-by (call-with-names angle) (integer 360) (integer 45) (block (call polarto (integer 10) (call-with-names angle)))) (call-with-names dowel))
 </div></div>
 </div>
 </p>
@@ -97,7 +97,7 @@ end
 identity
 
 dowel</div>
-  <div class="block-editor"><div class="s-expression">(block (call rotate (INTEGER 0) (INTEGER 1) (INTEGER 0) (INTEGER 90)) (for-through-by (call-with-names angle) (INTEGER 360) (INTEGER 45) (block (call polarto (INTEGER 10) (call-with-names angle)))) (call-with-names identity) (call-with-names dowel))
+  <div class="block-editor"><div class="s-expression">(block (call rotate (integer 0) (integer 1) (integer 0) (integer 90)) (for-through-by (call-with-names angle) (integer 360) (integer 45) (block (call polarto (integer 10) (call-with-names angle)))) (call-with-names identity) (call-with-names dowel))
 </div></div>
 </div>
 </p>

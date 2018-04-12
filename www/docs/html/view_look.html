@@ -15,7 +15,7 @@
   <div class="text-editor">moveto 0, 0, 0
 yaw 45
 pitch 45</div>
-  <div class="block-editor"><div class="s-expression">(block (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (call yaw (INTEGER 45)) (call pitch (INTEGER 45)))
+  <div class="block-editor"><div class="s-expression">(block (call moveto (integer 0) (integer 0) (integer 0)) (call yaw (integer 45)) (call pitch (integer 45)))
 </div></div>
 </div>
 </p>
@@ -34,7 +34,7 @@ moveto 0, 0, 0
 yaw 45
 pitch 45
 elbow</div>
-  <div class="block-editor"><div class="s-expression">(block (define elbow () (block (call move (INTEGER 5)) (call yaw (INTEGER 45)) (call move (INTEGER 5)) (call-with-names dowel))) (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (call yaw (INTEGER 45)) (call pitch (INTEGER 45)) (call-with-names elbow))
+  <div class="block-editor"><div class="s-expression">(block (define elbow () (block (call move (integer 5)) (call yaw (integer 45)) (call move (integer 5)) (call-with-names dowel))) (call moveto (integer 0) (integer 0) (integer 0)) (call yaw (integer 45)) (call pitch (integer 45)) (call-with-names elbow))
 </div></div>
 </div>
 </p>
@@ -56,7 +56,7 @@ elbow
 
 moveto 0, -3, 0
 elbow</div>
-  <div class="block-editor"><div class="s-expression">(block (define elbow () (block (call move (INTEGER 5)) (call yaw (INTEGER 45)) (call move (INTEGER 5)) (call-with-names dowel))) (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (call yaw (INTEGER 45)) (call pitch (INTEGER 45)) (call-with-names elbow) (call moveto (INTEGER 0) (INTEGER -3) (INTEGER 0)) (call-with-names elbow))
+  <div class="block-editor"><div class="s-expression">(block (define elbow () (block (call move (integer 5)) (call yaw (integer 45)) (call move (integer 5)) (call-with-names dowel))) (call moveto (integer 0) (integer 0) (integer 0)) (call yaw (integer 45)) (call pitch (integer 45)) (call-with-names elbow) (call moveto (integer 0) (integer -3) (integer 0)) (call-with-names elbow))
 </div></div>
 </div>
 </p>
@@ -80,7 +80,7 @@ elbow
 moveto 0, -3, 0
 look direction
 elbow</div>
-  <div class="block-editor"><div class="s-expression">(block (define elbow () (block (call move (INTEGER 5)) (call yaw (INTEGER 45)) (call move (INTEGER 5)) (call-with-names dowel))) (call moveto (INTEGER 0) (INTEGER 0) (INTEGER 0)) (call yaw (INTEGER 45)) (call pitch (INTEGER 45)) (define-variable direction (call-with-names view)) (call-with-names elbow) (call moveto (INTEGER 0) (INTEGER -3) (INTEGER 0)) (call look (call-with-names direction)) (call-with-names elbow))
+  <div class="block-editor"><div class="s-expression">(block (define elbow () (block (call move (integer 5)) (call yaw (integer 45)) (call move (integer 5)) (call-with-names dowel))) (call moveto (integer 0) (integer 0) (integer 0)) (call yaw (integer 45)) (call pitch (integer 45)) (define-variable direction (call-with-names view)) (call-with-names elbow) (call moveto (integer 0) (integer -3) (integer 0)) (call look (call-with-names direction)) (call-with-names elbow))
 </div></div>
 </div>
 </p>
