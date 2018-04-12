@@ -426,7 +426,14 @@
       <block type="madeup_coalesce"></block>
       <block type="madeup_dilate"></block>
       <block type="madeup_reverse"></block>
-      <block type="madeup_mirror"></block>
+      <block type="madeup_mirror">
+        <mutation>
+          <defaults>
+            <default id="path" enabled="false"></default>
+            <default id="point" enabled="false"></default>
+          </defaults>
+        </mutation>
+      </block>
     </category>
     <category name="Solidifiers">
       <block type="madeup_spheres"></block>
