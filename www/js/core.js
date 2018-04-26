@@ -503,6 +503,7 @@ $(window).on('load', function() {
 
   textEditor.on('mousemove', function(e) {
     position = e.getDocumentPosition();
+    console.log("position:", position);
     if (e.domEvent.altKey) {
       detectSlider(position);
     } else {

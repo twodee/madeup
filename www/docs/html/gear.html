@@ -1,0 +1,134 @@
+
+
+
+
+<h3>Gear</h3>
+
+<p class="grayblock">Our goal today is to model an object that makes the world go 'round: a gear. Gears look like this:</p>
+
+<img src="./docs/html/images/gear/geareg.png" style="width: 75%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em; margin-left: auto; margin-right: auto; display: block;">
+
+<p class="grayblock">We could try to model this with a series of <code>move</code>s and <code>yaw</code>s, but there's an easier way to create shapes that have circular profiles. But we must leave the xy-coordinate system. Instead, we will work with the polar coordinate system, which looks like this:</p>
+
+<img src="./docs/html/images/gear/polargrid.png" style="width: 75%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em; margin-left: auto; margin-right: auto; display: block;">
+
+<p class="grayblock">Each spoke of this circular grid is labeled with an angle. The spokes meet at the center and lead outward through a bunch of circles&mdash;each with a bigger radius. We say the center point has radius 0, then smallest circle has radius 1, the next has radius 2, and so on.</p>
+
+<span class="toggler">What's the radius of the largest circle?</span><div class="togglee">There are 10 circles, so the outermost circle has radius 10.</div>
+
+<h4>Finding the Vertices</h4>
+
+<p class="grayblock">Before we dive into modeling on the computer, let's draw the gear on paper.</p>
+
+<p class="grayblock">To trace out the toothy perimeter of a gear, we're going to visit certain places where the spokes intersect the circles. We'll identify these locations with their radius and angle.</p>
+
+<p class="grayblock">Start by placing at a dot at each of those locations:</p>
+
+<ol>
+  <li>Mark where the circle of radius 7 intersects the spoke of 0 degrees.</li>
+  <li>Mark where radius 10 intersects 10 degrees.</li>
+  <li>Mark where radius 10 intersects 20 degrees.</li>
+  <li>Mark where radius 7 intersects 30 degrees.</li>
+</ol>
+
+<p class="grayblock">You've just marked the vertices of the first tooth of the gear! Draw straight line segments connecting each vertex to the next.</p>
+
+<p class="grayblock">Now let's draw the second tooth:</p>
+
+<ol>
+  <li>Mark radius 7, degrees 40.</li>
+  <li>Mark radius 10, degrees 50.</li>
+  <li>Mark radius 10, degrees 60.</li>
+  <li>Mark radius 7, degrees 70.</li>
+</ol>
+
+<p class="grayblock">And the third:</p>
+
+<ol>
+  <li>Mark radius 7, degrees 80.</li>
+  <li>Mark radius 10, degrees 90.</li>
+  <li>Mark radius 10, degrees 100.</li>
+  <li>Mark radius 7, degrees 110.</li>
+</ol>
+
+<p class="grayblock">Go ahead and mark up the rest of the vertices, following the exact same pattern.</p>
+
+<h4>Polarto</h4>
+
+<p class="grayblock">Now that we have our vertices identified, let's visit them in Madeup. When we know the xy-coordinates of our vertices, we use <code>moveto</code>. We don't know x and y for these vertices, but we do know their radius and degrees. Instead of <code>moveto</code>, we use the <code>polarto</code> command:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">polarto 7, 0</div>
+  <div class="block-editor"><div class="s-expression">(block (call polarto (integer 7) (integer 0)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">Use this command to visit each of your vertices that you marked in the previous step.</p>
+
+<p class="grayblock">If you think visiting each one is too much work, read on to learn about how to use a loop. If you don't think it's too much work, that's fine too. Just skip down to the Extrude section once you've completed the perimeter.</p>
+
+<h4>For Loops</h4>
+
+<p class="grayblock">Notice how each tooth is plotted very similarly. Suppose the starting spoke is <code>d</code> degrees. Then the tooth is plotted like this:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">polarto 7, d
+polarto 10, d + 10
+polarto 10, d + 20
+polarto 7, d + 30</div>
+  <div class="block-editor"><div class="s-expression">(block (call polarto (integer 7) (call-with-names d)) (call polarto (integer 10) (+ (call-with-names d) (integer 10))) (call polarto (integer 10) (+ (call-with-names d) (integer 20))) (call polarto (integer 7) (+ (call-with-names d) (integer 30))))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">This code works for each tooth, no matter where we are on the gear. The only thing we need to change for each tooth is <code>d</code>. For the first tooth, <code>d</code> is 0. For the second tooth, it's 40. For the third, it's 80. For the fourth, it's 120. And so on. We can march through a sequence like this using a <code>for</code> loop:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">for d to 360 by 40
+  -- insert repeated code here
+end</div>
+  <div class="block-editor"><div class="s-expression">(block (for-to-by (call-with-names d) (integer 360) (integer 40) (block)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">Nest the code to plot each tooth inside this loop. Be sure to use the <code>for</code> loop with <code>to</code> and <code>by</code>.</p>
+
+<p class="grayblock">If you are using blocks, you'll need to create the variable <code>d</code>. Visit the Variables menu and click <em>Create variable...</em>. Then <code>d</code> will show up in the list of variables.</p>
+
+<h4>Extrude</h4>
+
+<p class="grayblock">Once your perimeter is traced, extrude it along the z-axis. Here we extrude it 3 units:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">extrude 0, 0, 1, 3</div>
+  <div class="block-editor"><div class="s-expression">(block (call extrude (integer 0) (integer 0) (integer 1) (integer 3)))
+</div></div>
+</div>
+</p>
+
+<h4>Hole</h4>
+
+<p class="grayblock">Gears often have a hole in their center. Maybe we should too? Let's start by putting a dowel through the center. Add this code after you extrude:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">.radius = 2
+nsides = 20
+moveto 0, 0, -10
+moveto 0, 0, 10
+dowel</div>
+  <div class="block-editor"><div class="s-expression">(block (define-variable .radius (integer 2)) (define-variable nsides (integer 20)) (call moveto (integer 0) (integer 0) (integer -10)) (call moveto (integer 0) (integer 0) (integer 10)) (call-with-names dowel))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">You might need to adjust your numbers. Make sure the dowel passes through your gear completely. Once it does, insert the <code>subtract</code> command before <code>dowel</code> to carve the dowel away:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">subtract
+dowel</div>
+  <div class="block-editor"><div class="s-expression">(block (call-with-names subtract) (call-with-names dowel))
+</div></div>
+</div>
+</p>
