@@ -32,7 +32,7 @@ Before we dive into modeling on the computer, let's draw the gear on paper.
 
 To trace out the toothy perimeter of a gear, we're going to visit certain places where the spokes intersect the circles. We'll identify these locations with their radius and angle.
 
-Start by placing at a dot at each of those locations:
+Start by placing a dot at each of those locations:
 
 1. Mark where the circle of radius 7 intersects the spoke of 0 degrees.
 1. Mark where radius 10 intersects 10 degrees.
