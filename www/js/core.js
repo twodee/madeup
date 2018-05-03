@@ -2325,6 +2325,17 @@ function docify() {
     docsToBlocks();
   }
 
+  // Switch all lesson anchor elements to load.
+  var lessonSelector = '#panel-section-lesson > .panel-section-content';
+  $(lessonSelector + ' a').each(function(index, anchor) {
+    anchor.onclick = function() {
+      $(lessonSelector).load(anchor.href, function() {
+        docify();
+      });
+      return false;
+    };
+  });
+
   // Switch all anchor elements to load.
   var docsSelector = '#panel-section-tutorial > .panel-section-content';
   $(docsSelector + ' a').each(function(index, anchor) {

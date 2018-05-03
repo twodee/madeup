@@ -76,7 +76,7 @@ ul#settings > li > .panel-section-label:hover {
   color: #DDDD00;
 }
 
-.toggler, #panel-section-tutorial > .panel-section-content a {
+.toggler, .doccopy a {
   color: rgb(255, 200, 100);
 }
 

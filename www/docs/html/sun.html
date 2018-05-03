@@ -1,0 +1,96 @@
+
+
+
+
+<h3>Sun</h3>
+
+<p class="grayblock">This lesson builds off of the gear lesson. If you haven't done that one yet, <a href="docs/html/gear.html">do it first</a>.</p>
+
+<p class="grayblock">If you have done the gear lesson, stay here. Let's make another thing using the polar coordinate system!</p>
+
+<img src="./docs/html/images/gear/polargrid.png" style="width: 75%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em; margin-left: auto; margin-right: auto; display: block;">
+
+<p class="grayblock">Recall that each spoke of the polar grid is labeled with an angle. The spokes in the grid above mark off every 10 degrees around the circles. Additionally, there are circles that mark how far away we are from the center of the grid. The outermost circle is 10 units away, and the innermost circle is 1 unit away.</p>
+
+<p class="grayblock">Using this grid, let's make a flaming sun thing with flailing rays!</p>
+
+<h4>Perimeter</h4>
+
+<p class="grayblock">Before we dive into modeling on the computer, let's draw the sun on polar graph paper. Here's the outer perimeter:</p>
+
+<img src="./docs/html/images/sun/sunperimeter.png" style="width: 75%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em; margin-left: auto; margin-right: auto; display: block;">
+
+<p class="grayblock">Draw this&mdash;or something like it&mdash;on your graph paper. Have your lines follow the grid's lines. Once it's all plotted, figure out these two numbers for each vertex:</p>
+
+<ol>
+  <li>The radius of the circle that the vertex is on. This will be a number in the range 1 for the innermost circle to 10 for the outermost circle.</li>
+  <li>The degrees of the spoke that the vertex is on. This will be a number like 0, 10, 20, 30, and so on, up to 360.</li>
+</ol>
+
+<p class="grayblock">Write the numbers down for later reference.</p>
+
+<h4>Polarto</h4>
+
+<p class="grayblock">Now that we have our vertices identified, let's visit them in Madeup. As with the gear, we'll use <code>polarto</code> to visit each vertex's radius and degrees. Here we visit the vertex at radius 7 on spoke 0:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">polarto 7, 0</div>
+  <div class="block-editor"><div class="s-expression">(block (call polarto (integer 7) (integer 0)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">Use this command to visit each of your vertices that you marked in the previous step.</p>
+
+<p class="grayblock">There are a lot of vertices and visiting them all is a fair bit of work. Feel free to use the for-loop described in the gear lesson. But also feel free to do the fair bit of work and then skip over to the Extrude section below.</p>
+
+<h4>For Loops</h4>
+
+<p class="grayblock">A for-loop can make this program really short and sweet. I'll help you get started, but you'll have to do some thinking.</p>
+
+<p class="grayblock">First, you'll need a variable to track the current spoke/angle that you are visiting. Create a variable named <code>d</code> for this.</p>
+
+<p class="grayblock">Second, you'll need a mechanism to march around the spokes. A single tooth/arm looks like this:</p>
+
+<img src="./docs/html/images/sun/tooth.png" style="width: 75%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em; margin-left: auto; margin-right: auto; display: block;">
+
+<span class="toggler">How many degrees are in a tooth?</span><div class="togglee">We jump between spokes three times, so each tooth is 30 degrees.</div>
+
+<p class="grayblock">We have enough information to structure our loop. We want <code>d</code> to jump from 0 to 30 to 60 to 90 to 120 and so on to 360. Add the following loop to do that. Be sure to use the <code>for</code> loop with <code>to</code> and <code>by</code>.</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">for d to 360 by 30
+  -- draw single tooth
+end</div>
+  <div class="block-editor"><div class="s-expression">(block (for-to-by (call-with-names d) (integer 360) (integer 30) (block)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">Next comes the thinking part. Nest the code to plot each tooth inside this loop. Follow the shape of the single tooth shown above. But don't use exact angles. Use <code>d</code>. The first two points are on spoke <code>d</code>. The next two are on <code>d + 10</code>. The next two are on <code>d + 20</code>.</p>
+
+<p class="grayblock">Don't actually visit the last and seventh point inside your loop. That point is actually part of the next tooth. When the loop repeats, it will visit that point. You should have exactly 6 <code>polarto</code> commands inside the loop.</p>
+
+<h4>Extrude</h4>
+
+<p class="grayblock">Once your perimeter is traced, extrude it along the z-axis. Here we extrude it 3 units:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">extrude 0, 0, 1, 3</div>
+  <div class="block-editor"><div class="s-expression">(block (call extrude (integer 0) (integer 0) (integer 1) (integer 3)))
+</div></div>
+</div>
+</p>
+
+<h4>Color</h4>
+
+<p class="grayblock">Flaming suns should be colored in a warm color. Set the color at the very beginning of your program with code like this:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">.rgb = {1, 0, 0}</div>
+  <div class="block-editor"><div class="s-expression">(block (define-variable .rgb (arrayliteral (integer 1) (integer 0) (integer 0))))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">Color in computers is a mix of red, green, and blue. When red is 1 and the others are 0, the object is pure red. But you can mix in some green to produce orange or yellow.</p>
