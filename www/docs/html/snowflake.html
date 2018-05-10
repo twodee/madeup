@@ -1,0 +1,64 @@
+
+
+
+
+<h3>Snowflake</h3>
+
+<p class="grayblock">This lesson builds on the <a href="docs/html/gear.html">gear</a> and <a href="docs/html/sun.html">sun</a> lessons. Do those before starting this one.</p>
+
+<p class="grayblock">By now you folks have gotten pretty comfortable moving around the polar grid. You can identify a point on the polar grid with just a radius and an angle!</p>
+
+<p class="grayblock">Since it's a <em>polar</em> grid, let's model something cold today: a snowflake.</p>
+
+<h4>Hexagons</h4>
+
+<p class="grayblock">Start on polar graph paper and draw two hexagons, one small and one large:</p>
+
+<img src="./docs/html/images/snowflake/twohexes.png" style="width: 75%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em; margin-left: auto; margin-right: auto; display: block;">
+
+<p class="grayblock">Be careful if you are counting spokes. Your graph paper may have fewer or more spokes than the figure above. Regardless of the your number, we want to put vertices on spokes whose degrees are 0, 60, 120, 180, 240, and 300. Also, draw them as large or as small as you want, as long as you stick to the grid.</p>
+
+<p class="grayblock">Once you've got these drawn, determine the following information for each vertex:</p>
+
+<ol>
+  <li>the radius of the smaller hexagon</li>
+  <li>the radius of the larger hexagon</li>
+  <li>the degrees of the six spokes that you stop on</li>
+</ol>
+
+<p class="grayblock">Write these numbers down on your paper.</p>
+
+<p class="grayblock">Then in Madeup plot the smaller hexagon. For the smaller, you'll need seven <code>polarto</code> commands followed by a <code>dowel</code> command. The larger hexagon will need the exact same commands, but with the larger radius.</p>
+
+<h4>Spokes</h4>
+
+<p class="grayblock">Back in your drawing, add some spokes that pass through your hexagons like this:</p>
+
+<img src="./docs/html/images/snowflake/spokes.png" style="width: 75%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em; margin-left: auto; margin-right: auto; display: block;">
+
+<p class="grayblock">Note that there are six spokes&mdash;with two vertices for each spoke. Write down the radii and angles for each spoke's vertices.</p>
+
+<p class="grayblock">In Madeup, plot the spokes one at a time. Visit one end with a <code>polarto</code> command, visit the other end with a <code>polarto</code> command, and then solidify the line segment with <code>dowel</code>.</p>
+
+<h4>Spurs</h4>
+
+<p class="grayblock">One last step. We need to add a little decoration to each spoke. Like this:</p>
+
+<img src="./docs/html/images/snowflake/spurs.png" style="width: 75%; background-color: white; margin-top: 0.5em; margin-bottom: 0.5em; margin-left: auto; margin-right: auto; display: block;">
+
+<p class="grayblock">Draw the spurs on your graph paper. As before, write down the angles and radii of their vertices.</p>
+
+<p class="grayblock">Then plot them in Madeup. Each can be modeled with three <code>polarto</code> commands and a <code>dowel</code> command.</p>
+
+<h4>Tweaks</h4>
+
+<p class="grayblock">If the spokes and spurs are smashed together or too thin, you might need to adjust the thickness of your dowels with something like this:</p>
+
+<p class="grayblock"><div class="mup-switcher">
+  <div class="text-editor">.radius = 0.5</div>
+  <div class="block-editor"><div class="s-expression">(block (define-variable .radius (real 0.5)))
+</div></div>
+</div>
+</p>
+
+<p class="grayblock">But change the number. The default value is 0.5. Put this statement at the very top of your program. Alternatively, adjust the radii your circles.</p>
