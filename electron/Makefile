@@ -11,7 +11,7 @@ filesaver:
 	git clone --depth=1 https://github.com/eligrey/FileSaver.js filesaver
 
 ace/src-noconflict/mode-madeup.js: 
-	ln -s ../js/mode-madeup.js $@
+	ln ../js/mode-madeup.js $@
 
 js-cookie:
 	git clone --depth=1 https://github.com/js-cookie/js-cookie.git js-cookie
