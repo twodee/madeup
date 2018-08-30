@@ -81,7 +81,7 @@ Co<Expression> ExpressionMirror::evaluate(Environment &env) const {
   // Eliminate the middle elements if they coalesce.
   vector<Node>::iterator fore = mirrored_path.begin() + (path.size() - 1);
   vector<Node>::iterator aft = fore + 1;
-  if (fore->position.GetDistanceTo(aft->position) < 1.0e-3f) {
+  if (fore->position.DistanceTo(aft->position) < 1.0e-3f) {
     mirrored_path.erase(mirrored_path.erase(fore));
   }
  
@@ -90,7 +90,7 @@ Co<Expression> ExpressionMirror::evaluate(Environment &env) const {
   // loop.
   fore = mirrored_path.end() - 1;
   aft = mirrored_path.begin();
-  if (fore->position.GetDistanceTo(aft->position) < 1.0e-3f) {
+  if (fore->position.DistanceTo(aft->position) < 1.0e-3f) {
     mirrored_path.erase(fore);
     mirrored_path.erase(aft);
     mirrored_path.push_back(*mirrored_path.begin());

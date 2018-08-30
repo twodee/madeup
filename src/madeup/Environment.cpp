@@ -760,7 +760,7 @@ int Environment::coalesce(float threshold) {
   int ndoubles = 0;
 
   for (int i = run.size() - 1; i > 0; --i) {
-    float distance = run[i].position.GetDistanceTo(run[i - 1].position); 
+    float distance = run[i].position.DistanceTo(run[i - 1].position); 
     if (distance <= threshold) {
       run.erase(run.begin() + i);
       // TODO: clear path and reissue instead of trying to tweak
@@ -1502,14 +1502,14 @@ Co<Trimesh> Environment::surface(int width, int height) {
 
     bool wrap_y = true;
     for (int c = 0; wrap_y && c < width; ++c) {
-      if (run[c].position.GetDistanceTo(run[(height - 1) * width + c].position) > 1.0e-3f) {
+      if (run[c].position.DistanceTo(run[(height - 1) * width + c].position) > 1.0e-3f) {
         wrap_y = false;
       }
     }
 
     bool wrap_x = true;
     for (int r = 0; wrap_x && r < height; ++r) {
-      if (run[r * width + 0].position.GetDistanceTo(run[(r + 1) * width - 1].position) > 1.0e-3f) {
+      if (run[r * width + 0].position.DistanceTo(run[(r + 1) * width - 1].position) > 1.0e-3f) {
         wrap_x = false;
       }
     }
