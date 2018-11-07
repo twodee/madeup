@@ -1,9 +1,13 @@
 #ifndef MESHBOOLEAN_H
 #define MESHBOOLEAN_H
 
+#include <vector>
+
 #include <madeup/Environment.h>
 #include <madeup/ExpressionMesh.h>
 #include <twodee/Trimesh.h>
+#include <twodee/QVector3.h>
+#include <twodee/QVector2.h>
 
 namespace madeup {
 namespace MeshBoolean {
@@ -32,6 +36,11 @@ td::Trimesh *construct_and_color(const td::Trimesh &l_mesh,
 /* ------------------------------------------------------------------------- */
 
 td::Trimesh *compute_normals(const td::Trimesh &mesh, float angle);
+
+td::Trimesh *network(const std::vector<td::QVector3<float>> &positions,
+                     const std::vector<td::QVector2<int>> &edges,
+                     float radius,
+                     int nsides);
 
 }
 }

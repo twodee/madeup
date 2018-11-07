@@ -28,7 +28,7 @@ jquery-ui:
 	ln -s jquery-ui-$(JQUERY_UI_VERSION) jquery-ui
 
 three-js:
-	git clone --depth=1 https://github.com/mrdoob/three.js.git three-js
+	git clone https://github.com/mrdoob/three.js.git three-js
 
 meshline:
 	git clone --depth=1 https://github.com/spite/THREE.MeshLine meshline

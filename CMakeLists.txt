@@ -60,7 +60,7 @@ if (USE_IGL)
   find_package(MPFR REQUIRED)
 endif()
 
-option(WANTS_DESKTOP "Build desktop client" ON)
+option(WANTS_DESKTOP "Build desktop client" OFF)
 if (WANTS_DESKTOP)
   add_subdirectory(src/desktop)
   option(WANTS_OPENGL "Enable OpenGL" ON)

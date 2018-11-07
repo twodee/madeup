@@ -2,6 +2,7 @@
 
 #define EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
 #define IGL_NO_CORK
+#include <igl/copyleft/cgal/wire_mesh.h>
 #include <igl/copyleft/cgal/mesh_boolean.h>
 #include <igl/per_corner_normals.h>
 
@@ -17,7 +18,7 @@ namespace MeshBoolean {
 
 /* ------------------------------------------------------------------------- */
 
-void TrimeshToEigen(const Trimesh &mesh,
+void trimeshToEigen(const Trimesh &mesh,
                     Eigen::MatrixXd &vertices,
                     Eigen::MatrixXi &faces) {
   vertices.resize(mesh.GetVertexCount(), 3);
@@ -42,7 +43,7 @@ void TrimeshToEigen(const Trimesh &mesh,
 
 /* ------------------------------------------------------------------------- */
 
-Trimesh *EigenToTrimesh(const Eigen::MatrixXd &vertices,
+Trimesh *eigenToTrimesh(const Eigen::MatrixXd &vertices,
                         const Eigen::MatrixXi &faces) {
   Trimesh *join = new Trimesh(vertices.rows(), faces.rows());
 
@@ -67,7 +68,7 @@ Trimesh *EigenToTrimesh(const Eigen::MatrixXd &vertices,
 
 /* ------------------------------------------------------------------------- */
 
-Trimesh *EigenToTrimesh(const float *vertex_colors,
+Trimesh *eigenToTrimesh(const float *vertex_colors,
                         const Eigen::MatrixXd &vertices,
                         const Eigen::MatrixXi &faces,
                         const Eigen::MatrixXd &normals) {
@@ -136,8 +137,8 @@ Trimesh *construct(const Trimesh &a,
   Eigen::MatrixXd vertices[3];
   Eigen::MatrixXi faces[3];
 
-  TrimeshToEigen(a, vertices[0], faces[0]);
-  TrimeshToEigen(b, vertices[1], faces[1]);
+  trimeshToEigen(a, vertices[0], faces[0]);
+  trimeshToEigen(b, vertices[1], faces[1]);
 
   Eigen::VectorXi J;
   igl::copyleft::cgal::mesh_boolean(vertices[0], faces[0], vertices[1], faces[1], boolean_operation, vertices[2], faces[2], J);
@@ -145,7 +146,7 @@ Trimesh *construct(const Trimesh &a,
   /* Eigen::MatrixXd N_corners; */
   /* igl::per_corner_normals(vertices[2], faces[2], 20, N_corners); */
 
-  return EigenToTrimesh(vertices[2], faces[2]);
+  return eigenToTrimesh(vertices[2], faces[2]);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -209,15 +210,45 @@ td::Trimesh *compute_normals(const td::Trimesh &mesh, float sharp_degrees) {
   // First prep the mesh to be used by IGL.
   Eigen::MatrixXd vertices;
   Eigen::MatrixXi faces;
-  TrimeshToEigen(mesh, vertices, faces);
+  trimeshToEigen(mesh, vertices, faces);
 
   // Generate new normals.
   Eigen::MatrixXd normals;
   igl::per_corner_normals(vertices, faces, sharp_degrees, normals);
 
-  td::Trimesh *mesh_with_normals = EigenToTrimesh(mesh.GetColors(), vertices, faces, normals);
+  td::Trimesh *mesh_with_normals = eigenToTrimesh(mesh.GetColors(), vertices, faces, normals);
 
   return mesh_with_normals;
+}
+
+/* ------------------------------------------------------------------------- */
+
+td::Trimesh *network(const vector<QVector3<float>> &positions,
+                     const vector<QVector2<int>> &edges,
+                     float radius,
+                     int nsides) {
+  
+  Eigen::MatrixXd eigen_vertices(positions.size(), 3);
+  Eigen::MatrixXi eigen_edges(edges.size(), 2);
+
+  for (int i = 0; i < positions.size(); ++i) {
+    eigen_vertices(i, 0) = positions[i][0];
+    eigen_vertices(i, 1) = positions[i][1];
+    eigen_vertices(i, 2) = positions[i][2];
+  }
+
+  for (int i = 0; i < edges.size(); ++i) {
+    eigen_edges(i, 0) = edges[i][0];
+    eigen_edges(i, 1) = edges[i][1];
+  }
+
+  Eigen::MatrixXd out_vertices;
+  Eigen::MatrixXi out_faces;
+  Eigen::VectorXi out_j;
+
+  igl::copyleft::cgal::wire_mesh(eigen_vertices, eigen_edges, radius, nsides, out_vertices, out_faces, out_j);
+
+  return eigenToTrimesh(out_vertices, out_faces);
 }
 
 /* ------------------------------------------------------------------------- */

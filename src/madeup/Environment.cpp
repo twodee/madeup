@@ -43,6 +43,7 @@
 #include "madeup/ExpressionMove.h"
 #include "madeup/ExpressionMoveX.h"
 #include "madeup/ExpressionMoveTo.h"
+#include "madeup/ExpressionNetwork.h"
 #include "madeup/ExpressionNoise.h"
 #include "madeup/ExpressionNormalize.h"
 #include "madeup/ExpressionPath.h"
@@ -312,6 +313,11 @@ void Environment::prime() {
   Co<ExpressionDefine> define_loft(new ExpressionDefine("loft", Co<Expression>(new ExpressionLoft())));
   define_loft->addFormal("paths");
 
+  Co<ExpressionDefine> define_network(new ExpressionDefine("network", Co<Expression>(new ExpressionNetwork())));
+  define_network->addFormal("paths");
+  define_network->addFormal("radius");
+  define_network->addFormal("precision");
+
   Co<ExpressionDefine> define_transform(new ExpressionDefine("transform", Co<Expression>(new ExpressionTransform())));
   define_transform->addFormal("mesh");
 
@@ -463,6 +469,7 @@ void Environment::prime() {
   add("subtract", Co<ExpressionClosure>(new ExpressionClosure(define_subtract, globals)));
   add("echo", Co<ExpressionClosure>(new ExpressionClosure(define_echo, globals)));
   add("loft", Co<ExpressionClosure>(new ExpressionClosure(define_loft, globals)));
+  add("network", Co<ExpressionClosure>(new ExpressionClosure(define_network, globals)));
   add("transform", Co<ExpressionClosure>(new ExpressionClosure(define_transform, globals)));
   add("coalesce", Co<ExpressionClosure>(new ExpressionClosure(define_coalesce, globals)));
   add("fracture", Co<ExpressionClosure>(new ExpressionClosure(define_fracture, globals)));
@@ -523,6 +530,7 @@ void Environment::prime() {
   globals->add("home", (*this)["home"]);
   globals->add("identity", (*this)["identity"]);
   globals->add("log", (*this)["log"]);
+  globals->add("loft", (*this)["loft"]);
   globals->add("magnitude", (*this)["magnitude"]);
   globals->add("max", (*this)["max"]);
   globals->add("min", (*this)["min"]);
@@ -531,6 +539,7 @@ void Environment::prime() {
   globals->add("moveto", (*this)["moveto"]);
   globals->add("polarto", (*this)["polarto"]);
   globals->add("movex", (*this)["movex"]);
+  globals->add("network", (*this)["network"]);
   globals->add("noise", (*this)["noise"]);
   globals->add("normalize", (*this)["normalize"]);
   globals->add("path", (*this)["path"]);

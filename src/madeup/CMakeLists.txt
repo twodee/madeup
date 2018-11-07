@@ -75,6 +75,7 @@ add_library(madeup
   ExpressionMoveTo.cpp
   ExpressionMultiply.cpp
   ExpressionNegation.cpp
+  ExpressionNetwork.cpp
   ExpressionNodes.cpp
   ExpressionNoise.cpp
   ExpressionNormalize.cpp
