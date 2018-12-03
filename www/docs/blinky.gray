@@ -18,7 +18,7 @@ To get good at Pac-Man, you must get good at moving around in space. And that's 
 
 ## Observe Blinky
 
-There are actually four ghosts in Pac-Man, and they each behave a little differently and are a different color. We will create Blinky, the red ghost. He's the lead, and he's the only ghost that was programmed to actively chase Pac-Man.
+There are actually four ghosts in Pac-Man, and they each behave a little differently and are a different color. We will create Blinky, the red ghost. He's the lead, and he's the only ghost who was programmed to actively chase Pac-Man.
 
 Eventually we are going to write code, but all great works of art start with observation. Let's stare at him for exactly one minute. Trace him with your eyes. Internalize his shape. 
 
