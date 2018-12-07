@@ -185,25 +185,33 @@ function platformPromptForSaveAs(onSuccess) {
   });
 }
 
+function fetchPage(mups, nextPageToken) {
+  return gapi.client.drive.files.list({
+    q: "'" + driveDirectory.id + "' in parents and trashed = false",
+    pageSize: 100,
+    pageToken: nextPageToken,
+    fields: "nextPageToken, files(id, name, modifiedTime)"
+  }).then(function(response) {
+    var files = response.result.files;
+    if (files && files.length > 0) {
+      for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        mups.push(new Mup(file.name, Date.parse(file.modifiedTime), file.id));
+      }
+    }
+
+    if (response.result.nextPageToken) {
+      return fetchPage(mups, response.result.nextPageToken);
+    } else {
+      return mups;
+    }
+  });
+}
+
 function populateMupsList() {
   var promise = null;
   if (isGoogled) {
-    promise = gapi.client.drive.files.list({
-      q: "'" + driveDirectory.id + "' in parents and trashed = false",
-      corpora: 'user',
-      pageSize: 100,
-      fields: "nextPageToken, files(id, name, modifiedTime)"
-    }).then(function(response) {
-      var files = response.result.files;
-      var mups = [];
-      if (files && files.length > 0) {
-        for (var i = 0; i < files.length; i++) {
-          var file = files[i];
-          mups.push(new Mup(file.name, Date.parse(file.modifiedTime), file.id));
-        }
-      }
-      return mups;
-    });
+    promise = fetchPage([], null);
   } else {
     promise = new Promise(function(resolve, reject) {
       var mups = [];
