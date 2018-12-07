@@ -190,7 +190,8 @@ function populateMupsList() {
   if (isGoogled) {
     promise = gapi.client.drive.files.list({
       q: "'" + driveDirectory.id + "' in parents and trashed = false",
-      pageSize: 10,
+      corpora: 'user',
+      pageSize: 100,
       fields: "nextPageToken, files(id, name, modifiedTime)"
     }).then(function(response) {
       var files = response.result.files;
@@ -334,7 +335,10 @@ $(document).ready(function() {
 
 var CLIENT_ID = '1044882582652-7g4d00clc613n2ahn48neumroauv7tu2.apps.googleusercontent.com';
 var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
-var SCOPES = 'https://www.googleapis.com/auth/drive.file';
+var SCOPES = [
+  'https://www.googleapis.com/auth/drive',
+  'https://www.googleapis.com/auth/drive.file',
+].join(' ');
 var isGoogled = false;
 var driveDirectory = null;
 
@@ -378,12 +382,20 @@ function updateGoogleStatus(isConnected) {
 		$('#googleLogin').text('Use local storage');
     $('#archiver').hide();
     $('#storageDrive').prop('checked', true);
-		isGoogled = true;
-		appFolder().then(listGoogleMups);
+		appFolder().then(function(parentDirectory) {
+      isGoogled = true;
+      driveDirectory = parentDirectory;
+      populateMupsList();
+    }, function() {
+      isGoogled = false;
+      updateGoogleStatus(false);
+    });
 	} else {
     // Signing out seems to mean something different than I expect. We want to
     // completely disconnect from Google Drive when we're doing local storage.
-    gapi.auth2.getAuthInstance().disconnect();
+    if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
+      gapi.auth2.getAuthInstance().disconnect();
+    }
 
 		$('#googleLogin').text('Use Google Drive');
     $('#archiver').show();
@@ -391,11 +403,6 @@ function updateGoogleStatus(isConnected) {
 		isGoogled = false;
 		populateMupsList();
 	}
-}
-
-function listGoogleMups(parentDirectory) {
-  driveDirectory = parentDirectory;
-  populateMupsList();
 }
 
 function appFolder() {

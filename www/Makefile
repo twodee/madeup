@@ -1,7 +1,8 @@
 JS = $(addprefix js/,text_to_blocks.js core.js keystrokes.js)
 CSS = $(addprefix css/,ide_skin.css ide_skin_dark.css ide_skin_light.css)
 IMAGES = $(addprefix images/,favicon-16x16.png favicon-32x32.png pathify_icon.png solidify_icon.png fit.png gear.png close.png)
-SRC = forn index.php translate.php save.php snapshot.php interpret.php index.html bridge.js $(JS) $(CSS) $(IMAGES)
+PRIVACY = $(addprefix privacy/,index.html)
+SRC = forn index.php translate.php save.php snapshot.php interpret.php index.html bridge.js $(JS) $(CSS) $(IMAGES) $(PRIVACY)
 DST = $(addprefix $(WWW_ROOT)/, $(SRC))
 DEPS = ace gapi.js three-js jquery.js js-cookie jquery-ui blockly closure-library filesaver jquery_ui_touch_punch mousetrap meshline
 JQUERY_UI_VERSION = 1.12.1
@@ -33,7 +34,7 @@ $(WWW_ROOT)/docs/html $(WWW_ROOT)/docs/html/images:
 $(WWW_ROOT)/docs/html/%: docs/html/%
 	@echo cp -r $< $@
 	cp -r $< $@
-	chmod g+r $@
+	chmod -R g+rX $@
 
 $(DST_BINARIES): $(MADEUP) $(TWODEE) $(MERP)
 	$(SUDO) cp $^ $(WWW_ROOT)
@@ -119,11 +120,15 @@ $(WWW_ROOT)/images:
 	mkdir $@
 	chmod g+rX $@
 
+$(WWW_ROOT)/privacy:
+	mkdir $@
+	chmod g+rX $@
+
 $(WWW_ROOT)/repos:
 	mkdir $@
 	chmod g+rX $@
 
-$(DST): $(WWW_ROOT)/%: % $(WWW_ROOT)/js $(WWW_ROOT)/css $(WWW_ROOT)/images $(WWW_ROOT)/repos
+$(DST): $(WWW_ROOT)/%: % $(WWW_ROOT)/js $(WWW_ROOT)/css $(WWW_ROOT)/images $(WWW_ROOT)/privacy $(WWW_ROOT)/repos
 	echo $(SUDO) cp $* $@
 	$(SUDO) cp $* $@
 	$(SUDO) chmod g+rX $@
