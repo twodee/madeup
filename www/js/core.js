@@ -628,7 +628,7 @@ $(window).on('load', function() {
   platformize();
  
   // Showing gear menu?
-  if (!lesson && settings.has('showGearMenu') && settings.get('showGearMenu')) {
+  if (!lesson && settings.has('showGearMenu') && settings.get('showGearMenu') && !isEmbedded) {
     showGearMenu();
   }
 
