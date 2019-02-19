@@ -3,7 +3,8 @@ var fs = require('fs');
 var Dialogs = require('dialogs');
 var dialogs = Dialogs();
 var screenshot = require('electron-screenshot');
-var fsdialog = require('electron').remote.dialog;
+const { remote, ipcRenderer } = require('electron');
+const { dialog } = remote;
 var LocalStorage = require('node-localstorage').LocalStorage;
 var localStorage = new LocalStorage(require('os').homedir() + '/.madeup');
 
@@ -179,7 +180,7 @@ function platformSave(mup, source, mode, onSuccess) {
 }
 
 function platformPromptForSaveAs(onSuccess) {
-  fsdialog.showSaveDialog({
+  dialog.showSaveDialog({
     title: 'Save as...',
   }, function(path) {
     onSuccess(path);
@@ -223,7 +224,7 @@ function export3D(extension) {
       shading_mode: settings.get('isFlatShaded') ? 'FLAT' : 'SMOOTH'
     }, function(data) {
       console.log(data);
-      fsdialog.showSaveDialog({
+      dialog.showSaveDialog({
         title: 'Save ' + extension.toUpperCase() + ' as...',
         defaultPath: mup.name.replace(/\.[^.]*$/, '') + '.' + extension
       }, function(path) {
@@ -237,9 +238,25 @@ function export3D(extension) {
   };
 }
 
-require('electron').ipcRenderer.on('exportOBJ', export3D('obj'));
-require('electron').ipcRenderer.on('exportSTL', export3D('stl'));
+function onBeforeUnload(e) {
+  if (mup.isDirty) {
+    let options = {
+      type: 'question',
+      buttons: ['Wait', 'Discard Changes'],
+      defaultId: 0,
+      title: 'Confirm',
+      message: 'You have unsaved changes. Discard them?'
+    }
+    let choice = dialog.showMessageBox(remote.getCurrentWindow(), options);
 
-require('electron').ipcRenderer.on('screenshot', function(event, data) {
+    if (choice == 0) {
+      e.returnValue = true;
+    }
+  }
+}
+
+ipcRenderer.on('exportOBJ', export3D('obj'));
+ipcRenderer.on('exportSTL', export3D('stl'));
+ipcRenderer.on('screenshot', function(event, data) {
   exportScreenshot();
 });

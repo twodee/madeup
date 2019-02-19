@@ -430,3 +430,13 @@ function appFolder() {
     }
   });
 }
+
+function onBeforeUnload(e) {
+  if (!isDownloading && mup.isDirty) {
+    var message = 'You have unsaved changes. Throw them away?';
+    e.returnValue = message;
+    return message;
+  } else if (isDownloading) {
+    isDownloading = false;
+  }
+}
