@@ -179,14 +179,6 @@ var onMouseDown = (function() {
   return onMouseDown;
 })();
 
-// Warn on leaving the page if there are unsaved changes. Downloading triggers
-// this, even though we're not leaving the page, so we add a special flag to
-// filter out these events.
-window.addEventListener('beforeunload', function(e) {
-  syncSettings();
-  return onBeforeUnload(e);
-});
-
 THREE.Object3D.prototype.clear = function() {
   var children = this.children;
   for (var i = children.length - 1; i >= 0; --i) {
@@ -2358,4 +2350,8 @@ function docify() {
       }
     });
   });
+}
+
+function onPossibleClose() {
+  return mup.isDirty;
 }

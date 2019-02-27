@@ -431,7 +431,12 @@ function appFolder() {
   });
 }
 
-function onBeforeUnload(e) {
+// Warn on leaving the page if there are unsaved changes. Downloading triggers
+// this, even though we're not leaving the page, so we add a special flag to
+// filter out these events.
+window.addEventListener('beforeunload', function(e) {
+  syncSettings();
+
   if (!isDownloading && mup.isDirty) {
     var message = 'You have unsaved changes. Throw them away?';
     e.returnValue = message;
@@ -439,4 +444,4 @@ function onBeforeUnload(e) {
   } else if (isDownloading) {
     isDownloading = false;
   }
-}
+});
