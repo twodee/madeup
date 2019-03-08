@@ -966,6 +966,11 @@ $(window).on('load', function() {
     focusEditor();
   });
 
+  $('#privacy').click(function() {
+    window.open('privacy', '_blank');
+    focusEditor();
+  });
+
   $('#magic').click(function() {
     var source = getSource();
     sendToChris(source);
