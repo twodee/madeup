@@ -179,19 +179,6 @@ var onMouseDown = (function() {
   return onMouseDown;
 })();
 
-// Warn on leaving the page if there are unsaved changes. Downloading triggers
-// this, even though we're not leaving the page, so we add a special flag to
-// filter out these events.
-window.addEventListener('beforeunload', function(e) {
-  if (!isDownloading && mup.isDirty && needsUnsavedPrompt()) {
-    var message = 'You have unsaved changes. Throw them away?';
-    e.returnValue = message;
-    return message;
-  } else if (isDownloading) {
-    isDownloading = false;
-  }
-});
-
 THREE.Object3D.prototype.clear = function() {
   var children = this.children;
   for (var i = children.length - 1; i >= 0; --i) {
@@ -618,12 +605,12 @@ $(window).on('load', function() {
   });
 
   // Only save cookies if they were successfully loaded.
-  $(window).on('unload', function() {
-    syncSettings();
-    if (mup.isDirty && confirm('Save changes to ' + mup.name + ' before leaving?')) {
-      save();
-    }
-  });
+  // $(window).on('beforeunload', function() {
+    // syncSettings();
+    // if (mup.isDirty && confirm('Save changes to ' + mup.name + ' before leaving?')) {
+      // save();
+    // }
+  // });
 
   platformize();
  
@@ -1577,7 +1564,7 @@ function load(newMup) {
       // Wipe away variables that aren't in use. Blockly used to do this
       // automatically. We only do this on load, as removing variables during a
       // coding session can lead to unwanted surprises.
-      blocklyWorkspace.updateVariableStore(true);
+      // blocklyWorkspace.updateVariableStore(true);
 
       // But the builtin variables should always be around.
       ensureBuiltinVariables();
@@ -2368,4 +2355,8 @@ function docify() {
       }
     });
   });
+}
+
+function onPossibleClose() {
+  return mup.isDirty;
 }

@@ -185,8 +185,10 @@ function parse(peeker, workspace) {
           connectExpression(block, 'ARG' + formalToPosition[formal], actual);
         }
       } else {
+        var variable = workspace.createVariable(id);
+        console.log("id:", id);
         block = workspace.newBlock('variables_get');
-        block.setFieldValue(id, 'VAR');
+        block.setFieldValue(variable.getId(), 'VAR');
       }
     }
   }
@@ -262,8 +264,9 @@ function parse(peeker, workspace) {
           ++i;
         }
       } else {
+        var variable = workspace.createVariable(id);
         block = workspace.newBlock('variables_get');
-        block.setFieldValue(id, 'VAR');
+        block.setFieldValue(variable.getId(), 'VAR');
       }
     }
   }
@@ -476,8 +479,9 @@ function parse(peeker, workspace) {
         connectExpression(block, 'ARG0', b);
       }
     } else { // foo - a
+      var variable = workspace.createVariable(id);
       var a = workspace.newBlock('variables_get');
-      a.setFieldValue(id, 'VAR');
+      a.setFieldValue(variable.getId(), 'VAR');
       a.initSvg();
       a.render();
 
@@ -526,6 +530,9 @@ function parse(peeker, workspace) {
         console.error('Default parameters not supported in blocks yet.');
       }
       peeker.get(); // eat )
+      if (peeker.peek() == ' ') {
+        peeker.get(); // eat space
+      }
     }
     peeker.get(); // eat )
     peeker.get(); // eat space
@@ -541,8 +548,9 @@ function parse(peeker, workspace) {
     peeker.get(); // eat space
     var rhs = parse(peeker, workspace);
 
+    var variable = workspace.createVariable(id);
     block = workspace.newBlock('variables_set');
-    block.setFieldValue(id, 'VAR');
+    block.setFieldValue(variable.getId(), 'VAR');
     connectExpression(block, 'VALUE', rhs);
   }
 

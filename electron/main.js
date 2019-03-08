@@ -43,14 +43,40 @@ function createWindow(mup) {
     });
   }
 
-  frame.on('close', () => {
+  frame.on('close', e => {
     let size = frame.getSize();
     localStorage.setItem('window_width', size[0]);
     localStorage.setItem('window_height', size[1]);
     localStorage.setItem('show_tools', frame.webContents.isDevToolsOpened() ? 1 : 0);
+
+    e.preventDefault();
+    checkDirty(frame, () => {
+      frame.destroy();
+    });
   });
 
   return frame;
+}
+
+function checkDirty(browser, onDiscard) {
+  browser.webContents.executeJavaScript('onPossibleClose()').then(isDirty => {
+    if (isDirty) {
+      let options = {
+        type: 'question',
+        cancelId: 1,
+        defaultId: 0,
+        buttons: ['Wait', 'Discard Changes'],
+        title: 'Confirm',
+        message: 'You have unsaved changes. Discard them?',
+      };
+      let choice = dialog.showMessageBox(browser, options);
+      if (choice == 1) {
+        onDiscard();
+      }
+    } else {
+      onDiscard();
+    }
+  });
 }
 
 app.on('ready', function() {
@@ -142,8 +168,20 @@ app.on('ready', function() {
 		{
 			label: 'View',
 			submenu: [
-				{role: 'reload'},
-				{role: 'forcereload'},
+        {
+          label: 'Reload',
+          accelerator: 'CommandOrControl+R',
+          click(item, focusedWindow) {
+            checkDirty(focusedWindow, () => focusedWindow.reload());
+          },
+        },
+        {
+          label: 'Force Reload',
+          accelerator: 'CommandOrControl+Shift+R',
+          click(item, focusedWindow) {
+            checkDirty(focusedWindow, () => focusedWindow.webContents.reloadIgnoringCache());
+          },
+        },
 				{role: 'toggledevtools'},
 				{type: 'separator'},
 				{role: 'resetzoom'},
