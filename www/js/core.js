@@ -498,10 +498,6 @@ $(window).on('load', function() {
     }
   });
 
-  if (isEmbedded) {
-    $('#breakout').show();
-  }
-
   // Preloads are forced to be text for the time being.
   if (source0) {
     settings.set('isEditorText', true);
@@ -973,13 +969,6 @@ $(window).on('load', function() {
     syncSettings();
     run(getSource(), GeometryMode.PATH);
     focusEditor();
-  });
-
-  $('#breakout').click(function() {
-    // I tried using $.post for this, but the new window didn't show
-    // the source or URL correctly.
-    $('#breakout-form input[name=src]').val(getSource());
-    $('#breakout-form').submit();
   });
 
   // This isn't UFW. jQuery will send a parameter to the callback. I
