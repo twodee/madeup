@@ -377,7 +377,6 @@ $(window).on('load', function() {
     document.body.addEventListener('wheel', function (e) {
       e.preventDefault();
     });
-    // TODO: confirm that this works as intended.
   }
 
   configureDownloader();
