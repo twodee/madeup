@@ -15,7 +15,7 @@
     "build-linux": "electron-packager . madeup --overwrite --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=builds"
   },
   "devDependencies": {
-    "electron": "^1.6.8",
+    "electron": "^15.5.5",
     "electron-packager": ">=8.7.0"
   },
   "dependencies": {
