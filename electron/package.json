@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "electron": "^1.6.8",
-    "electron-packager": ">=8.7.0"
+    "electron-packager": ">=16.0.0"
   },
   "dependencies": {
     "dialogs": ">=1.1.19",
